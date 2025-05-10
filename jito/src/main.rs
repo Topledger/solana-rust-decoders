@@ -15,7 +15,7 @@ fn str_to_pubkey(s: &str) -> anyhow::Result<Pubkey> {
 
 fn main() -> Result<()> {
     // decode the 8-byte discriminator + Borsh args in one go:
-    let data_base58 = "Cc9CdHiv1Kc";
+    let data_base58 = "2tyLmy4hrs3LECniL4Wd9PGgdNv8tSDT6zk2HCBc74p3PHAwmLLGr5JsCTQ38ZhhHDgNSUzrju9bD";
     let data = decode(data_base58).into_vec()?;
     let accounts = ["94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB", 
                                 "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB", 
