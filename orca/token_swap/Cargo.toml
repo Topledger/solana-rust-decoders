@@ -1,0 +1,17 @@
+[package]
+name = "token_swap"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "token_swap"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+bs58                     = "0.5"   # base58 decode
+borsh                    = "0.10"  # Borsh (de)serialization
+anyhow                   = "1.0"   # ergonomic error handling
+serde                    = { version = "1.0", features = ["derive"] }
+serde-wasm-bindgen       = "0.5"   # serde ↔ Wasm bindings
+wasm-bindgen             = { version = "0.2", features = ["serde-serialize"] }
+console_error_panic_hook = "0.1"   # nicer panic messages in Wasm
