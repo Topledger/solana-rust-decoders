@@ -8,39 +8,21 @@
 
 <body>
   <script type="module">
-    import init, { parse } from "./pkg/token_swap.js";
+    import init, { parse } from "./pkg/orca_token_swap.js";
     init().then(() => {
       let join_key = "5kkPihtAaNhVHmAShzyRw3vg3dQFAiEA888BmvTHU3v8nRCKQSp4j52EVapC6QRyLivuWmPWvVx9NBBShLdcMqMp_0_1";
-      let data = "vrm9sPLaCSy1pDKDsmfffV";
+      let data = "22otxS2ubtf29WH1PiyDVSm1hc71MP2f3m";
       let accounts = [
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+      "ErWwp9HKjk5ZPLDt8SrHKH5PvSKTwFDdFo5E3zDuE5Be",
+        "GYY1t5d4pZnJC4rMXGY9yKMyCzLqxRqbtSguD2KkxghH",
+        "bobCPc5nqVoX7r8gKzCMPLrKjFidjnSCrAdcYGCH2Ye",
+        "GzfnnG9ghu4BFDvXk8EmYVNmPF5i5tBRve4FczmmDqRk",
+        "Bi95f8H7o7zHWuYysxDHEubPv4c3NhsHWhaesXJu91NC",
+        "GEtZSc8188t2cCAv21UGCyjvxCeyU5Co99GtRtyTkpdh",
+        "iSRGgDVAwoACAARHYMJSzCw9fhv56bwE9cQYeF2z9XD",
+        "GBijunwxa4Ni3JmYC6q6zgaVhSUJU6hVX5qTyJDRpNTc",
+        "6NhybmW42rdWj5TcobNKQT6JaZispgngcfTDrCsgVq4Q",
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
     ];
       console.log(parse(data, accounts));
     });
