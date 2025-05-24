@@ -1,23 +1,18 @@
-use anyhow::Result;
-use borsh::BorshDeserialize;
-use bs58::decode;
-include!("idl.rs");
-use anchor_lang::prelude::Pubkey;
-use std::str::FromStr;
+<!doctype html>
+<html lang="en-US">
 
-fn str_to_pubkey(s: &str) -> anyhow::Result<Pubkey> {
-    // FromStr is implemented for Pubkey, and errors if the string
-    // isn’t valid Base58 or isn’t 32 bytes.
-    let pk = Pubkey::from_str(s)
-        .map_err(|e| anyhow::anyhow!("Invalid pubkey string {}: {}", s, e))?;
-    Ok(pk)
-}
+<head>
+  <meta charset="utf-8" />
+  <title>hello-wasm example</title>
+</head>
 
-fn main() -> Result<()> {
-    // decode the 8-byte discriminator + Borsh args in one go:
-    let data_base58 = "2tyLmy4hrs3LECniL4Wd9PGgdNv8tSDT6zk2HCBc74p3PHAwmLLGr5JsCTQ38ZhhHDgNSUzrju9bD";
-    let data = decode(data_base58).into_vec()?;
-    let accounts = ["94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB", 
+<body>
+  <script type="module">
+    import init, { parse } from "./pkg/tips_distribution.js";
+    init().then(() => {
+      let join_key = "5kkPihtAaNhVHmAShzyRw3vg3dQFAiEA888BmvTHU3v8nRCKQSp4j52EVapC6QRyLivuWmPWvVx9NBBShLdcMqMp_0_1";
+      let data = "Uko38CQxZ2tKSgUCgKQdaUFQEa7FjvieibbX4W7kV1HotjwojWYSdDYa68gLiVWsZv63uZgogCLyzhewjjJNPxZAUknoS1oqvtj18yGMsjGnBNVUi";
+      let accounts = ["94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB", 
                                 "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB", 
                                 "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
                                 "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
@@ -33,13 +28,9 @@ fn main() -> Result<()> {
                                 "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
                                 "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
                                 "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB"];
-    let pubkeys: Result<Vec<Pubkey>> = accounts
-    .iter()
-    .map(|s| str_to_pubkey(s))
-    .collect();
-let pubkeys = pubkeys?;
-    let ix = Instruction::decode(&pubkeys, &data)?;
-    println!("{:#?}", ix);
+      console.log(parse(data, accounts));
+    });
+  </script>
+</body>
 
-    Ok(())
-}
+</html>

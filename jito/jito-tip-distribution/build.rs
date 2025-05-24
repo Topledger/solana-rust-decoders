@@ -47,7 +47,7 @@ fn main() -> Result<()> {
             quote! { pub #f: #ty_ts, }
         });
         args_structs.push(quote! {
-            #[derive(::borsh::BorshDeserialize, Debug)]
+            #[derive(::borsh::BorshDeserialize, Debug, Serialize)]
             pub struct #args_ty { #(#fields)* }
         });
 
@@ -55,13 +55,13 @@ fn main() -> Result<()> {
         let flat_accounts = flatten_accounts(&ix.accounts);
         let acc_fields = flat_accounts.iter().map(|acc| {
             let f = format_ident!("{}", &acc.name);
-            quote! { pub #f: anchor_lang::prelude::Pubkey, }
+            quote! { pub #f: String, }
         });
         accounts_structs.push(quote! {
-            #[derive(Debug)]
+            #[derive(Debug, Serialize)]
             pub struct #accounts_ty {
                 #(#acc_fields)*
-                pub remaining: Vec<anchor_lang::prelude::Pubkey>,
+                pub remaining: Vec<String>,
             }
         });
 
@@ -69,8 +69,7 @@ fn main() -> Result<()> {
         let acc_idents: Vec<_> = flat_accounts.iter().map(|acc| format_ident!("{}", &acc.name)).collect();
         let extract_accounts = acc_idents.iter().map(|ident| {
             quote! {
-                let #ident = *keys.next()
-                    .ok_or_else(|| anyhow::anyhow!(concat!("Missing account: ", stringify!(#ident))))?;
+                let #ident = keys.next().unwrap().clone();
             }
         });
 
@@ -98,7 +97,8 @@ fn main() -> Result<()> {
         quote! { #var { accounts: #accounts_ty, args: #args_ty }, }
     });
     let decoded_enum = quote! {
-        #[derive(Debug)]
+        #[derive(Debug, Serialize)]
+        #[serde(tag = "instruction_type")]
         pub enum Instruction { #(#variants)* }
     };
 
@@ -106,7 +106,7 @@ fn main() -> Result<()> {
     let decode_impl = quote! {
         impl Instruction {
             pub fn decode(
-                account_keys: &[anchor_lang::prelude::Pubkey],
+                account_keys: &[String],
                 data: &[u8],
             ) -> anyhow::Result<Self> {
                 if data.len() < 8 {
@@ -122,6 +122,30 @@ fn main() -> Result<()> {
         }
     };
 
+    let mut file = syn::parse2::<syn::File>(typedefs_ts)?;
+
+    for item in &mut file.items {
+
+        if let syn::Item::Struct(s) = item {
+
+            // prepend a #[derive(Serialize, Deserialize)] attr
+
+            let derive_attr: syn::Attribute = syn::parse_quote!(
+
+                #[derive(Serialize)]
+
+            );
+
+            s.attrs.insert(0, derive_attr);
+
+        }
+
+    }
+
+    // then turn `file` back into tokens:
+
+    let typedefs_with_serde = quote! { #file };
+
     // 2) generate typedefs
 
 
@@ -132,7 +156,6 @@ fn main() -> Result<()> {
 
         // for splitting slices and converting sizes
         use std::convert::TryInto;
-        use std::mem;
 
         // re-export
         pub use ix_data::*;
@@ -141,15 +164,18 @@ fn main() -> Result<()> {
 
         pub mod typedefs {
             use anchor_lang::prelude::*;
-            #typedefs_ts
+            use serde::Serialize;
+            #typedefs_with_serde
         }
 
         pub mod accounts_data {
+            use serde::Serialize;
             #(#accounts_structs)*
         }
 
         pub mod ix_data {
             use super::*;
+            use serde::Serialize;
             #(#args_structs)*
         }
 
@@ -178,7 +204,7 @@ fn map_idl_type(ty: &IdlType) -> proc_macro2::TokenStream {
         IdlType::I128 => quote! { i128 },
         IdlType::Bytes => quote! { Vec<u8> },
         IdlType::String => quote! { String },
-        IdlType::Pubkey => quote! { anchor_lang::prelude::Pubkey },
+        IdlType::Pubkey => quote! { String },
         IdlType::Vec(inner) => {
             let inner_ts = map_idl_type(inner);
             quote! { Vec<#inner_ts> }
