@@ -1,13 +1,13 @@
-use bs58::decode;
 use borsh::BorshDeserialize;
+use bs58::decode;
 use serde::Serialize;
 mod pubkey_serializer;
 include!("idl.rs");
 
-use serde_wasm_bindgen::{to_value, from_value};
+use console_error_panic_hook;
+use serde_wasm_bindgen::{from_value, to_value};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsValue;
-use console_error_panic_hook;
 
 // A simple struct to serialize errors back into JS
 #[derive(Serialize)]
@@ -26,7 +26,9 @@ pub fn parse(base58_str: &str, accounts_js: JsValue) -> JsValue {
     let decoded = match decode(base58_str).into_vec() {
         Ok(b) => b,
         Err(e) => {
-            let err = ErrorObj { error: format!("base58 decode failed: {}", e) };
+            let err = ErrorObj {
+                error: format!("base58 decode failed: {}", e),
+            };
             return to_value(&err).unwrap();
         }
     };
@@ -34,12 +36,18 @@ pub fn parse(base58_str: &str, accounts_js: JsValue) -> JsValue {
     // 2) Is it an Anchor‐logged event?
     if decoded.len() >= 8 && &decoded[..8] == &events::EVENT_LOG_DISCRIMINATOR {
         match events::Event::decode(&decoded) {
-            Ok(ev) => return to_value(&ev).unwrap_or_else(|e| {
-                let err = ErrorObj { error: format!("event serialize failed: {}", e) };
-                to_value(&err).unwrap()
-            }),
+            Ok(ev) => {
+                return to_value(&ev).unwrap_or_else(|e| {
+                    let err = ErrorObj {
+                        error: format!("event serialize failed: {}", e),
+                    };
+                    to_value(&err).unwrap()
+                })
+            }
             Err(e) => {
-                let err = ErrorObj { error: format!("Event decode failed: {}", e) };
+                let err = ErrorObj {
+                    error: format!("Event decode failed: {}", e),
+                };
                 return to_value(&err).unwrap();
             }
         }
@@ -49,18 +57,24 @@ pub fn parse(base58_str: &str, accounts_js: JsValue) -> JsValue {
     let accounts: Vec<String> = match from_value(accounts_js) {
         Ok(v) => v,
         Err(e) => {
-            let err = ErrorObj { error: format!("accounts deserialize failed: {}", e) };
+            let err = ErrorObj {
+                error: format!("accounts deserialize failed: {}", e),
+            };
             return to_value(&err).unwrap();
         }
     };
 
     match Instruction::decode(&accounts, &decoded) {
         Ok(ix) => to_value(&ix).unwrap_or_else(|e| {
-            let err = ErrorObj { error: format!("serialize failed: {}", e) };
+            let err = ErrorObj {
+                error: format!("serialize failed: {}", e),
+            };
             to_value(&err).unwrap()
         }),
         Err(e) => {
-            let err = ErrorObj { error: format!("Instruction::decode failed: {}", e) };
+            let err = ErrorObj {
+                error: format!("Instruction::decode failed: {}", e),
+            };
             to_value(&err).unwrap()
         }
     }

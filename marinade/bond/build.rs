@@ -1,7 +1,7 @@
 // build.rs
 
+use anchor_idl::{EnumFields, GeneratorOptions, Idl, IdlAccountItem, IdlTypeDefinitionTy};
 use anyhow::Result;
-use anchor_idl::{GeneratorOptions, Idl, IdlAccountItem, EnumFields, IdlTypeDefinitionTy};
 use heck::{ToSnakeCase, ToUpperCamelCase};
 use quote::{format_ident, quote};
 use serde_json::from_str;
@@ -39,32 +39,35 @@ fn main() -> Result<()> {
                 // Enums: support unit, named and tuple variants
                 IdlTypeDefinitionTy::Enum { variants } => {
                     // Build each variant’s definition
-                    let variant_defs = variants.iter().map(|v| {
-                        let v_ident = format_ident!("{}", v.name.to_upper_camel_case());
-                        match &v.fields {
-                            None => {
-                                // unit variant
-                                quote! { #v_ident, }
+                    let variant_defs = variants
+                        .iter()
+                        .map(|v| {
+                            let v_ident = format_ident!("{}", v.name.to_upper_camel_case());
+                            match &v.fields {
+                                None => {
+                                    // unit variant
+                                    quote! { #v_ident, }
+                                }
+                                Some(EnumFields::Named(fields)) => {
+                                    // named‐field variant
+                                    let named = fields.iter().map(|f| {
+                                        let f_ident = format_ident!("{}", f.name.to_snake_case());
+                                        let ty_ts = map_idl_type(&f.ty);
+                                        quote! { #f_ident: #ty_ts, }
+                                    });
+                                    quote! { #v_ident { #(#named)* }, }
+                                }
+                                Some(EnumFields::Tuple(types)) => {
+                                    // tuple‐field variant
+                                    let tuple = types.iter().map(|t| {
+                                        let ty_ts = map_idl_type(t);
+                                        quote! { #ty_ts, }
+                                    });
+                                    quote! { #v_ident( #(#tuple)* ), }
+                                }
                             }
-                            Some(EnumFields::Named(fields)) => {
-                                // named‐field variant
-                                let named = fields.iter().map(|f| {
-                                    let f_ident = format_ident!("{}", f.name.to_snake_case());
-                                    let ty_ts = map_idl_type(&f.ty);
-                                    quote! { #f_ident: #ty_ts, }
-                                });
-                                quote! { #v_ident { #(#named)* }, }
-                            }
-                            Some(EnumFields::Tuple(types)) => {
-                                // tuple‐field variant
-                                let tuple = types.iter().map(|t| {
-                                    let ty_ts = map_idl_type(t);
-                                    quote! { #ty_ts, }
-                                });
-                                quote! { #v_ident( #(#tuple)* ), }
-                            }
-                        }
-                    }).collect::<Vec<_>>();
+                        })
+                        .collect::<Vec<_>>();
 
                     // Pick the first variant as default
                     let default_ident = format_ident!("{}", variants[0].name.to_upper_camel_case());
@@ -111,7 +114,7 @@ fn main() -> Result<()> {
         let args_fields = ix.args.iter().map(|arg| {
             let field_ident = format_ident!("{}", arg.name.to_snake_case());
             let ty = map_idl_type(&arg.ty);
-             // check for U64 / U128
+            // check for U64 / U128
             let field_tokens = match &arg.ty {
                 anchor_idl::IdlType::U64 | anchor_idl::IdlType::U128 => {
                     quote! {
@@ -150,7 +153,10 @@ fn main() -> Result<()> {
         });
 
         // 3d) decoder arm
-        let idents = flat.iter().map(|acc| format_ident!("{}", acc.name)).collect::<Vec<_>>();
+        let idents = flat
+            .iter()
+            .map(|acc| format_ident!("{}", acc.name))
+            .collect::<Vec<_>>();
         let extract = idents.iter().map(|id| {
             quote! {
                 let #id = keys.next().unwrap().clone();
@@ -207,7 +213,7 @@ fn main() -> Result<()> {
 
     // 1) prepare vectors for the generated structs & match arms
     let mut event_structs = Vec::new();
-    let mut event_arms    = Vec::new();
+    let mut event_arms = Vec::new();
 
     // 2) iterate only if the IDL actually has events
     if let Some(events) = &idl.events {
@@ -217,7 +223,7 @@ fn main() -> Result<()> {
             let mut fields = Vec::new();
             for f in &ev.fields {
                 let fld = format_ident!("{}", f.name.to_snake_case());
-            
+
                 // pick the right tokens based on your IDL type
                 let field_tokens = match &f.ty {
                     // plain PublicKey → [u8;32] + base58 serde
@@ -228,7 +234,9 @@ fn main() -> Result<()> {
                         }
                     }
                     // Option<PublicKey> → Option<[u8;32]> + its serde
-                    anchor_idl::IdlType::Option(inner) if matches!(inner.as_ref(), &anchor_idl::IdlType::PublicKey) => {
+                    anchor_idl::IdlType::Option(inner)
+                        if matches!(inner.as_ref(), &anchor_idl::IdlType::PublicKey) =>
+                    {
                         quote! {
                             #[serde(with = "pubkey_serde_option")]
                             pub #fld: Option<[u8; 32usize]>,
@@ -242,7 +250,7 @@ fn main() -> Result<()> {
                         }
                     }
                 };
-            
+
                 fields.push(field_tokens);
             }
 
@@ -259,7 +267,7 @@ fn main() -> Result<()> {
             hasher.update(b"event:");
             hasher.update(ev.name.as_bytes());
             let hash = hasher.finalize();
-            let disc: [u8;8] = hash[0..8].try_into().unwrap();
+            let disc: [u8; 8] = hash[0..8].try_into().unwrap();
             let disc_tokens = disc.iter().map(|b| quote! { #b }).collect::<Vec<_>>();
 
             // D) push the match‐arm for this event
@@ -275,15 +283,10 @@ fn main() -> Result<()> {
 
     // 3) build the Event enum if we saw any structs
     let decoded_events = if !event_structs.is_empty() {
-        let variants = idl
-            .events
-            .as_ref()
-            .unwrap()
-            .iter()
-            .map(|ev| {
-                let pascal = format_ident!("{}", ev.name.to_upper_camel_case());
-                quote! { #pascal{ args: #pascal}, }
-            });
+        let variants = idl.events.as_ref().unwrap().iter().map(|ev| {
+            let pascal = format_ident!("{}", ev.name.to_upper_camel_case());
+            quote! { #pascal{ args: #pascal}, }
+        });
         Some(quote! {
             #[derive(Debug, Serialize)]
             #[serde(tag = "event_type")]
@@ -334,8 +337,7 @@ fn main() -> Result<()> {
     } else {
         None
     };
-    
-    
+
     // 6) write out
     let out = quote! {
         // @generated by build.rs — DO NOT EDIT
@@ -382,9 +384,9 @@ fn main() -> Result<()> {
             use super::*;
             use ::borsh::BorshDeserialize;
             use serde::Serialize;
-    
+
             #(#event_structs)*
-    
+
             #decoded_events
             #event_decode_impl
         }
