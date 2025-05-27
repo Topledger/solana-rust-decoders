@@ -1,7 +1,7 @@
 pub mod pubkey_serde {
-    use serde::{Serializer, Deserializer, Deserialize};
-    use serde::de::Error as DeError;
     use bs58;
+    use serde::de::Error as DeError;
+    use serde::{Deserialize, Deserializer, Serializer};
 
     // serialize &[u8;32] as a base58 &str
     pub fn serialize<S>(bytes: &[u8; 32], serializer: S) -> Result<S::Ok, S::Error>
@@ -18,9 +18,7 @@ pub mod pubkey_serde {
         D: Deserializer<'de>,
     {
         let s = String::deserialize(deserializer)?;
-        let vec = bs58::decode(&s)
-            .into_vec()
-            .map_err(DeError::custom)?;
+        let vec = bs58::decode(&s).into_vec().map_err(DeError::custom)?;
         if vec.len() != 32 {
             return Err(DeError::invalid_length(vec.len(), &"expected 32 bytes"));
         }
@@ -32,8 +30,8 @@ pub mod pubkey_serde {
 
 pub mod pubkey_serde_option {
     use super::pubkey_serde;
-    use serde::{Serializer, Deserializer, Deserialize};
     use serde::de::Error as DeError;
+    use serde::{Deserialize, Deserializer, Serializer};
 
     pub fn serialize<S>(opt: &Option<[u8; 32]>, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -63,4 +61,3 @@ pub mod pubkey_serde_option {
         }
     }
 }
-
