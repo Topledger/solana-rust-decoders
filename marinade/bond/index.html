@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en-US">
+
+<head>
+  <meta charset="utf-8" />
+  <title>hello-wasm example</title>
+</head>
+
+<body>
+  <script type="module">
+    import init, { parse } from "./pkg/bond.js";
+    init().then(() => {
+      let join_key = "5kkPihtAaNhVHmAShzyRw3vg3dQFAiEA888BmvTHU3v8nRCKQSp4j52EVapC6QRyLivuWmPWvVx9NBBShLdcMqMp_0_1";
+      let data = "3ck7szVsdFfRnzkph2Ke82enmbZLXxf4HvSoc2nJ1MgvNqooCHUBkgUvTqaMQFqDtQiHZSMz3W6TRFnFMDf8DrHXXKsS5cxKAFWTDsgq165yCoBJsvNGgHdkLPJFG4oVTNPvvfsZdQM3MN2PX5MYMrm7EqMuuNZTQxtHs3fZRXMawPv2VWHw91qAbjeRRJ95XjpRBj7TPjkFhaXnmav8kgFfxKwxLPNkQVyJwy8YjiqoDAWTxRTfivwzYbd5WbucABg184TuKCNKnr1Yawt1pwBdAWqbqL5o6ijadwVUfvGMtFfMdnzzqKPiAySofuVgdDqc3G2aFrFqUkhPbcJcxtYhgpunEXqgkYBTMN54wbbd";
+      let accounts = ["9JhW5CsHqKTBuEQGpXxA7GEGnptNtUTU85KkPGsGTxcF", 
+                      "9JhW5CsHqKTBuEQGpXxA7GEGnptNtUTU85KkPGsGTxcF", 
+                      "HUr6Pia4cByKPgD4EAzdDfcqsvmnWT6dPjm2UroTyo7z", 
+                      "5c7XvvD4RLeYjXsiGb2pXxArrxHnjM3EsawQtFGPy15r", 
+                      "8YRzZkmcJWDtXEwQYWFfNknZEobBFwp7s5vw8ZTjUfNY",
+                      "HUr6Pia4cByKPgD4EAzdDfcqsvmnWT6dPjm2UroTyo7z", 
+                      "5c7XvvD4RLeYjXsiGb2pXxArrxHnjM3EsawQtFGPy15r", 
+                      "8YRzZkmcJWDtXEwQYWFfNknZEobBFwp7s5vw8ZTjUfNY", 
+                      "HUr6Pia4cByKPgD4EAzdDfcqsvmnWT6dPjm2UroTyo7z", 
+                      "5c7XvvD4RLeYjXsiGb2pXxArrxHnjM3EsawQtFGPy15r", 
+                      "8YRzZkmcJWDtXEwQYWFfNknZEobBFwp7s5vw8ZTjUfNY",  
+                      "HUr6Pia4cByKPgD4EAzdDfcqsvmnWT6dPjm2UroTyo7z", 
+                      "5c7XvvD4RLeYjXsiGb2pXxArrxHnjM3EsawQtFGPy15r", 
+                      "8YRzZkmcJWDtXEwQYWFfNknZEobBFwp7s5vw8ZTjUfNY", 
+                      "HUr6Pia4cByKPgD4EAzdDfcqsvmnWT6dPjm2UroTyo7z", 
+                      "5c7XvvD4RLeYjXsiGb2pXxArrxHnjM3EsawQtFGPy15r", 
+                      "8YRzZkmcJWDtXEwQYWFfNknZEobBFwp7s5vw8ZTjUfNY",  
+                      "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"];
+      console.log(parse(data, accounts));
+    });
+  </script>
+</body>
+
+</html>
