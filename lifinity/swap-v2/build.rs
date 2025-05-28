@@ -11,7 +11,7 @@ use std::{fs, process::Command};
 
 
 fn main() -> Result<()> {
-    let path = "idls/jito_tip_payment.json";
+    let path = "idls/lifinity_swap_v2.json";
     // 1) load the IDL JSON
     let idl_json = fs::read_to_string(path)?;
     let idl: Idl = from_str(&idl_json)?;
