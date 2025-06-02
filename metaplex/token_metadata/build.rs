@@ -77,8 +77,30 @@ fn main() -> Result<()> {
                                     // named‐field variant
                                     let named = fields.iter().map(|f| {
                                         let f_ident = format_ident!("{}", f.name.to_snake_case());
-                                        let ty_ts = map_idl_type(&f.ty);
-                                        quote! { #f_ident: #ty_ts, }
+                                        match &f.ty {
+                                            // a bare PublicKey
+                                            anchor_idl::IdlType::PublicKey => {
+                                                quote! {
+                                                    #[serde(with = "pubkey_serde")]
+                                                     #f_ident: [u8; 32usize],
+                                                }
+                                            }
+                                            // Option<PublicKey>
+                                            anchor_idl::IdlType::Option(inner)
+                                                if matches!(**inner, anchor_idl::IdlType::PublicKey) =>
+                                            {
+                                                quote! {
+                                                    #[serde(with = "pubkey_serde_option")]
+                                                    #f_ident: Option<[u8; 32usize]>,
+                                                }
+                                            }
+                                            // everything else
+                                            _ => {
+                                                let ty = map_idl_type(&f.ty);
+                                                quote! { #f_ident: #ty, }
+                                            }
+                                        }
+                                        
                                     });
                                     quote! { #v_ident { #(#named)* }, }
                                 }
@@ -398,12 +420,16 @@ fn main() -> Result<()> {
 
         pub mod accounts_data {
             use serde::Serialize;
+            use crate::pubkey_serializer::pubkey_serde;
+            use crate::pubkey_serializer::pubkey_serde_option;
             #(#accounts_structs)*
         }
 
         pub mod ix_data {
             use serde::Serialize;
             use super::*;
+            use crate::pubkey_serializer::pubkey_serde;
+            use crate::pubkey_serializer::pubkey_serde_option;
             #(#args_structs)*
         }
 
