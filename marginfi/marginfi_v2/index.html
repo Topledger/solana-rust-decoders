@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en-US">
+
+<head>
+  <meta charset="utf-8" />
+  <title>hello-wasm example</title>
+</head>
+
+<body>
+  <script type="module">
+    import init, { parse } from "./pkg/v2.js";
+    init().then(() => {
+      let join_key = "5kkPihtAaNhVHmAShzyRw3vg3dQFAiEA888BmvTHU3v8nRCKQSp4j52EVapC6QRyLivuWmPWvVx9NBBShLdcMqMp_0_1";
+      let data = "3PvEej4MvNYWo4Su9qKYnjZDaxgyn7Goy2uD8SqruTzxjmZpoZs2Ud6QbChkYABWB8z7Ht9seTJ5E4UNSzmEGtskM82kZvpmwHv8V2SuD4HqV4ECGySk2wYLW35xx3EMUtFTgxfjKRWuC2SshXvej1oMhTBRGS9WMAu8vK2VxTV65CdmqMzQ3kFWzmu77aKkbB9PorE6A96hfTmmtuoorv1E4EDytmvQ1KKdC2jo93euSNSa4BQMqin318Bwxqik93us8fLARBobLyifuaNbxLeDDKRbyjWme3cJeWscwD8aDWY2aEhtnqnuyqwUXjVDAYUUb5xFfc9FP2n6qQFnH85MuR";
+      let accounts = ["94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB", 
+                                "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB", 
+                                "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+                                "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+                                "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+                                "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+                                "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+                                "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+                                "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+                                "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+                                "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+                                "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+                                "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+                                "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+                                "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+                                "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB"];
+      console.log(parse(data, accounts));
+    });
+  </script>
+</body>
+
+</html>
