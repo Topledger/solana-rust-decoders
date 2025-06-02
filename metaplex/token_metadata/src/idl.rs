@@ -26,6 +26,10 @@ pub mod typedefs {
         pub max_supply: Option<u64>,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct MintPrintingTokensViaTokenArgs {
+        pub supply: u64,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct MintNewEditionFromMasterEditionViaTokenArgs {
         pub edition: u64,
     }
@@ -176,6 +180,7 @@ pub mod typedefs {
         },
         LockedTransferV1 {
             amount: u64,
+            #[serde(with = "pubkey_serde")]
             locked_address: [u8; 32usize],
             authorization_data: Option<AuthorizationData>,
         },
@@ -256,6 +261,7 @@ pub mod typedefs {
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub enum UpdateArgs {
         V1 {
+            #[serde(with = "pubkey_serde_option")]
             new_update_authority: Option<[u8; 32usize]>,
             data: Option<Data>,
             primary_sale_happened: Option<bool>,
@@ -267,6 +273,7 @@ pub mod typedefs {
             authorization_data: Option<AuthorizationData>,
         },
         AsUpdateAuthorityV2 {
+            #[serde(with = "pubkey_serde_option")]
             new_update_authority: Option<[u8; 32usize]>,
             data: Option<Data>,
             primary_sale_happened: Option<bool>,
@@ -279,6 +286,7 @@ pub mod typedefs {
             authorization_data: Option<AuthorizationData>,
         },
         AsAuthorityItemDelegateV2 {
+            #[serde(with = "pubkey_serde_option")]
             new_update_authority: Option<[u8; 32usize]>,
             primary_sale_happened: Option<bool>,
             is_mutable: Option<bool>,
@@ -407,7 +415,10 @@ pub mod typedefs {
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub enum ProgrammableConfig {
-        V1 { rule_set: Option<[u8; 32usize]> },
+        V1 {
+            #[serde(with = "pubkey_serde_option")]
+            rule_set: Option<[u8; 32usize]>,
+        },
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub enum MigrationType {
@@ -466,6 +477,8 @@ pub mod typedefs {
     }
 }
 pub mod accounts_data {
+    use crate::pubkey_serializer::pubkey_serde;
+    use crate::pubkey_serializer::pubkey_serde_option;
     use serde::Serialize;
     #[derive(Debug, Serialize)]
     pub struct CreateMetadataAccountAccounts {
@@ -1194,11 +1207,21 @@ pub mod accounts_data {
 }
 pub mod ix_data {
     use super::*;
+    use crate::pubkey_serializer::pubkey_serde;
+    use crate::pubkey_serializer::pubkey_serde_option;
     use serde::Serialize;
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
-    pub struct CreateMetadataAccountArguments {}
+    pub struct CreateMetadataAccountArguments {
+        pub data: Data,
+        pub is_mutable: bool,
+    }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
-    pub struct UpdateMetadataAccountArguments {}
+    pub struct UpdateMetadataAccountArguments {
+        pub data: Option<Data>,
+        #[serde(with = "pubkey_serde_option")]
+        pub update_authority: Option<[u8; 32usize]>,
+        pub primary_sale_happened: bool,
+    }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct DeprecatedCreateMasterEditionArguments {}
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
@@ -1212,11 +1235,17 @@ pub mod ix_data {
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct SignMetadataArguments {}
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
-    pub struct DeprecatedMintPrintingTokensViaTokenArguments {}
+    pub struct DeprecatedMintPrintingTokensViaTokenArguments {
+        pub mint_printing_tokens_via_token_args: MintPrintingTokensViaTokenArgs,
+    }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
-    pub struct DeprecatedMintPrintingTokensArguments {}
+    pub struct DeprecatedMintPrintingTokensArguments {
+        pub mint_printing_tokens_via_token_args: MintPrintingTokensViaTokenArgs,
+    }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
-    pub struct CreateMasterEditionArguments {}
+    pub struct CreateMasterEditionArguments {
+        pub create_master_edition_args: CreateMasterEditionArgs,
+    }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct MintNewEditionFromMasterEditionViaTokenArguments {
         pub mint_new_edition_from_master_edition_via_token_args:
@@ -1236,7 +1265,10 @@ pub mod ix_data {
         pub update_metadata_account_args_v2: UpdateMetadataAccountArgsV2,
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
-    pub struct CreateMetadataAccountV2Arguments {}
+    pub struct CreateMetadataAccountV2Arguments {
+        pub data_v2: DataV2,
+        pub is_mutable: bool,
+    }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct CreateMasterEditionV3Arguments {
         pub create_master_edition_args: CreateMasterEditionArgs,

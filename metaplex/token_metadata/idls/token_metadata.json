@@ -62,7 +62,18 @@
           ]
         }
       ],
-      "args": [],
+      "args": [
+        {
+          "name": "data",
+          "type": {
+            "defined": "Data"
+          }
+        },
+        {
+          "name": "isMutable",
+          "type": "bool"
+        }
+      ],
       "discriminant": {
         "type": "u8",
         "value": 0
@@ -88,7 +99,26 @@
           ]
         }
       ],
-      "args": [],
+      "args": [
+         {
+            "name": "data",
+            "type": {
+              "option": {
+                "defined": "Data"
+              }
+            }
+          },
+          {
+            "name": "updateAuthority",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "primarySaleHappened",
+            "type": "bool"
+          }
+      ],
       "discriminant": {
         "type": "u8",
         "value": 1
@@ -592,7 +622,14 @@
           ]
         }
       ],
-      "args": [],
+      "args": [
+        {
+          "name": "mintPrintingTokensViaTokenArgs",
+          "type": {
+            "defined": "MintPrintingTokensViaTokenArgs"
+          }
+        }
+      ],
       "discriminant": {
         "type": "u8",
         "value": 8
@@ -658,7 +695,14 @@
           ]
         }
       ],
-      "args": [],
+      "args": [
+        {
+          "name": "mintPrintingTokensViaTokenArgs",
+          "type": {
+            "defined": "MintPrintingTokensViaTokenArgs"
+          }
+        }
+      ],
       "discriminant": {
         "type": "u8",
         "value": 9
@@ -740,7 +784,14 @@
           ]
         }
       ],
-      "args": [],
+      "args": [
+        {
+          "name": "createMasterEditionArgs",
+          "type": {
+            "defined": "CreateMasterEditionArgs"
+          }
+        }
+      ],
       "discriminant": {
         "type": "u8",
         "value": 10
@@ -1178,7 +1229,18 @@
           ]
         }
       ],
-      "args": [],
+      "args": [
+        {
+          "name": "dataV2",
+          "type": {
+            "defined": "DataV2"
+          }
+        },
+        {
+          "name": "isMutable",
+          "type": "bool"
+        }
+      ],
       "legacyOptionalAccountsStrategy": true,
       "discriminant": {
         "type": "u8",
@@ -5279,6 +5341,18 @@
             "type": {
               "option": "u64"
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "MintPrintingTokensViaTokenArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "Supply",
+            "type": "u64"
           }
         ]
       }
