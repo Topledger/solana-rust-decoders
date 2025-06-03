@@ -572,7 +572,7 @@ fn main() -> Result<()> {
             use crate::pubkey_serializer::pubkey_serde;
             use crate::pubkey_serializer::pubkey_serde_option;
             use serde::Serialize;
-            serde_big_array::big_array! { BigArray; 64, 51 /*, …other sizes…*/ }
+            serde_big_array::big_array! { BigArray; 64, 51,128, 72, 256 /*, …other sizes…*/ }
             #typedefs_rs
         }
 
@@ -586,7 +586,7 @@ fn main() -> Result<()> {
             use super::*;
             use crate::pubkey_serializer::pubkey_serde;
             use crate::pubkey_serializer::pubkey_serde_option;
-            serde_big_array::big_array! { BigArray; 64, 51, 72 /*, …other sizes…*/ }
+            serde_big_array::big_array! { BigArray; 64, 51, 72 , 128, 256/*, …other sizes…*/ }
             #(#args_structs)*
         }
 

@@ -34,7 +34,7 @@ pub mod typedefs {
     use anchor_lang::prelude::*;
     use borsh::{BorshDeserialize, BorshSerialize};
     use serde::Serialize;
-    serde_big_array::big_array! { BigArray ; 64 , 51 }
+    serde_big_array::big_array! { BigArray ; 64 , 51 , 128 , 72 , 256 }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub enum UpdateConfigMode {
         UpdateLoanToValuePct,
@@ -1053,7 +1053,7 @@ pub mod ix_data {
     use crate::pubkey_serializer::pubkey_serde;
     use crate::pubkey_serializer::pubkey_serde_option;
     use serde::Serialize;
-    serde_big_array::big_array! { BigArray ; 64 , 51 , 72 }
+    serde_big_array::big_array! { BigArray ; 64 , 51 , 72 , 128 , 256 }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct InitLendingMarketArguments {
         pub quote_currency: [u8; 32usize],
