@@ -5392,11 +5392,8 @@
                   "type": {
                       "defined": "OracleSource"
                   }
-              },
-              {
-                  "name": "skipInvariantCheck",
-                  "type": "bool"
               }
+             
           ]
       },
       {
@@ -6124,6 +6121,52 @@
               }
           ]
       },
+    {
+      "name": "adminDeposit",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "spotMarketVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "adminTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "marketIndex",
+          "type": "u16"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+
       {
           "name": "updatePerpMarketStepSizeAndTickSize",
           "accounts": [
@@ -9010,13 +9053,7 @@
                       "type": {
                           "option": "bool"
                       }
-                  },
-                  {
-                      "name": "excludeTotalLiqFee",
-                      "type": {
-                          "option": "bool"
-                      }
-                  }
+                  }                 
               ]
           }
       },

@@ -116,6 +116,21 @@ fn main() -> Result<()> {
                         pub #field_ident: #ty,
                     }
                 }
+                &anchor_idl::IdlType::PublicKey => {
+                    quote! {
+                        #[serde(with = "pubkey_serde")]
+                        pub #field_ident: [u8; 32usize],
+                    }
+                }
+                // Option<PublicKey> → Option<[u8;32]> + its serde
+                anchor_idl::IdlType::Option(inner)
+                    if matches!(inner.as_ref(), &anchor_idl::IdlType::PublicKey) =>
+                {
+                    quote! {
+                        #[serde(with = "pubkey_serde_option")]
+                        pub #field_ident: Option<[u8; 32usize]>,
+                    }
+                }
                 _ => {
                     quote! {
                         pub #field_ident: #ty,

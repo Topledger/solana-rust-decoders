@@ -22,7 +22,6 @@ pub mod typedefs {
         pub quote_asset_amount_with_unsettled_lp: Option<i64>,
         pub net_unsettled_funding_pnl: Option<i64>,
         pub update_amm_summary_stats: Option<bool>,
-        pub exclude_total_liq_fee: Option<bool>,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct LiquidatePerpRecord {
@@ -2189,6 +2188,16 @@ pub mod accounts_data {
         pub remaining: Vec<String>,
     }
     #[derive(Debug, Serialize)]
+    pub struct AdminDepositAccounts {
+        pub state: String,
+        pub user: String,
+        pub admin: String,
+        pub spotMarketVault: String,
+        pub adminTokenAccount: String,
+        pub tokenProgram: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
     pub struct UpdatePerpMarketStepSizeAndTickSizeAccounts {
         pub admin: String,
         pub state: String,
@@ -2432,6 +2441,7 @@ pub mod ix_data {
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct ChangeSignedMsgWsDelegateStatusArguments {
+        #[serde(with = "pubkey_serde")]
         pub delegate: [u8; 32usize],
         pub add: bool,
     }
@@ -2606,6 +2616,7 @@ pub mod ix_data {
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct UpdateUserDelegateArguments {
         pub sub_account_id: u16,
+        #[serde(with = "pubkey_serde")]
         pub delegate: [u8; 32usize],
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
@@ -3085,9 +3096,9 @@ pub mod ix_data {
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct UpdateSpotMarketOracleArguments {
+        #[serde(with = "pubkey_serde")]
         pub oracle: [u8; 32usize],
         pub oracle_source: OracleSource,
-        pub skip_invariant_check: bool,
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct UpdateSpotMarketStepSizeAndTickSizeArguments {
@@ -3195,6 +3206,7 @@ pub mod ix_data {
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct UpdatePerpMarketOracleArguments {
+        #[serde(with = "pubkey_serde")]
         pub oracle: [u8; 32usize],
         pub oracle_source: OracleSource,
         pub skip_invariant_check: bool,
@@ -3210,6 +3222,12 @@ pub mod ix_data {
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct UpdatePerpMarketMaxSpreadArguments {
         pub max_spread: u32,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct AdminDepositArguments {
+        pub market_index: u16,
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub amount: u64,
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct UpdatePerpMarketStepSizeAndTickSizeArguments {
@@ -3277,14 +3295,17 @@ pub mod ix_data {
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct UpdateAdminArguments {
+        #[serde(with = "pubkey_serde")]
         pub admin: [u8; 32usize],
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct UpdateWhitelistMintArguments {
+        #[serde(with = "pubkey_serde")]
         pub whitelist_mint: [u8; 32usize],
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct UpdateDiscountMintArguments {
+        #[serde(with = "pubkey_serde")]
         pub discount_mint: [u8; 32usize],
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
@@ -4028,6 +4049,10 @@ pub enum Instruction {
     UpdatePerpMarketMaxSpread {
         accounts: UpdatePerpMarketMaxSpreadAccounts,
         args: UpdatePerpMarketMaxSpreadArguments,
+    },
+    AdminDeposit {
+        accounts: AdminDepositAccounts,
+        args: AdminDepositArguments,
     },
     UpdatePerpMarketStepSizeAndTickSize {
         accounts: UpdatePerpMarketStepSizeAndTickSizeAccounts,
@@ -7331,6 +7356,28 @@ impl Instruction {
                     remaining,
                 };
                 return Ok(Instruction::UpdatePerpMarketMaxSpread { accounts, args });
+            }
+            [210u8, 66u8, 65u8, 182u8, 102u8, 214u8, 176u8, 30u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = AdminDepositArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let state = keys.next().unwrap().clone();
+                let user = keys.next().unwrap().clone();
+                let admin = keys.next().unwrap().clone();
+                let spotMarketVault = keys.next().unwrap().clone();
+                let adminTokenAccount = keys.next().unwrap().clone();
+                let tokenProgram = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = AdminDepositAccounts {
+                    state,
+                    user,
+                    admin,
+                    spotMarketVault,
+                    adminTokenAccount,
+                    tokenProgram,
+                    remaining,
+                };
+                return Ok(Instruction::AdminDeposit { accounts, args });
             }
             [231u8, 255u8, 97u8, 25u8, 146u8, 139u8, 174u8, 4u8] => {
                 let mut rdr: &[u8] = rest;
