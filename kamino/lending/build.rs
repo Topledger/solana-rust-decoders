@@ -49,7 +49,6 @@ fn main() -> Result<()> {
                             anchor_idl::IdlType::Array(inner, len) => {
                                 let l = *len as usize;
                                 let inner_type_ts = map_idl_type(inner);
-
                                 if l > 32 {
                                     quote! {
                                         #[serde(with = "BigArray")]
@@ -114,7 +113,6 @@ fn main() -> Result<()> {
                                             anchor_idl::IdlType::Array(inner, len) => {
                                                 let l = *len as usize;
                                                 let inner_type_ts = map_idl_type(inner);
-
                                                 if l > 32 {
                                                     quote! {
                                                         #[serde(with = "BigArray")]
