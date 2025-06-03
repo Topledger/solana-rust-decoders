@@ -599,6 +599,8 @@ fn main() -> Result<()> {
             pub use typedefs::*;
             use ::borsh::BorshDeserialize;
             use serde::Serialize;
+            use crate::pubkey_serializer::pubkey_serde;
+            use crate::pubkey_serializer::pubkey_serde_option;
 
             #(#event_structs)*
 

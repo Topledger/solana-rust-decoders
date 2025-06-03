@@ -3420,6 +3420,8 @@ impl Instruction {
 }
 pub mod events {
     use super::*;
+    use crate::pubkey_serializer::pubkey_serde;
+    use crate::pubkey_serializer::pubkey_serde_option;
     use borsh::BorshDeserialize;
     use serde::Serialize;
     pub use typedefs::*;
