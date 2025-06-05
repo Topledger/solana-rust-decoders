@@ -1,0 +1,3112 @@
+use serde::Serializer;
+#[allow(dead_code)]
+use std::convert::TryInto;
+fn serialize_to_string<S, T>(x: &T, s: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+    T: ToString,
+{
+    s.serialize_str(&x.to_string())
+}
+pub use accounts_data::*;
+pub use ix_data::*;
+pub use typedefs::*;
+pub mod typedefs {
+    use crate::pubkey_serializer::pubkey_serde;
+    use crate::pubkey_serializer::pubkey_serde_option;
+    use anchor_lang::prelude::*;
+    use borsh::{BorshDeserialize, BorshSerialize};
+    use serde::Serialize;
+    serde_big_array::big_array! { BigArray ; 64 , 51 , 128 , 72 , 256 }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct PositionRewardInfo {
+        pub growth_inside_checkpoint: u128,
+        pub amount_owed: u64,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct WhirlpoolRewardInfo {
+        #[serde(with = "pubkey_serde")]
+        pub mint: [u8; 32usize],
+        #[serde(with = "pubkey_serde")]
+        pub vault: [u8; 32usize],
+        #[serde(with = "pubkey_serde")]
+        pub authority: [u8; 32usize],
+        pub emissions_per_second_x64: u128,
+        pub growth_global_x64: u128,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct RewardInfo {
+        pub reward_state: u8,
+        pub open_time: u64,
+        pub end_time: u64,
+        pub last_update_time: u64,
+        pub emissions_per_second_x64: u128,
+        pub reward_total_emissioned: u64,
+        pub reward_claimed: u64,
+        #[serde(with = "pubkey_serde")]
+        pub token_mint: [u8; 32usize],
+        #[serde(with = "pubkey_serde")]
+        pub token_vault: [u8; 32usize],
+        #[serde(with = "pubkey_serde")]
+        pub authority: [u8; 32usize],
+        pub reward_growth_global_x64: u128,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct RebalanceRaw {
+        #[serde(with = "BigArray")]
+        pub params: [u8; 128usize],
+        #[serde(with = "BigArray")]
+        pub state: [u8; 256usize],
+        pub reference_price_type: u8,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct CollateralInfo {
+        #[serde(with = "pubkey_serde")]
+        pub mint: [u8; 32usize],
+        pub lower_heuristic: u64,
+        pub upper_heuristic: u64,
+        pub exp_heuristic: u64,
+        pub max_twap_divergence_bps: u64,
+        pub scope_twap_price_chain: [u16; 4usize],
+        pub scope_price_chain: [u16; 4usize],
+        pub name: [u8; 32usize],
+        pub max_age_price_seconds: u64,
+        pub max_age_twap_seconds: u64,
+        pub max_ignorable_amount_as_reward: u64,
+        pub disabled: u8,
+        pub padding0: [u8; 7usize],
+        pub scope_staking_rate_chain: [u16; 4usize],
+        pub padding: [u64; 8usize],
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct CollateralInfoParams {
+        #[serde(with = "pubkey_serde")]
+        pub mint: [u8; 32usize],
+        pub lower_heuristic: u64,
+        pub upper_heuristic: u64,
+        pub exp_heuristic: u64,
+        pub max_twap_divergence_bps: u64,
+        pub scope_twap_price_chain: [u16; 4usize],
+        pub scope_price_chain: [u16; 4usize],
+        pub name: [u8; 32usize],
+        pub max_age_price_seconds: u64,
+        pub max_age_twap_seconds: u64,
+        pub max_ignorable_amount_as_reward: u64,
+        pub disabled: u8,
+        pub scope_staking_rate_chain: [u16; 4usize],
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct KaminoRewardInfo {
+        pub decimals: u64,
+        #[serde(with = "pubkey_serde")]
+        pub reward_vault: [u8; 32usize],
+        #[serde(with = "pubkey_serde")]
+        pub reward_mint: [u8; 32usize],
+        pub reward_collateral_id: u64,
+        pub last_issuance_ts: u64,
+        pub reward_per_second: u64,
+        pub amount_uncollected: u64,
+        pub amount_issued_cumulative: u64,
+        pub amount_available: u64,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct WithdrawalCaps {
+        pub config_capacity: i64,
+        pub current_total: i64,
+        pub last_interval_start_timestamp: u64,
+        pub config_interval_length_seconds: u64,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct Price {
+        pub value: u64,
+        pub exp: u64,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct RebalanceAutodriftParams {
+        pub init_drift_ticks_per_epoch: u32,
+        pub ticks_below_mid: i32,
+        pub ticks_above_mid: i32,
+        pub frontrun_multiplier_bps: u16,
+        pub staking_rate_a_source: StakingRateSource,
+        pub staking_rate_b_source: StakingRateSource,
+        pub init_drift_direction: DriftDirection,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct RebalanceAutodriftWindow {
+        pub staking_rate_a: Option<Price>,
+        pub staking_rate_b: Option<Price>,
+        pub epoch: u64,
+        pub theoretical_tick: i32,
+        pub strat_mid_tick: i32,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct RebalanceAutodriftState {
+        pub last_window: RebalanceAutodriftWindow,
+        pub current_window: RebalanceAutodriftWindow,
+        pub step: RebalanceAutodriftStep,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct RebalanceDriftParams {
+        pub start_mid_tick: i32,
+        pub ticks_below_mid: i32,
+        pub ticks_above_mid: i32,
+        pub seconds_per_tick: u64,
+        pub direction: DriftDirection,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct RebalanceDriftState {
+        pub step: RebalanceDriftStep,
+        pub last_drift_timestamp: u64,
+        pub last_mid_tick: i32,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct RebalanceExpanderState {
+        pub initial_pool_price: u128,
+        pub expansion_count: u16,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct RebalanceManualState {}
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct PeriodicRebalanceState {
+        pub last_rebalance_timestamp: u64,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct RebalancePricePercentageWithResetState {
+        pub last_rebalance_lower_reset_pool_price: u128,
+        pub last_rebalance_upper_reset_pool_price: u128,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct RebalancePricePercentageState {
+        pub last_rebalance_lower_pool_price: u128,
+        pub last_rebalance_upper_pool_price: u128,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct RebalanceTakeProfitState {
+        pub step: RebalanceTakeProfitStep,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub enum BinAddLiquidityStrategy {
+        Uniform {
+            current_bin_index: i32,
+            lower_bin_index: i32,
+            upper_bin_index: i32,
+            amount_x_to_deposit: u64,
+            amount_y_to_deposit: u64,
+            x_current_bin: u64,
+            y_current_bin: u64,
+        },
+        CurrentTick(i32),
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub enum SimulationPrice {
+        PoolPrice,
+        SqrtPrice(u128),
+        TickIndex(i32),
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub enum DexSpecificPrice {
+        SqrtPrice(u128),
+        Q6464(u128),
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub enum RemoveLiquidityMode {
+        Liquidity(u128),
+        Bps(u16),
+        All,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub enum WithdrawalCapAccumulatorAction {
+        KeepAccumulator,
+        ResetAccumulator,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub enum RebalanceEffects {
+        NewRange(i32, i32),
+        WithdrawAndFreeze,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub enum SwapLimit {
+        Bps(u64),
+        Absolute {
+            src_amount_to_swap: u64,
+            dst_amount_to_vault: u64,
+            a_to_b: bool,
+        },
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub enum MintingMethod {
+        PriceBased,
+        Proportional,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub enum GlobalConfigOption {
+        EmergencyMode,
+        BlockDeposit,
+        BlockInvest,
+        BlockWithdraw,
+        BlockCollectFees,
+        BlockCollectRewards,
+        BlockSwapRewards,
+        BlockSwapUnevenVaults,
+        WithdrawalFeeBps,
+        SwapDiscountBps,
+        ActionsAuthority,
+        DeprecatedTreasuryFeeVaults,
+        AdminAuthority,
+        BlockEmergencySwap,
+        BlockLocalAdmin,
+        UpdateTokenInfos,
+        ScopeProgramId,
+        ScopePriceId,
+        MinPerformanceFeeBps,
+        MinSwapUnevenSlippageToleranceBps,
+        MinReferencePriceSlippageToleranceBps,
+        ActionsAfterRebalanceDelaySeconds,
+        TreasuryFeeVaultReceiver,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub enum StrategyConfigOption {
+        UpdateDepositCap,
+        UpdateDepositCapIxn,
+        UpdateWithdrawalCapACapacity,
+        UpdateWithdrawalCapAInterval,
+        UpdateWithdrawalCapACurrentTotal,
+        UpdateWithdrawalCapBCapacity,
+        UpdateWithdrawalCapBInterval,
+        UpdateWithdrawalCapBCurrentTotal,
+        UpdateMaxDeviationBps,
+        UpdateSwapVaultMaxSlippage,
+        UpdateStrategyType,
+        UpdateDepositFee,
+        UpdateWithdrawFee,
+        UpdateCollectFeesFee,
+        UpdateReward0Fee,
+        UpdateReward1Fee,
+        UpdateReward2Fee,
+        UpdateAdminAuthority,
+        KaminoRewardIndex0Ts,
+        KaminoRewardIndex1Ts,
+        KaminoRewardIndex2Ts,
+        KaminoRewardIndex0RewardPerSecond,
+        KaminoRewardIndex1RewardPerSecond,
+        KaminoRewardIndex2RewardPerSecond,
+        UpdateDepositBlocked,
+        UpdateRaydiumProtocolPositionOrBaseVaultAuthority,
+        UpdateRaydiumPoolConfigOrBaseVaultAuthority,
+        UpdateInvestBlocked,
+        UpdateWithdrawBlocked,
+        UpdateLocalAdminBlocked,
+        DeprecatedUpdateCollateralIdA,
+        DeprecatedUpdateCollateralIdB,
+        UpdateFlashVaultSwap,
+        AllowDepositWithoutInvest,
+        UpdateSwapVaultMaxSlippageFromRef,
+        ResetReferencePrices,
+        UpdateStrategyCreationState,
+        UpdateIsCommunity,
+        UpdateRebalanceType,
+        UpdateRebalanceParams,
+        UpdateDepositMintingMethod,
+        UpdateLookupTable,
+        UpdateReferencePriceType,
+        UpdateReward0Amount,
+        UpdateReward1Amount,
+        UpdateReward2Amount,
+        UpdateFarm,
+        UpdateRebalancesCapCapacity,
+        UpdateRebalancesCapInterval,
+        UpdateRebalancesCapCurrentTotal,
+        UpdateSwapUnevenAuthority,
+        UpdatePendingStrategyAdmin,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub enum StrategyStatus {
+        Uninitialized,
+        Active,
+        Frozen,
+        Rebalancing,
+        NoPosition,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub enum StrategyType {
+        Stable,
+        Pegged,
+        Volatile,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub enum CreationStatus {
+        Ignored,
+        Shadow,
+        Live,
+        Deprecated,
+        Staging,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub enum ExecutiveWithdrawAction {
+        Freeze,
+        Unfreeze,
+        Rebalance,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub enum ReferencePriceType {
+        Pool,
+        Twap,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub enum LiquidityCalculationMode {
+        Deposit,
+        Withdraw,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub enum UpdateCollateralInfoMode {
+        CollateralId,
+        LowerHeuristic,
+        UpperHeuristic,
+        ExpHeuristic,
+        TwapDivergence,
+        UpdateScopeTwap,
+        UpdateScopeChain,
+        UpdateName,
+        UpdatePriceMaxAge,
+        UpdateTwapMaxAge,
+        UpdateDisabled,
+        UpdateStakingRateChain,
+        UpdateMaxIgnorableAmountAsReward,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub enum BalanceStatus {
+        Balanced,
+        Unbalanced,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub enum RebalanceAutodriftStep {
+        Uninitialized,
+        Autodrifting,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub enum StakingRateSource {
+        Constant,
+        Scope,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub enum DriftDirection {
+        Increasing,
+        Decreasing,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub enum RebalanceDriftStep {
+        Uninitialized,
+        Drifting,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub enum ExpanderStep {
+        ExpandOrContract(u16),
+        Recenter,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub enum RebalanceTakeProfitToken {
+        A,
+        B,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub enum RebalanceTakeProfitStep {
+        Uninitialized,
+        TakingProfit,
+        Finished,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub enum RebalanceAction {
+        NewPriceRange(DexSpecificPrice, DexSpecificPrice),
+        NewTickRange(i32, i32),
+        WithdrawAndFreeze,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub enum RebalanceType {
+        Manual,
+        PricePercentage,
+        PricePercentageWithReset,
+        Drift,
+        TakeProfit,
+        PeriodicRebalance,
+        Expander,
+        Autodrift,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub enum CollateralTestToken {
+        Usdc,
+        Usdh,
+        Sol,
+        Eth,
+        Btc,
+        Msol,
+        Stsol,
+        Usdt,
+        Orca,
+        Mnde,
+        Hbb,
+        Jsol,
+        Ush,
+        Dai,
+        Ldo,
+        Scnsol,
+        Uxd,
+        Hdg,
+        Dust,
+        Usdr,
+        Ratio,
+        Uxp,
+        Jitosol,
+        Ray,
+        Bonk,
+        Samo,
+        LaineSol,
+        Bsol,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub enum ScopePriceIdTest {
+        Sol,
+        Eth,
+        Btc,
+        Srm,
+        Ray,
+        Ftt,
+        Msol,
+        ScnSolSol,
+        Bnb,
+        Avax,
+        DaoSolSol,
+        SaberMsolSol,
+        Usdh,
+        StSol,
+        CsolSol,
+        CethEth,
+        CbtcBtc,
+        CmsolSol,
+        WstEth,
+        Ldo,
+        Usdc,
+        CusdcUsdc,
+        Usdt,
+        Orca,
+        Mnde,
+        Hbb,
+        CorcaOrca,
+        CslndSlnd,
+        CsrmSrm,
+        CrayRay,
+        CfttFtt,
+        CstsolStsol,
+        Slnd,
+        Dai,
+        JsolSol,
+        Ush,
+        Uxd,
+        UsdhTwap,
+        UshTwap,
+        UxdTwap,
+        Hdg,
+        Dust,
+        Usdr,
+        UsdrTwap,
+        Ratio,
+        Uxp,
+        Kuxdusdcorca,
+        JitosolSol,
+        SolEma,
+        EthEma,
+        BtcEma,
+        SrmEma,
+        RayEma,
+        FttEma,
+        MsolEma,
+        BnbEma,
+        AvaxEma,
+        StsolEma,
+        UsdcEma,
+        UsdtEma,
+        SlndEma,
+        DaiEma,
+        WstEthTwap,
+        DustTwap,
+        Bonk,
+        BonkTwap,
+        Samo,
+        SamoTwap,
+        Bsol,
+        LaineSol,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub enum Dex {
+        Orca,
+        Raydium,
+        Meteora,
+    }
+}
+pub mod accounts_data {
+    use serde::Serialize;
+    #[derive(Debug, Serialize)]
+    pub struct InitializeStrategyAccounts {
+        pub adminAuthority: String,
+        pub globalConfig: String,
+        pub pool: String,
+        pub tokenAMint: String,
+        pub tokenBMint: String,
+        pub tokenAVault: String,
+        pub tokenBVault: String,
+        pub baseVaultAuthority: String,
+        pub sharesMint: String,
+        pub sharesMintAuthority: String,
+        pub tokenInfos: String,
+        pub systemProgram: String,
+        pub rent: String,
+        pub tokenProgram: String,
+        pub tokenATokenProgram: String,
+        pub tokenBTokenProgram: String,
+        pub strategy: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct InitializeKaminoRewardAccounts {
+        pub adminAuthority: String,
+        pub strategy: String,
+        pub globalConfig: String,
+        pub rewardMint: String,
+        pub rewardVault: String,
+        pub tokenInfos: String,
+        pub baseVaultAuthority: String,
+        pub systemProgram: String,
+        pub rent: String,
+        pub tokenProgram: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct AddKaminoRewardsAccounts {
+        pub adminAuthority: String,
+        pub strategy: String,
+        pub rewardMint: String,
+        pub rewardVault: String,
+        pub baseVaultAuthority: String,
+        pub rewardAta: String,
+        pub tokenProgram: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct InitializeGlobalConfigAccounts {
+        pub adminAuthority: String,
+        pub globalConfig: String,
+        pub systemProgram: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct InitializeCollateralInfoAccounts {
+        pub adminAuthority: String,
+        pub globalConfig: String,
+        pub collInfo: String,
+        pub systemProgram: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct UpdateCollateralInfoAccounts {
+        pub adminAuthority: String,
+        pub globalConfig: String,
+        pub tokenInfos: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct InsertCollateralInfoAccounts {
+        pub adminAuthority: String,
+        pub globalConfig: String,
+        pub tokenInfos: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct InitializeSharesMetadataAccounts {
+        pub adminAuthority: String,
+        pub strategy: String,
+        pub globalConfig: String,
+        pub sharesMint: String,
+        pub sharesMetadata: String,
+        pub sharesMintAuthority: String,
+        pub systemProgram: String,
+        pub rent: String,
+        pub metadataProgram: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct UpdateSharesMetadataAccounts {
+        pub adminAuthority: String,
+        pub strategy: String,
+        pub globalConfig: String,
+        pub sharesMint: String,
+        pub sharesMetadata: String,
+        pub sharesMintAuthority: String,
+        pub metadataProgram: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct UpdateGlobalConfigAccounts {
+        pub adminAuthority: String,
+        pub globalConfig: String,
+        pub systemProgram: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct UpdateTreasuryFeeVaultAccounts {
+        pub signer: String,
+        pub globalConfig: String,
+        pub feeMint: String,
+        pub treasuryFeeVault: String,
+        pub treasuryFeeVaultAuthority: String,
+        pub tokenInfos: String,
+        pub systemProgram: String,
+        pub rent: String,
+        pub tokenProgram: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct UpdateStrategyConfigAccounts {
+        pub adminAuthority: String,
+        pub newAccount: String,
+        pub strategy: String,
+        pub globalConfig: String,
+        pub systemProgram: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct UpdateRewardMappingAccounts {
+        pub payer: String,
+        pub strategy: String,
+        pub globalConfig: String,
+        pub pool: String,
+        pub rewardMint: String,
+        pub rewardVault: String,
+        pub baseVaultAuthority: String,
+        pub tokenInfos: String,
+        pub systemProgram: String,
+        pub rent: String,
+        pub tokenProgram: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct OpenLiquidityPositionAccounts {
+        pub adminAuthority: String,
+        pub strategy: String,
+        pub globalConfig: String,
+        pub pool: String,
+        pub tickArrayLower: String,
+        pub tickArrayUpper: String,
+        pub baseVaultAuthority: String,
+        pub position: String,
+        pub positionMint: String,
+        pub positionMetadataAccount: String,
+        pub positionTokenAccount: String,
+        pub rent: String,
+        pub system: String,
+        pub tokenProgram: String,
+        pub tokenProgram2022: String,
+        pub tokenATokenProgram: String,
+        pub tokenBTokenProgram: String,
+        pub memoProgram: String,
+        pub associatedTokenProgram: String,
+        pub poolProgram: String,
+        pub oldTickArrayLowerOrBaseVaultAuthority: String,
+        pub oldTickArrayUpperOrBaseVaultAuthority: String,
+        pub oldPositionOrBaseVaultAuthority: String,
+        pub oldPositionMintOrBaseVaultAuthority: String,
+        pub oldPositionTokenAccountOrBaseVaultAuthority: String,
+        pub tokenAVault: String,
+        pub tokenBVault: String,
+        pub tokenAMint: String,
+        pub tokenBMint: String,
+        pub poolTokenVaultA: String,
+        pub poolTokenVaultB: String,
+        pub scopePrices: String,
+        pub tokenInfos: String,
+        pub eventAuthority: String,
+        pub consensusAccount: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct CloseStrategyAccounts {
+        pub adminAuthority: String,
+        pub strategy: String,
+        pub oldPositionOrBaseVaultAuthority: String,
+        pub oldPositionMintOrBaseVaultAuthority: String,
+        pub oldPositionTokenAccountOrBaseVaultAuthority: String,
+        pub oldTickArrayLowerOrBaseVaultAuthority: String,
+        pub oldTickArrayUpperOrBaseVaultAuthority: String,
+        pub pool: String,
+        pub tokenAVault: String,
+        pub tokenBVault: String,
+        pub userTokenAAta: String,
+        pub userTokenBAta: String,
+        pub tokenAMint: String,
+        pub tokenBMint: String,
+        pub reward0Vault: String,
+        pub reward1Vault: String,
+        pub reward2Vault: String,
+        pub kaminoReward0Vault: String,
+        pub kaminoReward1Vault: String,
+        pub kaminoReward2Vault: String,
+        pub userReward0Ata: String,
+        pub userReward1Ata: String,
+        pub userReward2Ata: String,
+        pub userKaminoReward0Ata: String,
+        pub userKaminoReward1Ata: String,
+        pub userKaminoReward2Ata: String,
+        pub baseVaultAuthority: String,
+        pub poolProgram: String,
+        pub tokenProgram: String,
+        pub tokenATokenProgram: String,
+        pub tokenBTokenProgram: String,
+        pub system: String,
+        pub eventAuthority: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct DepositAccounts {
+        pub user: String,
+        pub strategy: String,
+        pub globalConfig: String,
+        pub pool: String,
+        pub position: String,
+        pub tickArrayLower: String,
+        pub tickArrayUpper: String,
+        pub tokenAVault: String,
+        pub tokenBVault: String,
+        pub baseVaultAuthority: String,
+        pub tokenAAta: String,
+        pub tokenBAta: String,
+        pub tokenAMint: String,
+        pub tokenBMint: String,
+        pub userSharesAta: String,
+        pub sharesMint: String,
+        pub sharesMintAuthority: String,
+        pub scopePrices: String,
+        pub tokenInfos: String,
+        pub tokenProgram: String,
+        pub tokenATokenProgram: String,
+        pub tokenBTokenProgram: String,
+        pub instructionSysvarAccount: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct InvestAccounts {
+        pub payer: String,
+        pub strategy: String,
+        pub globalConfig: String,
+        pub tokenAVault: String,
+        pub tokenBVault: String,
+        pub tokenAMint: String,
+        pub tokenBMint: String,
+        pub baseVaultAuthority: String,
+        pub pool: String,
+        pub tokenATokenProgram: String,
+        pub tokenBTokenProgram: String,
+        pub memoProgram: String,
+        pub tokenProgram: String,
+        pub tokenProgram2022: String,
+        pub position: String,
+        pub raydiumProtocolPositionOrBaseVaultAuthority: String,
+        pub positionTokenAccount: String,
+        pub poolTokenVaultA: String,
+        pub poolTokenVaultB: String,
+        pub tickArrayLower: String,
+        pub tickArrayUpper: String,
+        pub scopePrices: String,
+        pub tokenInfos: String,
+        pub poolProgram: String,
+        pub instructionSysvarAccount: String,
+        pub eventAuthority: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct DepositAndInvestAccounts {
+        pub user: String,
+        pub strategy: String,
+        pub globalConfig: String,
+        pub pool: String,
+        pub position: String,
+        pub raydiumProtocolPositionOrBaseVaultAuthority: String,
+        pub positionTokenAccount: String,
+        pub tokenAVault: String,
+        pub tokenBVault: String,
+        pub poolTokenVaultA: String,
+        pub poolTokenVaultB: String,
+        pub tickArrayLower: String,
+        pub tickArrayUpper: String,
+        pub baseVaultAuthority: String,
+        pub tokenAAta: String,
+        pub tokenBAta: String,
+        pub tokenAMint: String,
+        pub tokenBMint: String,
+        pub userSharesAta: String,
+        pub sharesMint: String,
+        pub sharesMintAuthority: String,
+        pub scopePrices: String,
+        pub tokenInfos: String,
+        pub tokenProgram: String,
+        pub tokenProgram2022: String,
+        pub tokenATokenProgram: String,
+        pub tokenBTokenProgram: String,
+        pub memoProgram: String,
+        pub poolProgram: String,
+        pub instructionSysvarAccount: String,
+        pub eventAuthority: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct WithdrawAccounts {
+        pub user: String,
+        pub strategy: String,
+        pub globalConfig: String,
+        pub pool: String,
+        pub position: String,
+        pub tickArrayLower: String,
+        pub tickArrayUpper: String,
+        pub tokenAVault: String,
+        pub tokenBVault: String,
+        pub baseVaultAuthority: String,
+        pub poolTokenVaultA: String,
+        pub poolTokenVaultB: String,
+        pub tokenAAta: String,
+        pub tokenBAta: String,
+        pub tokenAMint: String,
+        pub tokenBMint: String,
+        pub userSharesAta: String,
+        pub sharesMint: String,
+        pub treasuryFeeTokenAVault: String,
+        pub treasuryFeeTokenBVault: String,
+        pub tokenProgram: String,
+        pub tokenProgram2022: String,
+        pub tokenATokenProgram: String,
+        pub tokenBTokenProgram: String,
+        pub memoProgram: String,
+        pub positionTokenAccount: String,
+        pub poolProgram: String,
+        pub instructionSysvarAccount: String,
+        pub eventAuthority: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct ExecutiveWithdrawAccounts {
+        pub adminAuthority: String,
+        pub strategy: String,
+        pub globalConfig: String,
+        pub pool: String,
+        pub position: String,
+        pub raydiumProtocolPositionOrBaseVaultAuthority: String,
+        pub positionTokenAccount: String,
+        pub tickArrayLower: String,
+        pub tickArrayUpper: String,
+        pub tokenAVault: String,
+        pub tokenBVault: String,
+        pub baseVaultAuthority: String,
+        pub poolTokenVaultA: String,
+        pub poolTokenVaultB: String,
+        pub tokenAMint: String,
+        pub tokenBMint: String,
+        pub scopePrices: String,
+        pub tokenInfos: String,
+        pub tokenATokenProgram: String,
+        pub tokenBTokenProgram: String,
+        pub memoProgram: String,
+        pub tokenProgram: String,
+        pub tokenProgram2022: String,
+        pub poolProgram: String,
+        pub eventAuthority: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct CollectRewardsAccounts {
+        pub user: String,
+        pub strategy: String,
+        pub globalConfig: String,
+        pub baseVaultAuthority: String,
+        pub pool: String,
+        pub tickArrayLower: String,
+        pub tickArrayUpper: String,
+        pub position: String,
+        pub raydiumProtocolPositionOrBaseVaultAuthority: String,
+        pub positionTokenAccount: String,
+        pub tokenAVault: String,
+        pub poolTokenVaultA: String,
+        pub tokenBVault: String,
+        pub poolTokenVaultB: String,
+        pub treasuryFeeTokenAVault: String,
+        pub treasuryFeeTokenBVault: String,
+        pub treasuryFeeVaultAuthority: String,
+        pub reward0Vault: String,
+        pub reward1Vault: String,
+        pub reward2Vault: String,
+        pub poolRewardVault0: String,
+        pub poolRewardVault1: String,
+        pub poolRewardVault2: String,
+        pub tokenAMint: String,
+        pub tokenBMint: String,
+        pub tokenATokenProgram: String,
+        pub tokenBTokenProgram: String,
+        pub memoProgram: String,
+        pub tokenProgram: String,
+        pub tokenProgram2022: String,
+        pub poolProgram: String,
+        pub instructionSysvarAccount: String,
+        pub eventAuthority: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct CollectFeesAccounts {
+        pub user: String,
+        pub strategy: String,
+        pub globalConfig: String,
+        pub baseVaultAuthority: String,
+        pub pool: String,
+        pub tickArrayLower: String,
+        pub tickArrayUpper: String,
+        pub position: String,
+        pub raydiumProtocolPositionOrBaseVaultAuthority: String,
+        pub positionTokenAccount: String,
+        pub tokenAVault: String,
+        pub poolTokenVaultA: String,
+        pub tokenBVault: String,
+        pub poolTokenVaultB: String,
+        pub treasuryFeeTokenAVault: String,
+        pub treasuryFeeTokenBVault: String,
+        pub treasuryFeeVaultAuthority: String,
+        pub reward0Vault: String,
+        pub reward1Vault: String,
+        pub reward2Vault: String,
+        pub poolRewardVault0: String,
+        pub poolRewardVault1: String,
+        pub poolRewardVault2: String,
+        pub tokenAMint: String,
+        pub tokenBMint: String,
+        pub tokenATokenProgram: String,
+        pub tokenBTokenProgram: String,
+        pub memoProgram: String,
+        pub tokenProgram: String,
+        pub tokenProgram2022: String,
+        pub poolProgram: String,
+        pub instructionSysvarAccount: String,
+        pub eventAuthority: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct SwapRewardsAccounts {
+        pub user: String,
+        pub strategy: String,
+        pub globalConfig: String,
+        pub pool: String,
+        pub tokenAVault: String,
+        pub tokenBVault: String,
+        pub rewardVault: String,
+        pub baseVaultAuthority: String,
+        pub treasuryFeeTokenAVault: String,
+        pub treasuryFeeTokenBVault: String,
+        pub treasuryFeeVaultAuthority: String,
+        pub tokenAMint: String,
+        pub tokenBMint: String,
+        pub rewardMint: String,
+        pub userTokenAAta: String,
+        pub userTokenBAta: String,
+        pub userRewardTokenAccount: String,
+        pub scopePrices: String,
+        pub tokenInfos: String,
+        pub systemProgram: String,
+        pub tokenATokenProgram: String,
+        pub tokenBTokenProgram: String,
+        pub rewardTokenProgram: String,
+        pub instructionSysvarAccount: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct CheckExpectedVaultsBalancesAccounts {
+        pub user: String,
+        pub tokenAAta: String,
+        pub tokenBAta: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct SingleTokenDepositAndInvestWithMinAccounts {
+        pub user: String,
+        pub strategy: String,
+        pub globalConfig: String,
+        pub pool: String,
+        pub position: String,
+        pub raydiumProtocolPositionOrBaseVaultAuthority: String,
+        pub positionTokenAccount: String,
+        pub tokenAVault: String,
+        pub tokenBVault: String,
+        pub poolTokenVaultA: String,
+        pub poolTokenVaultB: String,
+        pub tickArrayLower: String,
+        pub tickArrayUpper: String,
+        pub baseVaultAuthority: String,
+        pub tokenAAta: String,
+        pub tokenBAta: String,
+        pub tokenAMint: String,
+        pub tokenBMint: String,
+        pub userSharesAta: String,
+        pub sharesMint: String,
+        pub sharesMintAuthority: String,
+        pub scopePrices: String,
+        pub tokenInfos: String,
+        pub tokenProgram: String,
+        pub tokenProgram2022: String,
+        pub tokenATokenProgram: String,
+        pub tokenBTokenProgram: String,
+        pub memoProgram: String,
+        pub poolProgram: String,
+        pub instructionSysvarAccount: String,
+        pub eventAuthority: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct SingleTokenDepositWithMinAccounts {
+        pub user: String,
+        pub strategy: String,
+        pub globalConfig: String,
+        pub pool: String,
+        pub position: String,
+        pub tickArrayLower: String,
+        pub tickArrayUpper: String,
+        pub tokenAVault: String,
+        pub tokenBVault: String,
+        pub baseVaultAuthority: String,
+        pub tokenAAta: String,
+        pub tokenBAta: String,
+        pub tokenAMint: String,
+        pub tokenBMint: String,
+        pub userSharesAta: String,
+        pub sharesMint: String,
+        pub sharesMintAuthority: String,
+        pub scopePrices: String,
+        pub tokenInfos: String,
+        pub tokenProgram: String,
+        pub tokenATokenProgram: String,
+        pub tokenBTokenProgram: String,
+        pub instructionSysvarAccount: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct FlashSwapUnevenVaultsStartAccounts {
+        pub swapper: String,
+        pub strategy: String,
+        pub globalConfig: String,
+        pub tokenAVault: String,
+        pub tokenBVault: String,
+        pub tokenAAta: String,
+        pub tokenBAta: String,
+        pub baseVaultAuthority: String,
+        pub pool: String,
+        pub position: String,
+        pub scopePrices: String,
+        pub tokenInfos: String,
+        pub tickArrayLower: String,
+        pub tickArrayUpper: String,
+        pub tokenAMint: String,
+        pub tokenBMint: String,
+        pub tokenATokenProgram: String,
+        pub tokenBTokenProgram: String,
+        pub instructionSysvarAccount: String,
+        pub consensusAccount: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct FlashSwapUnevenVaultsEndAccounts {
+        pub swapper: String,
+        pub strategy: String,
+        pub globalConfig: String,
+        pub tokenAVault: String,
+        pub tokenBVault: String,
+        pub tokenAAta: String,
+        pub tokenBAta: String,
+        pub baseVaultAuthority: String,
+        pub pool: String,
+        pub position: String,
+        pub scopePrices: String,
+        pub tokenInfos: String,
+        pub tickArrayLower: String,
+        pub tickArrayUpper: String,
+        pub tokenAMint: String,
+        pub tokenBMint: String,
+        pub tokenATokenProgram: String,
+        pub tokenBTokenProgram: String,
+        pub instructionSysvarAccount: String,
+        pub consensusAccount: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct EmergencySwapAccounts {
+        pub adminAuthority: String,
+        pub strategy: String,
+        pub globalConfig: String,
+        pub tokenAMint: String,
+        pub tokenBMint: String,
+        pub tokenAVault: String,
+        pub tokenBVault: String,
+        pub baseVaultAuthority: String,
+        pub pool: String,
+        pub position: String,
+        pub poolTokenVaultA: String,
+        pub poolTokenVaultB: String,
+        pub tickArray0: String,
+        pub tickArray1: String,
+        pub tickArray2: String,
+        pub oracle: String,
+        pub poolProgram: String,
+        pub scopePrices: String,
+        pub tokenInfos: String,
+        pub tokenATokenProgram: String,
+        pub tokenBTokenProgram: String,
+        pub memoProgram: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct WithdrawFromTreasuryAccounts {
+        pub adminAuthority: String,
+        pub globalConfig: String,
+        pub mint: String,
+        pub treasuryFeeVault: String,
+        pub treasuryFeeVaultAuthority: String,
+        pub tokenAccount: String,
+        pub systemProgram: String,
+        pub rent: String,
+        pub tokenProgram: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct PermisionlessWithdrawFromTreasuryAccounts {
+        pub signer: String,
+        pub globalConfig: String,
+        pub mint: String,
+        pub treasuryFeeVault: String,
+        pub treasuryFeeVaultAuthority: String,
+        pub tokenAccount: String,
+        pub tokenProgram: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct WithdrawFromTopupAccounts {
+        pub adminAuthority: String,
+        pub topupVault: String,
+        pub system: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct ChangePoolAccounts {
+        pub adminAuthority: String,
+        pub strategy: String,
+        pub oldPosition: String,
+        pub baseVaultAuthority: String,
+        pub newPool: String,
+        pub strategyRewardVault0OrBaseVaultAuthority: String,
+        pub strategyRewardVault1OrBaseVaultAuthority: String,
+        pub strategyRewardVault2OrBaseVaultAuthority: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct CloseProgramAccountAccounts {
+        pub adminAuthority: String,
+        pub program: String,
+        pub programData: String,
+        pub closingAccount: String,
+        pub systemProgram: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct OrcaSwapAccounts {
+        pub funder: String,
+        pub tokenATokenProgram: String,
+        pub tokenBTokenProgram: String,
+        pub memoProgram: String,
+        pub tokenAuthority: String,
+        pub whirlpool: String,
+        pub tokenOwnerAccountA: String,
+        pub tokenVaultA: String,
+        pub tokenOwnerAccountB: String,
+        pub tokenVaultB: String,
+        pub tokenMintA: String,
+        pub tokenMintB: String,
+        pub tickArray0: String,
+        pub tickArray1: String,
+        pub tickArray2: String,
+        pub oracle: String,
+        pub whirlpoolProgram: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct SignTermsAccounts {
+        pub owner: String,
+        pub ownerSignatureState: String,
+        pub systemProgram: String,
+        pub rent: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct UpdateStrategyAdminAccounts {
+        pub pendingAdmin: String,
+        pub strategy: String,
+        pub remaining: Vec<String>,
+    }
+}
+pub mod ix_data {
+    use super::*;
+    use crate::pubkey_serializer::pubkey_serde;
+    use crate::pubkey_serializer::pubkey_serde_option;
+    use serde::Serialize;
+    serde_big_array::big_array! { BigArray ; 64 , 51 , 72 , 128 , 256 }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct InitializeStrategyArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub strategy_type: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub token_a_collateral_id: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub token_b_collateral_id: u64,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct InitializeKaminoRewardArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub kamino_reward_index: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub collateral_token: u64,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct AddKaminoRewardsArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub kamino_reward_index: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub amount: u64,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct InitializeGlobalConfigArguments {}
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct InitializeCollateralInfoArguments {}
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct UpdateCollateralInfoArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub index: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub mode: u64,
+        pub value: [u8; 32usize],
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct InsertCollateralInfoArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub index: u64,
+        pub params: CollateralInfoParams,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct InitializeSharesMetadataArguments {
+        pub name: String,
+        pub symbol: String,
+        pub uri: String,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct UpdateSharesMetadataArguments {
+        pub name: String,
+        pub symbol: String,
+        pub uri: String,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct UpdateGlobalConfigArguments {
+        pub key: u16,
+        pub index: u16,
+        pub value: [u8; 32usize],
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct UpdateTreasuryFeeVaultArguments {
+        pub collateral_id: u16,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct UpdateStrategyConfigArguments {
+        pub mode: u16,
+        #[serde(with = "BigArray")]
+        pub value: [u8; 128usize],
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct UpdateRewardMappingArguments {
+        pub reward_index: u8,
+        pub collateral_token: u8,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct OpenLiquidityPositionArguments {
+        pub tick_lower_index: i64,
+        pub tick_upper_index: i64,
+        pub bump: u8,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct CloseStrategyArguments {}
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct DepositArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub token_max_a: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub token_max_b: u64,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct InvestArguments {}
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct DepositAndInvestArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub token_max_a: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub token_max_b: u64,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct WithdrawArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub shares_amount: u64,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct ExecutiveWithdrawArguments {
+        pub action: u8,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct CollectRewardsArguments {}
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct CollectFeesArguments {}
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct SwapRewardsArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub token_a_in: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub token_b_in: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub reward_index: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub reward_collateral_id: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub min_collateral_token_out: u64,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct CheckExpectedVaultsBalancesArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub token_a_ata_balance: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub token_b_ata_balance: u64,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct SingleTokenDepositAndInvestWithMinArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub token_a_min_post_deposit_balance: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub token_b_min_post_deposit_balance: u64,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct SingleTokenDepositWithMinArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub token_a_min_post_deposit_balance: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub token_b_min_post_deposit_balance: u64,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct FlashSwapUnevenVaultsStartArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub amount: u64,
+        pub a_to_b: bool,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct FlashSwapUnevenVaultsEndArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub min_repay_amount: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub amount_to_leave_to_user: u64,
+        pub a_to_b: bool,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct EmergencySwapArguments {
+        pub a_to_b: bool,
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub target_limit_bps: u64,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct WithdrawFromTreasuryArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub amount: u64,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct PermisionlessWithdrawFromTreasuryArguments {}
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct WithdrawFromTopupArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub amount: u64,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct ChangePoolArguments {}
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct CloseProgramAccountArguments {}
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct OrcaSwapArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub amount: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub other_amount_threshold: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub sqrt_price_limit: u128,
+        pub amount_specified_is_input: bool,
+        pub a_to_b: bool,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct SignTermsArguments {
+        #[serde(with = "BigArray")]
+        pub signature: [u8; 64usize],
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct UpdateStrategyAdminArguments {}
+}
+#[derive(Debug, Serialize)]
+#[serde(tag = "instruction_type")]
+pub enum Instruction {
+    InitializeStrategy {
+        accounts: InitializeStrategyAccounts,
+        args: InitializeStrategyArguments,
+    },
+    InitializeKaminoReward {
+        accounts: InitializeKaminoRewardAccounts,
+        args: InitializeKaminoRewardArguments,
+    },
+    AddKaminoRewards {
+        accounts: AddKaminoRewardsAccounts,
+        args: AddKaminoRewardsArguments,
+    },
+    InitializeGlobalConfig {
+        accounts: InitializeGlobalConfigAccounts,
+        args: InitializeGlobalConfigArguments,
+    },
+    InitializeCollateralInfo {
+        accounts: InitializeCollateralInfoAccounts,
+        args: InitializeCollateralInfoArguments,
+    },
+    UpdateCollateralInfo {
+        accounts: UpdateCollateralInfoAccounts,
+        args: UpdateCollateralInfoArguments,
+    },
+    InsertCollateralInfo {
+        accounts: InsertCollateralInfoAccounts,
+        args: InsertCollateralInfoArguments,
+    },
+    InitializeSharesMetadata {
+        accounts: InitializeSharesMetadataAccounts,
+        args: InitializeSharesMetadataArguments,
+    },
+    UpdateSharesMetadata {
+        accounts: UpdateSharesMetadataAccounts,
+        args: UpdateSharesMetadataArguments,
+    },
+    UpdateGlobalConfig {
+        accounts: UpdateGlobalConfigAccounts,
+        args: UpdateGlobalConfigArguments,
+    },
+    UpdateTreasuryFeeVault {
+        accounts: UpdateTreasuryFeeVaultAccounts,
+        args: UpdateTreasuryFeeVaultArguments,
+    },
+    UpdateStrategyConfig {
+        accounts: UpdateStrategyConfigAccounts,
+        args: UpdateStrategyConfigArguments,
+    },
+    UpdateRewardMapping {
+        accounts: UpdateRewardMappingAccounts,
+        args: UpdateRewardMappingArguments,
+    },
+    OpenLiquidityPosition {
+        accounts: OpenLiquidityPositionAccounts,
+        args: OpenLiquidityPositionArguments,
+    },
+    CloseStrategy {
+        accounts: CloseStrategyAccounts,
+        args: CloseStrategyArguments,
+    },
+    Deposit {
+        accounts: DepositAccounts,
+        args: DepositArguments,
+    },
+    Invest {
+        accounts: InvestAccounts,
+        args: InvestArguments,
+    },
+    DepositAndInvest {
+        accounts: DepositAndInvestAccounts,
+        args: DepositAndInvestArguments,
+    },
+    Withdraw {
+        accounts: WithdrawAccounts,
+        args: WithdrawArguments,
+    },
+    ExecutiveWithdraw {
+        accounts: ExecutiveWithdrawAccounts,
+        args: ExecutiveWithdrawArguments,
+    },
+    CollectRewards {
+        accounts: CollectRewardsAccounts,
+        args: CollectRewardsArguments,
+    },
+    CollectFees {
+        accounts: CollectFeesAccounts,
+        args: CollectFeesArguments,
+    },
+    SwapRewards {
+        accounts: SwapRewardsAccounts,
+        args: SwapRewardsArguments,
+    },
+    CheckExpectedVaultsBalances {
+        accounts: CheckExpectedVaultsBalancesAccounts,
+        args: CheckExpectedVaultsBalancesArguments,
+    },
+    SingleTokenDepositAndInvestWithMin {
+        accounts: SingleTokenDepositAndInvestWithMinAccounts,
+        args: SingleTokenDepositAndInvestWithMinArguments,
+    },
+    SingleTokenDepositWithMin {
+        accounts: SingleTokenDepositWithMinAccounts,
+        args: SingleTokenDepositWithMinArguments,
+    },
+    FlashSwapUnevenVaultsStart {
+        accounts: FlashSwapUnevenVaultsStartAccounts,
+        args: FlashSwapUnevenVaultsStartArguments,
+    },
+    FlashSwapUnevenVaultsEnd {
+        accounts: FlashSwapUnevenVaultsEndAccounts,
+        args: FlashSwapUnevenVaultsEndArguments,
+    },
+    EmergencySwap {
+        accounts: EmergencySwapAccounts,
+        args: EmergencySwapArguments,
+    },
+    WithdrawFromTreasury {
+        accounts: WithdrawFromTreasuryAccounts,
+        args: WithdrawFromTreasuryArguments,
+    },
+    PermisionlessWithdrawFromTreasury {
+        accounts: PermisionlessWithdrawFromTreasuryAccounts,
+        args: PermisionlessWithdrawFromTreasuryArguments,
+    },
+    WithdrawFromTopup {
+        accounts: WithdrawFromTopupAccounts,
+        args: WithdrawFromTopupArguments,
+    },
+    ChangePool {
+        accounts: ChangePoolAccounts,
+        args: ChangePoolArguments,
+    },
+    CloseProgramAccount {
+        accounts: CloseProgramAccountAccounts,
+        args: CloseProgramAccountArguments,
+    },
+    OrcaSwap {
+        accounts: OrcaSwapAccounts,
+        args: OrcaSwapArguments,
+    },
+    SignTerms {
+        accounts: SignTermsAccounts,
+        args: SignTermsArguments,
+    },
+    UpdateStrategyAdmin {
+        accounts: UpdateStrategyAdminAccounts,
+        args: UpdateStrategyAdminArguments,
+    },
+}
+impl Instruction {
+    pub fn decode(account_keys: &[String], data: &[u8]) -> anyhow::Result<Self> {
+        if data.len() < 8 {
+            anyhow::bail!("Data too short: {}", data.len());
+        }
+        let (disc_slice, rest) = data.split_at(8);
+        let disc: [u8; 8] = disc_slice.try_into().unwrap();
+        match disc {
+            [208u8, 119u8, 144u8, 145u8, 178u8, 57u8, 105u8, 252u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = InitializeStrategyArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let adminAuthority = keys.next().unwrap().clone();
+                let globalConfig = keys.next().unwrap().clone();
+                let pool = keys.next().unwrap().clone();
+                let tokenAMint = keys.next().unwrap().clone();
+                let tokenBMint = keys.next().unwrap().clone();
+                let tokenAVault = keys.next().unwrap().clone();
+                let tokenBVault = keys.next().unwrap().clone();
+                let baseVaultAuthority = keys.next().unwrap().clone();
+                let sharesMint = keys.next().unwrap().clone();
+                let sharesMintAuthority = keys.next().unwrap().clone();
+                let tokenInfos = keys.next().unwrap().clone();
+                let systemProgram = keys.next().unwrap().clone();
+                let rent = keys.next().unwrap().clone();
+                let tokenProgram = keys.next().unwrap().clone();
+                let tokenATokenProgram = keys.next().unwrap().clone();
+                let tokenBTokenProgram = keys.next().unwrap().clone();
+                let strategy = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = InitializeStrategyAccounts {
+                    adminAuthority,
+                    globalConfig,
+                    pool,
+                    tokenAMint,
+                    tokenBMint,
+                    tokenAVault,
+                    tokenBVault,
+                    baseVaultAuthority,
+                    sharesMint,
+                    sharesMintAuthority,
+                    tokenInfos,
+                    systemProgram,
+                    rent,
+                    tokenProgram,
+                    tokenATokenProgram,
+                    tokenBTokenProgram,
+                    strategy,
+                    remaining,
+                };
+                return Ok(Instruction::InitializeStrategy { accounts, args });
+            }
+            [203u8, 212u8, 8u8, 90u8, 91u8, 118u8, 111u8, 50u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = InitializeKaminoRewardArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let adminAuthority = keys.next().unwrap().clone();
+                let strategy = keys.next().unwrap().clone();
+                let globalConfig = keys.next().unwrap().clone();
+                let rewardMint = keys.next().unwrap().clone();
+                let rewardVault = keys.next().unwrap().clone();
+                let tokenInfos = keys.next().unwrap().clone();
+                let baseVaultAuthority = keys.next().unwrap().clone();
+                let systemProgram = keys.next().unwrap().clone();
+                let rent = keys.next().unwrap().clone();
+                let tokenProgram = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = InitializeKaminoRewardAccounts {
+                    adminAuthority,
+                    strategy,
+                    globalConfig,
+                    rewardMint,
+                    rewardVault,
+                    tokenInfos,
+                    baseVaultAuthority,
+                    systemProgram,
+                    rent,
+                    tokenProgram,
+                    remaining,
+                };
+                return Ok(Instruction::InitializeKaminoReward { accounts, args });
+            }
+            [174u8, 174u8, 142u8, 193u8, 47u8, 77u8, 235u8, 65u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = AddKaminoRewardsArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let adminAuthority = keys.next().unwrap().clone();
+                let strategy = keys.next().unwrap().clone();
+                let rewardMint = keys.next().unwrap().clone();
+                let rewardVault = keys.next().unwrap().clone();
+                let baseVaultAuthority = keys.next().unwrap().clone();
+                let rewardAta = keys.next().unwrap().clone();
+                let tokenProgram = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = AddKaminoRewardsAccounts {
+                    adminAuthority,
+                    strategy,
+                    rewardMint,
+                    rewardVault,
+                    baseVaultAuthority,
+                    rewardAta,
+                    tokenProgram,
+                    remaining,
+                };
+                return Ok(Instruction::AddKaminoRewards { accounts, args });
+            }
+            [113u8, 216u8, 122u8, 131u8, 225u8, 209u8, 22u8, 55u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = InitializeGlobalConfigArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let adminAuthority = keys.next().unwrap().clone();
+                let globalConfig = keys.next().unwrap().clone();
+                let systemProgram = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = InitializeGlobalConfigAccounts {
+                    adminAuthority,
+                    globalConfig,
+                    systemProgram,
+                    remaining,
+                };
+                return Ok(Instruction::InitializeGlobalConfig { accounts, args });
+            }
+            [74u8, 61u8, 216u8, 76u8, 244u8, 91u8, 18u8, 119u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = InitializeCollateralInfoArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let adminAuthority = keys.next().unwrap().clone();
+                let globalConfig = keys.next().unwrap().clone();
+                let collInfo = keys.next().unwrap().clone();
+                let systemProgram = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = InitializeCollateralInfoAccounts {
+                    adminAuthority,
+                    globalConfig,
+                    collInfo,
+                    systemProgram,
+                    remaining,
+                };
+                return Ok(Instruction::InitializeCollateralInfo { accounts, args });
+            }
+            [76u8, 94u8, 131u8, 44u8, 137u8, 61u8, 161u8, 110u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = UpdateCollateralInfoArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let adminAuthority = keys.next().unwrap().clone();
+                let globalConfig = keys.next().unwrap().clone();
+                let tokenInfos = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = UpdateCollateralInfoAccounts {
+                    adminAuthority,
+                    globalConfig,
+                    tokenInfos,
+                    remaining,
+                };
+                return Ok(Instruction::UpdateCollateralInfo { accounts, args });
+            }
+            [22u8, 97u8, 4u8, 78u8, 166u8, 188u8, 51u8, 190u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = InsertCollateralInfoArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let adminAuthority = keys.next().unwrap().clone();
+                let globalConfig = keys.next().unwrap().clone();
+                let tokenInfos = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = InsertCollateralInfoAccounts {
+                    adminAuthority,
+                    globalConfig,
+                    tokenInfos,
+                    remaining,
+                };
+                return Ok(Instruction::InsertCollateralInfo { accounts, args });
+            }
+            [3u8, 15u8, 172u8, 114u8, 200u8, 0u8, 131u8, 32u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = InitializeSharesMetadataArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let adminAuthority = keys.next().unwrap().clone();
+                let strategy = keys.next().unwrap().clone();
+                let globalConfig = keys.next().unwrap().clone();
+                let sharesMint = keys.next().unwrap().clone();
+                let sharesMetadata = keys.next().unwrap().clone();
+                let sharesMintAuthority = keys.next().unwrap().clone();
+                let systemProgram = keys.next().unwrap().clone();
+                let rent = keys.next().unwrap().clone();
+                let metadataProgram = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = InitializeSharesMetadataAccounts {
+                    adminAuthority,
+                    strategy,
+                    globalConfig,
+                    sharesMint,
+                    sharesMetadata,
+                    sharesMintAuthority,
+                    systemProgram,
+                    rent,
+                    metadataProgram,
+                    remaining,
+                };
+                return Ok(Instruction::InitializeSharesMetadata { accounts, args });
+            }
+            [155u8, 34u8, 122u8, 165u8, 245u8, 137u8, 147u8, 107u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = UpdateSharesMetadataArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let adminAuthority = keys.next().unwrap().clone();
+                let strategy = keys.next().unwrap().clone();
+                let globalConfig = keys.next().unwrap().clone();
+                let sharesMint = keys.next().unwrap().clone();
+                let sharesMetadata = keys.next().unwrap().clone();
+                let sharesMintAuthority = keys.next().unwrap().clone();
+                let metadataProgram = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = UpdateSharesMetadataAccounts {
+                    adminAuthority,
+                    strategy,
+                    globalConfig,
+                    sharesMint,
+                    sharesMetadata,
+                    sharesMintAuthority,
+                    metadataProgram,
+                    remaining,
+                };
+                return Ok(Instruction::UpdateSharesMetadata { accounts, args });
+            }
+            [164u8, 84u8, 130u8, 189u8, 111u8, 58u8, 250u8, 200u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = UpdateGlobalConfigArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let adminAuthority = keys.next().unwrap().clone();
+                let globalConfig = keys.next().unwrap().clone();
+                let systemProgram = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = UpdateGlobalConfigAccounts {
+                    adminAuthority,
+                    globalConfig,
+                    systemProgram,
+                    remaining,
+                };
+                return Ok(Instruction::UpdateGlobalConfig { accounts, args });
+            }
+            [9u8, 241u8, 94u8, 91u8, 173u8, 74u8, 166u8, 119u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = UpdateTreasuryFeeVaultArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let signer = keys.next().unwrap().clone();
+                let globalConfig = keys.next().unwrap().clone();
+                let feeMint = keys.next().unwrap().clone();
+                let treasuryFeeVault = keys.next().unwrap().clone();
+                let treasuryFeeVaultAuthority = keys.next().unwrap().clone();
+                let tokenInfos = keys.next().unwrap().clone();
+                let systemProgram = keys.next().unwrap().clone();
+                let rent = keys.next().unwrap().clone();
+                let tokenProgram = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = UpdateTreasuryFeeVaultAccounts {
+                    signer,
+                    globalConfig,
+                    feeMint,
+                    treasuryFeeVault,
+                    treasuryFeeVaultAuthority,
+                    tokenInfos,
+                    systemProgram,
+                    rent,
+                    tokenProgram,
+                    remaining,
+                };
+                return Ok(Instruction::UpdateTreasuryFeeVault { accounts, args });
+            }
+            [81u8, 217u8, 177u8, 65u8, 40u8, 227u8, 8u8, 165u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = UpdateStrategyConfigArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let adminAuthority = keys.next().unwrap().clone();
+                let newAccount = keys.next().unwrap().clone();
+                let strategy = keys.next().unwrap().clone();
+                let globalConfig = keys.next().unwrap().clone();
+                let systemProgram = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = UpdateStrategyConfigAccounts {
+                    adminAuthority,
+                    newAccount,
+                    strategy,
+                    globalConfig,
+                    systemProgram,
+                    remaining,
+                };
+                return Ok(Instruction::UpdateStrategyConfig { accounts, args });
+            }
+            [203u8, 37u8, 37u8, 96u8, 23u8, 85u8, 233u8, 42u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = UpdateRewardMappingArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let payer = keys.next().unwrap().clone();
+                let strategy = keys.next().unwrap().clone();
+                let globalConfig = keys.next().unwrap().clone();
+                let pool = keys.next().unwrap().clone();
+                let rewardMint = keys.next().unwrap().clone();
+                let rewardVault = keys.next().unwrap().clone();
+                let baseVaultAuthority = keys.next().unwrap().clone();
+                let tokenInfos = keys.next().unwrap().clone();
+                let systemProgram = keys.next().unwrap().clone();
+                let rent = keys.next().unwrap().clone();
+                let tokenProgram = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = UpdateRewardMappingAccounts {
+                    payer,
+                    strategy,
+                    globalConfig,
+                    pool,
+                    rewardMint,
+                    rewardVault,
+                    baseVaultAuthority,
+                    tokenInfos,
+                    systemProgram,
+                    rent,
+                    tokenProgram,
+                    remaining,
+                };
+                return Ok(Instruction::UpdateRewardMapping { accounts, args });
+            }
+            [204u8, 234u8, 204u8, 219u8, 6u8, 91u8, 96u8, 241u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = OpenLiquidityPositionArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let adminAuthority = keys.next().unwrap().clone();
+                let strategy = keys.next().unwrap().clone();
+                let globalConfig = keys.next().unwrap().clone();
+                let pool = keys.next().unwrap().clone();
+                let tickArrayLower = keys.next().unwrap().clone();
+                let tickArrayUpper = keys.next().unwrap().clone();
+                let baseVaultAuthority = keys.next().unwrap().clone();
+                let position = keys.next().unwrap().clone();
+                let positionMint = keys.next().unwrap().clone();
+                let positionMetadataAccount = keys.next().unwrap().clone();
+                let positionTokenAccount = keys.next().unwrap().clone();
+                let rent = keys.next().unwrap().clone();
+                let system = keys.next().unwrap().clone();
+                let tokenProgram = keys.next().unwrap().clone();
+                let tokenProgram2022 = keys.next().unwrap().clone();
+                let tokenATokenProgram = keys.next().unwrap().clone();
+                let tokenBTokenProgram = keys.next().unwrap().clone();
+                let memoProgram = keys.next().unwrap().clone();
+                let associatedTokenProgram = keys.next().unwrap().clone();
+                let poolProgram = keys.next().unwrap().clone();
+                let oldTickArrayLowerOrBaseVaultAuthority = keys.next().unwrap().clone();
+                let oldTickArrayUpperOrBaseVaultAuthority = keys.next().unwrap().clone();
+                let oldPositionOrBaseVaultAuthority = keys.next().unwrap().clone();
+                let oldPositionMintOrBaseVaultAuthority = keys.next().unwrap().clone();
+                let oldPositionTokenAccountOrBaseVaultAuthority = keys.next().unwrap().clone();
+                let tokenAVault = keys.next().unwrap().clone();
+                let tokenBVault = keys.next().unwrap().clone();
+                let tokenAMint = keys.next().unwrap().clone();
+                let tokenBMint = keys.next().unwrap().clone();
+                let poolTokenVaultA = keys.next().unwrap().clone();
+                let poolTokenVaultB = keys.next().unwrap().clone();
+                let scopePrices = keys.next().unwrap().clone();
+                let tokenInfos = keys.next().unwrap().clone();
+                let eventAuthority = keys.next().unwrap().clone();
+                let consensusAccount = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = OpenLiquidityPositionAccounts {
+                    adminAuthority,
+                    strategy,
+                    globalConfig,
+                    pool,
+                    tickArrayLower,
+                    tickArrayUpper,
+                    baseVaultAuthority,
+                    position,
+                    positionMint,
+                    positionMetadataAccount,
+                    positionTokenAccount,
+                    rent,
+                    system,
+                    tokenProgram,
+                    tokenProgram2022,
+                    tokenATokenProgram,
+                    tokenBTokenProgram,
+                    memoProgram,
+                    associatedTokenProgram,
+                    poolProgram,
+                    oldTickArrayLowerOrBaseVaultAuthority,
+                    oldTickArrayUpperOrBaseVaultAuthority,
+                    oldPositionOrBaseVaultAuthority,
+                    oldPositionMintOrBaseVaultAuthority,
+                    oldPositionTokenAccountOrBaseVaultAuthority,
+                    tokenAVault,
+                    tokenBVault,
+                    tokenAMint,
+                    tokenBMint,
+                    poolTokenVaultA,
+                    poolTokenVaultB,
+                    scopePrices,
+                    tokenInfos,
+                    eventAuthority,
+                    consensusAccount,
+                    remaining,
+                };
+                return Ok(Instruction::OpenLiquidityPosition { accounts, args });
+            }
+            [56u8, 247u8, 170u8, 246u8, 89u8, 221u8, 134u8, 200u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = CloseStrategyArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let adminAuthority = keys.next().unwrap().clone();
+                let strategy = keys.next().unwrap().clone();
+                let oldPositionOrBaseVaultAuthority = keys.next().unwrap().clone();
+                let oldPositionMintOrBaseVaultAuthority = keys.next().unwrap().clone();
+                let oldPositionTokenAccountOrBaseVaultAuthority = keys.next().unwrap().clone();
+                let oldTickArrayLowerOrBaseVaultAuthority = keys.next().unwrap().clone();
+                let oldTickArrayUpperOrBaseVaultAuthority = keys.next().unwrap().clone();
+                let pool = keys.next().unwrap().clone();
+                let tokenAVault = keys.next().unwrap().clone();
+                let tokenBVault = keys.next().unwrap().clone();
+                let userTokenAAta = keys.next().unwrap().clone();
+                let userTokenBAta = keys.next().unwrap().clone();
+                let tokenAMint = keys.next().unwrap().clone();
+                let tokenBMint = keys.next().unwrap().clone();
+                let reward0Vault = keys.next().unwrap().clone();
+                let reward1Vault = keys.next().unwrap().clone();
+                let reward2Vault = keys.next().unwrap().clone();
+                let kaminoReward0Vault = keys.next().unwrap().clone();
+                let kaminoReward1Vault = keys.next().unwrap().clone();
+                let kaminoReward2Vault = keys.next().unwrap().clone();
+                let userReward0Ata = keys.next().unwrap().clone();
+                let userReward1Ata = keys.next().unwrap().clone();
+                let userReward2Ata = keys.next().unwrap().clone();
+                let userKaminoReward0Ata = keys.next().unwrap().clone();
+                let userKaminoReward1Ata = keys.next().unwrap().clone();
+                let userKaminoReward2Ata = keys.next().unwrap().clone();
+                let baseVaultAuthority = keys.next().unwrap().clone();
+                let poolProgram = keys.next().unwrap().clone();
+                let tokenProgram = keys.next().unwrap().clone();
+                let tokenATokenProgram = keys.next().unwrap().clone();
+                let tokenBTokenProgram = keys.next().unwrap().clone();
+                let system = keys.next().unwrap().clone();
+                let eventAuthority = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = CloseStrategyAccounts {
+                    adminAuthority,
+                    strategy,
+                    oldPositionOrBaseVaultAuthority,
+                    oldPositionMintOrBaseVaultAuthority,
+                    oldPositionTokenAccountOrBaseVaultAuthority,
+                    oldTickArrayLowerOrBaseVaultAuthority,
+                    oldTickArrayUpperOrBaseVaultAuthority,
+                    pool,
+                    tokenAVault,
+                    tokenBVault,
+                    userTokenAAta,
+                    userTokenBAta,
+                    tokenAMint,
+                    tokenBMint,
+                    reward0Vault,
+                    reward1Vault,
+                    reward2Vault,
+                    kaminoReward0Vault,
+                    kaminoReward1Vault,
+                    kaminoReward2Vault,
+                    userReward0Ata,
+                    userReward1Ata,
+                    userReward2Ata,
+                    userKaminoReward0Ata,
+                    userKaminoReward1Ata,
+                    userKaminoReward2Ata,
+                    baseVaultAuthority,
+                    poolProgram,
+                    tokenProgram,
+                    tokenATokenProgram,
+                    tokenBTokenProgram,
+                    system,
+                    eventAuthority,
+                    remaining,
+                };
+                return Ok(Instruction::CloseStrategy { accounts, args });
+            }
+            [242u8, 35u8, 198u8, 137u8, 82u8, 225u8, 242u8, 182u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = DepositArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let user = keys.next().unwrap().clone();
+                let strategy = keys.next().unwrap().clone();
+                let globalConfig = keys.next().unwrap().clone();
+                let pool = keys.next().unwrap().clone();
+                let position = keys.next().unwrap().clone();
+                let tickArrayLower = keys.next().unwrap().clone();
+                let tickArrayUpper = keys.next().unwrap().clone();
+                let tokenAVault = keys.next().unwrap().clone();
+                let tokenBVault = keys.next().unwrap().clone();
+                let baseVaultAuthority = keys.next().unwrap().clone();
+                let tokenAAta = keys.next().unwrap().clone();
+                let tokenBAta = keys.next().unwrap().clone();
+                let tokenAMint = keys.next().unwrap().clone();
+                let tokenBMint = keys.next().unwrap().clone();
+                let userSharesAta = keys.next().unwrap().clone();
+                let sharesMint = keys.next().unwrap().clone();
+                let sharesMintAuthority = keys.next().unwrap().clone();
+                let scopePrices = keys.next().unwrap().clone();
+                let tokenInfos = keys.next().unwrap().clone();
+                let tokenProgram = keys.next().unwrap().clone();
+                let tokenATokenProgram = keys.next().unwrap().clone();
+                let tokenBTokenProgram = keys.next().unwrap().clone();
+                let instructionSysvarAccount = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = DepositAccounts {
+                    user,
+                    strategy,
+                    globalConfig,
+                    pool,
+                    position,
+                    tickArrayLower,
+                    tickArrayUpper,
+                    tokenAVault,
+                    tokenBVault,
+                    baseVaultAuthority,
+                    tokenAAta,
+                    tokenBAta,
+                    tokenAMint,
+                    tokenBMint,
+                    userSharesAta,
+                    sharesMint,
+                    sharesMintAuthority,
+                    scopePrices,
+                    tokenInfos,
+                    tokenProgram,
+                    tokenATokenProgram,
+                    tokenBTokenProgram,
+                    instructionSysvarAccount,
+                    remaining,
+                };
+                return Ok(Instruction::Deposit { accounts, args });
+            }
+            [13u8, 245u8, 180u8, 103u8, 254u8, 182u8, 121u8, 4u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = InvestArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let payer = keys.next().unwrap().clone();
+                let strategy = keys.next().unwrap().clone();
+                let globalConfig = keys.next().unwrap().clone();
+                let tokenAVault = keys.next().unwrap().clone();
+                let tokenBVault = keys.next().unwrap().clone();
+                let tokenAMint = keys.next().unwrap().clone();
+                let tokenBMint = keys.next().unwrap().clone();
+                let baseVaultAuthority = keys.next().unwrap().clone();
+                let pool = keys.next().unwrap().clone();
+                let tokenATokenProgram = keys.next().unwrap().clone();
+                let tokenBTokenProgram = keys.next().unwrap().clone();
+                let memoProgram = keys.next().unwrap().clone();
+                let tokenProgram = keys.next().unwrap().clone();
+                let tokenProgram2022 = keys.next().unwrap().clone();
+                let position = keys.next().unwrap().clone();
+                let raydiumProtocolPositionOrBaseVaultAuthority = keys.next().unwrap().clone();
+                let positionTokenAccount = keys.next().unwrap().clone();
+                let poolTokenVaultA = keys.next().unwrap().clone();
+                let poolTokenVaultB = keys.next().unwrap().clone();
+                let tickArrayLower = keys.next().unwrap().clone();
+                let tickArrayUpper = keys.next().unwrap().clone();
+                let scopePrices = keys.next().unwrap().clone();
+                let tokenInfos = keys.next().unwrap().clone();
+                let poolProgram = keys.next().unwrap().clone();
+                let instructionSysvarAccount = keys.next().unwrap().clone();
+                let eventAuthority = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = InvestAccounts {
+                    payer,
+                    strategy,
+                    globalConfig,
+                    tokenAVault,
+                    tokenBVault,
+                    tokenAMint,
+                    tokenBMint,
+                    baseVaultAuthority,
+                    pool,
+                    tokenATokenProgram,
+                    tokenBTokenProgram,
+                    memoProgram,
+                    tokenProgram,
+                    tokenProgram2022,
+                    position,
+                    raydiumProtocolPositionOrBaseVaultAuthority,
+                    positionTokenAccount,
+                    poolTokenVaultA,
+                    poolTokenVaultB,
+                    tickArrayLower,
+                    tickArrayUpper,
+                    scopePrices,
+                    tokenInfos,
+                    poolProgram,
+                    instructionSysvarAccount,
+                    eventAuthority,
+                    remaining,
+                };
+                return Ok(Instruction::Invest { accounts, args });
+            }
+            [22u8, 157u8, 173u8, 6u8, 187u8, 25u8, 86u8, 109u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = DepositAndInvestArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let user = keys.next().unwrap().clone();
+                let strategy = keys.next().unwrap().clone();
+                let globalConfig = keys.next().unwrap().clone();
+                let pool = keys.next().unwrap().clone();
+                let position = keys.next().unwrap().clone();
+                let raydiumProtocolPositionOrBaseVaultAuthority = keys.next().unwrap().clone();
+                let positionTokenAccount = keys.next().unwrap().clone();
+                let tokenAVault = keys.next().unwrap().clone();
+                let tokenBVault = keys.next().unwrap().clone();
+                let poolTokenVaultA = keys.next().unwrap().clone();
+                let poolTokenVaultB = keys.next().unwrap().clone();
+                let tickArrayLower = keys.next().unwrap().clone();
+                let tickArrayUpper = keys.next().unwrap().clone();
+                let baseVaultAuthority = keys.next().unwrap().clone();
+                let tokenAAta = keys.next().unwrap().clone();
+                let tokenBAta = keys.next().unwrap().clone();
+                let tokenAMint = keys.next().unwrap().clone();
+                let tokenBMint = keys.next().unwrap().clone();
+                let userSharesAta = keys.next().unwrap().clone();
+                let sharesMint = keys.next().unwrap().clone();
+                let sharesMintAuthority = keys.next().unwrap().clone();
+                let scopePrices = keys.next().unwrap().clone();
+                let tokenInfos = keys.next().unwrap().clone();
+                let tokenProgram = keys.next().unwrap().clone();
+                let tokenProgram2022 = keys.next().unwrap().clone();
+                let tokenATokenProgram = keys.next().unwrap().clone();
+                let tokenBTokenProgram = keys.next().unwrap().clone();
+                let memoProgram = keys.next().unwrap().clone();
+                let poolProgram = keys.next().unwrap().clone();
+                let instructionSysvarAccount = keys.next().unwrap().clone();
+                let eventAuthority = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = DepositAndInvestAccounts {
+                    user,
+                    strategy,
+                    globalConfig,
+                    pool,
+                    position,
+                    raydiumProtocolPositionOrBaseVaultAuthority,
+                    positionTokenAccount,
+                    tokenAVault,
+                    tokenBVault,
+                    poolTokenVaultA,
+                    poolTokenVaultB,
+                    tickArrayLower,
+                    tickArrayUpper,
+                    baseVaultAuthority,
+                    tokenAAta,
+                    tokenBAta,
+                    tokenAMint,
+                    tokenBMint,
+                    userSharesAta,
+                    sharesMint,
+                    sharesMintAuthority,
+                    scopePrices,
+                    tokenInfos,
+                    tokenProgram,
+                    tokenProgram2022,
+                    tokenATokenProgram,
+                    tokenBTokenProgram,
+                    memoProgram,
+                    poolProgram,
+                    instructionSysvarAccount,
+                    eventAuthority,
+                    remaining,
+                };
+                return Ok(Instruction::DepositAndInvest { accounts, args });
+            }
+            [183u8, 18u8, 70u8, 156u8, 148u8, 109u8, 161u8, 34u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = WithdrawArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let user = keys.next().unwrap().clone();
+                let strategy = keys.next().unwrap().clone();
+                let globalConfig = keys.next().unwrap().clone();
+                let pool = keys.next().unwrap().clone();
+                let position = keys.next().unwrap().clone();
+                let tickArrayLower = keys.next().unwrap().clone();
+                let tickArrayUpper = keys.next().unwrap().clone();
+                let tokenAVault = keys.next().unwrap().clone();
+                let tokenBVault = keys.next().unwrap().clone();
+                let baseVaultAuthority = keys.next().unwrap().clone();
+                let poolTokenVaultA = keys.next().unwrap().clone();
+                let poolTokenVaultB = keys.next().unwrap().clone();
+                let tokenAAta = keys.next().unwrap().clone();
+                let tokenBAta = keys.next().unwrap().clone();
+                let tokenAMint = keys.next().unwrap().clone();
+                let tokenBMint = keys.next().unwrap().clone();
+                let userSharesAta = keys.next().unwrap().clone();
+                let sharesMint = keys.next().unwrap().clone();
+                let treasuryFeeTokenAVault = keys.next().unwrap().clone();
+                let treasuryFeeTokenBVault = keys.next().unwrap().clone();
+                let tokenProgram = keys.next().unwrap().clone();
+                let tokenProgram2022 = keys.next().unwrap().clone();
+                let tokenATokenProgram = keys.next().unwrap().clone();
+                let tokenBTokenProgram = keys.next().unwrap().clone();
+                let memoProgram = keys.next().unwrap().clone();
+                let positionTokenAccount = keys.next().unwrap().clone();
+                let poolProgram = keys.next().unwrap().clone();
+                let instructionSysvarAccount = keys.next().unwrap().clone();
+                let eventAuthority = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = WithdrawAccounts {
+                    user,
+                    strategy,
+                    globalConfig,
+                    pool,
+                    position,
+                    tickArrayLower,
+                    tickArrayUpper,
+                    tokenAVault,
+                    tokenBVault,
+                    baseVaultAuthority,
+                    poolTokenVaultA,
+                    poolTokenVaultB,
+                    tokenAAta,
+                    tokenBAta,
+                    tokenAMint,
+                    tokenBMint,
+                    userSharesAta,
+                    sharesMint,
+                    treasuryFeeTokenAVault,
+                    treasuryFeeTokenBVault,
+                    tokenProgram,
+                    tokenProgram2022,
+                    tokenATokenProgram,
+                    tokenBTokenProgram,
+                    memoProgram,
+                    positionTokenAccount,
+                    poolProgram,
+                    instructionSysvarAccount,
+                    eventAuthority,
+                    remaining,
+                };
+                return Ok(Instruction::Withdraw { accounts, args });
+            }
+            [159u8, 39u8, 110u8, 137u8, 100u8, 234u8, 204u8, 141u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = ExecutiveWithdrawArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let adminAuthority = keys.next().unwrap().clone();
+                let strategy = keys.next().unwrap().clone();
+                let globalConfig = keys.next().unwrap().clone();
+                let pool = keys.next().unwrap().clone();
+                let position = keys.next().unwrap().clone();
+                let raydiumProtocolPositionOrBaseVaultAuthority = keys.next().unwrap().clone();
+                let positionTokenAccount = keys.next().unwrap().clone();
+                let tickArrayLower = keys.next().unwrap().clone();
+                let tickArrayUpper = keys.next().unwrap().clone();
+                let tokenAVault = keys.next().unwrap().clone();
+                let tokenBVault = keys.next().unwrap().clone();
+                let baseVaultAuthority = keys.next().unwrap().clone();
+                let poolTokenVaultA = keys.next().unwrap().clone();
+                let poolTokenVaultB = keys.next().unwrap().clone();
+                let tokenAMint = keys.next().unwrap().clone();
+                let tokenBMint = keys.next().unwrap().clone();
+                let scopePrices = keys.next().unwrap().clone();
+                let tokenInfos = keys.next().unwrap().clone();
+                let tokenATokenProgram = keys.next().unwrap().clone();
+                let tokenBTokenProgram = keys.next().unwrap().clone();
+                let memoProgram = keys.next().unwrap().clone();
+                let tokenProgram = keys.next().unwrap().clone();
+                let tokenProgram2022 = keys.next().unwrap().clone();
+                let poolProgram = keys.next().unwrap().clone();
+                let eventAuthority = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = ExecutiveWithdrawAccounts {
+                    adminAuthority,
+                    strategy,
+                    globalConfig,
+                    pool,
+                    position,
+                    raydiumProtocolPositionOrBaseVaultAuthority,
+                    positionTokenAccount,
+                    tickArrayLower,
+                    tickArrayUpper,
+                    tokenAVault,
+                    tokenBVault,
+                    baseVaultAuthority,
+                    poolTokenVaultA,
+                    poolTokenVaultB,
+                    tokenAMint,
+                    tokenBMint,
+                    scopePrices,
+                    tokenInfos,
+                    tokenATokenProgram,
+                    tokenBTokenProgram,
+                    memoProgram,
+                    tokenProgram,
+                    tokenProgram2022,
+                    poolProgram,
+                    eventAuthority,
+                    remaining,
+                };
+                return Ok(Instruction::ExecutiveWithdraw { accounts, args });
+            }
+            [63u8, 130u8, 90u8, 197u8, 39u8, 16u8, 143u8, 176u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = CollectRewardsArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let user = keys.next().unwrap().clone();
+                let strategy = keys.next().unwrap().clone();
+                let globalConfig = keys.next().unwrap().clone();
+                let baseVaultAuthority = keys.next().unwrap().clone();
+                let pool = keys.next().unwrap().clone();
+                let tickArrayLower = keys.next().unwrap().clone();
+                let tickArrayUpper = keys.next().unwrap().clone();
+                let position = keys.next().unwrap().clone();
+                let raydiumProtocolPositionOrBaseVaultAuthority = keys.next().unwrap().clone();
+                let positionTokenAccount = keys.next().unwrap().clone();
+                let tokenAVault = keys.next().unwrap().clone();
+                let poolTokenVaultA = keys.next().unwrap().clone();
+                let tokenBVault = keys.next().unwrap().clone();
+                let poolTokenVaultB = keys.next().unwrap().clone();
+                let treasuryFeeTokenAVault = keys.next().unwrap().clone();
+                let treasuryFeeTokenBVault = keys.next().unwrap().clone();
+                let treasuryFeeVaultAuthority = keys.next().unwrap().clone();
+                let reward0Vault = keys.next().unwrap().clone();
+                let reward1Vault = keys.next().unwrap().clone();
+                let reward2Vault = keys.next().unwrap().clone();
+                let poolRewardVault0 = keys.next().unwrap().clone();
+                let poolRewardVault1 = keys.next().unwrap().clone();
+                let poolRewardVault2 = keys.next().unwrap().clone();
+                let tokenAMint = keys.next().unwrap().clone();
+                let tokenBMint = keys.next().unwrap().clone();
+                let tokenATokenProgram = keys.next().unwrap().clone();
+                let tokenBTokenProgram = keys.next().unwrap().clone();
+                let memoProgram = keys.next().unwrap().clone();
+                let tokenProgram = keys.next().unwrap().clone();
+                let tokenProgram2022 = keys.next().unwrap().clone();
+                let poolProgram = keys.next().unwrap().clone();
+                let instructionSysvarAccount = keys.next().unwrap().clone();
+                let eventAuthority = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = CollectRewardsAccounts {
+                    user,
+                    strategy,
+                    globalConfig,
+                    baseVaultAuthority,
+                    pool,
+                    tickArrayLower,
+                    tickArrayUpper,
+                    position,
+                    raydiumProtocolPositionOrBaseVaultAuthority,
+                    positionTokenAccount,
+                    tokenAVault,
+                    poolTokenVaultA,
+                    tokenBVault,
+                    poolTokenVaultB,
+                    treasuryFeeTokenAVault,
+                    treasuryFeeTokenBVault,
+                    treasuryFeeVaultAuthority,
+                    reward0Vault,
+                    reward1Vault,
+                    reward2Vault,
+                    poolRewardVault0,
+                    poolRewardVault1,
+                    poolRewardVault2,
+                    tokenAMint,
+                    tokenBMint,
+                    tokenATokenProgram,
+                    tokenBTokenProgram,
+                    memoProgram,
+                    tokenProgram,
+                    tokenProgram2022,
+                    poolProgram,
+                    instructionSysvarAccount,
+                    eventAuthority,
+                    remaining,
+                };
+                return Ok(Instruction::CollectRewards { accounts, args });
+            }
+            [164u8, 152u8, 207u8, 99u8, 30u8, 186u8, 19u8, 182u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = CollectFeesArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let user = keys.next().unwrap().clone();
+                let strategy = keys.next().unwrap().clone();
+                let globalConfig = keys.next().unwrap().clone();
+                let baseVaultAuthority = keys.next().unwrap().clone();
+                let pool = keys.next().unwrap().clone();
+                let tickArrayLower = keys.next().unwrap().clone();
+                let tickArrayUpper = keys.next().unwrap().clone();
+                let position = keys.next().unwrap().clone();
+                let raydiumProtocolPositionOrBaseVaultAuthority = keys.next().unwrap().clone();
+                let positionTokenAccount = keys.next().unwrap().clone();
+                let tokenAVault = keys.next().unwrap().clone();
+                let poolTokenVaultA = keys.next().unwrap().clone();
+                let tokenBVault = keys.next().unwrap().clone();
+                let poolTokenVaultB = keys.next().unwrap().clone();
+                let treasuryFeeTokenAVault = keys.next().unwrap().clone();
+                let treasuryFeeTokenBVault = keys.next().unwrap().clone();
+                let treasuryFeeVaultAuthority = keys.next().unwrap().clone();
+                let reward0Vault = keys.next().unwrap().clone();
+                let reward1Vault = keys.next().unwrap().clone();
+                let reward2Vault = keys.next().unwrap().clone();
+                let poolRewardVault0 = keys.next().unwrap().clone();
+                let poolRewardVault1 = keys.next().unwrap().clone();
+                let poolRewardVault2 = keys.next().unwrap().clone();
+                let tokenAMint = keys.next().unwrap().clone();
+                let tokenBMint = keys.next().unwrap().clone();
+                let tokenATokenProgram = keys.next().unwrap().clone();
+                let tokenBTokenProgram = keys.next().unwrap().clone();
+                let memoProgram = keys.next().unwrap().clone();
+                let tokenProgram = keys.next().unwrap().clone();
+                let tokenProgram2022 = keys.next().unwrap().clone();
+                let poolProgram = keys.next().unwrap().clone();
+                let instructionSysvarAccount = keys.next().unwrap().clone();
+                let eventAuthority = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = CollectFeesAccounts {
+                    user,
+                    strategy,
+                    globalConfig,
+                    baseVaultAuthority,
+                    pool,
+                    tickArrayLower,
+                    tickArrayUpper,
+                    position,
+                    raydiumProtocolPositionOrBaseVaultAuthority,
+                    positionTokenAccount,
+                    tokenAVault,
+                    poolTokenVaultA,
+                    tokenBVault,
+                    poolTokenVaultB,
+                    treasuryFeeTokenAVault,
+                    treasuryFeeTokenBVault,
+                    treasuryFeeVaultAuthority,
+                    reward0Vault,
+                    reward1Vault,
+                    reward2Vault,
+                    poolRewardVault0,
+                    poolRewardVault1,
+                    poolRewardVault2,
+                    tokenAMint,
+                    tokenBMint,
+                    tokenATokenProgram,
+                    tokenBTokenProgram,
+                    memoProgram,
+                    tokenProgram,
+                    tokenProgram2022,
+                    poolProgram,
+                    instructionSysvarAccount,
+                    eventAuthority,
+                    remaining,
+                };
+                return Ok(Instruction::CollectFees { accounts, args });
+            }
+            [92u8, 41u8, 172u8, 30u8, 190u8, 65u8, 174u8, 90u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = SwapRewardsArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let user = keys.next().unwrap().clone();
+                let strategy = keys.next().unwrap().clone();
+                let globalConfig = keys.next().unwrap().clone();
+                let pool = keys.next().unwrap().clone();
+                let tokenAVault = keys.next().unwrap().clone();
+                let tokenBVault = keys.next().unwrap().clone();
+                let rewardVault = keys.next().unwrap().clone();
+                let baseVaultAuthority = keys.next().unwrap().clone();
+                let treasuryFeeTokenAVault = keys.next().unwrap().clone();
+                let treasuryFeeTokenBVault = keys.next().unwrap().clone();
+                let treasuryFeeVaultAuthority = keys.next().unwrap().clone();
+                let tokenAMint = keys.next().unwrap().clone();
+                let tokenBMint = keys.next().unwrap().clone();
+                let rewardMint = keys.next().unwrap().clone();
+                let userTokenAAta = keys.next().unwrap().clone();
+                let userTokenBAta = keys.next().unwrap().clone();
+                let userRewardTokenAccount = keys.next().unwrap().clone();
+                let scopePrices = keys.next().unwrap().clone();
+                let tokenInfos = keys.next().unwrap().clone();
+                let systemProgram = keys.next().unwrap().clone();
+                let tokenATokenProgram = keys.next().unwrap().clone();
+                let tokenBTokenProgram = keys.next().unwrap().clone();
+                let rewardTokenProgram = keys.next().unwrap().clone();
+                let instructionSysvarAccount = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = SwapRewardsAccounts {
+                    user,
+                    strategy,
+                    globalConfig,
+                    pool,
+                    tokenAVault,
+                    tokenBVault,
+                    rewardVault,
+                    baseVaultAuthority,
+                    treasuryFeeTokenAVault,
+                    treasuryFeeTokenBVault,
+                    treasuryFeeVaultAuthority,
+                    tokenAMint,
+                    tokenBMint,
+                    rewardMint,
+                    userTokenAAta,
+                    userTokenBAta,
+                    userRewardTokenAccount,
+                    scopePrices,
+                    tokenInfos,
+                    systemProgram,
+                    tokenATokenProgram,
+                    tokenBTokenProgram,
+                    rewardTokenProgram,
+                    instructionSysvarAccount,
+                    remaining,
+                };
+                return Ok(Instruction::SwapRewards { accounts, args });
+            }
+            [75u8, 151u8, 187u8, 125u8, 50u8, 4u8, 11u8, 71u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = CheckExpectedVaultsBalancesArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let user = keys.next().unwrap().clone();
+                let tokenAAta = keys.next().unwrap().clone();
+                let tokenBAta = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = CheckExpectedVaultsBalancesAccounts {
+                    user,
+                    tokenAAta,
+                    tokenBAta,
+                    remaining,
+                };
+                return Ok(Instruction::CheckExpectedVaultsBalances { accounts, args });
+            }
+            [118u8, 134u8, 143u8, 192u8, 188u8, 21u8, 131u8, 17u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = SingleTokenDepositAndInvestWithMinArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let user = keys.next().unwrap().clone();
+                let strategy = keys.next().unwrap().clone();
+                let globalConfig = keys.next().unwrap().clone();
+                let pool = keys.next().unwrap().clone();
+                let position = keys.next().unwrap().clone();
+                let raydiumProtocolPositionOrBaseVaultAuthority = keys.next().unwrap().clone();
+                let positionTokenAccount = keys.next().unwrap().clone();
+                let tokenAVault = keys.next().unwrap().clone();
+                let tokenBVault = keys.next().unwrap().clone();
+                let poolTokenVaultA = keys.next().unwrap().clone();
+                let poolTokenVaultB = keys.next().unwrap().clone();
+                let tickArrayLower = keys.next().unwrap().clone();
+                let tickArrayUpper = keys.next().unwrap().clone();
+                let baseVaultAuthority = keys.next().unwrap().clone();
+                let tokenAAta = keys.next().unwrap().clone();
+                let tokenBAta = keys.next().unwrap().clone();
+                let tokenAMint = keys.next().unwrap().clone();
+                let tokenBMint = keys.next().unwrap().clone();
+                let userSharesAta = keys.next().unwrap().clone();
+                let sharesMint = keys.next().unwrap().clone();
+                let sharesMintAuthority = keys.next().unwrap().clone();
+                let scopePrices = keys.next().unwrap().clone();
+                let tokenInfos = keys.next().unwrap().clone();
+                let tokenProgram = keys.next().unwrap().clone();
+                let tokenProgram2022 = keys.next().unwrap().clone();
+                let tokenATokenProgram = keys.next().unwrap().clone();
+                let tokenBTokenProgram = keys.next().unwrap().clone();
+                let memoProgram = keys.next().unwrap().clone();
+                let poolProgram = keys.next().unwrap().clone();
+                let instructionSysvarAccount = keys.next().unwrap().clone();
+                let eventAuthority = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = SingleTokenDepositAndInvestWithMinAccounts {
+                    user,
+                    strategy,
+                    globalConfig,
+                    pool,
+                    position,
+                    raydiumProtocolPositionOrBaseVaultAuthority,
+                    positionTokenAccount,
+                    tokenAVault,
+                    tokenBVault,
+                    poolTokenVaultA,
+                    poolTokenVaultB,
+                    tickArrayLower,
+                    tickArrayUpper,
+                    baseVaultAuthority,
+                    tokenAAta,
+                    tokenBAta,
+                    tokenAMint,
+                    tokenBMint,
+                    userSharesAta,
+                    sharesMint,
+                    sharesMintAuthority,
+                    scopePrices,
+                    tokenInfos,
+                    tokenProgram,
+                    tokenProgram2022,
+                    tokenATokenProgram,
+                    tokenBTokenProgram,
+                    memoProgram,
+                    poolProgram,
+                    instructionSysvarAccount,
+                    eventAuthority,
+                    remaining,
+                };
+                return Ok(Instruction::SingleTokenDepositAndInvestWithMin { accounts, args });
+            }
+            [250u8, 142u8, 102u8, 160u8, 72u8, 12u8, 83u8, 139u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = SingleTokenDepositWithMinArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let user = keys.next().unwrap().clone();
+                let strategy = keys.next().unwrap().clone();
+                let globalConfig = keys.next().unwrap().clone();
+                let pool = keys.next().unwrap().clone();
+                let position = keys.next().unwrap().clone();
+                let tickArrayLower = keys.next().unwrap().clone();
+                let tickArrayUpper = keys.next().unwrap().clone();
+                let tokenAVault = keys.next().unwrap().clone();
+                let tokenBVault = keys.next().unwrap().clone();
+                let baseVaultAuthority = keys.next().unwrap().clone();
+                let tokenAAta = keys.next().unwrap().clone();
+                let tokenBAta = keys.next().unwrap().clone();
+                let tokenAMint = keys.next().unwrap().clone();
+                let tokenBMint = keys.next().unwrap().clone();
+                let userSharesAta = keys.next().unwrap().clone();
+                let sharesMint = keys.next().unwrap().clone();
+                let sharesMintAuthority = keys.next().unwrap().clone();
+                let scopePrices = keys.next().unwrap().clone();
+                let tokenInfos = keys.next().unwrap().clone();
+                let tokenProgram = keys.next().unwrap().clone();
+                let tokenATokenProgram = keys.next().unwrap().clone();
+                let tokenBTokenProgram = keys.next().unwrap().clone();
+                let instructionSysvarAccount = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = SingleTokenDepositWithMinAccounts {
+                    user,
+                    strategy,
+                    globalConfig,
+                    pool,
+                    position,
+                    tickArrayLower,
+                    tickArrayUpper,
+                    tokenAVault,
+                    tokenBVault,
+                    baseVaultAuthority,
+                    tokenAAta,
+                    tokenBAta,
+                    tokenAMint,
+                    tokenBMint,
+                    userSharesAta,
+                    sharesMint,
+                    sharesMintAuthority,
+                    scopePrices,
+                    tokenInfos,
+                    tokenProgram,
+                    tokenATokenProgram,
+                    tokenBTokenProgram,
+                    instructionSysvarAccount,
+                    remaining,
+                };
+                return Ok(Instruction::SingleTokenDepositWithMin { accounts, args });
+            }
+            [129u8, 111u8, 174u8, 12u8, 10u8, 60u8, 149u8, 193u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = FlashSwapUnevenVaultsStartArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let swapper = keys.next().unwrap().clone();
+                let strategy = keys.next().unwrap().clone();
+                let globalConfig = keys.next().unwrap().clone();
+                let tokenAVault = keys.next().unwrap().clone();
+                let tokenBVault = keys.next().unwrap().clone();
+                let tokenAAta = keys.next().unwrap().clone();
+                let tokenBAta = keys.next().unwrap().clone();
+                let baseVaultAuthority = keys.next().unwrap().clone();
+                let pool = keys.next().unwrap().clone();
+                let position = keys.next().unwrap().clone();
+                let scopePrices = keys.next().unwrap().clone();
+                let tokenInfos = keys.next().unwrap().clone();
+                let tickArrayLower = keys.next().unwrap().clone();
+                let tickArrayUpper = keys.next().unwrap().clone();
+                let tokenAMint = keys.next().unwrap().clone();
+                let tokenBMint = keys.next().unwrap().clone();
+                let tokenATokenProgram = keys.next().unwrap().clone();
+                let tokenBTokenProgram = keys.next().unwrap().clone();
+                let instructionSysvarAccount = keys.next().unwrap().clone();
+                let consensusAccount = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = FlashSwapUnevenVaultsStartAccounts {
+                    swapper,
+                    strategy,
+                    globalConfig,
+                    tokenAVault,
+                    tokenBVault,
+                    tokenAAta,
+                    tokenBAta,
+                    baseVaultAuthority,
+                    pool,
+                    position,
+                    scopePrices,
+                    tokenInfos,
+                    tickArrayLower,
+                    tickArrayUpper,
+                    tokenAMint,
+                    tokenBMint,
+                    tokenATokenProgram,
+                    tokenBTokenProgram,
+                    instructionSysvarAccount,
+                    consensusAccount,
+                    remaining,
+                };
+                return Ok(Instruction::FlashSwapUnevenVaultsStart { accounts, args });
+            }
+            [226u8, 2u8, 190u8, 101u8, 202u8, 132u8, 156u8, 20u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = FlashSwapUnevenVaultsEndArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let swapper = keys.next().unwrap().clone();
+                let strategy = keys.next().unwrap().clone();
+                let globalConfig = keys.next().unwrap().clone();
+                let tokenAVault = keys.next().unwrap().clone();
+                let tokenBVault = keys.next().unwrap().clone();
+                let tokenAAta = keys.next().unwrap().clone();
+                let tokenBAta = keys.next().unwrap().clone();
+                let baseVaultAuthority = keys.next().unwrap().clone();
+                let pool = keys.next().unwrap().clone();
+                let position = keys.next().unwrap().clone();
+                let scopePrices = keys.next().unwrap().clone();
+                let tokenInfos = keys.next().unwrap().clone();
+                let tickArrayLower = keys.next().unwrap().clone();
+                let tickArrayUpper = keys.next().unwrap().clone();
+                let tokenAMint = keys.next().unwrap().clone();
+                let tokenBMint = keys.next().unwrap().clone();
+                let tokenATokenProgram = keys.next().unwrap().clone();
+                let tokenBTokenProgram = keys.next().unwrap().clone();
+                let instructionSysvarAccount = keys.next().unwrap().clone();
+                let consensusAccount = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = FlashSwapUnevenVaultsEndAccounts {
+                    swapper,
+                    strategy,
+                    globalConfig,
+                    tokenAVault,
+                    tokenBVault,
+                    tokenAAta,
+                    tokenBAta,
+                    baseVaultAuthority,
+                    pool,
+                    position,
+                    scopePrices,
+                    tokenInfos,
+                    tickArrayLower,
+                    tickArrayUpper,
+                    tokenAMint,
+                    tokenBMint,
+                    tokenATokenProgram,
+                    tokenBTokenProgram,
+                    instructionSysvarAccount,
+                    consensusAccount,
+                    remaining,
+                };
+                return Ok(Instruction::FlashSwapUnevenVaultsEnd { accounts, args });
+            }
+            [73u8, 226u8, 248u8, 215u8, 5u8, 197u8, 211u8, 229u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = EmergencySwapArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let adminAuthority = keys.next().unwrap().clone();
+                let strategy = keys.next().unwrap().clone();
+                let globalConfig = keys.next().unwrap().clone();
+                let tokenAMint = keys.next().unwrap().clone();
+                let tokenBMint = keys.next().unwrap().clone();
+                let tokenAVault = keys.next().unwrap().clone();
+                let tokenBVault = keys.next().unwrap().clone();
+                let baseVaultAuthority = keys.next().unwrap().clone();
+                let pool = keys.next().unwrap().clone();
+                let position = keys.next().unwrap().clone();
+                let poolTokenVaultA = keys.next().unwrap().clone();
+                let poolTokenVaultB = keys.next().unwrap().clone();
+                let tickArray0 = keys.next().unwrap().clone();
+                let tickArray1 = keys.next().unwrap().clone();
+                let tickArray2 = keys.next().unwrap().clone();
+                let oracle = keys.next().unwrap().clone();
+                let poolProgram = keys.next().unwrap().clone();
+                let scopePrices = keys.next().unwrap().clone();
+                let tokenInfos = keys.next().unwrap().clone();
+                let tokenATokenProgram = keys.next().unwrap().clone();
+                let tokenBTokenProgram = keys.next().unwrap().clone();
+                let memoProgram = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = EmergencySwapAccounts {
+                    adminAuthority,
+                    strategy,
+                    globalConfig,
+                    tokenAMint,
+                    tokenBMint,
+                    tokenAVault,
+                    tokenBVault,
+                    baseVaultAuthority,
+                    pool,
+                    position,
+                    poolTokenVaultA,
+                    poolTokenVaultB,
+                    tickArray0,
+                    tickArray1,
+                    tickArray2,
+                    oracle,
+                    poolProgram,
+                    scopePrices,
+                    tokenInfos,
+                    tokenATokenProgram,
+                    tokenBTokenProgram,
+                    memoProgram,
+                    remaining,
+                };
+                return Ok(Instruction::EmergencySwap { accounts, args });
+            }
+            [0u8, 164u8, 86u8, 76u8, 56u8, 72u8, 12u8, 170u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = WithdrawFromTreasuryArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let adminAuthority = keys.next().unwrap().clone();
+                let globalConfig = keys.next().unwrap().clone();
+                let mint = keys.next().unwrap().clone();
+                let treasuryFeeVault = keys.next().unwrap().clone();
+                let treasuryFeeVaultAuthority = keys.next().unwrap().clone();
+                let tokenAccount = keys.next().unwrap().clone();
+                let systemProgram = keys.next().unwrap().clone();
+                let rent = keys.next().unwrap().clone();
+                let tokenProgram = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = WithdrawFromTreasuryAccounts {
+                    adminAuthority,
+                    globalConfig,
+                    mint,
+                    treasuryFeeVault,
+                    treasuryFeeVaultAuthority,
+                    tokenAccount,
+                    systemProgram,
+                    rent,
+                    tokenProgram,
+                    remaining,
+                };
+                return Ok(Instruction::WithdrawFromTreasury { accounts, args });
+            }
+            [167u8, 36u8, 32u8, 79u8, 97u8, 170u8, 183u8, 108u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = PermisionlessWithdrawFromTreasuryArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let signer = keys.next().unwrap().clone();
+                let globalConfig = keys.next().unwrap().clone();
+                let mint = keys.next().unwrap().clone();
+                let treasuryFeeVault = keys.next().unwrap().clone();
+                let treasuryFeeVaultAuthority = keys.next().unwrap().clone();
+                let tokenAccount = keys.next().unwrap().clone();
+                let tokenProgram = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = PermisionlessWithdrawFromTreasuryAccounts {
+                    signer,
+                    globalConfig,
+                    mint,
+                    treasuryFeeVault,
+                    treasuryFeeVaultAuthority,
+                    tokenAccount,
+                    tokenProgram,
+                    remaining,
+                };
+                return Ok(Instruction::PermisionlessWithdrawFromTreasury { accounts, args });
+            }
+            [95u8, 227u8, 138u8, 220u8, 240u8, 95u8, 150u8, 113u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = WithdrawFromTopupArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let adminAuthority = keys.next().unwrap().clone();
+                let topupVault = keys.next().unwrap().clone();
+                let system = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = WithdrawFromTopupAccounts {
+                    adminAuthority,
+                    topupVault,
+                    system,
+                    remaining,
+                };
+                return Ok(Instruction::WithdrawFromTopup { accounts, args });
+            }
+            [141u8, 221u8, 123u8, 235u8, 35u8, 9u8, 145u8, 201u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = ChangePoolArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let adminAuthority = keys.next().unwrap().clone();
+                let strategy = keys.next().unwrap().clone();
+                let oldPosition = keys.next().unwrap().clone();
+                let baseVaultAuthority = keys.next().unwrap().clone();
+                let newPool = keys.next().unwrap().clone();
+                let strategyRewardVault0OrBaseVaultAuthority = keys.next().unwrap().clone();
+                let strategyRewardVault1OrBaseVaultAuthority = keys.next().unwrap().clone();
+                let strategyRewardVault2OrBaseVaultAuthority = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = ChangePoolAccounts {
+                    adminAuthority,
+                    strategy,
+                    oldPosition,
+                    baseVaultAuthority,
+                    newPool,
+                    strategyRewardVault0OrBaseVaultAuthority,
+                    strategyRewardVault1OrBaseVaultAuthority,
+                    strategyRewardVault2OrBaseVaultAuthority,
+                    remaining,
+                };
+                return Ok(Instruction::ChangePool { accounts, args });
+            }
+            [245u8, 14u8, 192u8, 211u8, 99u8, 42u8, 170u8, 187u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = CloseProgramAccountArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let adminAuthority = keys.next().unwrap().clone();
+                let program = keys.next().unwrap().clone();
+                let programData = keys.next().unwrap().clone();
+                let closingAccount = keys.next().unwrap().clone();
+                let systemProgram = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = CloseProgramAccountAccounts {
+                    adminAuthority,
+                    program,
+                    programData,
+                    closingAccount,
+                    systemProgram,
+                    remaining,
+                };
+                return Ok(Instruction::CloseProgramAccount { accounts, args });
+            }
+            [33u8, 94u8, 249u8, 97u8, 250u8, 254u8, 198u8, 93u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = OrcaSwapArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let funder = keys.next().unwrap().clone();
+                let tokenATokenProgram = keys.next().unwrap().clone();
+                let tokenBTokenProgram = keys.next().unwrap().clone();
+                let memoProgram = keys.next().unwrap().clone();
+                let tokenAuthority = keys.next().unwrap().clone();
+                let whirlpool = keys.next().unwrap().clone();
+                let tokenOwnerAccountA = keys.next().unwrap().clone();
+                let tokenVaultA = keys.next().unwrap().clone();
+                let tokenOwnerAccountB = keys.next().unwrap().clone();
+                let tokenVaultB = keys.next().unwrap().clone();
+                let tokenMintA = keys.next().unwrap().clone();
+                let tokenMintB = keys.next().unwrap().clone();
+                let tickArray0 = keys.next().unwrap().clone();
+                let tickArray1 = keys.next().unwrap().clone();
+                let tickArray2 = keys.next().unwrap().clone();
+                let oracle = keys.next().unwrap().clone();
+                let whirlpoolProgram = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = OrcaSwapAccounts {
+                    funder,
+                    tokenATokenProgram,
+                    tokenBTokenProgram,
+                    memoProgram,
+                    tokenAuthority,
+                    whirlpool,
+                    tokenOwnerAccountA,
+                    tokenVaultA,
+                    tokenOwnerAccountB,
+                    tokenVaultB,
+                    tokenMintA,
+                    tokenMintB,
+                    tickArray0,
+                    tickArray1,
+                    tickArray2,
+                    oracle,
+                    whirlpoolProgram,
+                    remaining,
+                };
+                return Ok(Instruction::OrcaSwap { accounts, args });
+            }
+            [226u8, 42u8, 174u8, 143u8, 144u8, 159u8, 139u8, 1u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = SignTermsArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let owner = keys.next().unwrap().clone();
+                let ownerSignatureState = keys.next().unwrap().clone();
+                let systemProgram = keys.next().unwrap().clone();
+                let rent = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = SignTermsAccounts {
+                    owner,
+                    ownerSignatureState,
+                    systemProgram,
+                    rent,
+                    remaining,
+                };
+                return Ok(Instruction::SignTerms { accounts, args });
+            }
+            [13u8, 227u8, 164u8, 236u8, 32u8, 39u8, 6u8, 255u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = UpdateStrategyAdminArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let pendingAdmin = keys.next().unwrap().clone();
+                let strategy = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = UpdateStrategyAdminAccounts {
+                    pendingAdmin,
+                    strategy,
+                    remaining,
+                };
+                return Ok(Instruction::UpdateStrategyAdmin { accounts, args });
+            }
+            _ => anyhow::bail!("Unknown discriminator: {:?}", disc),
+        }
+    }
+}
+pub mod events {
+    use super::*;
+    use borsh::BorshDeserialize;
+    use serde::Serialize;
+    pub use typedefs::*;
+}
