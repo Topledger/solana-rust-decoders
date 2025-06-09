@@ -19,6 +19,66 @@ pub mod typedefs {
     use serde::Serialize;
     serde_big_array::big_array! { BigArray ; 60 , 64 , 51 , 128 , 72 , 256 }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct SetCustodyGlobalLimitParams {
+        pub max_global_long_sizes: u64,
+        pub max_global_short_sizes: u64,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct DecreasePosition3Params {
+        pub use_price_update: bool,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct GetLiquidationStateParams {}
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct IncreasePosition2Params {
+        pub use_price_update: bool,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct UpdateDecreasePositionRequestParams {
+        pub size_usd_delta: u64,
+        pub trigger_price: u64,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct DecreasePositionPostSwapParams {}
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct SwapParams {
+        pub amount_in: u64,
+        pub min_amount_out: u64,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct CreateIncreasePositionRequestParams {
+        pub size_usd_delta: u64,
+        pub collateral_token_delta: u64,
+        pub side: Side,
+        pub request_type: RequestType,
+        pub price_slippage: Option<u64>,
+        pub jupiter_minimum_out: Option<u64>,
+        pub trigger_price: Option<u64>,
+        pub trigger_above_threshold: Option<bool>,
+        pub counter: u64,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct GetPnlAndFeeParams {}
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct AddLiquidityParams {
+        pub token_amount_in: u64,
+        pub min_lp_amount_out: u64,
+        pub token_amount_pre_swap: Option<u64>,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct SwapExactOutParams {
+        pub amount_out: u64,
+        pub max_amount_in: u64,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct LiquidateFullPosition2Params {
+        pub use_price_update: bool,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct DecreasePosition2Params {
+        pub use_price_update: bool,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct AddCustodyParams {
         pub is_stable: bool,
         pub oracle: OracleParams,
@@ -334,9 +394,18 @@ pub mod typedefs {
         pub allow_liquidate_position: bool,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct OraclePriceInfo {
+        pub increase_long: u64,
+        pub increase_short: u64,
+        pub decrease_long: u64,
+        pub decrease_short: u64,
+        pub buy_lp: u64,
+        pub sell_lp: u64,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct Fees {
-        pub swap_multiplier: u64,
-        pub stable_swap_multiplier: u64,
+        pub increase_position_bps: u64,
+        pub decrease_position_bps: u64,
         pub add_remove_liquidity_bps: u64,
         pub swap_bps: u64,
         pub tax_bps: u64,
@@ -355,7 +424,7 @@ pub mod typedefs {
     pub struct Limit {
         pub max_aum_usd: u128,
         pub token_weightage_buffer_bps: u128,
-        pub buffer: u64,
+        pub max_position_usd: u64,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub enum PriceImpactMechanism {
@@ -404,6 +473,221 @@ pub mod typedefs {
 }
 pub mod accounts_data {
     use serde::Serialize;
+    #[derive(Debug, Serialize)]
+    pub struct SetCustodyGlobalLimitAccounts {
+        pub keeper: String,
+        pub custody: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct GetOraclePriceAccounts {
+        pub perpetuals: String,
+        pub pool: String,
+        pub custody: String,
+        pub custodyOracleAccount: String,
+        pub custodyPriceUpdate: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct IncreasePosition2Accounts {
+        pub keeper: String,
+        pub perpetuals: String,
+        pub pool: String,
+        pub positionRequest: String,
+        pub positionRequestAta: String,
+        pub position: String,
+        pub custody: String,
+        pub custodyOracleAccount: String,
+        pub collateralCustody: String,
+        pub collateralCustodyOracleAccount: String,
+        pub collateralCustodyTokenAccount: String,
+        pub tokenProgram: String,
+        pub custodyPriceUpdate: String,
+        pub collateralCustodyPriceUpdate: String,
+        pub eventAuthority: String,
+        pub program: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct GetLiquidationStateAccounts {
+        pub perpetuals: String,
+        pub pool: String,
+        pub position: String,
+        pub custody: String,
+        pub custodyOracleAccount: String,
+        pub collateralCustody: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct UpdateDecreasePositionRequestAccounts {
+        pub owner: String,
+        pub perpetuals: String,
+        pub pool: String,
+        pub position: String,
+        pub positionRequest: String,
+        pub custody: String,
+        pub custodyOracleAccount: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct DecreasePositionPostSwapAccounts {
+        pub keeper: String,
+        pub positionRequest: String,
+        pub positionRequestAta: String,
+        pub eventAuthority: String,
+        pub program: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct CreateIncreasePositionRequestAccounts {
+        pub owner: String,
+        pub fundingAccount: String,
+        pub perpetuals: String,
+        pub pool: String,
+        pub position: String,
+        pub positionRequest: String,
+        pub positionRequestAta: String,
+        pub custody: String,
+        pub custodyOracleAccount: String,
+        pub collateralCustody: String,
+        pub inputMint: String,
+        pub referral: String,
+        pub tokenProgram: String,
+        pub associatedTokenProgram: String,
+        pub systemProgram: String,
+        pub eventAuthority: String,
+        pub program: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct SwapAccounts {
+        pub owner: String,
+        pub fundingAccount: String,
+        pub receivingAccount: String,
+        pub transferAuthority: String,
+        pub perpetuals: String,
+        pub pool: String,
+        pub receivingCustody: String,
+        pub receivingCustodyOracleAccount: String,
+        pub receivingCustodyTokenAccount: String,
+        pub dispensingCustody: String,
+        pub dispensingCustodyOracleAccount: String,
+        pub dispensingCustodyTokenAccount: String,
+        pub tokenProgram: String,
+        pub eventAuthority: String,
+        pub program: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct GetPnlAccounts {
+        pub perpetuals: String,
+        pub pool: String,
+        pub position: String,
+        pub custody: String,
+        pub custodyOracleAccount: String,
+        pub collateralCustody: String,
+        pub custodyPriceUpdate: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct AddLiquidityAccounts {
+        pub owner: String,
+        pub fundingAccount: String,
+        pub lpTokenAccount: String,
+        pub transferAuthority: String,
+        pub perpetuals: String,
+        pub pool: String,
+        pub custody: String,
+        pub custodyOracleAccount: String,
+        pub custodyTokenAccount: String,
+        pub lpTokenMint: String,
+        pub tokenProgram: String,
+        pub eventAuthority: String,
+        pub program: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct SwapExactOutAccounts {
+        pub owner: String,
+        pub fundingAccount: String,
+        pub receivingAccount: String,
+        pub transferAuthority: String,
+        pub perpetuals: String,
+        pub pool: String,
+        pub receivingCustody: String,
+        pub receivingCustodyOracleAccount: String,
+        pub receivingCustodyTokenAccount: String,
+        pub dispensingCustody: String,
+        pub dispensingCustodyOracleAccount: String,
+        pub dispensingCustodyTokenAccount: String,
+        pub tokenProgram: String,
+        pub eventAuthority: String,
+        pub program: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct DecreasePosition3Accounts {
+        pub keeper: String,
+        pub owner: String,
+        pub transferAuthority: String,
+        pub perpetuals: String,
+        pub pool: String,
+        pub positionRequest: String,
+        pub positionRequestAta: String,
+        pub position: String,
+        pub custody: String,
+        pub custodyOracleAccount: String,
+        pub collateralCustody: String,
+        pub collateralCustodyOracleAccount: String,
+        pub collateralCustodyTokenAccount: String,
+        pub tokenProgram: String,
+        pub custodyPriceUpdate: String,
+        pub collateralCustodyPriceUpdate: String,
+        pub eventAuthority: String,
+        pub program: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct LiquidateFullPosition2Accounts {
+        pub signer: String,
+        pub perpetuals: String,
+        pub pool: String,
+        pub position: String,
+        pub custody: String,
+        pub custodyOracleAccount: String,
+        pub collateralCustody: String,
+        pub collateralCustodyOracleAccount: String,
+        pub collateralCustodyTokenAccount: String,
+        pub custodyPriceUpdate: String,
+        pub collateralCustodyPriceUpdate: String,
+        pub eventAuthority: String,
+        pub program: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct DecreasePosition2Accounts {
+        pub keeper: String,
+        pub keeperAta: String,
+        pub owner: String,
+        pub transferAuthority: String,
+        pub perpetuals: String,
+        pub pool: String,
+        pub positionRequest: String,
+        pub positionRequestAta: String,
+        pub position: String,
+        pub custody: String,
+        pub custodyOracleAccount: String,
+        pub collateralCustody: String,
+        pub collateralCustodyOracleAccount: String,
+        pub collateralCustodyTokenAccount: String,
+        pub instruction: String,
+        pub tokenProgram: String,
+        pub custodyPriceUpdate: String,
+        pub collateralCustodyPriceUpdate: String,
+        pub eventAuthority: String,
+        pub program: String,
+        pub remaining: Vec<String>,
+    }
     #[derive(Debug, Serialize)]
     pub struct InitAccounts {
         pub upgradeAuthority: String,
@@ -505,7 +789,8 @@ pub mod accounts_data {
     }
     #[derive(Debug, Serialize)]
     pub struct ReallocCustodyAccounts {
-        pub keeper: String,
+        pub Admin: String,
+        pub Perpetuals: String,
         pub custody: String,
         pub systemProgram: String,
         pub rent: String,
@@ -1009,6 +1294,60 @@ pub mod ix_data {
     use serde::Serialize;
     serde_big_array::big_array! { BigArray ; 60 , 64 , 51 , 72 , 128 , 256 }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct SetCustodyGlobalLimitArguments {
+        pub params: SetCustodyGlobalLimitParams,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct GetOraclePriceArguments {}
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct IncreasePosition2Arguments {
+        pub params: IncreasePosition2Params,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct GetLiquidationStateArguments {
+        pub params: GetLiquidationStateParams,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct UpdateDecreasePositionRequestArguments {
+        pub params: UpdateDecreasePositionRequestParams,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct DecreasePositionPostSwapArguments {
+        pub params: DecreasePositionPostSwapParams,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct CreateIncreasePositionRequestArguments {
+        pub params: CreateIncreasePositionRequestParams,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct SwapArguments {
+        pub params: SwapParams,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct GetPnlArguments {
+        pub params: GetPnlAndFeeParams,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct AddLiquidityArguments {
+        pub params: AddLiquidityParams,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct SwapExactOutArguments {
+        pub params: SwapExactOutParams,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct DecreasePosition3Arguments {
+        pub params: DecreasePosition3Params,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct LiquidateFullPosition2Arguments {
+        pub params: LiquidateFullPosition2Params,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct DecreasePosition2Arguments {
+        pub params: DecreasePosition2Params,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct InitArguments {
         pub params: InitParams,
     }
@@ -1170,6 +1509,62 @@ pub mod ix_data {
 #[derive(Debug, Serialize)]
 #[serde(tag = "instruction_type")]
 pub enum Instruction {
+    SetCustodyGlobalLimit {
+        accounts: SetCustodyGlobalLimitAccounts,
+        args: SetCustodyGlobalLimitArguments,
+    },
+    GetOraclePrice {
+        accounts: GetOraclePriceAccounts,
+        args: GetOraclePriceArguments,
+    },
+    IncreasePosition2 {
+        accounts: IncreasePosition2Accounts,
+        args: IncreasePosition2Arguments,
+    },
+    GetLiquidationState {
+        accounts: GetLiquidationStateAccounts,
+        args: GetLiquidationStateArguments,
+    },
+    UpdateDecreasePositionRequest {
+        accounts: UpdateDecreasePositionRequestAccounts,
+        args: UpdateDecreasePositionRequestArguments,
+    },
+    DecreasePositionPostSwap {
+        accounts: DecreasePositionPostSwapAccounts,
+        args: DecreasePositionPostSwapArguments,
+    },
+    CreateIncreasePositionRequest {
+        accounts: CreateIncreasePositionRequestAccounts,
+        args: CreateIncreasePositionRequestArguments,
+    },
+    Swap {
+        accounts: SwapAccounts,
+        args: SwapArguments,
+    },
+    GetPnl {
+        accounts: GetPnlAccounts,
+        args: GetPnlArguments,
+    },
+    AddLiquidity {
+        accounts: AddLiquidityAccounts,
+        args: AddLiquidityArguments,
+    },
+    SwapExactOut {
+        accounts: SwapExactOutAccounts,
+        args: SwapExactOutArguments,
+    },
+    DecreasePosition3 {
+        accounts: DecreasePosition3Accounts,
+        args: DecreasePosition3Arguments,
+    },
+    LiquidateFullPosition2 {
+        accounts: LiquidateFullPosition2Accounts,
+        args: LiquidateFullPosition2Arguments,
+    },
+    DecreasePosition2 {
+        accounts: DecreasePosition2Accounts,
+        args: DecreasePosition2Arguments,
+    },
     Init {
         accounts: InitAccounts,
         args: InitArguments,
@@ -1347,6 +1742,464 @@ impl Instruction {
         let (disc_slice, rest) = data.split_at(8);
         let disc: [u8; 8] = disc_slice.try_into().unwrap();
         match disc {
+            [94u8, 82u8, 154u8, 177u8, 193u8, 205u8, 141u8, 76u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = SetCustodyGlobalLimitArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let keeper = keys.next().unwrap().clone();
+                let custody = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = SetCustodyGlobalLimitAccounts {
+                    keeper,
+                    custody,
+                    remaining,
+                };
+                return Ok(Instruction::SetCustodyGlobalLimit { accounts, args });
+            }
+            [200u8, 20u8, 0u8, 106u8, 56u8, 210u8, 230u8, 140u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = GetOraclePriceArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let perpetuals = keys.next().unwrap().clone();
+                let pool = keys.next().unwrap().clone();
+                let custody = keys.next().unwrap().clone();
+                let custodyOracleAccount = keys.next().unwrap().clone();
+                let custodyPriceUpdate = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = GetOraclePriceAccounts {
+                    perpetuals,
+                    pool,
+                    custody,
+                    custodyOracleAccount,
+                    custodyPriceUpdate,
+                    remaining,
+                };
+                return Ok(Instruction::GetOraclePrice { accounts, args });
+            }
+            [215u8, 101u8, 62u8, 100u8, 152u8, 11u8, 154u8, 61u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = IncreasePosition2Arguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let keeper = keys.next().unwrap().clone();
+                let perpetuals = keys.next().unwrap().clone();
+                let pool = keys.next().unwrap().clone();
+                let positionRequest = keys.next().unwrap().clone();
+                let positionRequestAta = keys.next().unwrap().clone();
+                let position = keys.next().unwrap().clone();
+                let custody = keys.next().unwrap().clone();
+                let custodyOracleAccount = keys.next().unwrap().clone();
+                let collateralCustody = keys.next().unwrap().clone();
+                let collateralCustodyOracleAccount = keys.next().unwrap().clone();
+                let collateralCustodyTokenAccount = keys.next().unwrap().clone();
+                let tokenProgram = keys.next().unwrap().clone();
+                let custodyPriceUpdate = keys.next().unwrap().clone();
+                let collateralCustodyPriceUpdate = keys.next().unwrap().clone();
+                let eventAuthority = keys.next().unwrap().clone();
+                let program = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = IncreasePosition2Accounts {
+                    keeper,
+                    perpetuals,
+                    pool,
+                    positionRequest,
+                    positionRequestAta,
+                    position,
+                    custody,
+                    custodyOracleAccount,
+                    collateralCustody,
+                    collateralCustodyOracleAccount,
+                    collateralCustodyTokenAccount,
+                    tokenProgram,
+                    custodyPriceUpdate,
+                    collateralCustodyPriceUpdate,
+                    eventAuthority,
+                    program,
+                    remaining,
+                };
+                return Ok(Instruction::IncreasePosition2 { accounts, args });
+            }
+            [127u8, 126u8, 199u8, 117u8, 90u8, 89u8, 29u8, 50u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = GetLiquidationStateArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let perpetuals = keys.next().unwrap().clone();
+                let pool = keys.next().unwrap().clone();
+                let position = keys.next().unwrap().clone();
+                let custody = keys.next().unwrap().clone();
+                let custodyOracleAccount = keys.next().unwrap().clone();
+                let collateralCustody = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = GetLiquidationStateAccounts {
+                    perpetuals,
+                    pool,
+                    position,
+                    custody,
+                    custodyOracleAccount,
+                    collateralCustody,
+                    remaining,
+                };
+                return Ok(Instruction::GetLiquidationState { accounts, args });
+            }
+            [69u8, 44u8, 72u8, 173u8, 62u8, 20u8, 177u8, 146u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = UpdateDecreasePositionRequestArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let owner = keys.next().unwrap().clone();
+                let perpetuals = keys.next().unwrap().clone();
+                let pool = keys.next().unwrap().clone();
+                let position = keys.next().unwrap().clone();
+                let positionRequest = keys.next().unwrap().clone();
+                let custody = keys.next().unwrap().clone();
+                let custodyOracleAccount = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = UpdateDecreasePositionRequestAccounts {
+                    owner,
+                    perpetuals,
+                    pool,
+                    position,
+                    positionRequest,
+                    custody,
+                    custodyOracleAccount,
+                    remaining,
+                };
+                return Ok(Instruction::UpdateDecreasePositionRequest { accounts, args });
+            }
+            [75u8, 246u8, 208u8, 7u8, 203u8, 66u8, 106u8, 91u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = DecreasePositionPostSwapArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let keeper = keys.next().unwrap().clone();
+                let positionRequest = keys.next().unwrap().clone();
+                let positionRequestAta = keys.next().unwrap().clone();
+                let eventAuthority = keys.next().unwrap().clone();
+                let program = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = DecreasePositionPostSwapAccounts {
+                    keeper,
+                    positionRequest,
+                    positionRequestAta,
+                    eventAuthority,
+                    program,
+                    remaining,
+                };
+                return Ok(Instruction::DecreasePositionPostSwap { accounts, args });
+            }
+            [8u8, 160u8, 201u8, 226u8, 217u8, 74u8, 228u8, 137u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = CreateIncreasePositionRequestArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let owner = keys.next().unwrap().clone();
+                let fundingAccount = keys.next().unwrap().clone();
+                let perpetuals = keys.next().unwrap().clone();
+                let pool = keys.next().unwrap().clone();
+                let position = keys.next().unwrap().clone();
+                let positionRequest = keys.next().unwrap().clone();
+                let positionRequestAta = keys.next().unwrap().clone();
+                let custody = keys.next().unwrap().clone();
+                let custodyOracleAccount = keys.next().unwrap().clone();
+                let collateralCustody = keys.next().unwrap().clone();
+                let inputMint = keys.next().unwrap().clone();
+                let referral = keys.next().unwrap().clone();
+                let tokenProgram = keys.next().unwrap().clone();
+                let associatedTokenProgram = keys.next().unwrap().clone();
+                let systemProgram = keys.next().unwrap().clone();
+                let eventAuthority = keys.next().unwrap().clone();
+                let program = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = CreateIncreasePositionRequestAccounts {
+                    owner,
+                    fundingAccount,
+                    perpetuals,
+                    pool,
+                    position,
+                    positionRequest,
+                    positionRequestAta,
+                    custody,
+                    custodyOracleAccount,
+                    collateralCustody,
+                    inputMint,
+                    referral,
+                    tokenProgram,
+                    associatedTokenProgram,
+                    systemProgram,
+                    eventAuthority,
+                    program,
+                    remaining,
+                };
+                return Ok(Instruction::CreateIncreasePositionRequest { accounts, args });
+            }
+            [248u8, 198u8, 158u8, 145u8, 225u8, 117u8, 135u8, 200u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = SwapArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let owner = keys.next().unwrap().clone();
+                let fundingAccount = keys.next().unwrap().clone();
+                let receivingAccount = keys.next().unwrap().clone();
+                let transferAuthority = keys.next().unwrap().clone();
+                let perpetuals = keys.next().unwrap().clone();
+                let pool = keys.next().unwrap().clone();
+                let receivingCustody = keys.next().unwrap().clone();
+                let receivingCustodyOracleAccount = keys.next().unwrap().clone();
+                let receivingCustodyTokenAccount = keys.next().unwrap().clone();
+                let dispensingCustody = keys.next().unwrap().clone();
+                let dispensingCustodyOracleAccount = keys.next().unwrap().clone();
+                let dispensingCustodyTokenAccount = keys.next().unwrap().clone();
+                let tokenProgram = keys.next().unwrap().clone();
+                let eventAuthority = keys.next().unwrap().clone();
+                let program = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = SwapAccounts {
+                    owner,
+                    fundingAccount,
+                    receivingAccount,
+                    transferAuthority,
+                    perpetuals,
+                    pool,
+                    receivingCustody,
+                    receivingCustodyOracleAccount,
+                    receivingCustodyTokenAccount,
+                    dispensingCustody,
+                    dispensingCustodyOracleAccount,
+                    dispensingCustodyTokenAccount,
+                    tokenProgram,
+                    eventAuthority,
+                    program,
+                    remaining,
+                };
+                return Ok(Instruction::Swap { accounts, args });
+            }
+            [106u8, 212u8, 3u8, 250u8, 195u8, 224u8, 64u8, 160u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = GetPnlArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let perpetuals = keys.next().unwrap().clone();
+                let pool = keys.next().unwrap().clone();
+                let position = keys.next().unwrap().clone();
+                let custody = keys.next().unwrap().clone();
+                let custodyOracleAccount = keys.next().unwrap().clone();
+                let collateralCustody = keys.next().unwrap().clone();
+                let custodyPriceUpdate = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = GetPnlAccounts {
+                    perpetuals,
+                    pool,
+                    position,
+                    custody,
+                    custodyOracleAccount,
+                    collateralCustody,
+                    custodyPriceUpdate,
+                    remaining,
+                };
+                return Ok(Instruction::GetPnl { accounts, args });
+            }
+            [181u8, 157u8, 89u8, 67u8, 143u8, 182u8, 52u8, 72u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = AddLiquidityArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let owner = keys.next().unwrap().clone();
+                let fundingAccount = keys.next().unwrap().clone();
+                let lpTokenAccount = keys.next().unwrap().clone();
+                let transferAuthority = keys.next().unwrap().clone();
+                let perpetuals = keys.next().unwrap().clone();
+                let pool = keys.next().unwrap().clone();
+                let custody = keys.next().unwrap().clone();
+                let custodyOracleAccount = keys.next().unwrap().clone();
+                let custodyTokenAccount = keys.next().unwrap().clone();
+                let lpTokenMint = keys.next().unwrap().clone();
+                let tokenProgram = keys.next().unwrap().clone();
+                let eventAuthority = keys.next().unwrap().clone();
+                let program = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = AddLiquidityAccounts {
+                    owner,
+                    fundingAccount,
+                    lpTokenAccount,
+                    transferAuthority,
+                    perpetuals,
+                    pool,
+                    custody,
+                    custodyOracleAccount,
+                    custodyTokenAccount,
+                    lpTokenMint,
+                    tokenProgram,
+                    eventAuthority,
+                    program,
+                    remaining,
+                };
+                return Ok(Instruction::AddLiquidity { accounts, args });
+            }
+            [250u8, 73u8, 101u8, 33u8, 38u8, 207u8, 75u8, 184u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = SwapExactOutArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let owner = keys.next().unwrap().clone();
+                let fundingAccount = keys.next().unwrap().clone();
+                let receivingAccount = keys.next().unwrap().clone();
+                let transferAuthority = keys.next().unwrap().clone();
+                let perpetuals = keys.next().unwrap().clone();
+                let pool = keys.next().unwrap().clone();
+                let receivingCustody = keys.next().unwrap().clone();
+                let receivingCustodyOracleAccount = keys.next().unwrap().clone();
+                let receivingCustodyTokenAccount = keys.next().unwrap().clone();
+                let dispensingCustody = keys.next().unwrap().clone();
+                let dispensingCustodyOracleAccount = keys.next().unwrap().clone();
+                let dispensingCustodyTokenAccount = keys.next().unwrap().clone();
+                let tokenProgram = keys.next().unwrap().clone();
+                let eventAuthority = keys.next().unwrap().clone();
+                let program = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = SwapExactOutAccounts {
+                    owner,
+                    fundingAccount,
+                    receivingAccount,
+                    transferAuthority,
+                    perpetuals,
+                    pool,
+                    receivingCustody,
+                    receivingCustodyOracleAccount,
+                    receivingCustodyTokenAccount,
+                    dispensingCustody,
+                    dispensingCustodyOracleAccount,
+                    dispensingCustodyTokenAccount,
+                    tokenProgram,
+                    eventAuthority,
+                    program,
+                    remaining,
+                };
+                return Ok(Instruction::SwapExactOut { accounts, args });
+            }
+            [145u8, 243u8, 130u8, 119u8, 196u8, 220u8, 95u8, 118u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = DecreasePosition3Arguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let keeper = keys.next().unwrap().clone();
+                let owner = keys.next().unwrap().clone();
+                let transferAuthority = keys.next().unwrap().clone();
+                let perpetuals = keys.next().unwrap().clone();
+                let pool = keys.next().unwrap().clone();
+                let positionRequest = keys.next().unwrap().clone();
+                let positionRequestAta = keys.next().unwrap().clone();
+                let position = keys.next().unwrap().clone();
+                let custody = keys.next().unwrap().clone();
+                let custodyOracleAccount = keys.next().unwrap().clone();
+                let collateralCustody = keys.next().unwrap().clone();
+                let collateralCustodyOracleAccount = keys.next().unwrap().clone();
+                let collateralCustodyTokenAccount = keys.next().unwrap().clone();
+                let tokenProgram = keys.next().unwrap().clone();
+                let custodyPriceUpdate = keys.next().unwrap().clone();
+                let collateralCustodyPriceUpdate = keys.next().unwrap().clone();
+                let eventAuthority = keys.next().unwrap().clone();
+                let program = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = DecreasePosition3Accounts {
+                    keeper,
+                    owner,
+                    transferAuthority,
+                    perpetuals,
+                    pool,
+                    positionRequest,
+                    positionRequestAta,
+                    position,
+                    custody,
+                    custodyOracleAccount,
+                    collateralCustody,
+                    collateralCustodyOracleAccount,
+                    collateralCustodyTokenAccount,
+                    tokenProgram,
+                    custodyPriceUpdate,
+                    collateralCustodyPriceUpdate,
+                    eventAuthority,
+                    program,
+                    remaining,
+                };
+                return Ok(Instruction::DecreasePosition3 { accounts, args });
+            }
+            [233u8, 160u8, 187u8, 98u8, 2u8, 234u8, 48u8, 249u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = LiquidateFullPosition2Arguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let signer = keys.next().unwrap().clone();
+                let perpetuals = keys.next().unwrap().clone();
+                let pool = keys.next().unwrap().clone();
+                let position = keys.next().unwrap().clone();
+                let custody = keys.next().unwrap().clone();
+                let custodyOracleAccount = keys.next().unwrap().clone();
+                let collateralCustody = keys.next().unwrap().clone();
+                let collateralCustodyOracleAccount = keys.next().unwrap().clone();
+                let collateralCustodyTokenAccount = keys.next().unwrap().clone();
+                let custodyPriceUpdate = keys.next().unwrap().clone();
+                let collateralCustodyPriceUpdate = keys.next().unwrap().clone();
+                let eventAuthority = keys.next().unwrap().clone();
+                let program = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = LiquidateFullPosition2Accounts {
+                    signer,
+                    perpetuals,
+                    pool,
+                    position,
+                    custody,
+                    custodyOracleAccount,
+                    collateralCustody,
+                    collateralCustodyOracleAccount,
+                    collateralCustodyTokenAccount,
+                    custodyPriceUpdate,
+                    collateralCustodyPriceUpdate,
+                    eventAuthority,
+                    program,
+                    remaining,
+                };
+                return Ok(Instruction::LiquidateFullPosition2 { accounts, args });
+            }
+            [180u8, 193u8, 163u8, 222u8, 169u8, 231u8, 66u8, 253u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = DecreasePosition2Arguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let keeper = keys.next().unwrap().clone();
+                let keeperAta = keys.next().unwrap().clone();
+                let owner = keys.next().unwrap().clone();
+                let transferAuthority = keys.next().unwrap().clone();
+                let perpetuals = keys.next().unwrap().clone();
+                let pool = keys.next().unwrap().clone();
+                let positionRequest = keys.next().unwrap().clone();
+                let positionRequestAta = keys.next().unwrap().clone();
+                let position = keys.next().unwrap().clone();
+                let custody = keys.next().unwrap().clone();
+                let custodyOracleAccount = keys.next().unwrap().clone();
+                let collateralCustody = keys.next().unwrap().clone();
+                let collateralCustodyOracleAccount = keys.next().unwrap().clone();
+                let collateralCustodyTokenAccount = keys.next().unwrap().clone();
+                let instruction = keys.next().unwrap().clone();
+                let tokenProgram = keys.next().unwrap().clone();
+                let custodyPriceUpdate = keys.next().unwrap().clone();
+                let collateralCustodyPriceUpdate = keys.next().unwrap().clone();
+                let eventAuthority = keys.next().unwrap().clone();
+                let program = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = DecreasePosition2Accounts {
+                    keeper,
+                    keeperAta,
+                    owner,
+                    transferAuthority,
+                    perpetuals,
+                    pool,
+                    positionRequest,
+                    positionRequestAta,
+                    position,
+                    custody,
+                    custodyOracleAccount,
+                    collateralCustody,
+                    collateralCustodyOracleAccount,
+                    collateralCustodyTokenAccount,
+                    instruction,
+                    tokenProgram,
+                    custodyPriceUpdate,
+                    collateralCustodyPriceUpdate,
+                    eventAuthority,
+                    program,
+                    remaining,
+                };
+                return Ok(Instruction::DecreasePosition2 { accounts, args });
+            }
             [220u8, 59u8, 207u8, 236u8, 108u8, 250u8, 47u8, 100u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = InitArguments::deserialize(&mut rdr)?;
@@ -1569,13 +2422,15 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = ReallocCustodyArguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
-                let keeper = keys.next().unwrap().clone();
+                let Admin = keys.next().unwrap().clone();
+                let Perpetuals = keys.next().unwrap().clone();
                 let custody = keys.next().unwrap().clone();
                 let systemProgram = keys.next().unwrap().clone();
                 let rent = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = ReallocCustodyAccounts {
-                    keeper,
+                    Admin,
+                    Perpetuals,
                     custody,
                     systemProgram,
                     rent,

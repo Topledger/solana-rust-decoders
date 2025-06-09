@@ -2,6 +2,996 @@
   "version": "0.1.0",
   "name": "perpetuals",
   "instructions": [
+    
+    {
+      "name": "setCustodyGlobalLimit",
+      "accounts": [
+        {
+          "name": "keeper",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "custody",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "SetCustodyGlobalLimitParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "getOraclePrice",
+      "accounts": [
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "custody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "custodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "custodyPriceUpdate",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        }
+      ],
+      "args": [],
+      "returns": {
+        "defined": "OraclePriceInfo"
+      }
+    },
+    {
+      "name": "increasePosition2",
+      "accounts": [
+        {
+          "name": "keeper",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "positionRequest",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "positionRequestAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "custody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "custodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "custodyPriceUpdate",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "collateralCustodyPriceUpdate",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "IncreasePosition2Params"
+          }
+        }
+      ]
+    },
+    {
+      "name": "getLiquidationState",
+      "accounts": [
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "custody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "custodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustody",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "GetLiquidationStateParams"
+          }
+        }
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "updateDecreasePositionRequest",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "positionRequest",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "custody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "custodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "UpdateDecreasePositionRequestParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "decreasePositionPostSwap",
+      "accounts": [
+        {
+          "name": "keeper",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "positionRequest",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "positionRequestAta",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "DecreasePositionPostSwapParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "createIncreasePositionRequest",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "fundingAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "positionRequest",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "positionRequestAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "custody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "custodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inputMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "referral",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "CreateIncreasePositionRequestParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "swap",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "fundingAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "receivingAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "receivingCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "receivingCustodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dispensingCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dispensingCustodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "dispensingCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "SwapParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "getPnl",
+      "accounts": [
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "custody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "custodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "custodyPriceUpdate",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "GetPnlAndFeeParams"
+          }
+        }
+      ],
+      "returns": {
+        "defined": "PnlAndFee"
+      }
+    },
+    {
+      "name": "addLiquidity",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "fundingAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lpTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "custody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "custodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "custodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lpTokenMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "AddLiquidityParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "swapExactOut",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "fundingAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "receivingAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "receivingCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "receivingCustodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dispensingCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dispensingCustodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "dispensingCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "SwapExactOutParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "decreasePosition3",
+      "accounts": [
+        {
+          "name": "keeper",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "positionRequest",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "positionRequestAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "custody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "custodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "custodyPriceUpdate",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "collateralCustodyPriceUpdate",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "DecreasePosition3Params"
+          }
+        }
+      ]
+    },
+    {
+      "name": "liquidateFullPosition2",
+      "accounts": [
+        {
+          "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "custody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "custodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "custodyPriceUpdate",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "collateralCustodyPriceUpdate",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "LiquidateFullPosition2Params"
+          }
+        }
+      ]
+    },
+    {
+      "name": "decreasePosition2",
+      "accounts": [
+        {
+          "name": "keeper",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "keeperAta",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "positionRequest",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "positionRequestAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "custody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "custodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "instruction",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "custodyPriceUpdate",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "collateralCustodyPriceUpdate",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "DecreasePosition2Params"
+          }
+        }
+      ]
+    },
     {
       "name": "init",
       "accounts": [
@@ -424,9 +1414,14 @@
       "name": "reallocCustody",
       "accounts": [
         {
-          "name": "keeper",
+          "name": "Admin",
           "isMut": true,
           "isSigner": true
+        },
+        {
+          "name": "Perpetuals",
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "custody",
@@ -3073,6 +4068,218 @@
   ],
   "types": [
     {
+      "name": "SetCustodyGlobalLimitParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "maxGlobalLongSizes",
+            "type": "u64"
+          },
+          {
+            "name": "maxGlobalShortSizes",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DecreasePosition3Params",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "usePriceUpdate",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+
+    {
+      "name": "GetLiquidationStateParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
+      "name": "IncreasePosition2Params",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "usePriceUpdate",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateDecreasePositionRequestParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "sizeUsdDelta",
+            "type": "u64"
+          },
+          {
+            "name": "triggerPrice",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DecreasePositionPostSwapParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
+      "name": "SwapParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amountIn",
+            "type": "u64"
+          },
+          {
+            "name": "minAmountOut",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CreateIncreasePositionRequestParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "sizeUsdDelta",
+            "type": "u64"
+          },
+          {
+            "name": "collateralTokenDelta",
+            "type": "u64"
+          },
+          {
+            "name": "side",
+            "type": {
+              "defined": "Side"
+            }
+          },
+          {
+            "name": "requestType",
+            "type": {
+              "defined": "RequestType"
+            }
+          },
+          {
+            "name": "priceSlippage",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "jupiterMinimumOut",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "triggerPrice",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "triggerAboveThreshold",
+            "type": {
+              "option": "bool"
+            }
+          },
+          {
+            "name": "counter",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GetPnlAndFeeParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
+      "name": "AddLiquidityParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "tokenAmountIn",
+            "type": "u64"
+          },
+          {
+            "name": "minLpAmountOut",
+            "type": "u64"
+          },
+          {
+            "name": "tokenAmountPreSwap",
+            "type": {
+              "option": "u64"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "SwapExactOutParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amountOut",
+            "type": "u64"
+          },
+          {
+            "name": "maxAmountIn",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LiquidateFullPosition2Params",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "usePriceUpdate",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DecreasePosition2Params",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "usePriceUpdate",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
       "name": "AddCustodyParams",
       "type": {
         "kind": "struct",
@@ -4226,16 +5433,48 @@
       }
     },
     {
+      "name": "OraclePriceInfo",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "increaseLong",
+            "type": "u64"
+          },
+          {
+            "name": "increaseShort",
+            "type": "u64"
+          },
+          {
+            "name": "decreaseLong",
+            "type": "u64"
+          },
+          {
+            "name": "decreaseShort",
+            "type": "u64"
+          },
+          {
+            "name": "buyLp",
+            "type": "u64"
+          },
+          {
+            "name": "sellLp",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "Fees",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "swapMultiplier",
+            "name": "increasePositionBps",
             "type": "u64"
           },
           {
-            "name": "stableSwapMultiplier",
+            "name": "decreasePositionBps",
             "type": "u64"
           },
           {
@@ -4303,7 +5542,7 @@
             "type": "u128"
           },
           {
-            "name": "buffer",
+            "name": "maxPositionUsd",
             "type": "u64"
           }
         ]
@@ -4434,6 +5673,7 @@
       }
     }
   ],
+
   "events": [
     {
       "name": "CreatePositionRequestEvent",
