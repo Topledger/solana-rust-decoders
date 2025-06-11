@@ -240,9 +240,6 @@ pub mod accounts_data {
         pub msolMintAuthority: String,
         pub systemProgram: String,
         pub tokenProgram: String,
-        pub marinadeFinanceProgram: String,
-        pub referralState: String,
-        pub msolTokenPartnerAccount: String,
         pub remaining: Vec<String>,
     }
     #[derive(Debug, Serialize)]
@@ -924,9 +921,6 @@ impl Instruction {
                 let msolMintAuthority = keys.next().unwrap().clone();
                 let systemProgram = keys.next().unwrap().clone();
                 let tokenProgram = keys.next().unwrap().clone();
-                let marinadeFinanceProgram = keys.next().unwrap().clone();
-                let referralState = keys.next().unwrap().clone();
-                let msolTokenPartnerAccount = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = DepositAccounts {
                     state,
@@ -940,9 +934,6 @@ impl Instruction {
                     msolMintAuthority,
                     systemProgram,
                     tokenProgram,
-                    marinadeFinanceProgram,
-                    referralState,
-                    msolTokenPartnerAccount,
                     remaining,
                 };
                 return Ok(Instruction::Deposit { accounts, args });
