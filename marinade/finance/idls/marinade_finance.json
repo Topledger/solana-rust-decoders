@@ -318,24 +318,8 @@
           "isMut": false,
           "isSigner": false
         }
-        ,
-        {
-          "name": "marinadeFinanceProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-        ,
-        {
-          "name": "referralState",
-          "isMut": false,
-          "isSigner": false
-        }
-        ,
-        {
-          "name": "msolTokenPartnerAccount",
-          "isMut": false,
-          "isSigner": false
-        }
+        
+        
       ],
       "args": [
         {
