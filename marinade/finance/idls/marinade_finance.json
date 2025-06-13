@@ -1917,12 +1917,6 @@
             "type": {
               "option": "publicKey"
             }
-          },
-          {
-            "name": "pauseAuthority",
-            "type": {
-              "option": "publicKey"
-            }
           }
         ]
       }
