@@ -12,12 +12,15 @@ pub use accounts_data::*;
 pub use ix_data::*;
 pub use typedefs::*;
 pub mod typedefs {
+    use crate::pubkey_serializer::pubkey_serde;
+    use crate::pubkey_serializer::pubkey_serde_option;
     use anchor_lang::prelude::*;
     use borsh::{BorshDeserialize, BorshSerialize};
     use serde::Serialize;
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct SplitStakeAccountInfo {
-        pub account: String,
+        #[serde(with = "pubkey_serde")]
+        pub account: [u8; 32usize],
         pub index: u32,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
@@ -42,8 +45,10 @@ pub mod typedefs {
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct PubkeyValueChange {
-        pub old: String,
-        pub new: String,
+        #[serde(with = "pubkey_serde")]
+        pub old: [u8; 32usize],
+        #[serde(with = "pubkey_serde")]
+        pub new: [u8; 32usize],
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct BoolValueChange {
@@ -52,11 +57,16 @@ pub mod typedefs {
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct ChangeAuthorityData {
-        pub admin: Option<String>,
-        pub validator_manager: Option<String>,
-        pub operational_sol_account: Option<String>,
-        pub treasury_msol_account: Option<String>,
-        pub pause_authority: Option<String>,
+        #[serde(with = "pubkey_serde_option")]
+        pub admin: Option<[u8; 32usize]>,
+        #[serde(with = "pubkey_serde_option")]
+        pub validator_manager: Option<[u8; 32usize]>,
+        #[serde(with = "pubkey_serde_option")]
+        pub operational_sol_account: Option<[u8; 32usize]>,
+        #[serde(with = "pubkey_serde_option")]
+        pub treasury_msol_account: Option<[u8; 32usize]>,
+        #[serde(with = "pubkey_serde_option")]
+        pub pause_authority: Option<[u8; 32usize]>,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct ConfigLpParams {
@@ -81,15 +91,18 @@ pub mod typedefs {
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct InitializeData {
-        pub admin_authority: String,
-        pub validator_manager_authority: String,
+        #[serde(with = "pubkey_serde")]
+        pub admin_authority: [u8; 32usize],
+        #[serde(with = "pubkey_serde")]
+        pub validator_manager_authority: [u8; 32usize],
         pub min_stake: u64,
         pub rewards_fee: Fee,
         pub liq_pool: LiqPoolInitializeData,
         pub additional_stake_record_space: u32,
         pub additional_validator_record_space: u32,
         pub slots_for_stake_delta: u64,
-        pub pause_authority: String,
+        #[serde(with = "pubkey_serde")]
+        pub pause_authority: [u8; 32usize],
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct LiqPoolInitializeData {
@@ -108,11 +121,13 @@ pub mod typedefs {
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct LiqPool {
-        pub lp_mint: String,
+        #[serde(with = "pubkey_serde")]
+        pub lp_mint: [u8; 32usize],
         pub lp_mint_authority_bump_seed: u8,
         pub sol_leg_bump_seed: u8,
         pub msol_leg_authority_bump_seed: u8,
-        pub msol_leg: String,
+        #[serde(with = "pubkey_serde")]
+        pub msol_leg: [u8; 32usize],
         pub lp_liquidity_target: u64,
         pub lp_max_fee: Fee,
         pub lp_min_fee: Fee,
@@ -123,15 +138,18 @@ pub mod typedefs {
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct List {
-        pub account: String,
+        #[serde(with = "pubkey_serde")]
+        pub account: [u8; 32usize],
         pub item_size: u32,
         pub count: u32,
-        pub reserved1: String,
+        #[serde(with = "pubkey_serde")]
+        pub reserved1: [u8; 32usize],
         pub reserved2: u32,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct StakeRecord {
-        pub stake_account: String,
+        #[serde(with = "pubkey_serde")]
+        pub stake_account: [u8; 32usize],
         pub last_update_delegated_lamports: u64,
         pub last_update_epoch: u64,
         pub is_emergency_unstaking: u8,
@@ -151,7 +169,8 @@ pub mod typedefs {
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct ValidatorRecord {
-        pub validator_account: String,
+        #[serde(with = "pubkey_serde")]
+        pub validator_account: [u8; 32usize],
         pub active_balance: u64,
         pub score: u32,
         pub last_stake_delta_epoch: u64,
@@ -162,7 +181,8 @@ pub mod typedefs {
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct ValidatorSystem {
         pub validator_list: List,
-        pub manager_authority: String,
+        #[serde(with = "pubkey_serde")]
+        pub manager_authority: [u8; 32usize],
         pub total_validator_score: u32,
         pub total_active_balance: u64,
         pub auto_add_validator_enabled: u8,
@@ -542,12 +562,12 @@ pub mod ix_data {
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct RemoveValidatorArgs {
         pub index: u32,
-        pub validator_vote: String,
+        pub validator_vote: [u8; 32usize],
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct SetValidatorScoreArgs {
         pub index: u32,
-        pub validator_vote: String,
+        pub validator_vote: [u8; 32usize],
         pub score: u32,
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
@@ -645,7 +665,7 @@ pub mod ix_data {
         pub validator_index: u32,
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub msol_amount: u64,
-        pub beneficiary: String,
+        pub beneficiary: [u8; 32usize],
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct ReallocValidatorListArgs {
