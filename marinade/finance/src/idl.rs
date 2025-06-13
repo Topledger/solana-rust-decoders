@@ -65,8 +65,6 @@ pub mod typedefs {
         pub operational_sol_account: Option<[u8; 32usize]>,
         #[serde(with = "pubkey_serde_option")]
         pub treasury_msol_account: Option<[u8; 32usize]>,
-        #[serde(with = "pubkey_serde_option")]
-        pub pause_authority: Option<[u8; 32usize]>,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct ConfigLpParams {
