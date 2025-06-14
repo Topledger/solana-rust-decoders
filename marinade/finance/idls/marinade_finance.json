@@ -2010,35 +2010,12 @@
             }
           },
           {
-            "name": "withdrawStakeAccountEnabled",
+            "name": "autoAddValidatorEnabled",
             "type": {
               "option": "bool"
             }
-          },
-          {
-            "name": "delayedUnstakeFee",
-            "type": {
-              "option": {
-                "defined": "FeeCents"
-              }
-            }
-          },
-          {
-            "name": "withdrawStakeAccountFee",
-            "type": {
-              "option": {
-                "defined": "FeeCents"
-              }
-            }
-          },
-          {
-            "name": "maxStakeMovedPerEpoch",
-            "type": {
-              "option": {
-                "defined": "Fee"
-              }
-            }
           }
+          
         ]
       }
     },
