@@ -82,10 +82,7 @@ pub mod typedefs {
         pub min_withdraw: Option<u64>,
         pub staking_sol_cap: Option<u64>,
         pub liquidity_sol_cap: Option<u64>,
-        pub withdraw_stake_account_enabled: Option<bool>,
-        pub delayed_unstake_fee: Option<FeeCents>,
-        pub withdraw_stake_account_fee: Option<FeeCents>,
-        pub max_stake_moved_per_epoch: Option<Fee>,
+        pub auto_add_validator_enabled: Option<bool>,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct InitializeData {
