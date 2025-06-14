@@ -24,19 +24,25 @@ pub mod typedefs {
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct U64ValueChange {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub old: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub new: u64,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct DelegationInfo {
         pub voter_pubkey: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub stake: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub activation_epoch: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub deactivation_epoch: u64,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct SplitStakeData {
         pub address: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount: u64,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
@@ -55,7 +61,9 @@ pub mod typedefs {
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct InitBondArgs {
         pub bond_authority: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub cpmpe: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub max_stake_wanted: u64,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
@@ -73,8 +81,11 @@ pub mod typedefs {
     pub struct InitConfigArgs {
         pub admin_authority: [u8; 32usize],
         pub operator_authority: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub epochs_to_claim_settlement: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub withdraw_lockup_epochs: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub slots_to_start_settlement_claiming: u64,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
@@ -83,15 +94,20 @@ pub mod typedefs {
         pub tree_node_hash: [u8; 32usize],
         pub stake_account_staker: [u8; 32usize],
         pub stake_account_withdrawer: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub claim: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub index: u64,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct InitSettlementArgs {
         pub merkle_root: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub max_total_claim: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub max_merkle_nodes: u64,
         pub rent_collector: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub epoch: u64,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
@@ -100,6 +116,7 @@ pub mod typedefs {
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct InitWithdrawRequestArgs {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount: u64,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
