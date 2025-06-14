@@ -100,6 +100,15 @@ pub mod typedefs {
         pub index: u64,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct ClaimSettlementArgs {
+        pub proof: Vec<[u8; 32usize]>,
+        pub tree_node_hash: [u8; 32usize],
+        pub stake_account_staker: [u8; 32usize],
+        pub stake_account_withdrawer: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub claim: u64,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct InitSettlementArgs {
         pub merkle_root: [u8; 32usize],
         #[serde(serialize_with = "crate::serialize_to_string")]
@@ -436,6 +445,22 @@ pub mod accounts_data {
         pub program: String,
         pub remaining: Vec<String>,
     }
+    #[derive(Debug, Serialize)]
+    pub struct ClaimSettlementAccounts {
+        pub config: String,
+        pub bond: String,
+        pub settlement: String,
+        pub settlementClaims: String,
+        pub stakeAccountFrom: String,
+        pub stakeAccountTo: String,
+        pub bondsWithdrawerAuthority: String,
+        pub stakeHistory: String,
+        pub clock: String,
+        pub stakeProgram: String,
+        pub eventAuthority: String,
+        pub program: String,
+        pub remaining: Vec<String>,
+    }
 }
 pub mod ix_data {
     use super::*;
@@ -503,6 +528,10 @@ pub mod ix_data {
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct ClaimSettlementV2Arguments {
         pub claim_settlement_args: ClaimSettlementV2Args,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct ClaimSettlementArguments {
+        pub claim_settlement_args: ClaimSettlementArgs,
     }
 }
 #[derive(Debug, Serialize)]
@@ -599,6 +628,10 @@ pub enum Instruction {
     ClaimSettlementV2 {
         accounts: ClaimSettlementV2Accounts,
         args: ClaimSettlementV2Arguments,
+    },
+    ClaimSettlement {
+        accounts: ClaimSettlementAccounts,
+        args: ClaimSettlementArguments,
     },
 }
 impl Instruction {
@@ -1270,6 +1303,40 @@ impl Instruction {
                     remaining,
                 };
                 return Ok(Instruction::ClaimSettlementV2 { accounts, args });
+            }
+            [85u8, 208u8, 73u8, 229u8, 143u8, 98u8, 83u8, 212u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = ClaimSettlementArguments::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let config = keys.next().unwrap().clone();
+                let bond = keys.next().unwrap().clone();
+                let settlement = keys.next().unwrap().clone();
+                let settlementClaims = keys.next().unwrap().clone();
+                let stakeAccountFrom = keys.next().unwrap().clone();
+                let stakeAccountTo = keys.next().unwrap().clone();
+                let bondsWithdrawerAuthority = keys.next().unwrap().clone();
+                let stakeHistory = keys.next().unwrap().clone();
+                let clock = keys.next().unwrap().clone();
+                let stakeProgram = keys.next().unwrap().clone();
+                let eventAuthority = keys.next().unwrap().clone();
+                let program = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = ClaimSettlementAccounts {
+                    config,
+                    bond,
+                    settlement,
+                    settlementClaims,
+                    stakeAccountFrom,
+                    stakeAccountTo,
+                    bondsWithdrawerAuthority,
+                    stakeHistory,
+                    clock,
+                    stakeProgram,
+                    eventAuthority,
+                    program,
+                    remaining,
+                };
+                return Ok(Instruction::ClaimSettlement { accounts, args });
             }
             _ => anyhow::bail!("Unknown discriminator: {:?}", disc),
         }
