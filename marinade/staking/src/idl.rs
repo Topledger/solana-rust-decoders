@@ -12,6 +12,8 @@ pub use accounts_data::*;
 pub use ix_data::*;
 pub use typedefs::*;
 pub mod typedefs {
+    use crate::pubkey_serializer::pubkey_serde;
+    use crate::pubkey_serializer::pubkey_serde_option;
     use anchor_lang::prelude::*;
     use borsh::{BorshDeserialize, BorshSerialize};
     use serde::Serialize;
@@ -128,6 +130,8 @@ pub mod accounts_data {
 }
 pub mod ix_data {
     use super::*;
+    use crate::pubkey_serializer::pubkey_serde;
+    use crate::pubkey_serializer::pubkey_serde_option;
     use serde::Serialize;
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct DepositArgs {
@@ -151,7 +155,8 @@ pub mod ix_data {
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct InitReferralAccountArgs {
         pub partner_name: String,
-        pub validator_vote_key: Option<String>,
+        #[serde(with = "pubkey_serde_option")]
+        pub validator_vote_key: Option<[u8; 32usize]>,
         pub keep_self_stake_pct: u8,
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]

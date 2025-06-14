@@ -1,7 +1,7 @@
 // build.rs
 
+use anchor_idl::{EnumFields, GeneratorOptions, Idl, IdlAccountItem, IdlTypeDefinitionTy};
 use anyhow::Result;
-use anchor_idl::{GeneratorOptions, Idl, IdlAccountItem, EnumFields, IdlTypeDefinitionTy};
 use heck::{ToSnakeCase, ToUpperCamelCase};
 use quote::{format_ident, quote};
 use serde_json::from_str;
@@ -26,8 +26,28 @@ fn main() -> Result<()> {
                 IdlTypeDefinitionTy::Struct { fields } => {
                     let fields_ts = fields.iter().map(|f| {
                         let f_ident = format_ident!("{}", f.name.to_snake_case());
-                        let ty = map_idl_type(&f.ty);
-                        quote! { pub #f_ident: #ty, }
+                        match &f.ty {
+                            // a bare PublicKey
+                            anchor_idl::IdlType::PublicKey => {
+                                quote! {
+                                    #[serde(with = "pubkey_serde")]
+                                    pub #f_ident: [u8; 32usize],
+                                }
+                            }
+                            // Option<PublicKey>
+                            anchor_idl::IdlType::Option(inner)
+                                if matches!(**inner, anchor_idl::IdlType::PublicKey) =>
+                            {
+                                quote! {
+                                    #[serde(with = "pubkey_serde_option")]
+                                    pub #f_ident: Option<[u8; 32usize]>,
+                                }
+                            }
+                            _ => {
+                                let ty = map_idl_type(&f.ty);
+                                quote! { pub #f_ident: #ty, }
+                            }
+                        }
                     });
                     tts.push(quote! {
                         #[derive(::borsh::BorshSerialize, ::borsh::BorshDeserialize, Clone, Debug, Serialize)]
@@ -39,32 +59,35 @@ fn main() -> Result<()> {
                 // Enums: support unit, named and tuple variants
                 IdlTypeDefinitionTy::Enum { variants } => {
                     // Build each variant’s definition
-                    let variant_defs = variants.iter().map(|v| {
-                        let v_ident = format_ident!("{}", v.name.to_upper_camel_case());
-                        match &v.fields {
-                            None => {
-                                // unit variant
-                                quote! { #v_ident, }
+                    let variant_defs = variants
+                        .iter()
+                        .map(|v| {
+                            let v_ident = format_ident!("{}", v.name.to_upper_camel_case());
+                            match &v.fields {
+                                None => {
+                                    // unit variant
+                                    quote! { #v_ident, }
+                                }
+                                Some(EnumFields::Named(fields)) => {
+                                    // named‐field variant
+                                    let named = fields.iter().map(|f| {
+                                        let f_ident = format_ident!("{}", f.name.to_snake_case());
+                                        let ty_ts = map_idl_type(&f.ty);
+                                        quote! { #f_ident: #ty_ts, }
+                                    });
+                                    quote! { #v_ident { #(#named)* }, }
+                                }
+                                Some(EnumFields::Tuple(types)) => {
+                                    // tuple‐field variant
+                                    let tuple = types.iter().map(|t| {
+                                        let ty_ts = map_idl_type(t);
+                                        quote! { #ty_ts, }
+                                    });
+                                    quote! { #v_ident( #(#tuple)* ), }
+                                }
                             }
-                            Some(EnumFields::Named(fields)) => {
-                                // named‐field variant
-                                let named = fields.iter().map(|f| {
-                                    let f_ident = format_ident!("{}", f.name.to_snake_case());
-                                    let ty_ts = map_idl_type(&f.ty);
-                                    quote! { #f_ident: #ty_ts, }
-                                });
-                                quote! { #v_ident { #(#named)* }, }
-                            }
-                            Some(EnumFields::Tuple(types)) => {
-                                // tuple‐field variant
-                                let tuple = types.iter().map(|t| {
-                                    let ty_ts = map_idl_type(t);
-                                    quote! { #ty_ts, }
-                                });
-                                quote! { #v_ident( #(#tuple)* ), }
-                            }
-                        }
-                    }).collect::<Vec<_>>();
+                        })
+                        .collect::<Vec<_>>();
 
                     // Pick the first variant as default
                     let default_ident = format_ident!("{}", variants[0].name.to_upper_camel_case());
@@ -111,12 +134,27 @@ fn main() -> Result<()> {
         let args_fields = ix.args.iter().map(|arg| {
             let field_ident = format_ident!("{}", arg.name.to_snake_case());
             let ty = map_idl_type(&arg.ty);
-             // check for U64 / U128
+            // check for U64 / U128
             let field_tokens = match &arg.ty {
                 anchor_idl::IdlType::U64 | anchor_idl::IdlType::U128 => {
                     quote! {
                         #[serde(serialize_with = "crate::serialize_to_string")]
                         pub #field_ident: #ty,
+                    }
+                }
+                anchor_idl::IdlType::PublicKey => {
+                    quote! {
+                        #[serde(with = "pubkey_serde")]
+                        pub #field_ident: [u8; 32usize],
+                    }
+                }
+                // Option<PublicKey>
+                anchor_idl::IdlType::Option(inner)
+                    if matches!(**inner, anchor_idl::IdlType::PublicKey) =>
+                {
+                    quote! {
+                        #[serde(with = "pubkey_serde_option")]
+                        pub #field_ident: Option<[u8; 32usize]>,
                     }
                 }
                 _ => {
@@ -150,7 +188,10 @@ fn main() -> Result<()> {
         });
 
         // 3d) decoder arm
-        let idents = flat.iter().map(|acc| format_ident!("{}", acc.name)).collect::<Vec<_>>();
+        let idents = flat
+            .iter()
+            .map(|acc| format_ident!("{}", acc.name))
+            .collect::<Vec<_>>();
         let extract = idents.iter().map(|id| {
             quote! {
                 let #id = keys.next().unwrap().clone();
@@ -227,6 +268,8 @@ fn main() -> Result<()> {
             use ::borsh::{BorshSerialize, BorshDeserialize};
             use anchor_lang::prelude::*;
             use serde::Serialize;
+            use crate::pubkey_serializer::pubkey_serde;
+            use crate::pubkey_serializer::pubkey_serde_option;
             #typedefs_rs
         }
 
@@ -238,6 +281,8 @@ fn main() -> Result<()> {
         pub mod ix_data {
             use serde::Serialize;
             use super::*;
+            use crate::pubkey_serializer::pubkey_serde;
+            use crate::pubkey_serializer::pubkey_serde_option;
             #(#args_structs)*
         }
 
@@ -268,7 +313,7 @@ fn map_idl_type(ty: &anchor_idl::IdlType) -> proc_macro2::TokenStream {
         I128 => quote! { i128 },
         Bytes => quote! { Vec<u8> },
         String => quote! { String },
-        PublicKey => quote! { String },
+        PublicKey => quote! { [u8; 32usize] },
         Vec(inner) => {
             let i = map_idl_type(inner);
             quote! { Vec<#i> }
