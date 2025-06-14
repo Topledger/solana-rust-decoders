@@ -2616,6 +2616,195 @@
           }
         }
       ]
+    },
+    {
+      "name": "claimSettlement",
+      "accounts": [
+        {
+          "name": "config",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "the config account under which the settlement was created"
+          ]
+        },
+        {
+          "name": "bond",
+          "isMut": false,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "bond_account"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Config",
+                "path": "config"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Bond",
+                "path": "bond.vote_account"
+              }
+            ]
+          },
+          "relations": [
+            "config"
+          ]
+        },
+        {
+          "name": "settlement",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "settlement_account"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Bond",
+                "path": "bond"
+              },
+              {
+                "kind": "account",
+                "type": {
+                  "array": [
+                    "u8",
+                    32
+                  ]
+                },
+                "account": "Settlement",
+                "path": "settlement.merkle_root"
+              },
+              {
+                "kind": "account",
+                "type": "u64",
+                "account": "Settlement",
+                "path": "settlement.epoch_created_for"
+              }
+            ]
+          },
+          "relations": [
+            "bond"
+          ]
+        },
+        {
+          "name": "settlementClaims",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "deduplication, merkle tree record cannot be claimed twice"
+          ],
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "claims_account"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Settlement",
+                "path": "settlement"
+              }
+            ]
+          },
+          "relations": [
+            "settlement"
+          ]
+        },
+        {
+          "name": "stakeAccountFrom",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "a stake account that will be withdrawn"
+          ]
+        },
+        {
+          "name": "stakeAccountTo",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "a stake account that will receive the funds"
+          ]
+        },
+        {
+          "name": "bondsWithdrawerAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "authority that manages (owns == by being withdrawer authority) all stakes account under the bonds program"
+          ],
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "bonds_authority"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Config",
+                "path": "config"
+              }
+            ]
+          }
+        },
+        {
+          "name": "stakeHistory",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "__event_authority"
+              }
+            ]
+          }
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "claimSettlementArgs",
+          "type": {
+            "defined": "ClaimSettlementArgs"
+          }
+        }
+      ]
     }
   ],
   "accounts": [
@@ -3405,6 +3594,58 @@
             "name": "index",
             "docs": [
               "index, ordered claim record in the settlement list; merkle root verification"
+            ],
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ClaimSettlementArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "proof",
+            "docs": [
+              "proof that the claim is appropriate"
+            ],
+            "type": {
+              "vec": {
+                "array": [
+                  "u8",
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "name": "treeNodeHash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "stakeAccountStaker",
+            "docs": [
+              "staker authority of the stake_account_to; merkle root verification"
+            ],
+            "type": "publicKey"
+          },
+          {
+            "name": "stakeAccountWithdrawer",
+            "docs": [
+              "withdrawer authority of the stake_account_to; merkle root verification"
+            ],
+            "type": "publicKey"
+          },
+          {
+            "name": "claim",
+            "docs": [
+              "claim amount; merkle root verification"
             ],
             "type": "u64"
           }
