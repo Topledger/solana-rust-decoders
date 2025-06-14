@@ -1274,7 +1274,9 @@ pub mod events {
         pub validator_identity: [u8; 32usize],
         #[serde(with = "pubkey_serde")]
         pub authority: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub cpmpe: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub max_stake_wanted: u64,
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
@@ -1301,6 +1303,7 @@ pub mod events {
         pub stake_account: [u8; 32usize],
         #[serde(with = "pubkey_serde")]
         pub stake_authority_signer: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub deposited_amount: u64,
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
@@ -1322,11 +1325,15 @@ pub mod events {
         pub admin_authority: [u8; 32usize],
         #[serde(with = "pubkey_serde")]
         pub operator_authority: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub withdraw_lockup_epochs: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub epochs_to_claim_settlement: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub minimum_stake_lamports: u64,
         #[serde(with = "pubkey_serde")]
         pub bonds_withdrawer_authority: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub slots_to_start_settlement_claiming: u64,
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
@@ -1348,8 +1355,11 @@ pub mod events {
         pub admin_authority: [u8; 32usize],
         #[serde(with = "pubkey_serde")]
         pub operator_authority: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub epochs_to_claim_settlement: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub withdraw_lockup_epochs: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub minimum_stake_lamports: u64,
         #[serde(with = "pubkey_serde")]
         pub pause_authority: [u8; 32usize],
@@ -1362,8 +1372,11 @@ pub mod events {
         pub admin_authority: [u8; 32usize],
         #[serde(with = "pubkey_serde")]
         pub operator_authority: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub epochs_to_claim_settlement: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub withdraw_lockup_epochs: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub minimum_stake_lamports: u64,
         #[serde(with = "pubkey_serde")]
         pub pause_authority: [u8; 32usize],
@@ -1373,6 +1386,7 @@ pub mod events {
         #[serde(with = "pubkey_serde")]
         pub settlement: [u8; 32usize],
         pub settlement_lamports_claimed: U64ValueChange,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub settlement_merkle_nodes_claimed: u64,
         #[serde(with = "pubkey_serde")]
         pub stake_account_to: [u8; 32usize],
@@ -1380,7 +1394,9 @@ pub mod events {
         pub stake_account_withdrawer: [u8; 32usize],
         #[serde(with = "pubkey_serde")]
         pub stake_account_staker: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub index: u64,
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
@@ -1394,9 +1410,13 @@ pub mod events {
         #[serde(with = "pubkey_serde")]
         pub staker_authority: [u8; 32usize],
         pub merkle_root: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub max_total_claim: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub max_merkle_nodes: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub epoch_created_for: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub slot_created_at: u64,
         #[serde(with = "pubkey_serde")]
         pub rent_collector: [u8; 32usize],
@@ -1408,10 +1428,15 @@ pub mod events {
         #[serde(with = "pubkey_serde")]
         pub settlement: [u8; 32usize],
         pub merkle_root: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub max_total_claim: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub max_merkle_nodes: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub lamports_funded: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub lamports_claimed: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub merkle_nodes_claimed: u64,
         #[serde(with = "pubkey_serde_option")]
         pub split_rent_collector: Option<[u8; 32usize]>,
@@ -1419,7 +1444,9 @@ pub mod events {
         pub split_rent_refund: Option<[u8; 32usize]>,
         #[serde(with = "pubkey_serde")]
         pub rent_collector: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub expiration_epoch: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub current_epoch: u64,
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
@@ -1429,10 +1456,15 @@ pub mod events {
         #[serde(with = "pubkey_serde")]
         pub settlement: [u8; 32usize],
         pub merkle_root: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub max_total_claim: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub max_merkle_nodes: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub lamports_funded: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub lamports_claimed: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub merkle_nodes_claimed: u64,
         #[serde(with = "pubkey_serde_option")]
         pub split_rent_collector: Option<[u8; 32usize]>,
@@ -1449,15 +1481,20 @@ pub mod events {
         pub bond: [u8; 32usize],
         #[serde(with = "pubkey_serde")]
         pub settlement: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub funding_amount: u64,
         #[serde(with = "pubkey_serde")]
         pub stake_account: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub lamports_funded: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub lamports_claimed: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub merkle_nodes_claimed: u64,
         pub split_stake_account: Option<SplitStakeData>,
         #[serde(with = "pubkey_serde_option")]
         pub split_rent_collector: Option<[u8; 32usize]>,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub split_rent_amount: u64,
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
@@ -1502,6 +1539,7 @@ pub mod events {
         pub withdraw_to: [u8; 32usize],
         #[serde(with = "pubkey_serde")]
         pub settlement_staker_authority: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub withdrawn_amount: u64,
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
@@ -1512,7 +1550,9 @@ pub mod events {
         pub bond: [u8; 32usize],
         #[serde(with = "pubkey_serde")]
         pub vote_account: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub epoch: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub requested_amount: u64,
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
@@ -1523,7 +1563,9 @@ pub mod events {
         pub bond: [u8; 32usize],
         #[serde(with = "pubkey_serde")]
         pub authority: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub requested_amount: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub withdrawn_amount: u64,
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
@@ -1539,6 +1581,7 @@ pub mod events {
         pub split_stake: Option<SplitStakeData>,
         #[serde(with = "pubkey_serde")]
         pub new_stake_account_owner: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub withdrawing_amount: u64,
         pub withdrawn_amount: U64ValueChange,
     }
@@ -1549,6 +1592,7 @@ pub mod events {
         #[serde(with = "pubkey_serde")]
         pub settlement: [u8; 32usize],
         pub settlement_lamports_claimed: U64ValueChange,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub settlement_merkle_nodes_claimed: u64,
         #[serde(with = "pubkey_serde")]
         pub stake_account_to: [u8; 32usize],
@@ -1556,6 +1600,7 @@ pub mod events {
         pub stake_account_withdrawer: [u8; 32usize],
         #[serde(with = "pubkey_serde")]
         pub stake_account_staker: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount: u64,
         #[serde(with = "pubkey_serde")]
         pub rent_collector: [u8; 32usize],
