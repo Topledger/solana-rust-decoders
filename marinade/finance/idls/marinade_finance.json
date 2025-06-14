@@ -774,7 +774,8 @@
         {
           "name": "rentPayer",
           "isMut": true,
-          "isSigner": true
+          "isSigner": true,
+          "optional": true
         },
         {
           "name": "clock",
