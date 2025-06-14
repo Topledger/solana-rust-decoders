@@ -242,6 +242,13 @@ fn main() -> Result<()> {
                             pub #fld: Option<[u8; 32usize]>,
                         }
                     }
+                    anchor_idl::IdlType::U64 | anchor_idl::IdlType::U128 => {
+                        let ty = map_idl_type(&f.ty);
+                        quote! {
+                            #[serde(serialize_with = "crate::serialize_to_string")]
+                            pub #fld: #ty,
+                        }
+                    }
                     // everything else: fall back to your existing logic
                     _ => {
                         let ty = map_idl_type(&f.ty);
