@@ -364,7 +364,8 @@ pub mod accounts_data {
         pub reservePda: String,
         pub stakeAccount: String,
         pub stakeDepositAuthority: String,
-        pub rentPayer: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub rentPayer: Option<String>,
         pub clock: String,
         pub epochSchedule: String,
         pub rent: String,
@@ -802,6 +803,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = InitializeArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 10usize;
                 let state = keys.next().unwrap().clone();
                 let reservePda = keys.next().unwrap().clone();
                 let stakeList = keys.next().unwrap().clone();
@@ -836,6 +839,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = ChangeAuthorityArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let state = keys.next().unwrap().clone();
                 let adminAuthority = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -850,6 +855,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = AddValidatorArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 9usize;
                 let state = keys.next().unwrap().clone();
                 let managerAuthority = keys.next().unwrap().clone();
                 let validatorList = keys.next().unwrap().clone();
@@ -878,6 +885,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = RemoveValidatorArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 5usize;
                 let state = keys.next().unwrap().clone();
                 let managerAuthority = keys.next().unwrap().clone();
                 let validatorList = keys.next().unwrap().clone();
@@ -898,6 +907,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = SetValidatorScoreArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let state = keys.next().unwrap().clone();
                 let managerAuthority = keys.next().unwrap().clone();
                 let validatorList = keys.next().unwrap().clone();
@@ -914,6 +925,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = ConfigValidatorSystemArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let state = keys.next().unwrap().clone();
                 let managerAuthority = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -928,6 +941,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = DepositArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 11usize;
                 let state = keys.next().unwrap().clone();
                 let msolMint = keys.next().unwrap().clone();
                 let liqPoolSolLegPda = keys.next().unwrap().clone();
@@ -960,6 +975,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = DepositStakeAccountArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 15usize;
                 let state = keys.next().unwrap().clone();
                 let validatorList = keys.next().unwrap().clone();
                 let stakeList = keys.next().unwrap().clone();
@@ -1000,6 +1017,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = LiquidUnstakeArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 10usize;
                 let state = keys.next().unwrap().clone();
                 let msolMint = keys.next().unwrap().clone();
                 let liqPoolSolLegPda = keys.next().unwrap().clone();
@@ -1030,6 +1049,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = AddLiquidityArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 9usize;
                 let state = keys.next().unwrap().clone();
                 let lpMint = keys.next().unwrap().clone();
                 let lpMintAuthority = keys.next().unwrap().clone();
@@ -1058,6 +1079,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = RemoveLiquidityArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 11usize;
                 let state = keys.next().unwrap().clone();
                 let lpMint = keys.next().unwrap().clone();
                 let burnFrom = keys.next().unwrap().clone();
@@ -1090,6 +1113,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = ConfigLpArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let state = keys.next().unwrap().clone();
                 let adminAuthority = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -1104,6 +1129,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = ConfigMarinadeArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let state = keys.next().unwrap().clone();
                 let adminAuthority = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -1118,6 +1145,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = OrderUnstakeArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 8usize;
                 let state = keys.next().unwrap().clone();
                 let msolMint = keys.next().unwrap().clone();
                 let burnMsolFrom = keys.next().unwrap().clone();
@@ -1144,6 +1173,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = ClaimArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 6usize;
                 let state = keys.next().unwrap().clone();
                 let reservePda = keys.next().unwrap().clone();
                 let ticketAccount = keys.next().unwrap().clone();
@@ -1166,6 +1197,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = StakeReserveArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 14usize;
                 let state = keys.next().unwrap().clone();
                 let validatorList = keys.next().unwrap().clone();
                 let stakeList = keys.next().unwrap().clone();
@@ -1173,7 +1206,11 @@ impl Instruction {
                 let reservePda = keys.next().unwrap().clone();
                 let stakeAccount = keys.next().unwrap().clone();
                 let stakeDepositAuthority = keys.next().unwrap().clone();
-                let rentPayer = keys.next().unwrap().clone();
+                let rentPayer = if has_extra {
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let clock = keys.next().unwrap().clone();
                 let epochSchedule = keys.next().unwrap().clone();
                 let rent = keys.next().unwrap().clone();
@@ -1206,6 +1243,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = UpdateActiveArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let state = keys.next().unwrap().clone();
                 let stakeList = keys.next().unwrap().clone();
                 let stakeAccount = keys.next().unwrap().clone();
@@ -1242,6 +1281,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = UpdateDeactivatedArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let state = keys.next().unwrap().clone();
                 let stakeList = keys.next().unwrap().clone();
                 let stakeAccount = keys.next().unwrap().clone();
@@ -1280,6 +1321,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = DeactivateStakeArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 14usize;
                 let state = keys.next().unwrap().clone();
                 let reservePda = keys.next().unwrap().clone();
                 let validatorList = keys.next().unwrap().clone();
@@ -1318,6 +1361,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = EmergencyUnstakeArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 8usize;
                 let state = keys.next().unwrap().clone();
                 let validatorManagerAuthority = keys.next().unwrap().clone();
                 let validatorList = keys.next().unwrap().clone();
@@ -1344,6 +1389,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = PartialUnstakeArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 14usize;
                 let state = keys.next().unwrap().clone();
                 let validatorManagerAuthority = keys.next().unwrap().clone();
                 let validatorList = keys.next().unwrap().clone();
@@ -1382,6 +1429,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = MergeStakesArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 11usize;
                 let state = keys.next().unwrap().clone();
                 let stakeList = keys.next().unwrap().clone();
                 let validatorList = keys.next().unwrap().clone();
@@ -1414,6 +1463,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = RedelegateArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 15usize;
                 let state = keys.next().unwrap().clone();
                 let validatorList = keys.next().unwrap().clone();
                 let stakeList = keys.next().unwrap().clone();
@@ -1454,6 +1505,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = PauseArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let state = keys.next().unwrap().clone();
                 let pauseAuthority = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -1468,6 +1521,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = ResumeArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let state = keys.next().unwrap().clone();
                 let pauseAuthority = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -1482,6 +1537,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = WithdrawStakeAccountArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 16usize;
                 let state = keys.next().unwrap().clone();
                 let msolMint = keys.next().unwrap().clone();
                 let burnMsolFrom = keys.next().unwrap().clone();
@@ -1524,6 +1581,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = ReallocValidatorListArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 5usize;
                 let state = keys.next().unwrap().clone();
                 let adminAuthority = keys.next().unwrap().clone();
                 let validatorList = keys.next().unwrap().clone();
@@ -1544,6 +1603,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = ReallocStakeListArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 5usize;
                 let state = keys.next().unwrap().clone();
                 let adminAuthority = keys.next().unwrap().clone();
                 let stakeList = keys.next().unwrap().clone();

@@ -1,10 +1,11 @@
 // build.rs
 
+use anchor_idl::{EnumFields, GeneratorOptions, Idl, IdlAccountItem, IdlTypeDefinitionTy};
 use anyhow::Result;
-use anchor_idl::{GeneratorOptions, Idl, IdlAccountItem, EnumFields, IdlTypeDefinitionTy};
 use heck::{ToSnakeCase, ToUpperCamelCase};
 use quote::{format_ident, quote};
 use serde_json::from_str;
+use serde_json::Value;
 use sha2::{Digest, Sha256};
 use std::{fs, process::Command};
 
@@ -14,6 +15,7 @@ fn main() -> Result<()> {
     // 1) load the IDL JSON
     let idl_json = fs::read_to_string(path)?;
     let idl: Idl = from_str(&idl_json)?;
+    let raw: Value = from_str(&idl_json)?;
 
     // 2) hand‐roll typedefs so that enums with fields work correctly
     let typedefs_rs = {
@@ -180,7 +182,7 @@ fn main() -> Result<()> {
         let args_fields = ix.args.iter().map(|arg| {
             let field_ident = format_ident!("{}", arg.name.to_snake_case());
             let ty = map_idl_type(&arg.ty);
-             // check for U64 / U128
+            // check for U64 / U128
             let field_tokens = match &arg.ty {
                 anchor_idl::IdlType::U64 | anchor_idl::IdlType::U128 => {
                     quote! {
@@ -207,8 +209,31 @@ fn main() -> Result<()> {
         // 3c) Accounts struct
         let flat = flatten_accounts(&ix.accounts);
         let acc_fields = flat.iter().map(|acc| {
+            // look up optional flag in raw JSON
+            let is_optional = raw["instructions"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|instr| instr["name"] == ix.name)
+                .and_then(|instr| {
+                    instr["accounts"]
+                        .as_array()
+                        .unwrap()
+                        .iter()
+                        .find(|a| a["name"] == acc.name)
+                        .and_then(|a| a["optional"].as_bool())
+                })
+                .unwrap_or(false);
+
             let f = format_ident!("{}", acc.name);
-            quote! { pub #f: String, }
+            if is_optional {
+                quote! {
+                    #[serde(skip_serializing_if = "Option::is_none")]
+                    pub #f: Option<String>,
+                }
+            } else {
+                quote! { pub #f: String, }
+            }
         });
         accounts_structs.push(quote! {
             #[derive(Debug, Serialize)]
@@ -218,13 +243,61 @@ fn main() -> Result<()> {
             }
         });
 
-        // 3d) decoder arm
-        let idents = flat.iter().map(|acc| format_ident!("{}", acc.name)).collect::<Vec<_>>();
-        let extract = idents.iter().map(|id| {
-            quote! {
-                let #id = keys.next().unwrap().clone();
+        // 3d) decoder arm (also respects optional)
+        // count how many mandatory accounts
+
+        let mut extract = Vec::new();
+        let mandatory_count = raw["instructions"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|instr| instr["name"] == ix.name)
+            .and_then(|instr| instr["accounts"].as_array())
+            .unwrap()
+            .iter()
+            .filter(|a| !a.get("optional").and_then(|b| b.as_bool()).unwrap_or(false))
+            .count();
+
+        // iterate the keys once
+        extract.push(quote! { let mut keys = account_keys.iter(); });
+        // true if this invocation has the extra slot
+        extract.push(quote! { let has_extra = account_keys.len() > #mandatory_count; });
+
+        for acc in &flat {
+            let name = format_ident!("{}", acc.name);
+            // check optional flag again
+            let is_opt = raw["instructions"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|instr| instr["name"] == ix.name)
+                .and_then(|instr| instr["accounts"].as_array())
+                .unwrap()
+                .iter()
+                .find(|a| a["name"] == acc.name)
+                .and_then(|a| a["optional"].as_bool())
+                .unwrap_or(false);
+
+            if is_opt {
+                extract.push(quote! {
+                    let #name = if has_extra {
+                        Some(keys.next().unwrap().clone())
+                    } else {
+                        None
+                    };
+                });
+            } else {
+                extract.push(quote! {
+                    let #name = keys.next().unwrap().clone();
+                });
             }
-        });
+        }
+
+        let idents = flat
+            .iter()
+            .map(|acc| format_ident!("{}", acc.name))
+            .collect::<Vec<_>>();
+
         arms.push(quote! {
             [#(#disc_tokens),*] => {
                 let mut rdr: &[u8] = rest;
