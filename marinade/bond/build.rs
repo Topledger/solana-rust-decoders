@@ -27,7 +27,20 @@ fn main() -> Result<()> {
                     let fields_ts = fields.iter().map(|f| {
                         let f_ident = format_ident!("{}", f.name.to_snake_case());
                         let ty = map_idl_type(&f.ty);
-                        quote! { pub #f_ident: #ty, }
+                        let field_tokens = match &f.ty {
+                            anchor_idl::IdlType::U64 | anchor_idl::IdlType::U128 => {
+                                quote! {
+                                    #[serde(serialize_with = "crate::serialize_to_string")]
+                                    pub #f_ident: #ty,
+                                }
+                            }
+                            _ => {
+                                quote! {
+                                    pub #f_ident: #ty,
+                                }
+                            }
+                        };
+                        field_tokens
                     });
                     tts.push(quote! {
                         #[derive(::borsh::BorshSerialize, ::borsh::BorshDeserialize, Clone, Debug, Serialize)]
