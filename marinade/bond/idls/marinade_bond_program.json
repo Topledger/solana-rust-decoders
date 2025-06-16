@@ -78,6 +78,7 @@
         {
           "name": "eventAuthority",
           "isMut": false,
+          "optional": true,
           "isSigner": false,
           "pda": {
             "seeds": [
@@ -91,6 +92,7 @@
         },
         {
           "name": "program",
+          "optional": true,
           "isMut": false,
           "isSigner": false
         }
@@ -595,6 +597,7 @@
         {
           "name": "eventAuthority",
           "isMut": false,
+          "optional": true,
           "isSigner": false,
           "pda": {
             "seeds": [
@@ -609,6 +612,7 @@
         {
           "name": "program",
           "isMut": false,
+          "optional": true,
           "isSigner": false
         }
       ],
@@ -710,6 +714,7 @@
         },
         {
           "name": "eventAuthority",
+          "optional": true,
           "isMut": false,
           "isSigner": false,
           "pda": {
@@ -725,6 +730,7 @@
         {
           "name": "program",
           "isMut": false,
+          "optional": true,
           "isSigner": false
         }
       ],
@@ -1196,6 +1202,7 @@
         {
           "name": "settlementClaims",
           "isMut": true,
+          "optional": true,
           "isSigner": false,
           "pda": {
             "seeds": [
@@ -1532,6 +1539,7 @@
         },
         {
           "name": "voteAccount",
+          "optional": true,
           "isMut": false,
           "isSigner": false
         },
@@ -1687,6 +1695,7 @@
         },
         {
           "name": "stakeConfig",
+          "optional": true,
           "isMut": false,
           "isSigner": false
         },

@@ -1,5 +1,3 @@
-use crate::pubkey_serializer::pubkey_serde;
-use crate::pubkey_serializer::pubkey_serde_option;
 use serde::Serializer;
 #[allow(dead_code)]
 use std::convert::TryInto;
@@ -10,16 +8,22 @@ where
 {
     s.serialize_str(&x.to_string())
 }
+use crate::pubkey_serializer::pubkey_serde;
+use crate::pubkey_serializer::pubkey_serde_option;
 pub use accounts_data::*;
 pub use ix_data::*;
 pub use typedefs::*;
 pub mod typedefs {
+    use crate::pubkey_serializer::pubkey_serde;
+    use crate::pubkey_serializer::pubkey_serde_option;
     use anchor_lang::prelude::*;
     use borsh::{BorshDeserialize, BorshSerialize};
     use serde::Serialize;
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct PubkeyValueChange {
+        #[serde(with = "pubkey_serde")]
         pub old: [u8; 32usize],
+        #[serde(with = "pubkey_serde")]
         pub new: [u8; 32usize],
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
@@ -31,6 +35,7 @@ pub mod typedefs {
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct DelegationInfo {
+        #[serde(with = "pubkey_serde")]
         pub voter_pubkey: [u8; 32usize],
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub stake: u64,
@@ -41,25 +46,30 @@ pub mod typedefs {
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct SplitStakeData {
+        #[serde(with = "pubkey_serde")]
         pub address: [u8; 32usize],
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount: u64,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct ConfigureBondWithMintArgs {
+        #[serde(with = "pubkey_serde")]
         pub validator_identity: [u8; 32usize],
+        #[serde(with = "pubkey_serde_option")]
         pub bond_authority: Option<[u8; 32usize]>,
         pub cpmpe: Option<u64>,
         pub max_stake_wanted: Option<u64>,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct ConfigureBondArgs {
+        #[serde(with = "pubkey_serde_option")]
         pub bond_authority: Option<[u8; 32usize]>,
         pub cpmpe: Option<u64>,
         pub max_stake_wanted: Option<u64>,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct InitBondArgs {
+        #[serde(with = "pubkey_serde")]
         pub bond_authority: [u8; 32usize],
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub cpmpe: u64,
@@ -68,8 +78,11 @@ pub mod typedefs {
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct ConfigureConfigArgs {
+        #[serde(with = "pubkey_serde_option")]
         pub admin: Option<[u8; 32usize]>,
+        #[serde(with = "pubkey_serde_option")]
         pub operator: Option<[u8; 32usize]>,
+        #[serde(with = "pubkey_serde_option")]
         pub pause_authority: Option<[u8; 32usize]>,
         pub epochs_to_claim_settlement: Option<u64>,
         pub withdraw_lockup_epochs: Option<u64>,
@@ -79,7 +92,9 @@ pub mod typedefs {
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct InitConfigArgs {
+        #[serde(with = "pubkey_serde")]
         pub admin_authority: [u8; 32usize],
+        #[serde(with = "pubkey_serde")]
         pub operator_authority: [u8; 32usize],
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub epochs_to_claim_settlement: u64,
@@ -92,7 +107,9 @@ pub mod typedefs {
     pub struct ClaimSettlementV2Args {
         pub proof: Vec<[u8; 32usize]>,
         pub tree_node_hash: [u8; 32usize],
+        #[serde(with = "pubkey_serde")]
         pub stake_account_staker: [u8; 32usize],
+        #[serde(with = "pubkey_serde")]
         pub stake_account_withdrawer: [u8; 32usize],
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub claim: u64,
@@ -103,7 +120,9 @@ pub mod typedefs {
     pub struct ClaimSettlementArgs {
         pub proof: Vec<[u8; 32usize]>,
         pub tree_node_hash: [u8; 32usize],
+        #[serde(with = "pubkey_serde")]
         pub stake_account_staker: [u8; 32usize],
+        #[serde(with = "pubkey_serde")]
         pub stake_account_withdrawer: [u8; 32usize],
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub claim: u64,
@@ -115,12 +134,14 @@ pub mod typedefs {
         pub max_total_claim: u64,
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub max_merkle_nodes: u64,
+        #[serde(with = "pubkey_serde")]
         pub rent_collector: [u8; 32usize],
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub epoch: u64,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct MergeStakeArgs {
+        #[serde(with = "pubkey_serde")]
         pub settlement: [u8; 32usize],
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
@@ -142,8 +163,10 @@ pub mod accounts_data {
         pub config: String,
         pub rentPayer: String,
         pub systemProgram: String,
-        pub eventAuthority: String,
-        pub program: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub eventAuthority: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub program: Option<String>,
         pub remaining: Vec<String>,
     }
     #[derive(Debug, Serialize)]
@@ -213,8 +236,10 @@ pub mod accounts_data {
         pub associatedTokenProgram: String,
         pub metadataProgram: String,
         pub rent: String,
-        pub eventAuthority: String,
-        pub program: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub eventAuthority: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub program: Option<String>,
         pub remaining: Vec<String>,
     }
     #[derive(Debug, Serialize)]
@@ -227,8 +252,10 @@ pub mod accounts_data {
         pub clock: String,
         pub stakeHistory: String,
         pub stakeProgram: String,
-        pub eventAuthority: String,
-        pub program: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub eventAuthority: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub program: Option<String>,
         pub remaining: Vec<String>,
     }
     #[derive(Debug, Serialize)]
@@ -281,7 +308,8 @@ pub mod accounts_data {
         pub config: String,
         pub bond: String,
         pub settlement: String,
-        pub settlementClaims: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub settlementClaims: Option<String>,
         pub operatorAuthority: String,
         pub rentPayer: String,
         pub systemProgram: String,
@@ -318,7 +346,8 @@ pub mod accounts_data {
     pub struct FundSettlementAccounts {
         pub config: String,
         pub bond: String,
-        pub voteAccount: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub voteAccount: Option<String>,
         pub settlement: String,
         pub operatorAuthority: String,
         pub stakeAccount: String,
@@ -331,7 +360,8 @@ pub mod accounts_data {
         pub clock: String,
         pub rent: String,
         pub stakeProgram: String,
-        pub stakeConfig: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub stakeConfig: Option<String>,
         pub eventAuthority: String,
         pub program: String,
         pub remaining: Vec<String>,
@@ -464,6 +494,8 @@ pub mod accounts_data {
 }
 pub mod ix_data {
     use super::*;
+    use crate::pubkey_serializer::pubkey_serde;
+    use crate::pubkey_serializer::pubkey_serde_option;
     use serde::Serialize;
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct InitConfigArguments {
@@ -646,11 +678,21 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = InitConfigArguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let config = keys.next().unwrap().clone();
                 let rentPayer = keys.next().unwrap().clone();
                 let systemProgram = keys.next().unwrap().clone();
-                let eventAuthority = keys.next().unwrap().clone();
-                let program = keys.next().unwrap().clone();
+                let eventAuthority = if has_extra {
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
+                let program = if has_extra {
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let remaining = keys.cloned().collect();
                 let accounts = InitConfigAccounts {
                     config,
@@ -666,6 +708,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = ConfigureConfigArguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 4usize;
                 let config = keys.next().unwrap().clone();
                 let adminAuthority = keys.next().unwrap().clone();
                 let eventAuthority = keys.next().unwrap().clone();
@@ -684,6 +728,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = CloseSettlementClaimArguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 5usize;
                 let settlement = keys.next().unwrap().clone();
                 let settlementClaim = keys.next().unwrap().clone();
                 let rentCollector = keys.next().unwrap().clone();
@@ -704,6 +750,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = InitBondArguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 8usize;
                 let config = keys.next().unwrap().clone();
                 let voteAccount = keys.next().unwrap().clone();
                 let validatorIdentity = keys.next().unwrap().clone();
@@ -730,6 +778,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = ConfigureBondArguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 6usize;
                 let config = keys.next().unwrap().clone();
                 let bond = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
@@ -752,6 +802,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = ConfigureBondWithMintArguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 9usize;
                 let config = keys.next().unwrap().clone();
                 let bond = keys.next().unwrap().clone();
                 let mint = keys.next().unwrap().clone();
@@ -780,6 +832,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = MintBondArguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 13usize;
                 let config = keys.next().unwrap().clone();
                 let bond = keys.next().unwrap().clone();
                 let mint = keys.next().unwrap().clone();
@@ -793,8 +847,16 @@ impl Instruction {
                 let associatedTokenProgram = keys.next().unwrap().clone();
                 let metadataProgram = keys.next().unwrap().clone();
                 let rent = keys.next().unwrap().clone();
-                let eventAuthority = keys.next().unwrap().clone();
-                let program = keys.next().unwrap().clone();
+                let eventAuthority = if has_extra {
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
+                let program = if has_extra {
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let remaining = keys.cloned().collect();
                 let accounts = MintBondAccounts {
                     config,
@@ -820,6 +882,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = FundBondArguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 8usize;
                 let config = keys.next().unwrap().clone();
                 let bond = keys.next().unwrap().clone();
                 let bondsWithdrawerAuthority = keys.next().unwrap().clone();
@@ -828,8 +892,16 @@ impl Instruction {
                 let clock = keys.next().unwrap().clone();
                 let stakeHistory = keys.next().unwrap().clone();
                 let stakeProgram = keys.next().unwrap().clone();
-                let eventAuthority = keys.next().unwrap().clone();
-                let program = keys.next().unwrap().clone();
+                let eventAuthority = if has_extra {
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
+                let program = if has_extra {
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let remaining = keys.cloned().collect();
                 let accounts = FundBondAccounts {
                     config,
@@ -850,6 +922,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = InitWithdrawRequestArguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 9usize;
                 let config = keys.next().unwrap().clone();
                 let bond = keys.next().unwrap().clone();
                 let voteAccount = keys.next().unwrap().clone();
@@ -878,6 +952,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = CancelWithdrawRequestArguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 8usize;
                 let config = keys.next().unwrap().clone();
                 let bond = keys.next().unwrap().clone();
                 let voteAccount = keys.next().unwrap().clone();
@@ -904,6 +980,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = ClaimWithdrawRequestArguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 16usize;
                 let config = keys.next().unwrap().clone();
                 let bond = keys.next().unwrap().clone();
                 let voteAccount = keys.next().unwrap().clone();
@@ -946,10 +1024,16 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = InitSettlementArguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 8usize;
                 let config = keys.next().unwrap().clone();
                 let bond = keys.next().unwrap().clone();
                 let settlement = keys.next().unwrap().clone();
-                let settlementClaims = keys.next().unwrap().clone();
+                let settlementClaims = if has_extra {
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let operatorAuthority = keys.next().unwrap().clone();
                 let rentPayer = keys.next().unwrap().clone();
                 let systemProgram = keys.next().unwrap().clone();
@@ -974,6 +1058,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = UpsizeSettlementClaimsArguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let settlementClaims = keys.next().unwrap().clone();
                 let rentPayer = keys.next().unwrap().clone();
                 let systemProgram = keys.next().unwrap().clone();
@@ -990,6 +1076,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = CancelSettlementArguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 14usize;
                 let config = keys.next().unwrap().clone();
                 let bond = keys.next().unwrap().clone();
                 let settlement = keys.next().unwrap().clone();
@@ -1028,9 +1116,15 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = FundSettlementArguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 16usize;
                 let config = keys.next().unwrap().clone();
                 let bond = keys.next().unwrap().clone();
-                let voteAccount = keys.next().unwrap().clone();
+                let voteAccount = if has_extra {
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let settlement = keys.next().unwrap().clone();
                 let operatorAuthority = keys.next().unwrap().clone();
                 let stakeAccount = keys.next().unwrap().clone();
@@ -1043,7 +1137,11 @@ impl Instruction {
                 let clock = keys.next().unwrap().clone();
                 let rent = keys.next().unwrap().clone();
                 let stakeProgram = keys.next().unwrap().clone();
-                let stakeConfig = keys.next().unwrap().clone();
+                let stakeConfig = if has_extra {
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let eventAuthority = keys.next().unwrap().clone();
                 let program = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -1074,6 +1172,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = MergeStakeArguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 9usize;
                 let config = keys.next().unwrap().clone();
                 let sourceStake = keys.next().unwrap().clone();
                 let destinationStake = keys.next().unwrap().clone();
@@ -1102,6 +1202,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = ResetStakeArguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 12usize;
                 let config = keys.next().unwrap().clone();
                 let bond = keys.next().unwrap().clone();
                 let settlement = keys.next().unwrap().clone();
@@ -1136,6 +1238,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = WithdrawStakeArguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 11usize;
                 let config = keys.next().unwrap().clone();
                 let operatorAuthority = keys.next().unwrap().clone();
                 let settlement = keys.next().unwrap().clone();
@@ -1168,6 +1272,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = EmergencyPauseArguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 4usize;
                 let config = keys.next().unwrap().clone();
                 let pauseAuthority = keys.next().unwrap().clone();
                 let eventAuthority = keys.next().unwrap().clone();
@@ -1186,6 +1292,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = EmergencyResumeArguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 4usize;
                 let config = keys.next().unwrap().clone();
                 let pauseAuthority = keys.next().unwrap().clone();
                 let eventAuthority = keys.next().unwrap().clone();
@@ -1204,6 +1312,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = CloseSettlementArguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 12usize;
                 let config = keys.next().unwrap().clone();
                 let bond = keys.next().unwrap().clone();
                 let settlement = keys.next().unwrap().clone();
@@ -1238,6 +1348,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = CloseSettlementV2Arguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 13usize;
                 let config = keys.next().unwrap().clone();
                 let bond = keys.next().unwrap().clone();
                 let settlement = keys.next().unwrap().clone();
@@ -1274,6 +1386,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = ClaimSettlementV2Arguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 12usize;
                 let config = keys.next().unwrap().clone();
                 let bond = keys.next().unwrap().clone();
                 let settlement = keys.next().unwrap().clone();
@@ -1308,6 +1422,8 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = ClaimSettlementArguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 12usize;
                 let config = keys.next().unwrap().clone();
                 let bond = keys.next().unwrap().clone();
                 let settlement = keys.next().unwrap().clone();
