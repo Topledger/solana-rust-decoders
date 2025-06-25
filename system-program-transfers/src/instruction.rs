@@ -16,7 +16,7 @@ pub struct TransferAccounts {
     pub recipient_account:String,
 }
 
-#[derive(BorshDeserialize, Serialize, Deserialize, Debug)]
+#[derive(BorshDeserialize, Serialize, Debug)]
 pub struct TransferArgs {
     pub lamports: u64,
 }
@@ -28,7 +28,7 @@ pub struct TransferWithSeedAccounts {
     pub recipient_account:String,
 }
 
-#[derive(BorshDeserialize, Serialize, Deserialize, Debug)]
+#[derive(BorshDeserialize, Serialize, Debug)]
 pub struct TransferWithSeedArgs {
     pub lamports:   u64,
     pub from_seed:  String,
@@ -36,7 +36,7 @@ pub struct TransferWithSeedArgs {
 }
 
 // tag the enum so Serde emits a `"instruction_type"` field for us
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Debug)]
 #[serde(tag = "instruction_type")]
 pub enum Instruction {
     Transfer {
@@ -63,8 +63,9 @@ impl Instruction {
 
         match disc {
             TRANSFER_DISCRIMINATOR => {
+                let mut rdr: &[u8] = rest;
                 // deserialize just the lamports
-                let args = TransferArgs::try_from_slice(rest).map_err(|e| anyhow!("failed to parse TransferArgs: {}", e))?;
+                let args = TransferArgs::deserialize(&mut rdr).map_err(|e| anyhow!("failed to parse TransferArgs: {}", e))?;
 
                 // map the first two account keys straight into strings
                 let accounts = TransferAccounts {

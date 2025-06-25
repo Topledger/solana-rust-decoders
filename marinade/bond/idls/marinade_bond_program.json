@@ -128,6 +128,7 @@
         {
           "name": "eventAuthority",
           "isMut": false,
+          "optional": true,
           "isSigner": false,
           "pda": {
             "seeds": [
@@ -141,6 +142,7 @@
         },
         {
           "name": "program",
+          "optional": true,
           "isMut": false,
           "isSigner": false
         }
@@ -258,6 +260,7 @@
         {
           "name": "eventAuthority",
           "isMut": false,
+          "optional": true,
           "isSigner": false,
           "pda": {
             "seeds": [
@@ -271,6 +274,7 @@
         },
         {
           "name": "program",
+          "optional": true,
           "isMut": false,
           "isSigner": false
         }
@@ -332,11 +336,13 @@
         {
           "name": "voteAccount",
           "isMut": false,
+          "optional": true,
           "isSigner": false
         },
         {
           "name": "eventAuthority",
           "isMut": false,
+          "optional": true,
           "isSigner": false,
           "pda": {
             "seeds": [
@@ -350,6 +356,7 @@
         },
         {
           "name": "program",
+          "optional": true,
           "isMut": false,
           "isSigner": false
         }
@@ -4722,6 +4729,22 @@
           "type": "publicKey",
           "index": false
         }
+      ]
+    },
+    {
+      "name": "CloseSettlementClaimEvent",
+      "fields": [
+        {
+          "name": "settlement",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "rentCollector",
+          "type": "publicKey",
+          "index": false
+        }
+       
       ]
     }
   ],

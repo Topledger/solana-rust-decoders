@@ -173,8 +173,10 @@ pub mod accounts_data {
     pub struct ConfigureConfigAccounts {
         pub config: String,
         pub adminAuthority: String,
-        pub eventAuthority: String,
-        pub program: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub eventAuthority: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub program: Option<String>,
         pub remaining: Vec<String>,
     }
     #[derive(Debug, Serialize)]
@@ -194,8 +196,10 @@ pub mod accounts_data {
         pub bond: String,
         pub rentPayer: String,
         pub systemProgram: String,
-        pub eventAuthority: String,
-        pub program: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub eventAuthority: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub program: Option<String>,
         pub remaining: Vec<String>,
     }
     #[derive(Debug, Serialize)]
@@ -203,9 +207,12 @@ pub mod accounts_data {
         pub config: String,
         pub bond: String,
         pub authority: String,
-        pub voteAccount: String,
-        pub eventAuthority: String,
-        pub program: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub voteAccount: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub eventAuthority: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub program: Option<String>,
         pub remaining: Vec<String>,
     }
     #[derive(Debug, Serialize)]
@@ -709,11 +716,19 @@ impl Instruction {
                 let args = ConfigureConfigArguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
                 let mut keys = account_keys.iter();
-                let has_extra = account_keys.len() > 4usize;
+                let has_extra = account_keys.len() > 2usize;
                 let config = keys.next().unwrap().clone();
                 let adminAuthority = keys.next().unwrap().clone();
-                let eventAuthority = keys.next().unwrap().clone();
-                let program = keys.next().unwrap().clone();
+                let eventAuthority = if has_extra {
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
+                let program = if has_extra {
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let remaining = keys.cloned().collect();
                 let accounts = ConfigureConfigAccounts {
                     config,
@@ -751,15 +766,23 @@ impl Instruction {
                 let args = InitBondArguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
                 let mut keys = account_keys.iter();
-                let has_extra = account_keys.len() > 8usize;
+                let has_extra = account_keys.len() > 6usize;
                 let config = keys.next().unwrap().clone();
                 let voteAccount = keys.next().unwrap().clone();
                 let validatorIdentity = keys.next().unwrap().clone();
                 let bond = keys.next().unwrap().clone();
                 let rentPayer = keys.next().unwrap().clone();
                 let systemProgram = keys.next().unwrap().clone();
-                let eventAuthority = keys.next().unwrap().clone();
-                let program = keys.next().unwrap().clone();
+                let eventAuthority = if has_extra {
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
+                let program = if has_extra {
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let remaining = keys.cloned().collect();
                 let accounts = InitBondAccounts {
                     config,
@@ -779,13 +802,25 @@ impl Instruction {
                 let args = ConfigureBondArguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
                 let mut keys = account_keys.iter();
-                let has_extra = account_keys.len() > 6usize;
+                let has_extra = account_keys.len() > 3usize;
                 let config = keys.next().unwrap().clone();
                 let bond = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
-                let voteAccount = keys.next().unwrap().clone();
-                let eventAuthority = keys.next().unwrap().clone();
-                let program = keys.next().unwrap().clone();
+                let voteAccount = if has_extra {
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
+                let eventAuthority = if has_extra {
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
+                let program = if has_extra {
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let remaining = keys.cloned().collect();
                 let accounts = ConfigureBondAccounts {
                     config,
@@ -1805,6 +1840,13 @@ pub mod events {
         #[serde(with = "pubkey_serde")]
         pub rent_collector: [u8; 32usize],
     }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct CloseSettlementClaimEvent {
+        #[serde(with = "pubkey_serde")]
+        pub settlement: [u8; 32usize],
+        #[serde(with = "pubkey_serde")]
+        pub rent_collector: [u8; 32usize],
+    }
     #[derive(Debug, Serialize)]
     #[serde(tag = "event_type")]
     pub enum Event {
@@ -1829,6 +1871,7 @@ pub mod events {
         CancelWithdrawRequestEvent { args: CancelWithdrawRequestEvent },
         ClaimWithdrawRequestEvent { args: ClaimWithdrawRequestEvent },
         ClaimSettlementEvent { args: ClaimSettlementEvent },
+        CloseSettlementClaimEvent { args: CloseSettlementClaimEvent },
     }
     pub const EVENT_LOG_DISCRIMINATOR: [u8; 8] = [228, 69, 165, 46, 81, 203, 154, 29];
     impl Event {
@@ -1955,6 +1998,11 @@ pub mod events {
                     let mut rdr = &payload[..];
                     let args = ClaimSettlementEvent::deserialize(&mut rdr)?;
                     return Ok(Event::ClaimSettlementEvent { args });
+                }
+                [131u8, 120u8, 161u8, 252u8, 249u8, 136u8, 153u8, 53u8] => {
+                    let mut rdr = &payload[..];
+                    let args = CloseSettlementClaimEvent::deserialize(&mut rdr)?;
+                    return Ok(Event::CloseSettlementClaimEvent { args });
                 }
                 _ => anyhow::bail!("Unknown event discriminator: {:?}", disc),
             }
