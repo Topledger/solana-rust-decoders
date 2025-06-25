@@ -36,6 +36,13 @@ fn main() -> Result<()> {
                                     pub #f_ident: [u8; 32usize],
                                 }
                             }
+                            anchor_idl::IdlType::U64 | anchor_idl::IdlType::U128 => {
+                                let ty = map_idl_type(&f.ty);
+                                quote! {
+                                    #[serde(serialize_with = "crate::serialize_to_string")]
+                                    pub #f_ident: #ty,
+                                }
+                            }
                             // Option<PublicKey>
                             anchor_idl::IdlType::Option(inner)
                                 if matches!(**inner, anchor_idl::IdlType::PublicKey) =>

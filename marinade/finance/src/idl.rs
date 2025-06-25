@@ -25,7 +25,9 @@ pub mod typedefs {
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct U64ValueChange {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub old: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub new: u64,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
@@ -90,17 +92,20 @@ pub mod typedefs {
         pub admin_authority: [u8; 32usize],
         #[serde(with = "pubkey_serde")]
         pub validator_manager_authority: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub min_stake: u64,
         pub rewards_fee: Fee,
         pub liq_pool: LiqPoolInitializeData,
         pub additional_stake_record_space: u32,
         pub additional_validator_record_space: u32,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub slots_for_stake_delta: u64,
         #[serde(with = "pubkey_serde")]
         pub pause_authority: [u8; 32usize],
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct LiqPoolInitializeData {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub lp_liquidity_target: u64,
         pub lp_max_fee: Fee,
         pub lp_min_fee: Fee,
@@ -123,12 +128,16 @@ pub mod typedefs {
         pub msol_leg_authority_bump_seed: u8,
         #[serde(with = "pubkey_serde")]
         pub msol_leg: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub lp_liquidity_target: u64,
         pub lp_max_fee: Fee,
         pub lp_min_fee: Fee,
         pub treasury_cut: Fee,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub lp_supply: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub lent_from_sol_leg: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub liquidity_sol_cap: u64,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
@@ -145,7 +154,9 @@ pub mod typedefs {
     pub struct StakeRecord {
         #[serde(with = "pubkey_serde")]
         pub stake_account: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub last_update_delegated_lamports: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub last_update_epoch: u64,
         pub is_emergency_unstaking: u8,
     }
@@ -154,11 +165,15 @@ pub mod typedefs {
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct StakeSystem {
         pub stake_list: List,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub delayed_unstake_cooling_down: u64,
         pub stake_deposit_bump_seed: u8,
         pub stake_withdraw_bump_seed: u8,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub slots_for_stake_delta: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub last_stake_delta_epoch: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub min_stake: u64,
         pub extra_stake_delta_runs: u32,
     }
@@ -166,8 +181,10 @@ pub mod typedefs {
     pub struct ValidatorRecord {
         #[serde(with = "pubkey_serde")]
         pub validator_account: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub active_balance: u64,
         pub score: u32,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub last_stake_delta_epoch: u64,
         pub duplication_flag_bump_seed: u8,
     }
@@ -179,6 +196,7 @@ pub mod typedefs {
         #[serde(with = "pubkey_serde")]
         pub manager_authority: [u8; 32usize],
         pub total_validator_score: u32,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub total_active_balance: u64,
         pub auto_add_validator_enabled: u8,
     }
