@@ -9,7 +9,7 @@ use sha2::{Digest, Sha256};
 use std::{fs, process::Command};
 
 fn main() -> Result<()> {
-    let path = "idls/marinade_staking.json";
+    let path = "idls/unstake_program.json";
 
     // 1) load the IDL JSON
     let idl_json = fs::read_to_string(path)?;
@@ -105,11 +105,11 @@ fn main() -> Result<()> {
                             #(#variant_defs)*
                         }
 
-                        impl Default for #name {
-                            fn default() -> Self {
-                                Self::#default_ident
-                            }
-                        }
+                        // impl Default for #name {
+                        //     fn default() -> Self {
+                        //         Self::#default_ident
+                        //     }
+                        // }
                     });
                 }
             }
