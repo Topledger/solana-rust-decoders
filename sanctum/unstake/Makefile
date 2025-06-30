@@ -9,4 +9,4 @@ wasm_pack_dev:
 .PHONY convert_and_gcloud_upload:
 convert_and_gcloud_upload:
 	go build utils/convert.go && mv convert utils/convert
-	utils/script.sh marinade staking
+	utils/script.sh sanctum unstake

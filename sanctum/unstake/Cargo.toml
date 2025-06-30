@@ -1,11 +1,11 @@
 [package]
-name = "marinade"
+name = "sanctum"
 version = "1.0.0"
 edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
-name = "staking"
+name = "unstake"
 
 [dependencies]
 bs58                     = "0.5"   # base58 decode
