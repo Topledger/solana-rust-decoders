@@ -182,6 +182,7 @@
         },
         {
           "name": "systemProgram",
+          "optional": true,
           "isMut": false,
           "isSigner": false
         }
@@ -247,6 +248,7 @@
         },
         {
           "name": "systemProgram",
+          "optional": true,
           "isMut": false,
           "isSigner": false
         }
@@ -552,6 +554,7 @@
         },
         {
           "name": "systemProgram",
+          "optional": true,
           "isMut": false,
           "isSigner": false
         }

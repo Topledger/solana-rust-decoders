@@ -109,7 +109,8 @@ pub mod accounts_data {
         pub mintLpTokensTo: String,
         pub flashAccount: String,
         pub tokenProgram: String,
-        pub systemProgram: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub systemProgram: Option<String>,
         pub remaining: Vec<String>,
     }
     #[derive(Debug, Serialize)]
@@ -122,7 +123,8 @@ pub mod accounts_data {
         pub burnLpTokensFrom: String,
         pub flashAccount: String,
         pub tokenProgram: String,
-        pub systemProgram: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub systemProgram: Option<String>,
         pub remaining: Vec<String>,
     }
     #[derive(Debug, Serialize)]
@@ -187,7 +189,8 @@ pub mod accounts_data {
         pub protocolFeeDestination: String,
         pub clock: String,
         pub stakeProgram: String,
-        pub systemProgram: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub systemProgram: Option<String>,
         pub remaining: Vec<String>,
     }
     #[derive(Debug, Serialize)]
@@ -368,8 +371,10 @@ impl Instruction {
         match disc {
             [225u8, 155u8, 167u8, 170u8, 29u8, 145u8, 165u8, 90u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitProtocolFeeArgs::deserialize(&mut rdr)?;
+                let args = InitProtocolFeeArgs {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let payer = keys.next().unwrap().clone();
                 let protocolFeeAccount = keys.next().unwrap().clone();
                 let systemProgram = keys.next().unwrap().clone();
@@ -384,8 +389,11 @@ impl Instruction {
             }
             [173u8, 239u8, 83u8, 242u8, 136u8, 43u8, 144u8, 217u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = SetProtocolFeeArgs::deserialize(&mut rdr)?;
+                let protocol_fee: ProtocolFee = ProtocolFee::deserialize(&mut rdr)?;
+                let args = SetProtocolFeeArgs { protocol_fee };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let authority = keys.next().unwrap().clone();
                 let protocolFeeAccount = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -398,8 +406,11 @@ impl Instruction {
             }
             [233u8, 146u8, 209u8, 142u8, 207u8, 104u8, 64u8, 188u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = CreatePoolArgs::deserialize(&mut rdr)?;
+                let fee: Fee = Fee::deserialize(&mut rdr)?;
+                let args = CreatePoolArgs { fee };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 9usize;
                 let payer = keys.next().unwrap().clone();
                 let feeAuthority = keys.next().unwrap().clone();
                 let poolAccount = keys.next().unwrap().clone();
@@ -426,8 +437,11 @@ impl Instruction {
             }
             [181u8, 157u8, 89u8, 67u8, 143u8, 182u8, 52u8, 72u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = AddLiquidityArgs::deserialize(&mut rdr)?;
+                let amount: u64 = u64::deserialize(&mut rdr)?;
+                let args = AddLiquidityArgs { amount };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 7usize;
                 let from = keys.next().unwrap().clone();
                 let poolAccount = keys.next().unwrap().clone();
                 let poolSolReserves = keys.next().unwrap().clone();
@@ -435,7 +449,11 @@ impl Instruction {
                 let mintLpTokensTo = keys.next().unwrap().clone();
                 let flashAccount = keys.next().unwrap().clone();
                 let tokenProgram = keys.next().unwrap().clone();
-                let systemProgram = keys.next().unwrap().clone();
+                let systemProgram = if has_extra {
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let remaining = keys.cloned().collect();
                 let accounts = AddLiquidityAccounts {
                     from,
@@ -452,8 +470,11 @@ impl Instruction {
             }
             [80u8, 85u8, 209u8, 72u8, 24u8, 206u8, 177u8, 108u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = RemoveLiquidityArgs::deserialize(&mut rdr)?;
+                let amount_lp: u64 = u64::deserialize(&mut rdr)?;
+                let args = RemoveLiquidityArgs { amount_lp };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 8usize;
                 let burnLpTokensFromAuthority = keys.next().unwrap().clone();
                 let to = keys.next().unwrap().clone();
                 let poolAccount = keys.next().unwrap().clone();
@@ -462,7 +483,11 @@ impl Instruction {
                 let burnLpTokensFrom = keys.next().unwrap().clone();
                 let flashAccount = keys.next().unwrap().clone();
                 let tokenProgram = keys.next().unwrap().clone();
-                let systemProgram = keys.next().unwrap().clone();
+                let systemProgram = if has_extra {
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let remaining = keys.cloned().collect();
                 let accounts = RemoveLiquidityAccounts {
                     burnLpTokensFromAuthority,
@@ -480,8 +505,11 @@ impl Instruction {
             }
             [18u8, 154u8, 24u8, 18u8, 237u8, 214u8, 19u8, 80u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = SetFeeArgs::deserialize(&mut rdr)?;
+                let fee: Fee = Fee::deserialize(&mut rdr)?;
+                let args = SetFeeArgs { fee };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 5usize;
                 let feeAuthority = keys.next().unwrap().clone();
                 let poolAccount = keys.next().unwrap().clone();
                 let feeAccount = keys.next().unwrap().clone();
@@ -500,8 +528,10 @@ impl Instruction {
             }
             [31u8, 1u8, 50u8, 87u8, 237u8, 101u8, 97u8, 132u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = SetFeeAuthorityArgs::deserialize(&mut rdr)?;
+                let args = SetFeeAuthorityArgs {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let feeAuthority = keys.next().unwrap().clone();
                 let poolAccount = keys.next().unwrap().clone();
                 let newFeeAuthority = keys.next().unwrap().clone();
@@ -516,8 +546,11 @@ impl Instruction {
             }
             [71u8, 73u8, 56u8, 155u8, 202u8, 142u8, 100u8, 150u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = SetLpTokenMetadataArgs::deserialize(&mut rdr)?;
+                let data: DataV2LpToken = DataV2LpToken::deserialize(&mut rdr)?;
+                let args = SetLpTokenMetadataArgs { data };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 9usize;
                 let payer = keys.next().unwrap().clone();
                 let feeAuthority = keys.next().unwrap().clone();
                 let poolAccount = keys.next().unwrap().clone();
@@ -544,8 +577,10 @@ impl Instruction {
             }
             [217u8, 64u8, 76u8, 16u8, 216u8, 77u8, 123u8, 226u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = DeactivateStakeAccountArgs::deserialize(&mut rdr)?;
+                let args = DeactivateStakeAccountArgs {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 5usize;
                 let stakeAccount = keys.next().unwrap().clone();
                 let poolAccount = keys.next().unwrap().clone();
                 let poolSolReserves = keys.next().unwrap().clone();
@@ -564,8 +599,10 @@ impl Instruction {
             }
             [47u8, 127u8, 90u8, 221u8, 10u8, 160u8, 183u8, 117u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = ReclaimStakeAccountArgs::deserialize(&mut rdr)?;
+                let args = ReclaimStakeAccountArgs {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 7usize;
                 let stakeAccount = keys.next().unwrap().clone();
                 let poolAccount = keys.next().unwrap().clone();
                 let poolSolReserves = keys.next().unwrap().clone();
@@ -588,8 +625,10 @@ impl Instruction {
             }
             [90u8, 95u8, 107u8, 42u8, 205u8, 124u8, 50u8, 225u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UnstakeArgs::deserialize(&mut rdr)?;
+                let args = UnstakeArgs {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 11usize;
                 let unstaker = keys.next().unwrap().clone();
                 let stakeAccount = keys.next().unwrap().clone();
                 let destination = keys.next().unwrap().clone();
@@ -601,7 +640,11 @@ impl Instruction {
                 let protocolFeeDestination = keys.next().unwrap().clone();
                 let clock = keys.next().unwrap().clone();
                 let stakeProgram = keys.next().unwrap().clone();
-                let systemProgram = keys.next().unwrap().clone();
+                let systemProgram = if has_extra {
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let remaining = keys.cloned().collect();
                 let accounts = UnstakeAccounts {
                     unstaker,
@@ -622,8 +665,10 @@ impl Instruction {
             }
             [125u8, 93u8, 190u8, 135u8, 89u8, 174u8, 142u8, 149u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UnstakeWsolArgs::deserialize(&mut rdr)?;
+                let args = UnstakeWsolArgs {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 13usize;
                 let unstaker = keys.next().unwrap().clone();
                 let stakeAccount = keys.next().unwrap().clone();
                 let destination = keys.next().unwrap().clone();
@@ -658,8 +703,11 @@ impl Instruction {
             }
             [21u8, 27u8, 137u8, 29u8, 226u8, 149u8, 221u8, 100u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = SetFlashLoanFeeArgs::deserialize(&mut rdr)?;
+                let flash_loan_fee: FlashLoanFee = FlashLoanFee::deserialize(&mut rdr)?;
+                let args = SetFlashLoanFeeArgs { flash_loan_fee };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 5usize;
                 let payer = keys.next().unwrap().clone();
                 let feeAuthority = keys.next().unwrap().clone();
                 let poolAccount = keys.next().unwrap().clone();
@@ -678,8 +726,11 @@ impl Instruction {
             }
             [64u8, 124u8, 6u8, 57u8, 151u8, 155u8, 26u8, 195u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = TakeFlashLoanArgs::deserialize(&mut rdr)?;
+                let lamports: u64 = u64::deserialize(&mut rdr)?;
+                let args = TakeFlashLoanArgs { lamports };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 6usize;
                 let receiver = keys.next().unwrap().clone();
                 let poolAccount = keys.next().unwrap().clone();
                 let poolSolReserves = keys.next().unwrap().clone();
@@ -700,8 +751,10 @@ impl Instruction {
             }
             [119u8, 239u8, 18u8, 45u8, 194u8, 107u8, 31u8, 238u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = RepayFlashLoanArgs::deserialize(&mut rdr)?;
+                let args = RepayFlashLoanArgs {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 8usize;
                 let repayer = keys.next().unwrap().clone();
                 let poolAccount = keys.next().unwrap().clone();
                 let poolSolReserves = keys.next().unwrap().clone();
