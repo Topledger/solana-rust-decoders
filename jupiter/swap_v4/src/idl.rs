@@ -19,6 +19,7 @@ pub mod typedefs {
     use serde::Serialize;
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct AmountWithSlippage {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount: u64,
         pub slippage_bps: u16,
     }
@@ -2055,9 +2056,11 @@ pub mod events {
         pub amm: [u8; 32usize],
         #[serde(with = "pubkey_serde")]
         pub input_mint: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub input_amount: u64,
         #[serde(with = "pubkey_serde")]
         pub output_mint: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub output_amount: u64,
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
@@ -2066,6 +2069,7 @@ pub mod events {
         pub account: [u8; 32usize],
         #[serde(with = "pubkey_serde")]
         pub mint: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount: u64,
     }
     #[derive(Debug, Serialize)]

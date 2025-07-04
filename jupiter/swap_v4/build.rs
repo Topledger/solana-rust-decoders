@@ -27,7 +27,36 @@ fn main() -> Result<()> {
                     let fields_ts = fields.iter().map(|f| {
                         let f_ident = format_ident!("{}", f.name.to_snake_case());
                         let ty = map_idl_type(&f.ty);
-                        quote! { pub #f_ident: #ty, }
+                        let field_tokens = match &f.ty {
+                            anchor_idl::IdlType::U64 | anchor_idl::IdlType::U128 => {
+                                quote! {
+                                    #[serde(serialize_with = "crate::serialize_to_string")]
+                                    pub #f_ident: #ty,
+                                }
+                            }
+                            &anchor_idl::IdlType::PublicKey => {
+                                quote! {
+                                    #[serde(with = "pubkey_serde")]
+                                    pub #f_ident: [u8; 32usize],
+                                }
+                            }
+                            // Option<PublicKey> → Option<[u8;32]> + its serde
+                            anchor_idl::IdlType::Option(inner)
+                                if matches!(inner.as_ref(), &anchor_idl::IdlType::PublicKey) =>
+                            {
+                                quote! {
+                                    #[serde(with = "pubkey_serde_option")]
+                                    pub #f_ident: Option<[u8; 32usize]>,
+                                }
+                            }
+                            _ => {
+                                quote! {
+                                    pub #f_ident: #ty,
+                                }
+                            }
+                        };
+            
+                        field_tokens
                     });
                     tts.push(quote! {
                         #[derive(::borsh::BorshSerialize, ::borsh::BorshDeserialize, Clone, Debug, Serialize)]
@@ -114,6 +143,21 @@ fn main() -> Result<()> {
                     quote! {
                         #[serde(serialize_with = "crate::serialize_to_string")]
                         pub #field_ident: #ty,
+                    }
+                }
+                &anchor_idl::IdlType::PublicKey => {
+                    quote! {
+                        #[serde(with = "pubkey_serde")]
+                        pub #field_ident: [u8; 32usize],
+                    }
+                }
+                // Option<PublicKey> → Option<[u8;32]> + its serde
+                anchor_idl::IdlType::Option(inner)
+                    if matches!(inner.as_ref(), &anchor_idl::IdlType::PublicKey) =>
+                {
+                    quote! {
+                        #[serde(with = "pubkey_serde_option")]
+                        pub #field_ident: Option<[u8; 32usize]>,
                     }
                 }
                 _ => {
@@ -217,9 +261,15 @@ fn main() -> Result<()> {
             let mut fields = Vec::new();
             for f in &ev.fields {
                 let fld = format_ident!("{}", f.name.to_snake_case());
-
+                let ty = map_idl_type(&f.ty);
                 // pick the right tokens based on your IDL type
                 let field_tokens = match &f.ty {
+                    anchor_idl::IdlType::U64 | anchor_idl::IdlType::U128 => {
+                        quote! {
+                            #[serde(serialize_with = "crate::serialize_to_string")]
+                            pub #fld: #ty,
+                        }
+                    }
                     // plain PublicKey → [u8;32] + base58 serde
                     &anchor_idl::IdlType::PublicKey => {
                         quote! {
@@ -238,7 +288,6 @@ fn main() -> Result<()> {
                     }
                     // everything else: fall back to your existing logic
                     _ => {
-                        let ty = map_idl_type(&f.ty);
                         quote! {
                             pub #fld: #ty,
                         }
