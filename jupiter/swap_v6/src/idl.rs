@@ -40,6 +40,7 @@ pub mod typedefs {
         pub account: Pubkey,
         #[serde(with = "pubkey_serde")]
         pub mint: Pubkey,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount: u64,
     }
     #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Debug, Default)]
@@ -233,15 +234,18 @@ pub mod typedefs {
         pub amm: Pubkey,
         #[serde(with = "pubkey_serde")]
         pub input_mint: Pubkey,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub input_amount: u64,
         #[serde(with = "pubkey_serde")]
         pub output_mint: Pubkey,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub output_amount: u64,
     }
     #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
     pub struct TokenLedger {
         #[serde(with = "pubkey_serde")]
         pub token_account: Pubkey,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount: u64,
     }
 }
@@ -446,7 +450,9 @@ pub mod ix_data {
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct ExactOutRouteArgs {
         pub route_plan: Vec<RoutePlanStep>,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub out_amount: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub quoted_in_amount: u64,
         pub slippage_bps: u16,
         pub platform_fee_bps: u8,
@@ -454,7 +460,9 @@ pub mod ix_data {
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct RouteArgs {
         pub route_plan: Vec<RoutePlanStep>,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub in_amount: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub quoted_out_amount: u64,
         pub slippage_bps: u16,
         pub platform_fee_bps: u8,
@@ -462,6 +470,7 @@ pub mod ix_data {
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct RouteWithTokenLedgerArgs {
         pub route_plan: Vec<RoutePlanStep>,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub quoted_out_amount: u64,
         pub slippage_bps: u16,
         pub platform_fee_bps: u8,
@@ -472,7 +481,9 @@ pub mod ix_data {
     pub struct SharedAccountsExactOutRouteArgs {
         pub id: u8,
         pub route_plan: Vec<RoutePlanStep>,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub out_amount: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub quoted_in_amount: u64,
         pub slippage_bps: u16,
         pub platform_fee_bps: u8,
@@ -481,7 +492,9 @@ pub mod ix_data {
     pub struct SharedAccountsRouteArgs {
         pub id: u8,
         pub route_plan: Vec<RoutePlanStep>,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub in_amount: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub quoted_out_amount: u64,
         pub slippage_bps: u16,
         pub platform_fee_bps: u8,
@@ -490,6 +503,7 @@ pub mod ix_data {
     pub struct SharedAccountsRouteWithTokenLedgerArgs {
         pub id: u8,
         pub route_plan: Vec<RoutePlanStep>,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub quoted_out_amount: u64,
         pub slippage_bps: u16,
         pub platform_fee_bps: u8,

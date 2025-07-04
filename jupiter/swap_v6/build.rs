@@ -43,9 +43,38 @@ fn main() -> Result<()> {
 
         // Args struct
         let fields = ix.args.iter().map(|arg| {
-            let f = format_ident!("{}", arg.name.to_snake_case());
-            let ty_ts = map_idl_type(&arg.ty);
-            quote! { pub #f: #ty_ts, }
+            let field_ident = format_ident!("{}", arg.name.to_snake_case());
+            let ty = map_idl_type(&arg.ty);
+            let field_tokens = match &arg.ty {
+                anchor_idl::IdlType::U64 | anchor_idl::IdlType::U128 => {
+                    quote! {
+                        #[serde(serialize_with = "crate::serialize_to_string")]
+                        pub #field_ident: #ty,
+                    }
+                }
+                anchor_idl::IdlType::Pubkey => {
+                    quote! {
+                        #[serde(with = "pubkey_serde")]
+                        pub #field_ident: [u8; 32usize],
+                    }
+                }
+                // Option<PublicKey>
+                anchor_idl::IdlType::Option(inner)
+                    if matches!(**inner, anchor_idl::IdlType::Pubkey) =>
+                {
+                    quote! {
+                        #[serde(with = "pubkey_serde_option")]
+                        pub #field_ident: Option<[u8; 32usize]>,
+                    }
+                }
+                _ => {
+                    quote! {
+                        pub #field_ident: #ty,
+                    }
+                }
+            };
+
+            field_tokens
         });
         args_structs.push(quote! {
             #[derive(::borsh::BorshDeserialize, Debug, Serialize)]
@@ -192,6 +221,14 @@ fn main() -> Result<()> {
                                 }
                             }
                         }
+                    }
+
+                    syn::Type::Path(path) if {
+                        let id = &path.path.segments.last().unwrap().ident;
+                        id == "u64" || id == "u128"
+                    } => {
+                        let attr: syn::Attribute = syn::parse_quote!(#[serde(serialize_with = "crate::serialize_to_string")]);
+                        field.attrs.insert(0, attr);
                     }
                     _ => {}
                 }
