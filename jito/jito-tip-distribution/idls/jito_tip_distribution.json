@@ -57,7 +57,8 @@
                     "signer": true
                 },
                 {
-                    "name": "system_program"
+                    "name": "system_program",
+                    "optional": true
                 }
             ],
             "args": [
