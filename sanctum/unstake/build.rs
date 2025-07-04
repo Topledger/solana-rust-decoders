@@ -7,13 +7,15 @@ use quote::{format_ident, quote};
 use serde_json::from_str;
 use sha2::{Digest, Sha256};
 use std::{fs, process::Command};
+use serde_json::Value;
 
 fn main() -> Result<()> {
-    let path = "idls/marinade_staking.json";
+    let path = "idls/unstake_program.json";
 
     // 1) load the IDL JSON
     let idl_json = fs::read_to_string(path)?;
     let idl: Idl = from_str(&idl_json)?;
+    let raw: Value = from_str(&idl_json)?;
 
     // 2) hand‐roll typedefs so that enums with fields work correctly
     let typedefs_rs = {
@@ -105,11 +107,11 @@ fn main() -> Result<()> {
                             #(#variant_defs)*
                         }
 
-                        impl Default for #name {
-                            fn default() -> Self {
-                                Self::#default_ident
-                            }
-                        }
+                        // impl Default for #name {
+                        //     fn default() -> Self {
+                        //         Self::#default_ident
+                        //     }
+                        // }
                     });
                 }
             }
@@ -183,8 +185,30 @@ fn main() -> Result<()> {
         // 3c) Accounts struct
         let flat = flatten_accounts(&ix.accounts);
         let acc_fields = flat.iter().map(|acc| {
+            let is_optional = raw["instructions"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|instr| instr["name"] == ix.name)
+                .and_then(|instr| {
+                    instr["accounts"]
+                        .as_array()
+                        .unwrap()
+                        .iter()
+                        .find(|a| a["name"] == acc.name)
+                        .and_then(|a| a["optional"].as_bool())
+                })
+                .unwrap_or(false);
+
             let f = format_ident!("{}", acc.name);
-            quote! { pub #f: String, }
+            if is_optional {
+                quote! {
+                    #[serde(skip_serializing_if = "Option::is_none")]
+                    pub #f: Option<String>,
+                }
+            } else {
+                quote! { pub #f: String, }
+            }
         });
         accounts_structs.push(quote! {
             #[derive(Debug, Serialize)]
@@ -194,20 +218,84 @@ fn main() -> Result<()> {
             }
         });
 
+        let mut parse_args = Vec::new();
+        let mut arg_idents= Vec::new();
+        for arg in &ix.args {
+            let fname = format_ident!("{}", arg.name.to_snake_case());
+            let fty   = map_idl_type(&arg.ty);
+            let snippet = match &arg.ty {
+                anchor_idl::IdlType::Option(inner) => {
+                    let inner_ty = map_idl_type(inner);
+                    quote! {
+                        let #fname: Option<#inner_ty> = parse_option(&mut rdr)?;
+                    }
+                }
+                _ => quote! {
+                    let #fname: #fty = #fty::deserialize(&mut rdr)?;
+                }
+            };
+            parse_args.push(snippet);
+            arg_idents.push(fname);
+        }
+
         // 3d) decoder arm
+        let mut extract = Vec::new();
+        let mandatory_count = raw["instructions"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|instr| instr["name"] == ix.name)
+            .and_then(|instr| instr["accounts"].as_array())
+            .unwrap()
+            .iter()
+            .filter(|a| !a.get("optional").and_then(|b| b.as_bool()).unwrap_or(false))
+            .count();
+
+        // iterate the keys once
+        extract.push(quote! { let mut keys = account_keys.iter(); });
+        // true if this invocation has the extra slot
+        extract.push(quote! { let has_extra = account_keys.len() > #mandatory_count; });
+
+        for acc in &flat {
+            let name = format_ident!("{}", acc.name);
+            // check optional flag again
+            let is_opt = raw["instructions"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|instr| instr["name"] == ix.name)
+                .and_then(|instr| instr["accounts"].as_array())
+                .unwrap()
+                .iter()
+                .find(|a| a["name"] == acc.name)
+                .and_then(|a| a["optional"].as_bool())
+                .unwrap_or(false);
+
+            if is_opt {
+                extract.push(quote! {
+                    let #name = if has_extra {
+                        Some(keys.next().unwrap().clone())
+                    } else {
+                        None
+                    };
+                });
+            } else {
+                extract.push(quote! {
+                    let #name = keys.next().unwrap().clone();
+                });
+            }
+        }
+
         let idents = flat
             .iter()
             .map(|acc| format_ident!("{}", acc.name))
             .collect::<Vec<_>>();
-        let extract = idents.iter().map(|id| {
-            quote! {
-                let #id = keys.next().unwrap().clone();
-            }
-        });
+
         arms.push(quote! {
             [#(#disc_tokens),*] => {
                 let mut rdr: &[u8] = rest;
-                let args = #args_ty::deserialize(&mut rdr)?;
+                #(#parse_args)*
+                let args = #args_ty { #(#arg_idents),* };
                 let mut keys = account_keys.iter();
                 #(#extract)*
                 let remaining = keys.cloned().collect();
@@ -215,6 +303,7 @@ fn main() -> Result<()> {
                 return Ok(Instruction::#variant { accounts, args });
             }
         });
+    
     }
 
     // 4) enum Instruction
@@ -250,6 +339,28 @@ fn main() -> Result<()> {
                     _ => anyhow::bail!("Unknown discriminator: {:?}", disc),
                 }
             }
+        }
+    };
+
+    let parse_option_fn = quote! {
+        /// Parse an Option<T> in either old‑IDL (no tag) or new‑IDL (0x00/0x01 prefix) form
+        fn parse_option<T: ::borsh::BorshDeserialize>(
+            rdr: &mut &[u8],
+        ) -> anyhow::Result<Option<T>> {
+            if rdr.is_empty() {
+                return Ok(None);
+            }
+            let tag = rdr[0];
+            if tag == 0 {
+                *rdr = &rdr[1..];
+                return Ok(None);
+            } else if tag == 1 {
+                *rdr = &rdr[1..];
+                let v = T::deserialize(rdr)?;
+                return Ok(Some(v));
+            }
+            let v = T::deserialize(rdr)?;
+            Ok(Some(v))
         }
     };
 

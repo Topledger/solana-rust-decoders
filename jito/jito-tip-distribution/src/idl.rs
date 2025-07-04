@@ -1,10 +1,38 @@
+#[allow(dead_code)]
+use serde::Serializer;
+use std::convert::TryInto;
+fn serialize_to_string<S, T>(x: &T, s: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+    T: ToString,
+{
+    s.serialize_str(&x.to_string())
+}
+#[doc = r" Parse an Option<T> in either old‑IDL (no tag) or new‑IDL (0x00/0x01 prefix) form"]
+fn parse_option<T: ::borsh::BorshDeserialize>(rdr: &mut &[u8]) -> anyhow::Result<Option<T>> {
+    if rdr.is_empty() {
+        return Ok(None);
+    }
+    let tag = rdr[0];
+    if tag == 0 {
+        *rdr = &rdr[1..];
+        return Ok(None);
+    } else if tag == 1 {
+        *rdr = &rdr[1..];
+        let v = T::deserialize(rdr)?;
+        return Ok(Some(v));
+    }
+    let v = T::deserialize(rdr)?;
+    Ok(Some(v))
+}
 pub use accounts_data::*;
 pub use ix_data::*;
-#[allow(dead_code)]
-use std::convert::TryInto;
 pub use typedefs::*;
 pub mod typedefs {
+    use crate::pubkey_serializer::pubkey_serde;
+    use crate::pubkey_serializer::pubkey_serde_option;
     use anchor_lang::prelude::*;
+    use borsh::{BorshDeserialize, BorshSerialize};
     use serde::Serialize;
     #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
     pub struct ClaimStatus {
@@ -101,7 +129,8 @@ pub mod accounts_data {
         pub claim_status: String,
         pub claimant: String,
         pub payer: String,
-        pub system_program: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub system_program: Option<String>,
         pub remaining: Vec<String>,
     }
     #[derive(Debug, Serialize)]
@@ -138,7 +167,8 @@ pub mod accounts_data {
     }
     #[derive(Debug, Serialize)]
     pub struct InitializeTipDistributionAccountAccounts {
-        pub config: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub config: Option<String>,
         pub tip_distribution_account: String,
         pub validator_vote_account: String,
         pub signer: String,
@@ -175,10 +205,13 @@ pub mod accounts_data {
 }
 pub mod ix_data {
     use super::*;
+    use crate::pubkey_serializer::pubkey_serde;
+    use crate::pubkey_serializer::pubkey_serde_option;
     use serde::Serialize;
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct ClaimArgs {
         pub bump: u8,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount: u64,
         pub proof: Vec<[u8; 32usize]>,
     }
@@ -186,24 +219,31 @@ pub mod ix_data {
     pub struct CloseClaimStatusArgs {}
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct CloseTipDistributionAccountArgs {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub epoch: u64,
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct InitializeArgs {
-        pub authority: String,
-        pub expired_funds_account: String,
+        #[serde(with = "pubkey_serde")]
+        pub authority: [u8; 32usize],
+        #[serde(with = "pubkey_serde")]
+        pub expired_funds_account: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub num_epochs_valid: u64,
         pub max_validator_commission_bps: u16,
         pub bump: u8,
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct InitializeMerkleRootUploadConfigArgs {
-        pub authority: String,
-        pub original_authority: String,
+        #[serde(with = "pubkey_serde")]
+        pub authority: [u8; 32usize],
+        #[serde(with = "pubkey_serde")]
+        pub original_authority: [u8; 32usize],
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct InitializeTipDistributionAccountArgs {
-        pub merkle_root_upload_authority: String,
+        #[serde(with = "pubkey_serde")]
+        pub merkle_root_upload_authority: [u8; 32usize],
         pub validator_commission_bps: u16,
         pub bump: u8,
     }
@@ -215,13 +255,17 @@ pub mod ix_data {
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct UpdateMerkleRootUploadConfigArgs {
-        pub authority: String,
-        pub original_authority: String,
+        #[serde(with = "pubkey_serde")]
+        pub authority: [u8; 32usize],
+        #[serde(with = "pubkey_serde")]
+        pub original_authority: [u8; 32usize],
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct UploadMerkleRootArgs {
         pub root: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub max_total_claim: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub max_num_nodes: u64,
     }
 }
@@ -279,15 +323,29 @@ impl Instruction {
         match disc {
             [62u8, 198u8, 214u8, 193u8, 213u8, 159u8, 108u8, 210u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = ClaimArgs::deserialize(&mut rdr)?;
+                let bump: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let amount: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let proof: Vec<[u8; 32usize]> =
+                    <Vec<[u8; 32usize]> as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = ClaimArgs {
+                    bump,
+                    amount,
+                    proof,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 6usize;
                 let config = keys.next().unwrap().clone();
                 let tip_distribution_account = keys.next().unwrap().clone();
                 let merkle_root_upload_authority = keys.next().unwrap().clone();
                 let claim_status = keys.next().unwrap().clone();
                 let claimant = keys.next().unwrap().clone();
                 let payer = keys.next().unwrap().clone();
-                let system_program = keys.next().unwrap().clone();
+                let system_program = if has_extra {
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let remaining = keys.cloned().collect();
                 let accounts = ClaimAccounts {
                     config,
@@ -303,8 +361,10 @@ impl Instruction {
             }
             [163u8, 214u8, 191u8, 165u8, 245u8, 188u8, 17u8, 185u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = CloseClaimStatusArgs::deserialize(&mut rdr)?;
+                let args = CloseClaimStatusArgs {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let config = keys.next().unwrap().clone();
                 let claim_status = keys.next().unwrap().clone();
                 let claim_status_payer = keys.next().unwrap().clone();
@@ -319,8 +379,11 @@ impl Instruction {
             }
             [47u8, 136u8, 208u8, 190u8, 125u8, 243u8, 74u8, 227u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = CloseTipDistributionAccountArgs::deserialize(&mut rdr)?;
+                let epoch: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = CloseTipDistributionAccountArgs { epoch };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 5usize;
                 let config = keys.next().unwrap().clone();
                 let expired_funds_account = keys.next().unwrap().clone();
                 let tip_distribution_account = keys.next().unwrap().clone();
@@ -339,8 +402,25 @@ impl Instruction {
             }
             [175u8, 175u8, 109u8, 31u8, 13u8, 152u8, 155u8, 237u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitializeArgs::deserialize(&mut rdr)?;
+                let authority: [u8; 32usize] =
+                    <[u8; 32usize] as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let expired_funds_account: [u8; 32usize] =
+                    <[u8; 32usize] as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let num_epochs_valid: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let max_validator_commission_bps: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let bump: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = InitializeArgs {
+                    authority,
+                    expired_funds_account,
+                    num_epochs_valid,
+                    max_validator_commission_bps,
+                    bump,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let config = keys.next().unwrap().clone();
                 let system_program = keys.next().unwrap().clone();
                 let initializer = keys.next().unwrap().clone();
@@ -355,8 +435,17 @@ impl Instruction {
             }
             [232u8, 87u8, 72u8, 14u8, 89u8, 40u8, 40u8, 27u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitializeMerkleRootUploadConfigArgs::deserialize(&mut rdr)?;
+                let authority: [u8; 32usize] =
+                    <[u8; 32usize] as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let original_authority: [u8; 32usize] =
+                    <[u8; 32usize] as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = InitializeMerkleRootUploadConfigArgs {
+                    authority,
+                    original_authority,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 5usize;
                 let config = keys.next().unwrap().clone();
                 let merkle_root_upload_config = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
@@ -375,9 +464,24 @@ impl Instruction {
             }
             [120u8, 191u8, 25u8, 182u8, 111u8, 49u8, 179u8, 55u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitializeTipDistributionAccountArgs::deserialize(&mut rdr)?;
+                let merkle_root_upload_authority: [u8; 32usize] =
+                    <[u8; 32usize] as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let validator_commission_bps: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let bump: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = InitializeTipDistributionAccountArgs {
+                    merkle_root_upload_authority,
+                    validator_commission_bps,
+                    bump,
+                };
                 let mut keys = account_keys.iter();
-                let config = keys.next().unwrap().clone();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 4usize;
+                let config = if has_extra {
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let tip_distribution_account = keys.next().unwrap().clone();
                 let validator_vote_account = keys.next().unwrap().clone();
                 let signer = keys.next().unwrap().clone();
@@ -395,8 +499,10 @@ impl Instruction {
             }
             [13u8, 226u8, 163u8, 144u8, 56u8, 202u8, 214u8, 23u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = MigrateTdaMerkleRootUploadAuthorityArgs::deserialize(&mut rdr)?;
+                let args = MigrateTdaMerkleRootUploadAuthorityArgs {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let tip_distribution_account = keys.next().unwrap().clone();
                 let merkle_root_upload_config = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -409,8 +515,12 @@ impl Instruction {
             }
             [29u8, 158u8, 252u8, 191u8, 10u8, 83u8, 219u8, 99u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateConfigArgs::deserialize(&mut rdr)?;
+                let new_config: Config =
+                    <Config as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateConfigArgs { new_config };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let config = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -423,8 +533,17 @@ impl Instruction {
             }
             [128u8, 227u8, 159u8, 139u8, 176u8, 128u8, 118u8, 2u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateMerkleRootUploadConfigArgs::deserialize(&mut rdr)?;
+                let authority: [u8; 32usize] =
+                    <[u8; 32usize] as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let original_authority: [u8; 32usize] =
+                    <[u8; 32usize] as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateMerkleRootUploadConfigArgs {
+                    authority,
+                    original_authority,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 4usize;
                 let config = keys.next().unwrap().clone();
                 let merkle_root_upload_config = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
@@ -441,8 +560,19 @@ impl Instruction {
             }
             [70u8, 3u8, 110u8, 29u8, 199u8, 190u8, 205u8, 176u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UploadMerkleRootArgs::deserialize(&mut rdr)?;
+                let root: [u8; 32usize] =
+                    <[u8; 32usize] as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let max_total_claim: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let max_num_nodes: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UploadMerkleRootArgs {
+                    root,
+                    max_total_claim,
+                    max_num_nodes,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let config = keys.next().unwrap().clone();
                 let tip_distribution_account = keys.next().unwrap().clone();
                 let merkle_root_upload_authority = keys.next().unwrap().clone();

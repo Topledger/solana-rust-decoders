@@ -1,0 +1,1195 @@
+{
+  "version": "2.0.0",
+  "name": "unstake",
+  "constants": [
+    {
+      "name": "FEE_SEED_SUFFIX",
+      "type": "bytes",
+      "value": "[102, 101, 101]"
+    },
+    {
+      "name": "FLASH_ACCOUNT_SEED_SUFFIX",
+      "type": "bytes",
+      "value": "[102, 108, 97, 115, 104, 97, 99, 99, 111, 117, 110, 116]"
+    },
+    {
+      "name": "FLASH_LOAN_FEE_SEED_SUFFIX",
+      "type": "bytes",
+      "value": "[102, 108, 97, 115, 104, 108, 111, 97, 110, 102, 101, 101]"
+    },
+    {
+      "name": "PROTOCOL_FEE_SEED",
+      "type": "bytes",
+      "value": "[112, 114, 111, 116, 111, 99, 111, 108, 45, 102, 101, 101]"
+    }
+  ],
+  "instructions": [
+    {
+      "name": "initProtocolFee",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": ["pubkey paying for protocol fee account's rent"]
+        },
+        {
+          "name": "protocolFeeAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["protocol fee account to be created"]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "setProtocolFee",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "docs": ["protocol fee authority"]
+        },
+        {
+          "name": "protocolFeeAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["protocol fee account to update"]
+        }
+      ],
+      "args": [
+        {
+          "name": "protocolFee",
+          "type": {
+            "defined": "ProtocolFee"
+          }
+        }
+      ]
+    },
+    {
+      "name": "createPool",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": ["pubkey paying for new accounts' rent"]
+        },
+        {
+          "name": "feeAuthority",
+          "isMut": false,
+          "isSigner": true,
+          "docs": ["pool's fee_authority"]
+        },
+        {
+          "name": "poolAccount",
+          "isMut": true,
+          "isSigner": true,
+          "docs": ["pool account to be created"]
+        },
+        {
+          "name": "poolSolReserves",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["pool SOL reserves and authority"]
+        },
+        {
+          "name": "feeAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["fee account to be created"]
+        },
+        {
+          "name": "lpMint",
+          "isMut": true,
+          "isSigner": true,
+          "docs": ["the LP token mint to be created"]
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "fee",
+          "type": {
+            "defined": "Fee"
+          }
+        }
+      ]
+    },
+    {
+      "name": "addLiquidity",
+      "accounts": [
+        {
+          "name": "from",
+          "isMut": true,
+          "isSigner": true,
+          "docs": ["SOL SystemAccount that's adding liquidity"]
+        },
+        {
+          "name": "poolAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["pool that SOL liquidity is being added to"]
+        },
+        {
+          "name": "poolSolReserves",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["pool's SOL reserves"]
+        },
+        {
+          "name": "lpMint",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["pool's LP mint"]
+        },
+        {
+          "name": "mintLpTokensTo",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["lp token account to mint lp tokens to"]
+        },
+        {
+          "name": "flashAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["amount taken for all active flash loans of the pool"]
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "optional": true,
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "removeLiquidity",
+      "accounts": [
+        {
+          "name": "burnLpTokensFromAuthority",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "signer thas has authority over burn_lp_tokens_from token account"
+          ]
+        },
+        {
+          "name": "to",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["SOL account to remove SOL liquidity to"]
+        },
+        {
+          "name": "poolAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["pool that SOL liquidity is being removed from"]
+        },
+        {
+          "name": "poolSolReserves",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["pool's SOL reserves. SOL liquidity deducted from here"]
+        },
+        {
+          "name": "lpMint",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["pool's LP mint"]
+        },
+        {
+          "name": "burnLpTokensFrom",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["lp token account to redeem/burn lp tokens from"]
+        },
+        {
+          "name": "flashAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["amount taken for all active flash loans of the pool"]
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "optional": true,
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amountLp",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "setFee",
+      "accounts": [
+        {
+          "name": "feeAuthority",
+          "isMut": false,
+          "isSigner": true,
+          "docs": ["pool's fee_authority"]
+        },
+        {
+          "name": "poolAccount",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["pool account for the fee account"]
+        },
+        {
+          "name": "feeAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["fee account to be modified"]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "fee",
+          "type": {
+            "defined": "Fee"
+          }
+        }
+      ]
+    },
+    {
+      "name": "setFeeAuthority",
+      "accounts": [
+        {
+          "name": "feeAuthority",
+          "isMut": false,
+          "isSigner": true,
+          "docs": ["pool's current fee_authority"]
+        },
+        {
+          "name": "poolAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["pool account to be modified"]
+        },
+        {
+          "name": "newFeeAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["new fee_authority to replace the current authority with"]
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "setLpTokenMetadata",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": ["account paying for token metadata rent"]
+        },
+        {
+          "name": "feeAuthority",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "pool's fee_authority",
+            "Only the pool's fee_authority can mutate LP token metadata"
+          ]
+        },
+        {
+          "name": "poolAccount",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["pool account for the fee account"]
+        },
+        {
+          "name": "poolSolReserves",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "pool SOL reserves PDA.",
+            "LP token mint authority and metadata update authority"
+          ]
+        },
+        {
+          "name": "lpMint",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["pool's LP mint"]
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["The metaplex PDA that metadata is saved to"]
+        },
+        {
+          "name": "metadataProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "data",
+          "type": {
+            "defined": "DataV2LpToken"
+          }
+        }
+      ]
+    },
+    {
+      "name": "deactivateStakeAccount",
+      "accounts": [
+        {
+          "name": "stakeAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The stake account to be deactivated. Should have authority",
+            "set to pool_sol_reserves, rely on stake program CPI call's check to verify"
+          ]
+        },
+        {
+          "name": "poolAccount",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["pool that owns stake_account"]
+        },
+        {
+          "name": "poolSolReserves",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["pool's SOL reserves"]
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "reclaimStakeAccount",
+      "accounts": [
+        {
+          "name": "stakeAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The stake account to be reclaimed.",
+            "Should be inactive, rely on stake program CPI to verify."
+          ]
+        },
+        {
+          "name": "poolAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["pool that owns stake_account"]
+        },
+        {
+          "name": "poolSolReserves",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["pool's SOL reserves. SOL will be reclaimed to here."]
+        },
+        {
+          "name": "stakeAccountRecordAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "stake_account's stake account record",
+            "Should have been created by a previous unstake instruction"
+          ]
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeHistory",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "unstake",
+      "accounts": [
+        {
+          "name": "unstaker",
+          "isMut": false,
+          "isSigner": true,
+          "docs": ["stake account owner"]
+        },
+        {
+          "name": "stakeAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "stake account to be unstaked",
+            "rely on stake program CPI call to ensure owned by unstaker"
+          ]
+        },
+        {
+          "name": "destination",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Solana native wallet pubkey to receive the unstaked amount"]
+        },
+        {
+          "name": "poolAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["pool account that SOL reserves belong to"]
+        },
+        {
+          "name": "poolSolReserves",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["pool's SOL reserves"]
+        },
+        {
+          "name": "feeAccount",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["pool's fee account"]
+        },
+        {
+          "name": "stakeAccountRecordAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["stake account record to be created"]
+        },
+        {
+          "name": "protocolFeeAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "protocolFeeDestination",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["destination specified in `protocol_fee_account`"]
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "optional": true,
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "unstakeWsol",
+      "accounts": [
+        {
+          "name": "unstaker",
+          "isMut": false,
+          "isSigner": true,
+          "docs": ["stake account owner"]
+        },
+        {
+          "name": "stakeAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "stake account to be unstaked",
+            "rely on stake program CPI call to ensure owned by unstaker"
+          ]
+        },
+        {
+          "name": "destination",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["wSOL token account to receive the unstaked amount"]
+        },
+        {
+          "name": "poolAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["pool account that SOL reserves belong to"]
+        },
+        {
+          "name": "poolSolReserves",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["pool's SOL reserves"]
+        },
+        {
+          "name": "feeAccount",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["pool's fee account"]
+        },
+        {
+          "name": "stakeAccountRecordAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["stake account record to be created"]
+        },
+        {
+          "name": "protocolFeeAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "protocolFeeDestination",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["destination specified in `protocol_fee_account`"]
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "setFlashLoanFee",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": ["pubkey paying for new accounts' rent"]
+        },
+        {
+          "name": "feeAuthority",
+          "isMut": false,
+          "isSigner": true,
+          "docs": ["pool's fee_authority"]
+        },
+        {
+          "name": "poolAccount",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["pool account for the fee account"]
+        },
+        {
+          "name": "flashLoanFeeAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["flash loan fee account to initialize"]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "flashLoanFee",
+          "type": {
+            "defined": "FlashLoanFee"
+          }
+        }
+      ]
+    },
+    {
+      "name": "takeFlashLoan",
+      "accounts": [
+        {
+          "name": "receiver",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "pubkey paying for new accounts' rent",
+            "it's the responsibility of the user to ensure this",
+            "is the correct receiver account"
+          ]
+        },
+        {
+          "name": "poolAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "poolSolReserves",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["pool's SOL reserves"]
+        },
+        {
+          "name": "flashAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "instructions",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["Solana Instructions Sysvar"]
+        }
+      ],
+      "args": [
+        {
+          "name": "lamports",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "repayFlashLoan",
+      "accounts": [
+        {
+          "name": "repayer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": ["system account paying back the flash loan lamports"]
+        },
+        {
+          "name": "poolAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "poolSolReserves",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["pool's SOL reserves"]
+        },
+        {
+          "name": "flashAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "flashLoanFeeAccount",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["flash loan fee account to initialize"]
+        },
+        {
+          "name": "protocolFeeAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "protocolFeeDestination",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["destination specified in `protocol_fee_account`"]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "fee",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "fee",
+            "type": {
+              "defined": "FeeEnum"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "flashLoanFee",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "feeRatio",
+            "docs": [
+              "The proportion of the flash loan amount that is levied as fees"
+            ],
+            "type": {
+              "defined": "Rational"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "pool",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "feeAuthority",
+            "docs": ["The authority authorized to set fees"],
+            "type": "publicKey"
+          },
+          {
+            "name": "lpMint",
+            "docs": ["The pool's lp token mint"],
+            "type": "publicKey"
+          },
+          {
+            "name": "incomingStake",
+            "docs": [
+              "The last known value of total number of lamports in stake accounts",
+              "owned by the pool that have not been reclaimed yet.",
+              "The total SOL owned by a pool accounted for can be calculated by taking",
+              "incoming_stake + pool_sol_reserves.lamports"
+            ],
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "protocolFee",
+      "docs": ["Global singleton containing protocol fee parameters"],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "destination",
+            "docs": ["Protocol-owned account to receive the protocol fees to"],
+            "type": "publicKey"
+          },
+          {
+            "name": "authority",
+            "docs": ["Signer that is authorized to modify this account"],
+            "type": "publicKey"
+          },
+          {
+            "name": "feeRatio",
+            "docs": ["The proportion of unstake fees that go to the protocol"],
+            "type": {
+              "defined": "Rational"
+            }
+          },
+          {
+            "name": "referrerFeeRatio",
+            "docs": [
+              "The proprtion of the protocol fees that go to the referrer"
+            ],
+            "type": {
+              "defined": "Rational"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "stakeAccountRecord",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "lamportsAtCreation",
+            "docs": [
+              "The stake account's lamports in the associated stake account",
+              "at time of Unstake.",
+              "Note: this is the account's total lamports not staked lamports",
+              "Solana enforces this to be at least rent exempt balance + 1 lamport"
+            ],
+            "type": "u64"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "DataV2LpToken",
+      "docs": [
+        "Have to duplicate struct definition from metaplex here for IDL.",
+        "At least we get to truncate some unnecessary fields because of that.",
+        "Issue tracking: https://github.com/coral-xyz/anchor/issues/1972"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "docs": ["The name of the asset"],
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "docs": ["The symbol for the asset"],
+            "type": "string"
+          },
+          {
+            "name": "uri",
+            "docs": ["URI pointing to JSON representing the asset"],
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "fee",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "fee",
+            "type": {
+              "defined": "FeeEnum"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "flashLoanFee",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "feeRatio",
+            "docs": [
+              "The proportion of the flash loan amount that is levied as fees"
+            ],
+            "type": {
+              "defined": "Rational"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "pool",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "feeAuthority",
+            "docs": ["The authority authorized to set fees"],
+            "type": "publicKey"
+          },
+          {
+            "name": "lpMint",
+            "docs": ["The pool's lp token mint"],
+            "type": "publicKey"
+          },
+          {
+            "name": "incomingStake",
+            "docs": [
+              "The last known value of total number of lamports in stake accounts",
+              "owned by the pool that have not been reclaimed yet.",
+              "The total SOL owned by a pool accounted for can be calculated by taking",
+              "incoming_stake + pool_sol_reserves.lamports"
+            ],
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "protocolFee",
+      "docs": ["Global singleton containing protocol fee parameters"],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "destination",
+            "docs": ["Protocol-owned account to receive the protocol fees to"],
+            "type": "publicKey"
+          },
+          {
+            "name": "authority",
+            "docs": ["Signer that is authorized to modify this account"],
+            "type": "publicKey"
+          },
+          {
+            "name": "feeRatio",
+            "docs": ["The proportion of unstake fees that go to the protocol"],
+            "type": {
+              "defined": "Rational"
+            }
+          },
+          {
+            "name": "referrerFeeRatio",
+            "docs": [
+              "The proprtion of the protocol fees that go to the referrer"
+            ],
+            "type": {
+              "defined": "Rational"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "stakeAccountRecord",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "lamportsAtCreation",
+            "docs": [
+              "The stake account's lamports in the associated stake account",
+              "at time of Unstake.",
+              "Note: this is the account's total lamports not staked lamports",
+              "Solana enforces this to be at least rent exempt balance + 1 lamport"
+            ],
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Rational",
+      "docs": ["A ratio. Denom should not = 0"],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "num",
+            "type": "u64"
+          },
+          {
+            "name": "denom",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LiquidityLinearParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "maxLiqRemaining",
+            "docs": [
+              "The fee applied to a swap that leaves",
+              "100% of all liquidity in the SOL reserves account"
+            ],
+            "type": {
+              "defined": "Rational"
+            }
+          },
+          {
+            "name": "zeroLiqRemaining",
+            "docs": [
+              "The fee applied to a swap that leaves",
+              "no liquidity remaining in the SOL reserves account"
+            ],
+            "type": {
+              "defined": "Rational"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "FeeEnum",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Flat",
+            "fields": [
+              {
+                "name": "ratio",
+                "type": {
+                  "defined": "Rational"
+                }
+              }
+            ]
+          },
+          {
+            "name": "LiquidityLinear",
+            "fields": [
+              {
+                "name": "params",
+                "type": {
+                  "defined": "LiquidityLinearParams"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidLpTokenAccount",
+      "msg": "The provided LP token account is invalid"
+    },
+    {
+      "code": 6001,
+      "name": "PdaBumpNotCached",
+      "msg": "Could not find PDA bump"
+    },
+    {
+      "code": 6002,
+      "name": "InvalidFeeAuthority",
+      "msg": "The provided fee authority does not have the authority over the provided pool account"
+    },
+    {
+      "code": 6003,
+      "name": "StakeAccountAuthorizedNotRetrievable",
+      "msg": "The Authorized of the given stake account is None (possibly an uninitialized stake account was given)"
+    },
+    {
+      "code": 6004,
+      "name": "StakeAccountLockupNotRetrievable",
+      "msg": "The Lockup of the given stake account is None (possibly an uninitialized stake account was given)"
+    },
+    {
+      "code": 6005,
+      "name": "StakeAccountLockupInForce",
+      "msg": "The provided stake account is locked up"
+    },
+    {
+      "code": 6006,
+      "name": "InvalidFee",
+      "msg": "The provided description of fee violates the invariants"
+    },
+    {
+      "code": 6007,
+      "name": "InternalError",
+      "msg": "Internal Error"
+    },
+    {
+      "code": 6008,
+      "name": "NotEnoughLiquidity",
+      "msg": "Not enough liquidity to service this unstake"
+    },
+    {
+      "code": 6009,
+      "name": "LiquidityToAddTooLittle",
+      "msg": "Liquidity to add too little"
+    },
+    {
+      "code": 6010,
+      "name": "DestinationNotWSol",
+      "msg": "Destination token account is not a wrapped SOL account"
+    },
+    {
+      "code": 6011,
+      "name": "WrongProtocolFeeDestination",
+      "msg": "Wrong protocol fee destination account"
+    },
+    {
+      "code": 6012,
+      "name": "InvalidProtocolFeeAuthority",
+      "msg": "The provided protocol fee authority does not have the authority over the protocol fee account"
+    },
+    {
+      "code": 6013,
+      "name": "InvalidInstructionsSysvar",
+      "msg": "Invalid instructions sysvar"
+    },
+    {
+      "code": 6014,
+      "name": "NoSucceedingRepayFlashLoan",
+      "msg": "No succeeding repay flash loan instruction found"
+    }
+  ]
+}
