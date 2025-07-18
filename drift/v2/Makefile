@@ -1,10 +1,10 @@
 .PHONY wasm_pack:
 wasm_pack:
-	wasm-pack build --no-typescript --target no-modules
+	wasm-pack build --release --no-typescript --target no-modules
 
 .PHONY wasm_pack_dev:
 wasm_pack_dev:
-	wasm-pack build --target web --dev
+	wasm-pack build --target web --release
 
 .PHONY convert_and_gcloud_upload:
 convert_and_gcloud_upload:

@@ -10,10 +10,29 @@ where
 {
     s.serialize_str(&x.to_string())
 }
+#[doc = r" Parse an Option<T> in either old‑IDL (no tag) or new‑IDL (0x00/0x01 prefix) form"]
+fn parse_option<T: ::borsh::BorshDeserialize>(rdr: &mut &[u8]) -> anyhow::Result<Option<T>> {
+    if rdr.is_empty() {
+        return Ok(None);
+    }
+    let tag = rdr[0];
+    if tag == 0 {
+        *rdr = &rdr[1..];
+        return Ok(None);
+    } else if tag == 1 {
+        *rdr = &rdr[1..];
+        let v = T::deserialize(rdr)?;
+        return Ok(Some(v));
+    }
+    let v = T::deserialize(rdr)?;
+    Ok(Some(v))
+}
 pub use accounts_data::*;
 pub use ix_data::*;
 pub use typedefs::*;
 pub mod typedefs {
+    use crate::pubkey_serializer::pubkey_serde;
+    use crate::pubkey_serializer::pubkey_serde_option;
     use anchor_lang::prelude::*;
     use borsh::{BorshDeserialize, BorshSerialize};
     use serde::Serialize;
@@ -22,6 +41,7 @@ pub mod typedefs {
         pub quote_asset_amount_with_unsettled_lp: Option<i64>,
         pub net_unsettled_funding_pnl: Option<i64>,
         pub update_amm_summary_stats: Option<bool>,
+        pub exclude_total_liq_fee: Option<bool>,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct LiquidatePerpRecord {
@@ -29,46 +49,59 @@ pub mod typedefs {
         pub oracle_price: i64,
         pub base_asset_amount: i64,
         pub quote_asset_amount: i64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub lp_shares: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub fill_record_id: u64,
         pub user_order_id: u32,
         pub liquidator_order_id: u32,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub liquidator_fee: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub if_fee: u64,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct LiquidateSpotRecord {
         pub asset_market_index: u16,
         pub asset_price: i64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub asset_transfer: u128,
         pub liability_market_index: u16,
         pub liability_price: i64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub liability_transfer: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub if_fee: u64,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct LiquidateBorrowForPerpPnlRecord {
         pub perp_market_index: u16,
         pub market_oracle_price: i64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub pnl_transfer: u128,
         pub liability_market_index: u16,
         pub liability_price: i64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub liability_transfer: u128,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct LiquidatePerpPnlForDepositRecord {
         pub perp_market_index: u16,
         pub market_oracle_price: i64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub pnl_transfer: u128,
         pub asset_market_index: u16,
         pub asset_price: i64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub asset_transfer: u128,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct PerpBankruptcyRecord {
         pub market_index: u16,
         pub pnl: i128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub if_payment: u128,
+        #[serde(with = "pubkey_serde_option")]
         pub clawback_user: Option<[u8; 32usize]>,
         pub clawback_user_payment: Option<u128>,
         pub cumulative_funding_rate_delta: i128,
@@ -76,9 +109,25 @@ pub mod typedefs {
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct SpotBankruptcyRecord {
         pub market_index: u16,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub borrow_amount: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub if_payment: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub cumulative_deposit_interest_delta: u128,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct IfRebalanceConfigParams {
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub total_in_amount: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub epoch_max_in_amount: u64,
+        pub epoch_duration: i64,
+        pub out_market_index: u16,
+        pub in_market_index: u16,
+        pub max_slippage_bps: u16,
+        pub swap_mode: u8,
+        pub status: u8,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct MarketIdentifier {
@@ -88,6 +137,7 @@ pub mod typedefs {
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct HistoricalOracleData {
         pub last_oracle_price: i64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub last_oracle_conf: u64,
         pub last_oracle_delay: i64,
         pub last_oracle_price_twap: i64,
@@ -96,9 +146,13 @@ pub mod typedefs {
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct HistoricalIndexData {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub last_index_bid_price: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub last_index_ask_price: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub last_index_price_twap: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub last_index_price_twap5min: u64,
         pub last_index_price_twap_ts: i64,
     }
@@ -114,12 +168,14 @@ pub mod typedefs {
         pub market_type: MarketType,
         pub direction: PositionDirection,
         pub user_order_id: u8,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub base_asset_amount: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub price: u64,
         pub market_index: u16,
         pub reduce_only: bool,
         pub post_only: PostOnlyParam,
-        pub immediate_or_cancel: bool,
+        pub bit_flags: u8,
         pub max_ts: Option<i64>,
         pub trigger_price: Option<u64>,
         pub trigger_condition: OrderTriggerCondition,
@@ -132,6 +188,18 @@ pub mod typedefs {
     pub struct SignedMsgOrderParamsMessage {
         pub signed_msg_order_params: OrderParams,
         pub sub_account_id: u16,
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub slot: u64,
+        pub uuid: [u8; 8usize],
+        pub take_profit_order_params: Option<SignedMsgTriggerOrderParams>,
+        pub stop_loss_order_params: Option<SignedMsgTriggerOrderParams>,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct SignedMsgOrderParamsDelegateMessage {
+        pub signed_msg_order_params: OrderParams,
+        #[serde(with = "pubkey_serde")]
+        pub taker_pubkey: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub slot: u64,
         pub uuid: [u8; 8usize],
         pub take_profit_order_params: Option<SignedMsgTriggerOrderParams>,
@@ -139,7 +207,9 @@ pub mod typedefs {
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct SignedMsgTriggerOrderParams {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub trigger_price: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub base_asset_amount: u64,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
@@ -149,7 +219,7 @@ pub mod typedefs {
         pub price: Option<u64>,
         pub reduce_only: Option<bool>,
         pub post_only: Option<PostOnlyParam>,
-        pub immediate_or_cancel: Option<bool>,
+        pub bit_flags: Option<u8>,
         pub max_ts: Option<i64>,
         pub trigger_price: Option<u64>,
         pub trigger_condition: Option<OrderTriggerCondition>,
@@ -162,42 +232,57 @@ pub mod typedefs {
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct InsuranceClaim {
         pub revenue_withdraw_since_last_settle: i64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub max_revenue_withdraw_per_period: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub quote_max_insurance: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub quote_settled_insurance: u64,
         pub last_revenue_withdraw_ts: i64,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct PoolBalance {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub scaled_balance: u128,
         pub market_index: u16,
         pub padding: [u8; 6usize],
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct Amm {
+        #[serde(with = "pubkey_serde")]
         pub oracle: [u8; 32usize],
         pub historical_oracle_data: HistoricalOracleData,
         pub base_asset_amount_per_lp: i128,
         pub quote_asset_amount_per_lp: i128,
         pub fee_pool: PoolBalance,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub base_asset_reserve: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub quote_asset_reserve: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub concentration_coef: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub min_base_asset_reserve: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub max_base_asset_reserve: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub sqrt_k: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub peg_multiplier: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub terminal_quote_asset_reserve: u128,
         pub base_asset_amount_long: i128,
         pub base_asset_amount_short: i128,
         pub base_asset_amount_with_amm: i128,
         pub base_asset_amount_with_unsettled_lp: i128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub max_open_interest: u128,
         pub quote_asset_amount: i128,
         pub quote_entry_amount_long: i128,
         pub quote_entry_amount_short: i128,
         pub quote_break_even_amount_long: i128,
         pub quote_break_even_amount_short: i128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub user_lp_shares: u128,
         pub last_funding_rate: i64,
         pub last_funding_rate_long: i64,
@@ -205,37 +290,60 @@ pub mod typedefs {
         pub last24h_avg_funding_rate: i64,
         pub total_fee: i128,
         pub total_mm_fee: i128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub total_exchange_fee: u128,
         pub total_fee_minus_distributions: i128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub total_fee_withdrawn: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub total_liquidation_fee: u128,
         pub cumulative_funding_rate_long: i128,
         pub cumulative_funding_rate_short: i128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub total_social_loss: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub ask_base_asset_reserve: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub ask_quote_asset_reserve: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub bid_base_asset_reserve: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub bid_quote_asset_reserve: u128,
         pub last_oracle_normalised_price: i64,
         pub last_oracle_reserve_price_spread_pct: i64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub last_bid_price_twap: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub last_ask_price_twap: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub last_mark_price_twap: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub last_mark_price_twap5min: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub last_update_slot: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub last_oracle_conf_pct: u64,
         pub net_revenue_since_last_funding: i64,
         pub last_funding_rate_ts: i64,
         pub funding_period: i64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub order_step_size: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub order_tick_size: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub min_order_size: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub max_position_size: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub volume24h: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub long_intensity_volume: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub short_intensity_volume: u64,
         pub last_trade_ts: i64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub mark_std: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub oracle_std: u64,
         pub last_mark_price_twap_ts: i64,
         pub base_spread: u32,
@@ -252,32 +360,41 @@ pub mod typedefs {
         pub last_oracle_valid: bool,
         pub target_base_asset_amount_per_lp: i32,
         pub per_lp_base: i8,
-        pub padding1: u8,
-        pub padding2: u16,
+        pub taker_speed_bump_override: i8,
+        pub amm_spread_adjustment: i8,
+        pub oracle_slot_delay_override: i8,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub total_fee_earned_per_lp: u64,
         pub net_unsettled_funding_pnl: i64,
         pub quote_asset_amount_with_unsettled_lp: i64,
         pub reference_price_offset: i32,
-        pub padding: [u8; 12usize],
+        pub amm_inventory_spread_adjustment: i8,
+        pub padding: [u8; 11usize],
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct SignedMsgOrderId {
         pub uuid: [u8; 8usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub max_slot: u64,
         pub order_id: u32,
         pub padding: u32,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct SignedMsgUserOrdersFixed {
+        #[serde(with = "pubkey_serde")]
         pub user_pubkey: [u8; 32usize],
         pub padding: u32,
         pub len: u32,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct InsuranceFund {
+        #[serde(with = "pubkey_serde")]
         pub vault: [u8; 32usize],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub total_shares: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub user_shares: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub shares_base: u128,
         pub unstaking_period: i64,
         pub last_revenue_settle_ts: i64,
@@ -292,13 +409,16 @@ pub mod typedefs {
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct PriceDivergenceGuardRails {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub mark_oracle_percent_divergence: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub oracle_twap5min_percent_divergence: u64,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct ValidityGuardRails {
         pub slots_before_stale_for_amm: i64,
         pub slots_before_stale_for_margin: i64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub confidence_interval_max_size: u64,
         pub too_volatile_ratio: i64,
     }
@@ -306,7 +426,9 @@ pub mod typedefs {
     pub struct FeeStructure {
         pub fee_tiers: [FeeTier; 10usize],
         pub filler_reward_structure: OrderFillerRewardStructure,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub referrer_reward_epoch_upper_bound: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub flat_filler_fee: u64,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
@@ -324,19 +446,27 @@ pub mod typedefs {
     pub struct OrderFillerRewardStructure {
         pub reward_numerator: u32,
         pub reward_denominator: u32,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub time_based_reward_lower_bound: u128,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct UserFees {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub total_fee_paid: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub total_fee_rebate: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub total_token_discount: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub total_referee_discount: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub total_referrer_reward: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub current_epoch_referrer_reward: u64,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct SpotPosition {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub scaled_balance: u64,
         pub open_bids: i64,
         pub open_asks: i64,
@@ -356,6 +486,7 @@ pub mod typedefs {
         pub open_bids: i64,
         pub open_asks: i64,
         pub settled_pnl: i64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub lp_shares: u64,
         pub last_base_asset_amount_per_lp: i64,
         pub last_quote_asset_amount_per_lp: i64,
@@ -366,11 +497,17 @@ pub mod typedefs {
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub struct Order {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub slot: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub price: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub base_asset_amount: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub base_asset_amount_filled: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub quote_asset_amount_filled: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub trigger_price: u64,
         pub auction_start_price: i64,
         pub auction_end_price: i64,
@@ -473,6 +610,7 @@ pub mod typedefs {
         Transfer,
         Borrow,
         RepayBorrow,
+        Reward,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub enum DepositDirection {
@@ -585,6 +723,11 @@ pub mod typedefs {
         PythLazer1K,
         PythLazer1M,
         PythLazerStableCoin,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub enum OrderParamsBitFlag {
+        ImmediateOrCancel,
+        UpdateHighLeverageMode,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub enum PostOnlyParam {
@@ -740,6 +883,12 @@ pub mod typedefs {
     pub enum MarketType {
         Spot,
         Perp,
+    }
+    #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
+    pub enum OrderBitFlag {
+        SignedMessage,
+        OracleTriggerMarket,
+        SafeTriggerOrder,
     }
     #[derive(:: borsh :: BorshSerialize, :: borsh :: BorshDeserialize, Clone, Debug, Serialize)]
     pub enum ReferrerStatus {
@@ -1481,7 +1630,8 @@ pub mod accounts_data {
         pub state: String,
         pub spotMarket: String,
         pub oracle: String,
-        pub spotMarketVault: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub spotMarketVault: Option<String>,
         pub remaining: Vec<String>,
     }
     #[derive(Debug, Serialize)]
@@ -1590,6 +1740,45 @@ pub mod accounts_data {
         pub userStats: String,
         pub authority: String,
         pub insuranceFundVault: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct BeginInsuranceFundSwapAccounts {
+        pub state: String,
+        pub authority: String,
+        pub outInsuranceFundVault: String,
+        pub inInsuranceFundVault: String,
+        pub outTokenAccount: String,
+        pub inTokenAccount: String,
+        pub ifRebalanceConfig: String,
+        pub tokenProgram: String,
+        pub driftSigner: String,
+        pub instructions: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct EndInsuranceFundSwapAccounts {
+        pub state: String,
+        pub authority: String,
+        pub outInsuranceFundVault: String,
+        pub inInsuranceFundVault: String,
+        pub outTokenAccount: String,
+        pub inTokenAccount: String,
+        pub ifRebalanceConfig: String,
+        pub tokenProgram: String,
+        pub driftSigner: String,
+        pub instructions: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct TransferProtocolIfSharesToRevenuePoolAccounts {
+        pub state: String,
+        pub authority: String,
+        pub insuranceFundVault: String,
+        pub spotMarketVault: String,
+        pub ifRebalanceConfig: String,
+        pub tokenProgram: String,
+        pub driftSigner: String,
         pub remaining: Vec<String>,
     }
     #[derive(Debug, Serialize)]
@@ -1767,6 +1956,15 @@ pub mod accounts_data {
         pub admin: String,
         pub state: String,
         pub perpMarket: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct RecenterPerpMarketAmmCrankAccounts {
+        pub admin: String,
+        pub state: String,
+        pub perpMarket: String,
+        pub spotMarket: String,
+        pub oracle: String,
         pub remaining: Vec<String>,
     }
     #[derive(Debug, Serialize)]
@@ -1996,7 +2194,8 @@ pub mod accounts_data {
         pub state: String,
         pub spotMarket: String,
         pub oracle: String,
-        pub oldOracle: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub oldOracle: Option<String>,
         pub remaining: Vec<String>,
     }
     #[derive(Debug, Serialize)]
@@ -2163,7 +2362,8 @@ pub mod accounts_data {
         pub state: String,
         pub perpMarket: String,
         pub oracle: String,
-        pub oldOracle: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub oldOracle: Option<String>,
         pub remaining: Vec<String>,
     }
     #[derive(Debug, Serialize)]
@@ -2185,16 +2385,6 @@ pub mod accounts_data {
         pub admin: String,
         pub state: String,
         pub perpMarket: String,
-        pub remaining: Vec<String>,
-    }
-    #[derive(Debug, Serialize)]
-    pub struct AdminDepositAccounts {
-        pub state: String,
-        pub user: String,
-        pub admin: String,
-        pub spotMarketVault: String,
-        pub adminTokenAccount: String,
-        pub tokenProgram: String,
         pub remaining: Vec<String>,
     }
     #[derive(Debug, Serialize)]
@@ -2262,6 +2452,34 @@ pub mod accounts_data {
     }
     #[derive(Debug, Serialize)]
     pub struct UpdatePerpMarketFuelAccounts {
+        pub admin: String,
+        pub state: String,
+        pub perpMarket: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct UpdatePerpMarketProtectedMakerParamsAccounts {
+        pub admin: String,
+        pub state: String,
+        pub perpMarket: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct UpdatePerpMarketTakerSpeedBumpOverrideAccounts {
+        pub admin: String,
+        pub state: String,
+        pub perpMarket: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct UpdatePerpMarketAmmSpreadAdjustmentAccounts {
+        pub admin: String,
+        pub state: String,
+        pub perpMarket: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct UpdatePerpMarketOracleSlotDelayOverrideAccounts {
         pub admin: String,
         pub state: String,
         pub perpMarket: String,
@@ -2416,66 +2634,92 @@ pub mod accounts_data {
         pub state: String,
         pub remaining: Vec<String>,
     }
+    #[derive(Debug, Serialize)]
+    pub struct AdminDepositAccounts {
+        pub state: String,
+        pub user: String,
+        pub admin: String,
+        pub spotMarketVault: String,
+        pub adminTokenAccount: String,
+        pub tokenProgram: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct InitializeIfRebalanceConfigAccounts {
+        pub admin: String,
+        pub ifRebalanceConfig: String,
+        pub state: String,
+        pub rent: String,
+        pub systemProgram: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct UpdateIfRebalanceConfigAccounts {
+        pub admin: String,
+        pub ifRebalanceConfig: String,
+        pub state: String,
+        pub remaining: Vec<String>,
+    }
 }
 pub mod ix_data {
     use super::*;
     use serde::Serialize;
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct InitializeUserArguments {
         pub sub_account_id: u16,
         pub name: [u8; 32usize],
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct InitializeUserStatsArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct InitializeSignedMsgUserOrdersArguments {
         pub num_orders: u16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct ResizeSignedMsgUserOrdersArguments {
         pub num_orders: u16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct InitializeSignedMsgWsDelegatesArguments {
         pub delegates: Vec<[u8; 32usize]>,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct ChangeSignedMsgWsDelegateStatusArguments {
         #[serde(with = "pubkey_serde")]
         pub delegate: [u8; 32usize],
         pub add: bool,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct InitializeFuelOverflowArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct SweepFuelArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct ResetFuelSeasonArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct InitializeReferrerNameArguments {
         pub name: [u8; 32usize],
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct DepositArguments {
         pub market_index: u16,
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount: u64,
         pub reduce_only: bool,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct WithdrawArguments {
         pub market_index: u16,
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount: u64,
         pub reduce_only: bool,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct TransferDepositArguments {
         pub market_index: u16,
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct TransferPoolsArguments {
         pub deposit_from_market_index: u16,
         pub deposit_to_market_index: u16,
@@ -2484,234 +2728,234 @@ pub mod ix_data {
         pub deposit_amount: Option<u64>,
         pub borrow_amount: Option<u64>,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct TransferPerpPositionArguments {
         pub market_index: u16,
         pub amount: Option<i64>,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct PlacePerpOrderArguments {
         pub params: OrderParams,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct CancelOrderArguments {
         pub order_id: Option<u32>,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct CancelOrderByUserIdArguments {
         pub user_order_id: u8,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct CancelOrdersArguments {
         pub market_type: Option<MarketType>,
         pub market_index: Option<u16>,
         pub direction: Option<PositionDirection>,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct CancelOrdersByIdsArguments {
         pub order_ids: Vec<u32>,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct ModifyOrderArguments {
         pub order_id: Option<u32>,
         pub modify_order_params: ModifyOrderParams,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct ModifyOrderByUserIdArguments {
         pub user_order_id: u8,
         pub modify_order_params: ModifyOrderParams,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct PlaceAndTakePerpOrderArguments {
         pub params: OrderParams,
         pub success_condition: Option<u32>,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct PlaceAndMakePerpOrderArguments {
         pub params: OrderParams,
         pub taker_order_id: u32,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct PlaceAndMakeSignedMsgPerpOrderArguments {
         pub params: OrderParams,
         pub signed_msg_order_uuid: [u8; 8usize],
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct PlaceSignedMsgTakerOrderArguments {
         pub signed_msg_order_params_message_bytes: Vec<u8>,
         pub is_delegate_signer: bool,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct PlaceSpotOrderArguments {
         pub params: OrderParams,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct PlaceAndTakeSpotOrderArguments {
         pub params: OrderParams,
         pub fulfillment_type: Option<SpotFulfillmentType>,
         pub maker_order_id: Option<u32>,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct PlaceAndMakeSpotOrderArguments {
         pub params: OrderParams,
         pub taker_order_id: u32,
         pub fulfillment_type: Option<SpotFulfillmentType>,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct PlaceOrdersArguments {
         pub params: Vec<OrderParams>,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct BeginSwapArguments {
         pub in_market_index: u16,
         pub out_market_index: u16,
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_in: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct EndSwapArguments {
         pub in_market_index: u16,
         pub out_market_index: u16,
         pub limit_price: Option<u64>,
         pub reduce_only: Option<SwapReduceOnly>,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct AddPerpLpSharesArguments {
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub n_shares: u64,
         pub market_index: u16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct RemovePerpLpSharesArguments {
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub shares_to_burn: u64,
         pub market_index: u16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct RemovePerpLpSharesInExpiringMarketArguments {
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub shares_to_burn: u64,
         pub market_index: u16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateUserNameArguments {
         pub sub_account_id: u16,
         pub name: [u8; 32usize],
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateUserCustomMarginRatioArguments {
         pub sub_account_id: u16,
         pub margin_ratio: u32,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateUserMarginTradingEnabledArguments {
         pub sub_account_id: u16,
         pub margin_trading_enabled: bool,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateUserPoolIdArguments {
         pub sub_account_id: u16,
         pub pool_id: u8,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateUserDelegateArguments {
         pub sub_account_id: u16,
         #[serde(with = "pubkey_serde")]
         pub delegate: [u8; 32usize],
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateUserReduceOnlyArguments {
         pub sub_account_id: u16,
         pub reduce_only: bool,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateUserAdvancedLpArguments {
         pub sub_account_id: u16,
         pub advanced_lp: bool,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateUserProtectedMakerOrdersArguments {
         pub sub_account_id: u16,
         pub protected_maker_orders: bool,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct DeleteUserArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct ForceDeleteUserArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct DeleteSignedMsgUserOrdersArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct ReclaimRentArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct EnableUserHighLeverageModeArguments {
         pub sub_account_id: u16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct FillPerpOrderArguments {
         pub order_id: Option<u32>,
         pub maker_order_id: Option<u32>,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct RevertFillArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct FillSpotOrderArguments {
         pub order_id: Option<u32>,
         pub fulfillment_type: Option<SpotFulfillmentType>,
         pub maker_order_id: Option<u32>,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct TriggerOrderArguments {
         pub order_id: u32,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct ForceCancelOrdersArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateUserIdleArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct LogUserBalancesArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct DisableUserHighLeverageModeArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateUserFuelBonusArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateUserStatsReferrerStatusArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateUserOpenOrdersCountArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct AdminDisableUpdatePerpBidAskTwapArguments {
         pub disable: bool,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct SettlePnlArguments {
         pub market_index: u16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct SettleMultiplePnlsArguments {
         pub market_indexes: Vec<u16>,
         pub mode: SettlePnlMode,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct SettleFundingPaymentArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct SettleLpArguments {
         pub market_index: u16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct SettleExpiredMarketArguments {
         pub market_index: u16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct LiquidatePerpArguments {
         pub market_index: u16,
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub liquidator_max_base_asset_amount: u64,
         pub limit_price: Option<u64>,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct LiquidatePerpWithFillArguments {
         pub market_index: u16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct LiquidateSpotArguments {
         pub asset_market_index: u16,
         pub liability_market_index: u16,
@@ -2719,19 +2963,19 @@ pub mod ix_data {
         pub liquidator_max_liability_transfer: u128,
         pub limit_price: Option<u64>,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct LiquidateSpotWithSwapBeginArguments {
         pub asset_market_index: u16,
         pub liability_market_index: u16,
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub swap_amount: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct LiquidateSpotWithSwapEndArguments {
         pub asset_market_index: u16,
         pub liability_market_index: u16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct LiquidateBorrowForPerpPnlArguments {
         pub perp_market_index: u16,
         pub spot_market_index: u16,
@@ -2739,7 +2983,7 @@ pub mod ix_data {
         pub liquidator_max_liability_transfer: u128,
         pub limit_price: Option<u64>,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct LiquidatePerpPnlForDepositArguments {
         pub perp_market_index: u16,
         pub spot_market_index: u16,
@@ -2747,102 +2991,120 @@ pub mod ix_data {
         pub liquidator_max_pnl_transfer: u128,
         pub limit_price: Option<u64>,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct SetUserStatusToBeingLiquidatedArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct ResolvePerpPnlDeficitArguments {
         pub spot_market_index: u16,
         pub perp_market_index: u16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct ResolvePerpBankruptcyArguments {
         pub quote_spot_market_index: u16,
         pub market_index: u16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct ResolveSpotBankruptcyArguments {
         pub market_index: u16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct SettleRevenueToInsuranceFundArguments {
         pub spot_market_index: u16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateFundingRateArguments {
         pub market_index: u16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdatePrelaunchOracleArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdatePerpBidAskTwapArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateSpotMarketCumulativeInterestArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateAmmsArguments {
         pub market_indexes: [u16; 5usize],
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateSpotMarketExpiryArguments {
         pub expiry_ts: i64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateUserQuoteAssetInsuranceStakeArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateUserGovTokenInsuranceStakeArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateUserGovTokenInsuranceStakeDevnetArguments {
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub gov_stake_amount: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct InitializeInsuranceFundStakeArguments {
         pub market_index: u16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct AddInsuranceFundStakeArguments {
         pub market_index: u16,
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct RequestRemoveInsuranceFundStakeArguments {
         pub market_index: u16,
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct CancelRequestRemoveInsuranceFundStakeArguments {
         pub market_index: u16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct RemoveInsuranceFundStakeArguments {
         pub market_index: u16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct TransferProtocolIfSharesArguments {
         pub market_index: u16,
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub shares: u128,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
+    pub struct BeginInsuranceFundSwapArguments {
+        pub in_market_index: u16,
+        pub out_market_index: u16,
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub amount_in: u64,
+    }
+    #[derive(Debug, serde :: Serialize)]
+    pub struct EndInsuranceFundSwapArguments {
+        pub in_market_index: u16,
+        pub out_market_index: u16,
+    }
+    #[derive(Debug, serde :: Serialize)]
+    pub struct TransferProtocolIfSharesToRevenuePoolArguments {
+        pub market_index: u16,
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub amount: u64,
+    }
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdatePythPullOracleArguments {
         pub feed_id: [u8; 32usize],
         pub params: Vec<u8>,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct PostPythPullOracleUpdateAtomicArguments {
         pub feed_id: [u8; 32usize],
         pub params: Vec<u8>,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct PostMultiPythPullOracleUpdatesAtomicArguments {
         pub params: Vec<u8>,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct PauseSpotMarketDepositWithdrawArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct InitializeArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct InitializeSpotMarketArguments {
         pub optimal_utilization: u32,
         pub optimal_borrow_rate: u32,
@@ -2868,37 +3130,37 @@ pub mod ix_data {
         pub if_total_factor: u32,
         pub name: [u8; 32usize],
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct DeleteInitializedSpotMarketArguments {
         pub market_index: u16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct InitializeSerumFulfillmentConfigArguments {
         pub market_index: u16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateSerumFulfillmentConfigStatusArguments {
         pub status: SpotFulfillmentConfigStatus,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct InitializeOpenbookV2FulfillmentConfigArguments {
         pub market_index: u16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct OpenbookV2FulfillmentConfigStatusArguments {
         pub status: SpotFulfillmentConfigStatus,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct InitializePhoenixFulfillmentConfigArguments {
         pub market_index: u16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct PhoenixFulfillmentConfigStatusArguments {
         pub status: SpotFulfillmentConfigStatus,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateSerumVaultArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct InitializePerpMarketArguments {
         pub market_index: u16,
         #[serde(serialize_with = "crate::serialize_to_string")]
@@ -2936,13 +3198,13 @@ pub mod ix_data {
         pub amm_jit_intensity: u8,
         pub name: [u8; 32usize],
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct InitializePredictionMarketArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct DeleteInitializedPerpMarketArguments {
         pub market_index: u16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct MoveAmmPriceArguments {
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub base_asset_reserve: u128,
@@ -2951,67 +3213,71 @@ pub mod ix_data {
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub sqrt_k: u128,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct RecenterPerpMarketAmmArguments {
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub peg_multiplier: u128,
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub sqrt_k: u128,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
+    pub struct RecenterPerpMarketAmmCrankArguments {
+        pub depth: Option<u128>,
+    }
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdatePerpMarketAmmSummaryStatsArguments {
         pub params: UpdatePerpMarketSummaryStatsParams,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdatePerpMarketExpiryArguments {
         pub expiry_ts: i64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct SettleExpiredMarketPoolsToRevenuePoolArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct DepositIntoPerpMarketFeePoolArguments {
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct DepositIntoSpotMarketVaultArguments {
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct DepositIntoSpotMarketRevenuePoolArguments {
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct RepegAmmCurveArguments {
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub new_peg_candidate: u128,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdatePerpMarketAmmOracleTwapArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct ResetPerpMarketAmmOracleTwapArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateKArguments {
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub sqrt_k: u128,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdatePerpMarketMarginRatioArguments {
         pub margin_ratio_initial: u32,
         pub margin_ratio_maintenance: u32,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdatePerpMarketHighLeverageMarginRatioArguments {
         pub margin_ratio_initial: u16,
         pub margin_ratio_maintenance: u16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdatePerpMarketFundingPeriodArguments {
         pub funding_period: i64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdatePerpMarketMaxImbalancesArguments {
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub unrealized_max_imbalance: u64,
@@ -3020,52 +3286,52 @@ pub mod ix_data {
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub quote_max_insurance: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdatePerpMarketLiquidationFeeArguments {
         pub liquidator_fee: u32,
         pub if_liquidation_fee: u32,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateInsuranceFundUnstakingPeriodArguments {
         pub insurance_fund_unstaking_period: i64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateSpotMarketPoolIdArguments {
         pub pool_id: u8,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateSpotMarketLiquidationFeeArguments {
         pub liquidator_fee: u32,
         pub if_liquidation_fee: u32,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateWithdrawGuardThresholdArguments {
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub withdraw_guard_threshold: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateSpotMarketIfFactorArguments {
         pub spot_market_index: u16,
         pub user_if_factor: u32,
         pub total_if_factor: u32,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateSpotMarketRevenueSettlePeriodArguments {
         pub revenue_settle_period: i64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateSpotMarketStatusArguments {
         pub status: MarketStatus,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateSpotMarketPausedOperationsArguments {
         pub paused_operations: u8,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateSpotMarketAssetTierArguments {
         pub asset_tier: AssetTier,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateSpotMarketMarginWeightsArguments {
         pub initial_asset_weight: u32,
         pub maintenance_asset_weight: u32,
@@ -3073,211 +3339,224 @@ pub mod ix_data {
         pub maintenance_liability_weight: u32,
         pub imf_factor: u32,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateSpotMarketBorrowRateArguments {
         pub optimal_utilization: u32,
         pub optimal_borrow_rate: u32,
         pub max_borrow_rate: u32,
         pub min_borrow_rate: Option<u8>,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateSpotMarketMaxTokenDepositsArguments {
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub max_token_deposits: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateSpotMarketMaxTokenBorrowsArguments {
         pub max_token_borrows_fraction: u16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateSpotMarketScaleInitialAssetWeightStartArguments {
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub scale_initial_asset_weight_start: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateSpotMarketOracleArguments {
         #[serde(with = "pubkey_serde")]
         pub oracle: [u8; 32usize],
         pub oracle_source: OracleSource,
+        pub skip_invariant_check: Option<bool>,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateSpotMarketStepSizeAndTickSizeArguments {
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub step_size: u64,
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub tick_size: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateSpotMarketMinOrderSizeArguments {
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub order_size: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateSpotMarketOrdersEnabledArguments {
         pub orders_enabled: bool,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateSpotMarketIfPausedOperationsArguments {
         pub paused_operations: u8,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateSpotMarketNameArguments {
         pub name: [u8; 32usize],
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdatePerpMarketStatusArguments {
         pub status: MarketStatus,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdatePerpMarketPausedOperationsArguments {
         pub paused_operations: u8,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdatePerpMarketContractTierArguments {
         pub contract_tier: ContractTier,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdatePerpMarketImfFactorArguments {
         pub imf_factor: u32,
         pub unrealized_pnl_imf_factor: u32,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdatePerpMarketUnrealizedAssetWeightArguments {
         pub unrealized_initial_asset_weight: u32,
         pub unrealized_maintenance_asset_weight: u32,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdatePerpMarketConcentrationCoefArguments {
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub concentration_scale: u128,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdatePerpMarketCurveUpdateIntensityArguments {
         pub curve_update_intensity: u8,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdatePerpMarketTargetBaseAssetAmountPerLpArguments {
         pub target_base_asset_amount_per_lp: i32,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdatePerpMarketPerLpBaseArguments {
         pub per_lp_base: i8,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateLpCooldownTimeArguments {
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub lp_cooldown_time: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdatePerpFeeStructureArguments {
         pub fee_structure: FeeStructure,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateSpotFeeStructureArguments {
         pub fee_structure: FeeStructure,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateInitialPctToLiquidateArguments {
         pub initial_pct_to_liquidate: u16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateLiquidationDurationArguments {
         pub liquidation_duration: u8,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateLiquidationMarginBufferRatioArguments {
         pub liquidation_margin_buffer_ratio: u32,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateOracleGuardRailsArguments {
         pub oracle_guard_rails: OracleGuardRails,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateStateSettlementDurationArguments {
         pub settlement_duration: u16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateStateMaxNumberOfSubAccountsArguments {
         pub max_number_of_sub_accounts: u16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateStateMaxInitializeUserFeeArguments {
         pub max_initialize_user_fee: u16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdatePerpMarketOracleArguments {
         #[serde(with = "pubkey_serde")]
         pub oracle: [u8; 32usize],
         pub oracle_source: OracleSource,
-        pub skip_invariant_check: bool,
+        pub skip_invariant_check: Option<bool>,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdatePerpMarketBaseSpreadArguments {
         pub base_spread: u32,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateAmmJitIntensityArguments {
         pub amm_jit_intensity: u8,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdatePerpMarketMaxSpreadArguments {
         pub max_spread: u32,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
-    pub struct AdminDepositArguments {
-        pub market_index: u16,
-        #[serde(serialize_with = "crate::serialize_to_string")]
-        pub amount: u64,
-    }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdatePerpMarketStepSizeAndTickSizeArguments {
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub step_size: u64,
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub tick_size: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdatePerpMarketNameArguments {
         pub name: [u8; 32usize],
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdatePerpMarketMinOrderSizeArguments {
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub order_size: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdatePerpMarketMaxSlippageRatioArguments {
         pub max_slippage_ratio: u16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdatePerpMarketMaxFillReserveFractionArguments {
         pub max_fill_reserve_fraction: u16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdatePerpMarketMaxOpenInterestArguments {
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub max_open_interest: u128,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdatePerpMarketNumberOfUsersArguments {
         pub number_of_users: Option<u32>,
         pub number_of_users_with_base: Option<u32>,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdatePerpMarketFeeAdjustmentArguments {
         pub fee_adjustment: i16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateSpotMarketFeeAdjustmentArguments {
         pub fee_adjustment: i16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdatePerpMarketFuelArguments {
         pub fuel_boost_taker: Option<u8>,
         pub fuel_boost_maker: Option<u8>,
         pub fuel_boost_position: Option<u8>,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
+    pub struct UpdatePerpMarketProtectedMakerParamsArguments {
+        pub protected_maker_limit_price_divisor: Option<u8>,
+        pub protected_maker_dynamic_divisor: Option<u8>,
+    }
+    #[derive(Debug, serde :: Serialize)]
+    pub struct UpdatePerpMarketTakerSpeedBumpOverrideArguments {
+        pub taker_speed_bump_override: i8,
+    }
+    #[derive(Debug, serde :: Serialize)]
+    pub struct UpdatePerpMarketAmmSpreadAdjustmentArguments {
+        pub amm_spread_adjustment: i8,
+        pub amm_inventory_spread_adjustment: i8,
+    }
+    #[derive(Debug, serde :: Serialize)]
+    pub struct UpdatePerpMarketOracleSlotDelayOverrideArguments {
+        pub oracle_slot_delay_override: i8,
+    }
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateSpotMarketFuelArguments {
         pub fuel_boost_deposits: Option<u8>,
         pub fuel_boost_borrows: Option<u8>,
@@ -3285,7 +3564,7 @@ pub mod ix_data {
         pub fuel_boost_maker: Option<u8>,
         pub fuel_boost_insurance: Option<u8>,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct InitUserFuelArguments {
         pub fuel_boost_deposits: Option<i32>,
         pub fuel_boost_borrows: Option<u32>,
@@ -3293,82 +3572,97 @@ pub mod ix_data {
         pub fuel_boost_maker: Option<u32>,
         pub fuel_boost_insurance: Option<u32>,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateAdminArguments {
         #[serde(with = "pubkey_serde")]
         pub admin: [u8; 32usize],
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateWhitelistMintArguments {
         #[serde(with = "pubkey_serde")]
         pub whitelist_mint: [u8; 32usize],
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateDiscountMintArguments {
         #[serde(with = "pubkey_serde")]
         pub discount_mint: [u8; 32usize],
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateExchangeStatusArguments {
         pub exchange_status: u8,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdatePerpAuctionDurationArguments {
         pub min_perp_auction_duration: u8,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateSpotAuctionDurationArguments {
         pub default_spot_auction_duration: u8,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct InitializeProtocolIfSharesTransferConfigArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateProtocolIfSharesTransferConfigArguments {
         pub whitelisted_signers: Option<[[u8; 32usize]; 4usize]>,
         pub max_transfer_per_epoch: Option<u128>,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct InitializePrelaunchOracleArguments {
         pub params: PrelaunchOracleParams,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdatePrelaunchOracleParamsArguments {
         pub params: PrelaunchOracleParams,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct DeletePrelaunchOracleArguments {
         pub perp_market_index: u16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct InitializePythPullOracleArguments {
         pub feed_id: [u8; 32usize],
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct InitializePythLazerOracleArguments {
         pub feed_id: u32,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct PostPythLazerOracleUpdateArguments {
         pub pyth_message: Vec<u8>,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct InitializeHighLeverageModeConfigArguments {
         pub max_users: u32,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateHighLeverageModeConfigArguments {
         pub max_users: u32,
         pub reduce_only: bool,
+        pub current_users: Option<u32>,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct InitializeProtectedMakerModeConfigArguments {
         pub max_users: u32,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateProtectedMakerModeConfigArguments {
         pub max_users: u32,
         pub reduce_only: bool,
         pub current_users: Option<u32>,
+    }
+    #[derive(Debug, serde :: Serialize)]
+    pub struct AdminDepositArguments {
+        pub market_index: u16,
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub amount: u64,
+    }
+    #[derive(Debug, serde :: Serialize)]
+    pub struct InitializeIfRebalanceConfigArguments {
+        pub params: IfRebalanceConfigParams,
+    }
+    #[derive(Debug, serde :: Serialize)]
+    pub struct UpdateIfRebalanceConfigArguments {
+        pub params: IfRebalanceConfigParams,
     }
 }
 #[derive(Debug, Serialize)]
@@ -3742,6 +4036,18 @@ pub enum Instruction {
         accounts: TransferProtocolIfSharesAccounts,
         args: TransferProtocolIfSharesArguments,
     },
+    BeginInsuranceFundSwap {
+        accounts: BeginInsuranceFundSwapAccounts,
+        args: BeginInsuranceFundSwapArguments,
+    },
+    EndInsuranceFundSwap {
+        accounts: EndInsuranceFundSwapAccounts,
+        args: EndInsuranceFundSwapArguments,
+    },
+    TransferProtocolIfSharesToRevenuePool {
+        accounts: TransferProtocolIfSharesToRevenuePoolAccounts,
+        args: TransferProtocolIfSharesToRevenuePoolArguments,
+    },
     UpdatePythPullOracle {
         accounts: UpdatePythPullOracleAccounts,
         args: UpdatePythPullOracleArguments,
@@ -3817,6 +4123,10 @@ pub enum Instruction {
     RecenterPerpMarketAmm {
         accounts: RecenterPerpMarketAmmAccounts,
         args: RecenterPerpMarketAmmArguments,
+    },
+    RecenterPerpMarketAmmCrank {
+        accounts: RecenterPerpMarketAmmCrankAccounts,
+        args: RecenterPerpMarketAmmCrankArguments,
     },
     UpdatePerpMarketAmmSummaryStats {
         accounts: UpdatePerpMarketAmmSummaryStatsAccounts,
@@ -4050,10 +4360,6 @@ pub enum Instruction {
         accounts: UpdatePerpMarketMaxSpreadAccounts,
         args: UpdatePerpMarketMaxSpreadArguments,
     },
-    AdminDeposit {
-        accounts: AdminDepositAccounts,
-        args: AdminDepositArguments,
-    },
     UpdatePerpMarketStepSizeAndTickSize {
         accounts: UpdatePerpMarketStepSizeAndTickSizeAccounts,
         args: UpdatePerpMarketStepSizeAndTickSizeArguments,
@@ -4093,6 +4399,22 @@ pub enum Instruction {
     UpdatePerpMarketFuel {
         accounts: UpdatePerpMarketFuelAccounts,
         args: UpdatePerpMarketFuelArguments,
+    },
+    UpdatePerpMarketProtectedMakerParams {
+        accounts: UpdatePerpMarketProtectedMakerParamsAccounts,
+        args: UpdatePerpMarketProtectedMakerParamsArguments,
+    },
+    UpdatePerpMarketTakerSpeedBumpOverride {
+        accounts: UpdatePerpMarketTakerSpeedBumpOverrideAccounts,
+        args: UpdatePerpMarketTakerSpeedBumpOverrideArguments,
+    },
+    UpdatePerpMarketAmmSpreadAdjustment {
+        accounts: UpdatePerpMarketAmmSpreadAdjustmentAccounts,
+        args: UpdatePerpMarketAmmSpreadAdjustmentArguments,
+    },
+    UpdatePerpMarketOracleSlotDelayOverride {
+        accounts: UpdatePerpMarketOracleSlotDelayOverrideAccounts,
+        args: UpdatePerpMarketOracleSlotDelayOverrideArguments,
     },
     UpdateSpotMarketFuel {
         accounts: UpdateSpotMarketFuelAccounts,
@@ -4174,6 +4496,18 @@ pub enum Instruction {
         accounts: UpdateProtectedMakerModeConfigAccounts,
         args: UpdateProtectedMakerModeConfigArguments,
     },
+    AdminDeposit {
+        accounts: AdminDepositAccounts,
+        args: AdminDepositArguments,
+    },
+    InitializeIfRebalanceConfig {
+        accounts: InitializeIfRebalanceConfigAccounts,
+        args: InitializeIfRebalanceConfigArguments,
+    },
+    UpdateIfRebalanceConfig {
+        accounts: UpdateIfRebalanceConfigAccounts,
+        args: UpdateIfRebalanceConfigArguments,
+    },
 }
 impl Instruction {
     pub fn decode(account_keys: &[String], data: &[u8]) -> anyhow::Result<Self> {
@@ -4185,8 +4519,17 @@ impl Instruction {
         match disc {
             [111u8, 17u8, 185u8, 250u8, 60u8, 122u8, 38u8, 254u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitializeUserArguments::deserialize(&mut rdr)?;
+                let sub_account_id: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let name: [u8; 32usize] =
+                    <[u8; 32usize] as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = InitializeUserArguments {
+                    sub_account_id,
+                    name,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 7usize;
                 let user = keys.next().unwrap().clone();
                 let userStats = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
@@ -4209,8 +4552,10 @@ impl Instruction {
             }
             [254u8, 243u8, 72u8, 98u8, 251u8, 130u8, 168u8, 213u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitializeUserStatsArguments::deserialize(&mut rdr)?;
+                let args = InitializeUserStatsArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 6usize;
                 let userStats = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
@@ -4231,8 +4576,11 @@ impl Instruction {
             }
             [164u8, 99u8, 156u8, 126u8, 156u8, 57u8, 99u8, 180u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitializeSignedMsgUserOrdersArguments::deserialize(&mut rdr)?;
+                let num_orders: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = InitializeSignedMsgUserOrdersArguments { num_orders };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 5usize;
                 let signedMsgUserOrders = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
                 let payer = keys.next().unwrap().clone();
@@ -4251,8 +4599,11 @@ impl Instruction {
             }
             [137u8, 10u8, 87u8, 150u8, 18u8, 115u8, 79u8, 168u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = ResizeSignedMsgUserOrdersArguments::deserialize(&mut rdr)?;
+                let num_orders: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = ResizeSignedMsgUserOrdersArguments { num_orders };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 5usize;
                 let signedMsgUserOrders = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
                 let user = keys.next().unwrap().clone();
@@ -4271,8 +4622,12 @@ impl Instruction {
             }
             [40u8, 132u8, 96u8, 219u8, 184u8, 193u8, 80u8, 8u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitializeSignedMsgWsDelegatesArguments::deserialize(&mut rdr)?;
+                let delegates: Vec<[u8; 32usize]> =
+                    <Vec<[u8; 32usize]> as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = InitializeSignedMsgWsDelegatesArguments { delegates };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 4usize;
                 let signedMsgWsDelegates = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
                 let rent = keys.next().unwrap().clone();
@@ -4289,8 +4644,13 @@ impl Instruction {
             }
             [252u8, 202u8, 252u8, 219u8, 179u8, 27u8, 84u8, 138u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = ChangeSignedMsgWsDelegateStatusArguments::deserialize(&mut rdr)?;
+                let delegate: [u8; 32usize] =
+                    <[u8; 32usize] as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let add: bool = <bool as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = ChangeSignedMsgWsDelegateStatusArguments { delegate, add };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let signedMsgWsDelegates = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
                 let systemProgram = keys.next().unwrap().clone();
@@ -4305,8 +4665,10 @@ impl Instruction {
             }
             [88u8, 223u8, 132u8, 161u8, 208u8, 88u8, 142u8, 42u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitializeFuelOverflowArguments::deserialize(&mut rdr)?;
+                let args = InitializeFuelOverflowArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 6usize;
                 let fuelOverflow = keys.next().unwrap().clone();
                 let userStats = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
@@ -4327,8 +4689,10 @@ impl Instruction {
             }
             [175u8, 107u8, 19u8, 56u8, 165u8, 241u8, 43u8, 69u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = SweepFuelArguments::deserialize(&mut rdr)?;
+                let args = SweepFuelArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 4usize;
                 let fuelOverflow = keys.next().unwrap().clone();
                 let userStats = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
@@ -4345,8 +4709,10 @@ impl Instruction {
             }
             [199u8, 122u8, 192u8, 255u8, 32u8, 99u8, 63u8, 200u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = ResetFuelSeasonArguments::deserialize(&mut rdr)?;
+                let args = ResetFuelSeasonArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 4usize;
                 let userStats = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
@@ -4363,8 +4729,12 @@ impl Instruction {
             }
             [235u8, 126u8, 231u8, 10u8, 42u8, 164u8, 26u8, 61u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitializeReferrerNameArguments::deserialize(&mut rdr)?;
+                let name: [u8; 32usize] =
+                    <[u8; 32usize] as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = InitializeReferrerNameArguments { name };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 7usize;
                 let referrerName = keys.next().unwrap().clone();
                 let user = keys.next().unwrap().clone();
                 let userStats = keys.next().unwrap().clone();
@@ -4387,8 +4757,17 @@ impl Instruction {
             }
             [242u8, 35u8, 198u8, 137u8, 82u8, 225u8, 242u8, 182u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = DepositArguments::deserialize(&mut rdr)?;
+                let market_index: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let amount: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let reduce_only: bool = <bool as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = DepositArguments {
+                    market_index,
+                    amount,
+                    reduce_only,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 7usize;
                 let state = keys.next().unwrap().clone();
                 let user = keys.next().unwrap().clone();
                 let userStats = keys.next().unwrap().clone();
@@ -4411,8 +4790,17 @@ impl Instruction {
             }
             [183u8, 18u8, 70u8, 156u8, 148u8, 109u8, 161u8, 34u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = WithdrawArguments::deserialize(&mut rdr)?;
+                let market_index: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let amount: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let reduce_only: bool = <bool as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = WithdrawArguments {
+                    market_index,
+                    amount,
+                    reduce_only,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 8usize;
                 let state = keys.next().unwrap().clone();
                 let user = keys.next().unwrap().clone();
                 let userStats = keys.next().unwrap().clone();
@@ -4437,8 +4825,15 @@ impl Instruction {
             }
             [20u8, 20u8, 147u8, 223u8, 41u8, 63u8, 204u8, 111u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = TransferDepositArguments::deserialize(&mut rdr)?;
+                let market_index: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let amount: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = TransferDepositArguments {
+                    market_index,
+                    amount,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 6usize;
                 let fromUser = keys.next().unwrap().clone();
                 let toUser = keys.next().unwrap().clone();
                 let userStats = keys.next().unwrap().clone();
@@ -4459,8 +4854,27 @@ impl Instruction {
             }
             [197u8, 103u8, 154u8, 25u8, 107u8, 90u8, 60u8, 94u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = TransferPoolsArguments::deserialize(&mut rdr)?;
+                let deposit_from_market_index: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let deposit_to_market_index: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let borrow_from_market_index: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let borrow_to_market_index: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let deposit_amount: Option<u64> = parse_option(&mut rdr)?;
+                let borrow_amount: Option<u64> = parse_option(&mut rdr)?;
+                let args = TransferPoolsArguments {
+                    deposit_from_market_index,
+                    deposit_to_market_index,
+                    borrow_from_market_index,
+                    borrow_to_market_index,
+                    deposit_amount,
+                    borrow_amount,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 10usize;
                 let fromUser = keys.next().unwrap().clone();
                 let toUser = keys.next().unwrap().clone();
                 let userStats = keys.next().unwrap().clone();
@@ -4489,8 +4903,15 @@ impl Instruction {
             }
             [23u8, 172u8, 188u8, 168u8, 134u8, 210u8, 3u8, 108u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = TransferPerpPositionArguments::deserialize(&mut rdr)?;
+                let market_index: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let amount: Option<i64> = parse_option(&mut rdr)?;
+                let args = TransferPerpPositionArguments {
+                    market_index,
+                    amount,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 5usize;
                 let fromUser = keys.next().unwrap().clone();
                 let toUser = keys.next().unwrap().clone();
                 let userStats = keys.next().unwrap().clone();
@@ -4509,8 +4930,52 @@ impl Instruction {
             }
             [69u8, 161u8, 93u8, 202u8, 120u8, 126u8, 76u8, 185u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = PlacePerpOrderArguments::deserialize(&mut rdr)?;
+                let order_type: OrderType =
+                    <OrderType as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let market_type: MarketType =
+                    <MarketType as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let direction: PositionDirection =
+                    <PositionDirection as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let user_order_id: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let base_asset_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let price: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let market_index: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let reduce_only: bool = <bool as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let post_only: PostOnlyParam =
+                    <PostOnlyParam as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let bit_flags: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let max_ts: Option<i64> = parse_option(&mut rdr)?;
+                let trigger_price: Option<u64> = parse_option(&mut rdr)?;
+                let trigger_condition: OrderTriggerCondition =
+                    <OrderTriggerCondition as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let oracle_price_offset: Option<i32> = parse_option(&mut rdr)?;
+                let auction_duration: Option<u8> = parse_option(&mut rdr)?;
+                let auction_start_price: Option<i64> = parse_option(&mut rdr)?;
+                let auction_end_price: Option<i64> = parse_option(&mut rdr)?;
+                let params = OrderParams {
+                    order_type,
+                    market_type,
+                    direction,
+                    user_order_id,
+                    base_asset_amount,
+                    price,
+                    market_index,
+                    reduce_only,
+                    post_only,
+                    bit_flags,
+                    max_ts,
+                    trigger_price,
+                    trigger_condition,
+                    oracle_price_offset,
+                    auction_duration,
+                    auction_start_price,
+                    auction_end_price,
+                };
+                let args = PlacePerpOrderArguments { params };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let state = keys.next().unwrap().clone();
                 let user = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
@@ -4525,8 +4990,11 @@ impl Instruction {
             }
             [95u8, 129u8, 237u8, 240u8, 8u8, 49u8, 223u8, 132u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = CancelOrderArguments::deserialize(&mut rdr)?;
+                let order_id: Option<u32> = parse_option(&mut rdr)?;
+                let args = CancelOrderArguments { order_id };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let state = keys.next().unwrap().clone();
                 let user = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
@@ -4541,8 +5009,11 @@ impl Instruction {
             }
             [107u8, 211u8, 250u8, 133u8, 18u8, 37u8, 57u8, 100u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = CancelOrderByUserIdArguments::deserialize(&mut rdr)?;
+                let user_order_id: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = CancelOrderByUserIdArguments { user_order_id };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let state = keys.next().unwrap().clone();
                 let user = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
@@ -4557,8 +5028,17 @@ impl Instruction {
             }
             [238u8, 225u8, 95u8, 158u8, 227u8, 103u8, 8u8, 194u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = CancelOrdersArguments::deserialize(&mut rdr)?;
+                let market_type: Option<MarketType> = parse_option(&mut rdr)?;
+                let market_index: Option<u16> = parse_option(&mut rdr)?;
+                let direction: Option<PositionDirection> = parse_option(&mut rdr)?;
+                let args = CancelOrdersArguments {
+                    market_type,
+                    market_index,
+                    direction,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let state = keys.next().unwrap().clone();
                 let user = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
@@ -4573,8 +5053,12 @@ impl Instruction {
             }
             [134u8, 19u8, 144u8, 165u8, 94u8, 240u8, 210u8, 94u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = CancelOrdersByIdsArguments::deserialize(&mut rdr)?;
+                let order_ids: Vec<u32> =
+                    <Vec<u32> as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = CancelOrdersByIdsArguments { order_ids };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let state = keys.next().unwrap().clone();
                 let user = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
@@ -4589,8 +5073,44 @@ impl Instruction {
             }
             [47u8, 124u8, 117u8, 255u8, 201u8, 197u8, 130u8, 94u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = ModifyOrderArguments::deserialize(&mut rdr)?;
+                let order_id: Option<u32> = parse_option(&mut rdr)?;
+                let direction: Option<PositionDirection> = parse_option(&mut rdr)?;
+                let base_asset_amount: Option<u64> = parse_option(&mut rdr)?;
+                let price: Option<u64> = parse_option(&mut rdr)?;
+                let reduce_only: Option<bool> = parse_option(&mut rdr)?;
+                let post_only: Option<PostOnlyParam> = parse_option(&mut rdr)?;
+                let bit_flags: Option<u8> = parse_option(&mut rdr)?;
+                let max_ts: Option<i64> = parse_option(&mut rdr)?;
+                let trigger_price: Option<u64> = parse_option(&mut rdr)?;
+                let trigger_condition: Option<OrderTriggerCondition> = parse_option(&mut rdr)?;
+                let oracle_price_offset: Option<i32> = parse_option(&mut rdr)?;
+                let auction_duration: Option<u8> = parse_option(&mut rdr)?;
+                let auction_start_price: Option<i64> = parse_option(&mut rdr)?;
+                let auction_end_price: Option<i64> = parse_option(&mut rdr)?;
+                let policy: Option<u8> = parse_option(&mut rdr)?;
+                let modify_order_params = ModifyOrderParams {
+                    direction,
+                    base_asset_amount,
+                    price,
+                    reduce_only,
+                    post_only,
+                    bit_flags,
+                    max_ts,
+                    trigger_price,
+                    trigger_condition,
+                    oracle_price_offset,
+                    auction_duration,
+                    auction_start_price,
+                    auction_end_price,
+                    policy,
+                };
+                let args = ModifyOrderArguments {
+                    order_id,
+                    modify_order_params,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let state = keys.next().unwrap().clone();
                 let user = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
@@ -4605,8 +5125,44 @@ impl Instruction {
             }
             [158u8, 77u8, 4u8, 253u8, 252u8, 194u8, 161u8, 179u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = ModifyOrderByUserIdArguments::deserialize(&mut rdr)?;
+                let user_order_id: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let direction: Option<PositionDirection> = parse_option(&mut rdr)?;
+                let base_asset_amount: Option<u64> = parse_option(&mut rdr)?;
+                let price: Option<u64> = parse_option(&mut rdr)?;
+                let reduce_only: Option<bool> = parse_option(&mut rdr)?;
+                let post_only: Option<PostOnlyParam> = parse_option(&mut rdr)?;
+                let bit_flags: Option<u8> = parse_option(&mut rdr)?;
+                let max_ts: Option<i64> = parse_option(&mut rdr)?;
+                let trigger_price: Option<u64> = parse_option(&mut rdr)?;
+                let trigger_condition: Option<OrderTriggerCondition> = parse_option(&mut rdr)?;
+                let oracle_price_offset: Option<i32> = parse_option(&mut rdr)?;
+                let auction_duration: Option<u8> = parse_option(&mut rdr)?;
+                let auction_start_price: Option<i64> = parse_option(&mut rdr)?;
+                let auction_end_price: Option<i64> = parse_option(&mut rdr)?;
+                let policy: Option<u8> = parse_option(&mut rdr)?;
+                let modify_order_params = ModifyOrderParams {
+                    direction,
+                    base_asset_amount,
+                    price,
+                    reduce_only,
+                    post_only,
+                    bit_flags,
+                    max_ts,
+                    trigger_price,
+                    trigger_condition,
+                    oracle_price_offset,
+                    auction_duration,
+                    auction_start_price,
+                    auction_end_price,
+                    policy,
+                };
+                let args = ModifyOrderByUserIdArguments {
+                    user_order_id,
+                    modify_order_params,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let state = keys.next().unwrap().clone();
                 let user = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
@@ -4621,8 +5177,56 @@ impl Instruction {
             }
             [213u8, 51u8, 1u8, 187u8, 108u8, 220u8, 230u8, 224u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = PlaceAndTakePerpOrderArguments::deserialize(&mut rdr)?;
+                let order_type: OrderType =
+                    <OrderType as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let market_type: MarketType =
+                    <MarketType as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let direction: PositionDirection =
+                    <PositionDirection as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let user_order_id: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let base_asset_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let price: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let market_index: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let reduce_only: bool = <bool as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let post_only: PostOnlyParam =
+                    <PostOnlyParam as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let bit_flags: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let max_ts: Option<i64> = parse_option(&mut rdr)?;
+                let trigger_price: Option<u64> = parse_option(&mut rdr)?;
+                let trigger_condition: OrderTriggerCondition =
+                    <OrderTriggerCondition as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let oracle_price_offset: Option<i32> = parse_option(&mut rdr)?;
+                let auction_duration: Option<u8> = parse_option(&mut rdr)?;
+                let auction_start_price: Option<i64> = parse_option(&mut rdr)?;
+                let auction_end_price: Option<i64> = parse_option(&mut rdr)?;
+                let params = OrderParams {
+                    order_type,
+                    market_type,
+                    direction,
+                    user_order_id,
+                    base_asset_amount,
+                    price,
+                    market_index,
+                    reduce_only,
+                    post_only,
+                    bit_flags,
+                    max_ts,
+                    trigger_price,
+                    trigger_condition,
+                    oracle_price_offset,
+                    auction_duration,
+                    auction_start_price,
+                    auction_end_price,
+                };
+                let success_condition: Option<u32> = parse_option(&mut rdr)?;
+                let args = PlaceAndTakePerpOrderArguments {
+                    params,
+                    success_condition,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 4usize;
                 let state = keys.next().unwrap().clone();
                 let user = keys.next().unwrap().clone();
                 let userStats = keys.next().unwrap().clone();
@@ -4639,8 +5243,57 @@ impl Instruction {
             }
             [149u8, 117u8, 11u8, 237u8, 47u8, 95u8, 89u8, 237u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = PlaceAndMakePerpOrderArguments::deserialize(&mut rdr)?;
+                let order_type: OrderType =
+                    <OrderType as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let market_type: MarketType =
+                    <MarketType as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let direction: PositionDirection =
+                    <PositionDirection as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let user_order_id: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let base_asset_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let price: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let market_index: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let reduce_only: bool = <bool as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let post_only: PostOnlyParam =
+                    <PostOnlyParam as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let bit_flags: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let max_ts: Option<i64> = parse_option(&mut rdr)?;
+                let trigger_price: Option<u64> = parse_option(&mut rdr)?;
+                let trigger_condition: OrderTriggerCondition =
+                    <OrderTriggerCondition as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let oracle_price_offset: Option<i32> = parse_option(&mut rdr)?;
+                let auction_duration: Option<u8> = parse_option(&mut rdr)?;
+                let auction_start_price: Option<i64> = parse_option(&mut rdr)?;
+                let auction_end_price: Option<i64> = parse_option(&mut rdr)?;
+                let params = OrderParams {
+                    order_type,
+                    market_type,
+                    direction,
+                    user_order_id,
+                    base_asset_amount,
+                    price,
+                    market_index,
+                    reduce_only,
+                    post_only,
+                    bit_flags,
+                    max_ts,
+                    trigger_price,
+                    trigger_condition,
+                    oracle_price_offset,
+                    auction_duration,
+                    auction_start_price,
+                    auction_end_price,
+                };
+                let taker_order_id: u32 =
+                    <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = PlaceAndMakePerpOrderArguments {
+                    params,
+                    taker_order_id,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 6usize;
                 let state = keys.next().unwrap().clone();
                 let user = keys.next().unwrap().clone();
                 let userStats = keys.next().unwrap().clone();
@@ -4661,8 +5314,57 @@ impl Instruction {
             }
             [16u8, 26u8, 123u8, 131u8, 94u8, 29u8, 175u8, 98u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = PlaceAndMakeSignedMsgPerpOrderArguments::deserialize(&mut rdr)?;
+                let order_type: OrderType =
+                    <OrderType as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let market_type: MarketType =
+                    <MarketType as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let direction: PositionDirection =
+                    <PositionDirection as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let user_order_id: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let base_asset_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let price: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let market_index: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let reduce_only: bool = <bool as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let post_only: PostOnlyParam =
+                    <PostOnlyParam as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let bit_flags: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let max_ts: Option<i64> = parse_option(&mut rdr)?;
+                let trigger_price: Option<u64> = parse_option(&mut rdr)?;
+                let trigger_condition: OrderTriggerCondition =
+                    <OrderTriggerCondition as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let oracle_price_offset: Option<i32> = parse_option(&mut rdr)?;
+                let auction_duration: Option<u8> = parse_option(&mut rdr)?;
+                let auction_start_price: Option<i64> = parse_option(&mut rdr)?;
+                let auction_end_price: Option<i64> = parse_option(&mut rdr)?;
+                let params = OrderParams {
+                    order_type,
+                    market_type,
+                    direction,
+                    user_order_id,
+                    base_asset_amount,
+                    price,
+                    market_index,
+                    reduce_only,
+                    post_only,
+                    bit_flags,
+                    max_ts,
+                    trigger_price,
+                    trigger_condition,
+                    oracle_price_offset,
+                    auction_duration,
+                    auction_start_price,
+                    auction_end_price,
+                };
+                let signed_msg_order_uuid: [u8; 8usize] =
+                    <[u8; 8usize] as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = PlaceAndMakeSignedMsgPerpOrderArguments {
+                    params,
+                    signed_msg_order_uuid,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 7usize;
                 let state = keys.next().unwrap().clone();
                 let user = keys.next().unwrap().clone();
                 let userStats = keys.next().unwrap().clone();
@@ -4685,8 +5387,17 @@ impl Instruction {
             }
             [32u8, 79u8, 101u8, 139u8, 25u8, 6u8, 98u8, 15u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = PlaceSignedMsgTakerOrderArguments::deserialize(&mut rdr)?;
+                let signed_msg_order_params_message_bytes: Vec<u8> =
+                    <Vec<u8> as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let is_delegate_signer: bool =
+                    <bool as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = PlaceSignedMsgTakerOrderArguments {
+                    signed_msg_order_params_message_bytes,
+                    is_delegate_signer,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 6usize;
                 let state = keys.next().unwrap().clone();
                 let user = keys.next().unwrap().clone();
                 let userStats = keys.next().unwrap().clone();
@@ -4707,8 +5418,52 @@ impl Instruction {
             }
             [45u8, 79u8, 81u8, 160u8, 248u8, 90u8, 91u8, 220u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = PlaceSpotOrderArguments::deserialize(&mut rdr)?;
+                let order_type: OrderType =
+                    <OrderType as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let market_type: MarketType =
+                    <MarketType as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let direction: PositionDirection =
+                    <PositionDirection as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let user_order_id: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let base_asset_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let price: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let market_index: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let reduce_only: bool = <bool as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let post_only: PostOnlyParam =
+                    <PostOnlyParam as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let bit_flags: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let max_ts: Option<i64> = parse_option(&mut rdr)?;
+                let trigger_price: Option<u64> = parse_option(&mut rdr)?;
+                let trigger_condition: OrderTriggerCondition =
+                    <OrderTriggerCondition as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let oracle_price_offset: Option<i32> = parse_option(&mut rdr)?;
+                let auction_duration: Option<u8> = parse_option(&mut rdr)?;
+                let auction_start_price: Option<i64> = parse_option(&mut rdr)?;
+                let auction_end_price: Option<i64> = parse_option(&mut rdr)?;
+                let params = OrderParams {
+                    order_type,
+                    market_type,
+                    direction,
+                    user_order_id,
+                    base_asset_amount,
+                    price,
+                    market_index,
+                    reduce_only,
+                    post_only,
+                    bit_flags,
+                    max_ts,
+                    trigger_price,
+                    trigger_condition,
+                    oracle_price_offset,
+                    auction_duration,
+                    auction_start_price,
+                    auction_end_price,
+                };
+                let args = PlaceSpotOrderArguments { params };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let state = keys.next().unwrap().clone();
                 let user = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
@@ -4723,8 +5478,58 @@ impl Instruction {
             }
             [191u8, 3u8, 138u8, 71u8, 114u8, 198u8, 202u8, 100u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = PlaceAndTakeSpotOrderArguments::deserialize(&mut rdr)?;
+                let order_type: OrderType =
+                    <OrderType as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let market_type: MarketType =
+                    <MarketType as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let direction: PositionDirection =
+                    <PositionDirection as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let user_order_id: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let base_asset_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let price: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let market_index: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let reduce_only: bool = <bool as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let post_only: PostOnlyParam =
+                    <PostOnlyParam as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let bit_flags: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let max_ts: Option<i64> = parse_option(&mut rdr)?;
+                let trigger_price: Option<u64> = parse_option(&mut rdr)?;
+                let trigger_condition: OrderTriggerCondition =
+                    <OrderTriggerCondition as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let oracle_price_offset: Option<i32> = parse_option(&mut rdr)?;
+                let auction_duration: Option<u8> = parse_option(&mut rdr)?;
+                let auction_start_price: Option<i64> = parse_option(&mut rdr)?;
+                let auction_end_price: Option<i64> = parse_option(&mut rdr)?;
+                let params = OrderParams {
+                    order_type,
+                    market_type,
+                    direction,
+                    user_order_id,
+                    base_asset_amount,
+                    price,
+                    market_index,
+                    reduce_only,
+                    post_only,
+                    bit_flags,
+                    max_ts,
+                    trigger_price,
+                    trigger_condition,
+                    oracle_price_offset,
+                    auction_duration,
+                    auction_start_price,
+                    auction_end_price,
+                };
+                let fulfillment_type: Option<SpotFulfillmentType> = parse_option(&mut rdr)?;
+                let maker_order_id: Option<u32> = parse_option(&mut rdr)?;
+                let args = PlaceAndTakeSpotOrderArguments {
+                    params,
+                    fulfillment_type,
+                    maker_order_id,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 4usize;
                 let state = keys.next().unwrap().clone();
                 let user = keys.next().unwrap().clone();
                 let userStats = keys.next().unwrap().clone();
@@ -4741,8 +5546,59 @@ impl Instruction {
             }
             [149u8, 158u8, 85u8, 66u8, 239u8, 9u8, 243u8, 98u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = PlaceAndMakeSpotOrderArguments::deserialize(&mut rdr)?;
+                let order_type: OrderType =
+                    <OrderType as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let market_type: MarketType =
+                    <MarketType as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let direction: PositionDirection =
+                    <PositionDirection as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let user_order_id: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let base_asset_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let price: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let market_index: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let reduce_only: bool = <bool as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let post_only: PostOnlyParam =
+                    <PostOnlyParam as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let bit_flags: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let max_ts: Option<i64> = parse_option(&mut rdr)?;
+                let trigger_price: Option<u64> = parse_option(&mut rdr)?;
+                let trigger_condition: OrderTriggerCondition =
+                    <OrderTriggerCondition as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let oracle_price_offset: Option<i32> = parse_option(&mut rdr)?;
+                let auction_duration: Option<u8> = parse_option(&mut rdr)?;
+                let auction_start_price: Option<i64> = parse_option(&mut rdr)?;
+                let auction_end_price: Option<i64> = parse_option(&mut rdr)?;
+                let params = OrderParams {
+                    order_type,
+                    market_type,
+                    direction,
+                    user_order_id,
+                    base_asset_amount,
+                    price,
+                    market_index,
+                    reduce_only,
+                    post_only,
+                    bit_flags,
+                    max_ts,
+                    trigger_price,
+                    trigger_condition,
+                    oracle_price_offset,
+                    auction_duration,
+                    auction_start_price,
+                    auction_end_price,
+                };
+                let taker_order_id: u32 =
+                    <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let fulfillment_type: Option<SpotFulfillmentType> = parse_option(&mut rdr)?;
+                let args = PlaceAndMakeSpotOrderArguments {
+                    params,
+                    taker_order_id,
+                    fulfillment_type,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 6usize;
                 let state = keys.next().unwrap().clone();
                 let user = keys.next().unwrap().clone();
                 let userStats = keys.next().unwrap().clone();
@@ -4763,8 +5619,12 @@ impl Instruction {
             }
             [60u8, 63u8, 50u8, 123u8, 12u8, 197u8, 60u8, 190u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = PlaceOrdersArguments::deserialize(&mut rdr)?;
+                let params: Vec<OrderParams> =
+                    <Vec<OrderParams> as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = PlaceOrdersArguments { params };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let state = keys.next().unwrap().clone();
                 let user = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
@@ -4779,8 +5639,19 @@ impl Instruction {
             }
             [174u8, 109u8, 228u8, 1u8, 242u8, 105u8, 232u8, 105u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = BeginSwapArguments::deserialize(&mut rdr)?;
+                let in_market_index: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let out_market_index: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let amount_in: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = BeginSwapArguments {
+                    in_market_index,
+                    out_market_index,
+                    amount_in,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 11usize;
                 let state = keys.next().unwrap().clone();
                 let user = keys.next().unwrap().clone();
                 let userStats = keys.next().unwrap().clone();
@@ -4811,8 +5682,21 @@ impl Instruction {
             }
             [177u8, 184u8, 27u8, 193u8, 34u8, 13u8, 210u8, 145u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = EndSwapArguments::deserialize(&mut rdr)?;
+                let in_market_index: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let out_market_index: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let limit_price: Option<u64> = parse_option(&mut rdr)?;
+                let reduce_only: Option<SwapReduceOnly> = parse_option(&mut rdr)?;
+                let args = EndSwapArguments {
+                    in_market_index,
+                    out_market_index,
+                    limit_price,
+                    reduce_only,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 11usize;
                 let state = keys.next().unwrap().clone();
                 let user = keys.next().unwrap().clone();
                 let userStats = keys.next().unwrap().clone();
@@ -4843,8 +5727,15 @@ impl Instruction {
             }
             [56u8, 209u8, 56u8, 197u8, 119u8, 254u8, 188u8, 117u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = AddPerpLpSharesArguments::deserialize(&mut rdr)?;
+                let n_shares: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let market_index: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = AddPerpLpSharesArguments {
+                    n_shares,
+                    market_index,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let state = keys.next().unwrap().clone();
                 let user = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
@@ -4859,8 +5750,16 @@ impl Instruction {
             }
             [213u8, 89u8, 217u8, 18u8, 160u8, 55u8, 53u8, 141u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = RemovePerpLpSharesArguments::deserialize(&mut rdr)?;
+                let shares_to_burn: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let market_index: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = RemovePerpLpSharesArguments {
+                    shares_to_burn,
+                    market_index,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let state = keys.next().unwrap().clone();
                 let user = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
@@ -4875,8 +5774,16 @@ impl Instruction {
             }
             [83u8, 254u8, 253u8, 137u8, 59u8, 122u8, 68u8, 156u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = RemovePerpLpSharesInExpiringMarketArguments::deserialize(&mut rdr)?;
+                let shares_to_burn: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let market_index: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = RemovePerpLpSharesInExpiringMarketArguments {
+                    shares_to_burn,
+                    market_index,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let state = keys.next().unwrap().clone();
                 let user = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -4889,8 +5796,17 @@ impl Instruction {
             }
             [135u8, 25u8, 185u8, 56u8, 165u8, 53u8, 34u8, 136u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateUserNameArguments::deserialize(&mut rdr)?;
+                let sub_account_id: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let name: [u8; 32usize] =
+                    <[u8; 32usize] as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateUserNameArguments {
+                    sub_account_id,
+                    name,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let user = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -4903,8 +5819,16 @@ impl Instruction {
             }
             [21u8, 221u8, 140u8, 187u8, 32u8, 129u8, 11u8, 123u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateUserCustomMarginRatioArguments::deserialize(&mut rdr)?;
+                let sub_account_id: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let margin_ratio: u32 = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateUserCustomMarginRatioArguments {
+                    sub_account_id,
+                    margin_ratio,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let user = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -4917,8 +5841,17 @@ impl Instruction {
             }
             [194u8, 92u8, 204u8, 223u8, 246u8, 188u8, 31u8, 203u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateUserMarginTradingEnabledArguments::deserialize(&mut rdr)?;
+                let sub_account_id: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let margin_trading_enabled: bool =
+                    <bool as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateUserMarginTradingEnabledArguments {
+                    sub_account_id,
+                    margin_trading_enabled,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let user = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -4931,8 +5864,16 @@ impl Instruction {
             }
             [219u8, 86u8, 73u8, 106u8, 56u8, 218u8, 128u8, 109u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateUserPoolIdArguments::deserialize(&mut rdr)?;
+                let sub_account_id: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let pool_id: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateUserPoolIdArguments {
+                    sub_account_id,
+                    pool_id,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let user = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -4945,8 +5886,17 @@ impl Instruction {
             }
             [139u8, 205u8, 141u8, 141u8, 113u8, 36u8, 94u8, 187u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateUserDelegateArguments::deserialize(&mut rdr)?;
+                let sub_account_id: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let delegate: [u8; 32usize] =
+                    <[u8; 32usize] as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateUserDelegateArguments {
+                    sub_account_id,
+                    delegate,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let user = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -4959,8 +5909,16 @@ impl Instruction {
             }
             [199u8, 71u8, 42u8, 67u8, 144u8, 19u8, 86u8, 109u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateUserReduceOnlyArguments::deserialize(&mut rdr)?;
+                let sub_account_id: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let reduce_only: bool = <bool as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateUserReduceOnlyArguments {
+                    sub_account_id,
+                    reduce_only,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let user = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -4973,8 +5931,16 @@ impl Instruction {
             }
             [66u8, 80u8, 107u8, 186u8, 27u8, 242u8, 66u8, 95u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateUserAdvancedLpArguments::deserialize(&mut rdr)?;
+                let sub_account_id: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let advanced_lp: bool = <bool as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateUserAdvancedLpArguments {
+                    sub_account_id,
+                    advanced_lp,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let user = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -4987,8 +5953,17 @@ impl Instruction {
             }
             [114u8, 39u8, 123u8, 198u8, 187u8, 25u8, 90u8, 219u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateUserProtectedMakerOrdersArguments::deserialize(&mut rdr)?;
+                let sub_account_id: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let protected_maker_orders: bool =
+                    <bool as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateUserProtectedMakerOrdersArguments {
+                    sub_account_id,
+                    protected_maker_orders,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 4usize;
                 let state = keys.next().unwrap().clone();
                 let user = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
@@ -5005,8 +5980,10 @@ impl Instruction {
             }
             [186u8, 85u8, 17u8, 249u8, 219u8, 231u8, 98u8, 251u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = DeleteUserArguments::deserialize(&mut rdr)?;
+                let args = DeleteUserArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 4usize;
                 let user = keys.next().unwrap().clone();
                 let userStats = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
@@ -5023,8 +6000,10 @@ impl Instruction {
             }
             [2u8, 241u8, 195u8, 172u8, 227u8, 24u8, 254u8, 158u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = ForceDeleteUserArguments::deserialize(&mut rdr)?;
+                let args = ForceDeleteUserArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 6usize;
                 let user = keys.next().unwrap().clone();
                 let userStats = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
@@ -5045,8 +6024,10 @@ impl Instruction {
             }
             [221u8, 247u8, 128u8, 253u8, 212u8, 254u8, 46u8, 153u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = DeleteSignedMsgUserOrdersArguments::deserialize(&mut rdr)?;
+                let args = DeleteSignedMsgUserOrdersArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let signedMsgUserOrders = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
@@ -5061,8 +6042,10 @@ impl Instruction {
             }
             [218u8, 200u8, 19u8, 197u8, 227u8, 89u8, 192u8, 22u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = ReclaimRentArguments::deserialize(&mut rdr)?;
+                let args = ReclaimRentArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 5usize;
                 let user = keys.next().unwrap().clone();
                 let userStats = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
@@ -5081,8 +6064,12 @@ impl Instruction {
             }
             [231u8, 24u8, 230u8, 112u8, 201u8, 173u8, 73u8, 184u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = EnableUserHighLeverageModeArguments::deserialize(&mut rdr)?;
+                let sub_account_id: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = EnableUserHighLeverageModeArguments { sub_account_id };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 4usize;
                 let state = keys.next().unwrap().clone();
                 let user = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
@@ -5099,8 +6086,15 @@ impl Instruction {
             }
             [13u8, 188u8, 248u8, 103u8, 134u8, 217u8, 106u8, 240u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = FillPerpOrderArguments::deserialize(&mut rdr)?;
+                let order_id: Option<u32> = parse_option(&mut rdr)?;
+                let maker_order_id: Option<u32> = parse_option(&mut rdr)?;
+                let args = FillPerpOrderArguments {
+                    order_id,
+                    maker_order_id,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 6usize;
                 let state = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
                 let filler = keys.next().unwrap().clone();
@@ -5121,8 +6115,10 @@ impl Instruction {
             }
             [236u8, 238u8, 176u8, 69u8, 239u8, 10u8, 181u8, 193u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = RevertFillArguments::deserialize(&mut rdr)?;
+                let args = RevertFillArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 4usize;
                 let state = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
                 let filler = keys.next().unwrap().clone();
@@ -5139,8 +6135,17 @@ impl Instruction {
             }
             [212u8, 206u8, 130u8, 173u8, 21u8, 34u8, 199u8, 40u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = FillSpotOrderArguments::deserialize(&mut rdr)?;
+                let order_id: Option<u32> = parse_option(&mut rdr)?;
+                let fulfillment_type: Option<SpotFulfillmentType> = parse_option(&mut rdr)?;
+                let maker_order_id: Option<u32> = parse_option(&mut rdr)?;
+                let args = FillSpotOrderArguments {
+                    order_id,
+                    fulfillment_type,
+                    maker_order_id,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 6usize;
                 let state = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
                 let filler = keys.next().unwrap().clone();
@@ -5161,8 +6166,11 @@ impl Instruction {
             }
             [63u8, 112u8, 51u8, 233u8, 232u8, 47u8, 240u8, 199u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = TriggerOrderArguments::deserialize(&mut rdr)?;
+                let order_id: u32 = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = TriggerOrderArguments { order_id };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 4usize;
                 let state = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
                 let filler = keys.next().unwrap().clone();
@@ -5179,8 +6187,10 @@ impl Instruction {
             }
             [64u8, 181u8, 196u8, 63u8, 222u8, 72u8, 64u8, 232u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = ForceCancelOrdersArguments::deserialize(&mut rdr)?;
+                let args = ForceCancelOrdersArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 4usize;
                 let state = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
                 let filler = keys.next().unwrap().clone();
@@ -5197,8 +6207,10 @@ impl Instruction {
             }
             [253u8, 133u8, 67u8, 22u8, 103u8, 161u8, 20u8, 100u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateUserIdleArguments::deserialize(&mut rdr)?;
+                let args = UpdateUserIdleArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 4usize;
                 let state = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
                 let filler = keys.next().unwrap().clone();
@@ -5215,8 +6227,10 @@ impl Instruction {
             }
             [162u8, 21u8, 35u8, 251u8, 32u8, 57u8, 161u8, 210u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = LogUserBalancesArguments::deserialize(&mut rdr)?;
+                let args = LogUserBalancesArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let state = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
                 let user = keys.next().unwrap().clone();
@@ -5231,8 +6245,10 @@ impl Instruction {
             }
             [183u8, 155u8, 45u8, 0u8, 226u8, 85u8, 213u8, 69u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = DisableUserHighLeverageModeArguments::deserialize(&mut rdr)?;
+                let args = DisableUserHighLeverageModeArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 4usize;
                 let state = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
                 let user = keys.next().unwrap().clone();
@@ -5249,8 +6265,10 @@ impl Instruction {
             }
             [88u8, 175u8, 201u8, 190u8, 222u8, 100u8, 143u8, 57u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateUserFuelBonusArguments::deserialize(&mut rdr)?;
+                let args = UpdateUserFuelBonusArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 4usize;
                 let state = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
                 let user = keys.next().unwrap().clone();
@@ -5267,8 +6285,10 @@ impl Instruction {
             }
             [174u8, 154u8, 72u8, 42u8, 191u8, 148u8, 145u8, 205u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateUserStatsReferrerStatusArguments::deserialize(&mut rdr)?;
+                let args = UpdateUserStatsReferrerStatusArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let state = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
                 let userStats = keys.next().unwrap().clone();
@@ -5283,8 +6303,10 @@ impl Instruction {
             }
             [104u8, 39u8, 65u8, 210u8, 250u8, 163u8, 100u8, 134u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateUserOpenOrdersCountArguments::deserialize(&mut rdr)?;
+                let args = UpdateUserOpenOrdersCountArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 4usize;
                 let state = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
                 let filler = keys.next().unwrap().clone();
@@ -5301,8 +6323,11 @@ impl Instruction {
             }
             [17u8, 164u8, 82u8, 45u8, 183u8, 86u8, 191u8, 199u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = AdminDisableUpdatePerpBidAskTwapArguments::deserialize(&mut rdr)?;
+                let disable: bool = <bool as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = AdminDisableUpdatePerpBidAskTwapArguments { disable };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let userStats = keys.next().unwrap().clone();
@@ -5317,8 +6342,11 @@ impl Instruction {
             }
             [43u8, 61u8, 234u8, 45u8, 15u8, 95u8, 152u8, 153u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = SettlePnlArguments::deserialize(&mut rdr)?;
+                let market_index: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = SettlePnlArguments { market_index };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 4usize;
                 let state = keys.next().unwrap().clone();
                 let user = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
@@ -5335,8 +6363,17 @@ impl Instruction {
             }
             [127u8, 66u8, 117u8, 57u8, 40u8, 50u8, 152u8, 127u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = SettleMultiplePnlsArguments::deserialize(&mut rdr)?;
+                let market_indexes: Vec<u16> =
+                    <Vec<u16> as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let mode: SettlePnlMode =
+                    <SettlePnlMode as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = SettleMultiplePnlsArguments {
+                    market_indexes,
+                    mode,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 4usize;
                 let state = keys.next().unwrap().clone();
                 let user = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
@@ -5353,8 +6390,10 @@ impl Instruction {
             }
             [222u8, 90u8, 202u8, 94u8, 28u8, 45u8, 115u8, 183u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = SettleFundingPaymentArguments::deserialize(&mut rdr)?;
+                let args = SettleFundingPaymentArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let state = keys.next().unwrap().clone();
                 let user = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -5367,8 +6406,11 @@ impl Instruction {
             }
             [155u8, 231u8, 116u8, 113u8, 97u8, 229u8, 139u8, 141u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = SettleLpArguments::deserialize(&mut rdr)?;
+                let market_index: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = SettleLpArguments { market_index };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let state = keys.next().unwrap().clone();
                 let user = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -5381,8 +6423,11 @@ impl Instruction {
             }
             [120u8, 89u8, 11u8, 25u8, 122u8, 77u8, 72u8, 193u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = SettleExpiredMarketArguments::deserialize(&mut rdr)?;
+                let market_index: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = SettleExpiredMarketArguments { market_index };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -5397,8 +6442,18 @@ impl Instruction {
             }
             [75u8, 35u8, 119u8, 247u8, 191u8, 18u8, 139u8, 2u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = LiquidatePerpArguments::deserialize(&mut rdr)?;
+                let market_index: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let liquidator_max_base_asset_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let limit_price: Option<u64> = parse_option(&mut rdr)?;
+                let args = LiquidatePerpArguments {
+                    market_index,
+                    liquidator_max_base_asset_amount,
+                    limit_price,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 6usize;
                 let state = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
                 let liquidator = keys.next().unwrap().clone();
@@ -5419,8 +6474,11 @@ impl Instruction {
             }
             [95u8, 111u8, 124u8, 105u8, 86u8, 169u8, 187u8, 34u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = LiquidatePerpWithFillArguments::deserialize(&mut rdr)?;
+                let market_index: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = LiquidatePerpWithFillArguments { market_index };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 6usize;
                 let state = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
                 let liquidator = keys.next().unwrap().clone();
@@ -5441,8 +6499,22 @@ impl Instruction {
             }
             [107u8, 0u8, 128u8, 41u8, 35u8, 229u8, 251u8, 18u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = LiquidateSpotArguments::deserialize(&mut rdr)?;
+                let asset_market_index: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let liability_market_index: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let liquidator_max_liability_transfer: u128 =
+                    <u128 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let limit_price: Option<u64> = parse_option(&mut rdr)?;
+                let args = LiquidateSpotArguments {
+                    asset_market_index,
+                    liability_market_index,
+                    liquidator_max_liability_transfer,
+                    limit_price,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 6usize;
                 let state = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
                 let liquidator = keys.next().unwrap().clone();
@@ -5463,8 +6535,19 @@ impl Instruction {
             }
             [12u8, 43u8, 176u8, 83u8, 156u8, 251u8, 117u8, 13u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = LiquidateSpotWithSwapBeginArguments::deserialize(&mut rdr)?;
+                let asset_market_index: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let liability_market_index: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let swap_amount: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = LiquidateSpotWithSwapBeginArguments {
+                    asset_market_index,
+                    liability_market_index,
+                    swap_amount,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 13usize;
                 let state = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
                 let liquidator = keys.next().unwrap().clone();
@@ -5499,8 +6582,17 @@ impl Instruction {
             }
             [142u8, 88u8, 163u8, 160u8, 223u8, 75u8, 55u8, 225u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = LiquidateSpotWithSwapEndArguments::deserialize(&mut rdr)?;
+                let asset_market_index: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let liability_market_index: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = LiquidateSpotWithSwapEndArguments {
+                    asset_market_index,
+                    liability_market_index,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 13usize;
                 let state = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
                 let liquidator = keys.next().unwrap().clone();
@@ -5535,8 +6627,22 @@ impl Instruction {
             }
             [169u8, 17u8, 32u8, 90u8, 207u8, 148u8, 209u8, 27u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = LiquidateBorrowForPerpPnlArguments::deserialize(&mut rdr)?;
+                let perp_market_index: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let spot_market_index: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let liquidator_max_liability_transfer: u128 =
+                    <u128 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let limit_price: Option<u64> = parse_option(&mut rdr)?;
+                let args = LiquidateBorrowForPerpPnlArguments {
+                    perp_market_index,
+                    spot_market_index,
+                    liquidator_max_liability_transfer,
+                    limit_price,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 6usize;
                 let state = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
                 let liquidator = keys.next().unwrap().clone();
@@ -5557,8 +6663,22 @@ impl Instruction {
             }
             [237u8, 75u8, 198u8, 235u8, 233u8, 186u8, 75u8, 35u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = LiquidatePerpPnlForDepositArguments::deserialize(&mut rdr)?;
+                let perp_market_index: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let spot_market_index: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let liquidator_max_pnl_transfer: u128 =
+                    <u128 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let limit_price: Option<u64> = parse_option(&mut rdr)?;
+                let args = LiquidatePerpPnlForDepositArguments {
+                    perp_market_index,
+                    spot_market_index,
+                    liquidator_max_pnl_transfer,
+                    limit_price,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 6usize;
                 let state = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
                 let liquidator = keys.next().unwrap().clone();
@@ -5579,8 +6699,10 @@ impl Instruction {
             }
             [106u8, 133u8, 160u8, 206u8, 193u8, 171u8, 192u8, 194u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = SetUserStatusToBeingLiquidatedArguments::deserialize(&mut rdr)?;
+                let args = SetUserStatusToBeingLiquidatedArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let state = keys.next().unwrap().clone();
                 let user = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
@@ -5595,8 +6717,17 @@ impl Instruction {
             }
             [168u8, 204u8, 68u8, 150u8, 159u8, 126u8, 95u8, 148u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = ResolvePerpPnlDeficitArguments::deserialize(&mut rdr)?;
+                let spot_market_index: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let perp_market_index: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = ResolvePerpPnlDeficitArguments {
+                    spot_market_index,
+                    perp_market_index,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 6usize;
                 let state = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
                 let spotMarketVault = keys.next().unwrap().clone();
@@ -5617,8 +6748,16 @@ impl Instruction {
             }
             [224u8, 16u8, 176u8, 214u8, 162u8, 213u8, 183u8, 222u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = ResolvePerpBankruptcyArguments::deserialize(&mut rdr)?;
+                let quote_spot_market_index: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let market_index: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = ResolvePerpBankruptcyArguments {
+                    quote_spot_market_index,
+                    market_index,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 10usize;
                 let state = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
                 let liquidator = keys.next().unwrap().clone();
@@ -5647,8 +6786,11 @@ impl Instruction {
             }
             [124u8, 194u8, 240u8, 254u8, 198u8, 213u8, 52u8, 122u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = ResolveSpotBankruptcyArguments::deserialize(&mut rdr)?;
+                let market_index: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = ResolveSpotBankruptcyArguments { market_index };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 10usize;
                 let state = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
                 let liquidator = keys.next().unwrap().clone();
@@ -5677,8 +6819,12 @@ impl Instruction {
             }
             [200u8, 120u8, 93u8, 136u8, 69u8, 38u8, 199u8, 159u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = SettleRevenueToInsuranceFundArguments::deserialize(&mut rdr)?;
+                let spot_market_index: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = SettleRevenueToInsuranceFundArguments { spot_market_index };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 6usize;
                 let state = keys.next().unwrap().clone();
                 let spotMarket = keys.next().unwrap().clone();
                 let spotMarketVault = keys.next().unwrap().clone();
@@ -5699,8 +6845,11 @@ impl Instruction {
             }
             [201u8, 178u8, 116u8, 212u8, 166u8, 144u8, 72u8, 238u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateFundingRateArguments::deserialize(&mut rdr)?;
+                let market_index: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateFundingRateArguments { market_index };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
                 let oracle = keys.next().unwrap().clone();
@@ -5715,8 +6864,10 @@ impl Instruction {
             }
             [220u8, 132u8, 27u8, 27u8, 233u8, 220u8, 61u8, 219u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdatePrelaunchOracleArguments::deserialize(&mut rdr)?;
+                let args = UpdatePrelaunchOracleArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
                 let oracle = keys.next().unwrap().clone();
@@ -5731,8 +6882,10 @@ impl Instruction {
             }
             [247u8, 23u8, 255u8, 65u8, 212u8, 90u8, 221u8, 194u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdatePerpBidAskTwapArguments::deserialize(&mut rdr)?;
+                let args = UpdatePerpBidAskTwapArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 5usize;
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
                 let oracle = keys.next().unwrap().clone();
@@ -5751,12 +6904,18 @@ impl Instruction {
             }
             [39u8, 166u8, 139u8, 243u8, 158u8, 165u8, 155u8, 225u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateSpotMarketCumulativeInterestArguments::deserialize(&mut rdr)?;
+                let args = UpdateSpotMarketCumulativeInterestArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let state = keys.next().unwrap().clone();
                 let spotMarket = keys.next().unwrap().clone();
                 let oracle = keys.next().unwrap().clone();
-                let spotMarketVault = keys.next().unwrap().clone();
+                let spotMarketVault = if has_extra {
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let remaining = keys.cloned().collect();
                 let accounts = UpdateSpotMarketCumulativeInterestAccounts {
                     state,
@@ -5769,8 +6928,12 @@ impl Instruction {
             }
             [201u8, 106u8, 217u8, 253u8, 4u8, 175u8, 228u8, 97u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateAmmsArguments::deserialize(&mut rdr)?;
+                let market_indexes: [u16; 5usize] =
+                    <[u16; 5usize] as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateAmmsArguments { market_indexes };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let state = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -5783,8 +6946,11 @@ impl Instruction {
             }
             [208u8, 11u8, 211u8, 159u8, 226u8, 24u8, 11u8, 247u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateSpotMarketExpiryArguments::deserialize(&mut rdr)?;
+                let expiry_ts: i64 = <i64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateSpotMarketExpiryArguments { expiry_ts };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let spotMarket = keys.next().unwrap().clone();
@@ -5799,8 +6965,10 @@ impl Instruction {
             }
             [251u8, 101u8, 156u8, 7u8, 2u8, 63u8, 30u8, 23u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateUserQuoteAssetInsuranceStakeArguments::deserialize(&mut rdr)?;
+                let args = UpdateUserQuoteAssetInsuranceStakeArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 6usize;
                 let state = keys.next().unwrap().clone();
                 let spotMarket = keys.next().unwrap().clone();
                 let insuranceFundStake = keys.next().unwrap().clone();
@@ -5821,8 +6989,10 @@ impl Instruction {
             }
             [143u8, 99u8, 235u8, 187u8, 20u8, 159u8, 184u8, 84u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateUserGovTokenInsuranceStakeArguments::deserialize(&mut rdr)?;
+                let args = UpdateUserGovTokenInsuranceStakeArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 6usize;
                 let state = keys.next().unwrap().clone();
                 let spotMarket = keys.next().unwrap().clone();
                 let insuranceFundStake = keys.next().unwrap().clone();
@@ -5843,8 +7013,12 @@ impl Instruction {
             }
             [129u8, 185u8, 243u8, 183u8, 228u8, 111u8, 64u8, 175u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateUserGovTokenInsuranceStakeDevnetArguments::deserialize(&mut rdr)?;
+                let gov_stake_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateUserGovTokenInsuranceStakeDevnetArguments { gov_stake_amount };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let userStats = keys.next().unwrap().clone();
                 let signer = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -5857,8 +7031,11 @@ impl Instruction {
             }
             [187u8, 179u8, 243u8, 70u8, 248u8, 90u8, 92u8, 147u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitializeInsuranceFundStakeArguments::deserialize(&mut rdr)?;
+                let market_index: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = InitializeInsuranceFundStakeArguments { market_index };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 8usize;
                 let spotMarket = keys.next().unwrap().clone();
                 let insuranceFundStake = keys.next().unwrap().clone();
                 let userStats = keys.next().unwrap().clone();
@@ -5883,8 +7060,15 @@ impl Instruction {
             }
             [251u8, 144u8, 115u8, 11u8, 222u8, 47u8, 62u8, 236u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = AddInsuranceFundStakeArguments::deserialize(&mut rdr)?;
+                let market_index: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let amount: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = AddInsuranceFundStakeArguments {
+                    market_index,
+                    amount,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 10usize;
                 let state = keys.next().unwrap().clone();
                 let spotMarket = keys.next().unwrap().clone();
                 let insuranceFundStake = keys.next().unwrap().clone();
@@ -5913,8 +7097,15 @@ impl Instruction {
             }
             [142u8, 70u8, 204u8, 92u8, 73u8, 106u8, 180u8, 52u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = RequestRemoveInsuranceFundStakeArguments::deserialize(&mut rdr)?;
+                let market_index: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let amount: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = RequestRemoveInsuranceFundStakeArguments {
+                    market_index,
+                    amount,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 5usize;
                 let spotMarket = keys.next().unwrap().clone();
                 let insuranceFundStake = keys.next().unwrap().clone();
                 let userStats = keys.next().unwrap().clone();
@@ -5933,8 +7124,11 @@ impl Instruction {
             }
             [97u8, 235u8, 78u8, 62u8, 212u8, 42u8, 241u8, 127u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = CancelRequestRemoveInsuranceFundStakeArguments::deserialize(&mut rdr)?;
+                let market_index: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = CancelRequestRemoveInsuranceFundStakeArguments { market_index };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 5usize;
                 let spotMarket = keys.next().unwrap().clone();
                 let insuranceFundStake = keys.next().unwrap().clone();
                 let userStats = keys.next().unwrap().clone();
@@ -5953,8 +7147,11 @@ impl Instruction {
             }
             [128u8, 166u8, 142u8, 9u8, 254u8, 187u8, 143u8, 174u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = RemoveInsuranceFundStakeArguments::deserialize(&mut rdr)?;
+                let market_index: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = RemoveInsuranceFundStakeArguments { market_index };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 9usize;
                 let state = keys.next().unwrap().clone();
                 let spotMarket = keys.next().unwrap().clone();
                 let insuranceFundStake = keys.next().unwrap().clone();
@@ -5981,8 +7178,15 @@ impl Instruction {
             }
             [94u8, 93u8, 226u8, 240u8, 195u8, 201u8, 184u8, 109u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = TransferProtocolIfSharesArguments::deserialize(&mut rdr)?;
+                let market_index: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let shares: u128 = <u128 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = TransferProtocolIfSharesArguments {
+                    market_index,
+                    shares,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 8usize;
                 let signer = keys.next().unwrap().clone();
                 let transferConfig = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
@@ -6005,10 +7209,127 @@ impl Instruction {
                 };
                 return Ok(Instruction::TransferProtocolIfShares { accounts, args });
             }
+            [176u8, 69u8, 143u8, 205u8, 32u8, 132u8, 163u8, 0u8] => {
+                let mut rdr: &[u8] = rest;
+                let in_market_index: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let out_market_index: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let amount_in: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = BeginInsuranceFundSwapArguments {
+                    in_market_index,
+                    out_market_index,
+                    amount_in,
+                };
+                let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 10usize;
+                let state = keys.next().unwrap().clone();
+                let authority = keys.next().unwrap().clone();
+                let outInsuranceFundVault = keys.next().unwrap().clone();
+                let inInsuranceFundVault = keys.next().unwrap().clone();
+                let outTokenAccount = keys.next().unwrap().clone();
+                let inTokenAccount = keys.next().unwrap().clone();
+                let ifRebalanceConfig = keys.next().unwrap().clone();
+                let tokenProgram = keys.next().unwrap().clone();
+                let driftSigner = keys.next().unwrap().clone();
+                let instructions = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = BeginInsuranceFundSwapAccounts {
+                    state,
+                    authority,
+                    outInsuranceFundVault,
+                    inInsuranceFundVault,
+                    outTokenAccount,
+                    inTokenAccount,
+                    ifRebalanceConfig,
+                    tokenProgram,
+                    driftSigner,
+                    instructions,
+                    remaining,
+                };
+                return Ok(Instruction::BeginInsuranceFundSwap { accounts, args });
+            }
+            [206u8, 230u8, 98u8, 8u8, 249u8, 158u8, 169u8, 167u8] => {
+                let mut rdr: &[u8] = rest;
+                let in_market_index: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let out_market_index: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = EndInsuranceFundSwapArguments {
+                    in_market_index,
+                    out_market_index,
+                };
+                let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 10usize;
+                let state = keys.next().unwrap().clone();
+                let authority = keys.next().unwrap().clone();
+                let outInsuranceFundVault = keys.next().unwrap().clone();
+                let inInsuranceFundVault = keys.next().unwrap().clone();
+                let outTokenAccount = keys.next().unwrap().clone();
+                let inTokenAccount = keys.next().unwrap().clone();
+                let ifRebalanceConfig = keys.next().unwrap().clone();
+                let tokenProgram = keys.next().unwrap().clone();
+                let driftSigner = keys.next().unwrap().clone();
+                let instructions = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = EndInsuranceFundSwapAccounts {
+                    state,
+                    authority,
+                    outInsuranceFundVault,
+                    inInsuranceFundVault,
+                    outTokenAccount,
+                    inTokenAccount,
+                    ifRebalanceConfig,
+                    tokenProgram,
+                    driftSigner,
+                    instructions,
+                    remaining,
+                };
+                return Ok(Instruction::EndInsuranceFundSwap { accounts, args });
+            }
+            [236u8, 136u8, 147u8, 153u8, 146u8, 205u8, 104u8, 29u8] => {
+                let mut rdr: &[u8] = rest;
+                let market_index: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let amount: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = TransferProtocolIfSharesToRevenuePoolArguments {
+                    market_index,
+                    amount,
+                };
+                let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 7usize;
+                let state = keys.next().unwrap().clone();
+                let authority = keys.next().unwrap().clone();
+                let insuranceFundVault = keys.next().unwrap().clone();
+                let spotMarketVault = keys.next().unwrap().clone();
+                let ifRebalanceConfig = keys.next().unwrap().clone();
+                let tokenProgram = keys.next().unwrap().clone();
+                let driftSigner = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = TransferProtocolIfSharesToRevenuePoolAccounts {
+                    state,
+                    authority,
+                    insuranceFundVault,
+                    spotMarketVault,
+                    ifRebalanceConfig,
+                    tokenProgram,
+                    driftSigner,
+                    remaining,
+                };
+                return Ok(Instruction::TransferProtocolIfSharesToRevenuePool { accounts, args });
+            }
             [230u8, 191u8, 189u8, 94u8, 108u8, 59u8, 74u8, 197u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdatePythPullOracleArguments::deserialize(&mut rdr)?;
+                let feed_id: [u8; 32usize] =
+                    <[u8; 32usize] as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let params: Vec<u8> =
+                    <Vec<u8> as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdatePythPullOracleArguments { feed_id, params };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 4usize;
                 let keeper = keys.next().unwrap().clone();
                 let pythSolanaReceiver = keys.next().unwrap().clone();
                 let encodedVaa = keys.next().unwrap().clone();
@@ -6025,8 +7346,14 @@ impl Instruction {
             }
             [116u8, 122u8, 137u8, 158u8, 224u8, 195u8, 173u8, 119u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = PostPythPullOracleUpdateAtomicArguments::deserialize(&mut rdr)?;
+                let feed_id: [u8; 32usize] =
+                    <[u8; 32usize] as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let params: Vec<u8> =
+                    <Vec<u8> as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = PostPythPullOracleUpdateAtomicArguments { feed_id, params };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 4usize;
                 let keeper = keys.next().unwrap().clone();
                 let pythSolanaReceiver = keys.next().unwrap().clone();
                 let guardianSet = keys.next().unwrap().clone();
@@ -6043,8 +7370,12 @@ impl Instruction {
             }
             [243u8, 79u8, 204u8, 228u8, 227u8, 208u8, 100u8, 244u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = PostMultiPythPullOracleUpdatesAtomicArguments::deserialize(&mut rdr)?;
+                let params: Vec<u8> =
+                    <Vec<u8> as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = PostMultiPythPullOracleUpdatesAtomicArguments { params };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let keeper = keys.next().unwrap().clone();
                 let pythSolanaReceiver = keys.next().unwrap().clone();
                 let guardianSet = keys.next().unwrap().clone();
@@ -6059,8 +7390,10 @@ impl Instruction {
             }
             [183u8, 119u8, 59u8, 170u8, 137u8, 35u8, 242u8, 86u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = PauseSpotMarketDepositWithdrawArguments::deserialize(&mut rdr)?;
+                let args = PauseSpotMarketDepositWithdrawArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 4usize;
                 let state = keys.next().unwrap().clone();
                 let keeper = keys.next().unwrap().clone();
                 let spotMarket = keys.next().unwrap().clone();
@@ -6077,8 +7410,10 @@ impl Instruction {
             }
             [175u8, 175u8, 109u8, 31u8, 13u8, 152u8, 155u8, 237u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitializeArguments::deserialize(&mut rdr)?;
+                let args = InitializeArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 7usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let quoteAssetMint = keys.next().unwrap().clone();
@@ -6101,8 +7436,67 @@ impl Instruction {
             }
             [234u8, 196u8, 128u8, 44u8, 94u8, 15u8, 48u8, 201u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitializeSpotMarketArguments::deserialize(&mut rdr)?;
+                let optimal_utilization: u32 =
+                    <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let optimal_borrow_rate: u32 =
+                    <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let max_borrow_rate: u32 =
+                    <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let oracle_source: OracleSource =
+                    <OracleSource as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let initial_asset_weight: u32 =
+                    <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let maintenance_asset_weight: u32 =
+                    <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let initial_liability_weight: u32 =
+                    <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let maintenance_liability_weight: u32 =
+                    <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let imf_factor: u32 = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let liquidator_fee: u32 =
+                    <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let if_liquidation_fee: u32 =
+                    <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let active_status: bool =
+                    <bool as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let asset_tier: AssetTier =
+                    <AssetTier as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let scale_initial_asset_weight_start: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let withdraw_guard_threshold: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let order_tick_size: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let order_step_size: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let if_total_factor: u32 =
+                    <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let name: [u8; 32usize] =
+                    <[u8; 32usize] as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = InitializeSpotMarketArguments {
+                    optimal_utilization,
+                    optimal_borrow_rate,
+                    max_borrow_rate,
+                    oracle_source,
+                    initial_asset_weight,
+                    maintenance_asset_weight,
+                    initial_liability_weight,
+                    maintenance_liability_weight,
+                    imf_factor,
+                    liquidator_fee,
+                    if_liquidation_fee,
+                    active_status,
+                    asset_tier,
+                    scale_initial_asset_weight_start,
+                    withdraw_guard_threshold,
+                    order_tick_size,
+                    order_step_size,
+                    if_total_factor,
+                    name,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 11usize;
                 let spotMarket = keys.next().unwrap().clone();
                 let spotMarketMint = keys.next().unwrap().clone();
                 let spotMarketVault = keys.next().unwrap().clone();
@@ -6133,8 +7527,11 @@ impl Instruction {
             }
             [31u8, 140u8, 67u8, 191u8, 189u8, 20u8, 101u8, 221u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = DeleteInitializedSpotMarketArguments::deserialize(&mut rdr)?;
+                let market_index: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = DeleteInitializedSpotMarketArguments { market_index };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 7usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let spotMarket = keys.next().unwrap().clone();
@@ -6157,8 +7554,11 @@ impl Instruction {
             }
             [193u8, 211u8, 132u8, 172u8, 70u8, 171u8, 7u8, 94u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitializeSerumFulfillmentConfigArguments::deserialize(&mut rdr)?;
+                let market_index: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = InitializeSerumFulfillmentConfigArguments { market_index };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 11usize;
                 let baseSpotMarket = keys.next().unwrap().clone();
                 let quoteSpotMarket = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
@@ -6189,8 +7589,14 @@ impl Instruction {
             }
             [171u8, 109u8, 240u8, 251u8, 95u8, 1u8, 149u8, 89u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateSerumFulfillmentConfigStatusArguments::deserialize(&mut rdr)?;
+                let status: SpotFulfillmentConfigStatus =
+                    <SpotFulfillmentConfigStatus as ::borsh::BorshDeserialize>::deserialize(
+                        &mut rdr,
+                    )?;
+                let args = UpdateSerumFulfillmentConfigStatusArguments { status };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let state = keys.next().unwrap().clone();
                 let serumFulfillmentConfig = keys.next().unwrap().clone();
                 let admin = keys.next().unwrap().clone();
@@ -6205,8 +7611,11 @@ impl Instruction {
             }
             [7u8, 221u8, 103u8, 153u8, 107u8, 57u8, 27u8, 197u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitializeOpenbookV2FulfillmentConfigArguments::deserialize(&mut rdr)?;
+                let market_index: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = InitializeOpenbookV2FulfillmentConfigArguments { market_index };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 10usize;
                 let baseSpotMarket = keys.next().unwrap().clone();
                 let quoteSpotMarket = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
@@ -6235,8 +7644,14 @@ impl Instruction {
             }
             [25u8, 173u8, 19u8, 189u8, 4u8, 211u8, 64u8, 238u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = OpenbookV2FulfillmentConfigStatusArguments::deserialize(&mut rdr)?;
+                let status: SpotFulfillmentConfigStatus =
+                    <SpotFulfillmentConfigStatus as ::borsh::BorshDeserialize>::deserialize(
+                        &mut rdr,
+                    )?;
+                let args = OpenbookV2FulfillmentConfigStatusArguments { status };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let state = keys.next().unwrap().clone();
                 let openbookV2FulfillmentConfig = keys.next().unwrap().clone();
                 let admin = keys.next().unwrap().clone();
@@ -6251,8 +7666,11 @@ impl Instruction {
             }
             [135u8, 132u8, 110u8, 107u8, 185u8, 160u8, 169u8, 154u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitializePhoenixFulfillmentConfigArguments::deserialize(&mut rdr)?;
+                let market_index: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = InitializePhoenixFulfillmentConfigArguments { market_index };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 10usize;
                 let baseSpotMarket = keys.next().unwrap().clone();
                 let quoteSpotMarket = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
@@ -6281,8 +7699,14 @@ impl Instruction {
             }
             [96u8, 31u8, 113u8, 32u8, 12u8, 203u8, 7u8, 154u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = PhoenixFulfillmentConfigStatusArguments::deserialize(&mut rdr)?;
+                let status: SpotFulfillmentConfigStatus =
+                    <SpotFulfillmentConfigStatus as ::borsh::BorshDeserialize>::deserialize(
+                        &mut rdr,
+                    )?;
+                let args = PhoenixFulfillmentConfigStatusArguments { status };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let state = keys.next().unwrap().clone();
                 let phoenixFulfillmentConfig = keys.next().unwrap().clone();
                 let admin = keys.next().unwrap().clone();
@@ -6297,8 +7721,10 @@ impl Instruction {
             }
             [219u8, 8u8, 246u8, 96u8, 169u8, 121u8, 91u8, 110u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateSerumVaultArguments::deserialize(&mut rdr)?;
+                let args = UpdateSerumVaultArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let state = keys.next().unwrap().clone();
                 let admin = keys.next().unwrap().clone();
                 let srmVault = keys.next().unwrap().clone();
@@ -6313,8 +7739,82 @@ impl Instruction {
             }
             [132u8, 9u8, 229u8, 118u8, 117u8, 118u8, 117u8, 62u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitializePerpMarketArguments::deserialize(&mut rdr)?;
+                let market_index: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let amm_base_asset_reserve: u128 =
+                    <u128 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let amm_quote_asset_reserve: u128 =
+                    <u128 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let amm_periodicity: i64 =
+                    <i64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let amm_peg_multiplier: u128 =
+                    <u128 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let oracle_source: OracleSource =
+                    <OracleSource as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let contract_tier: ContractTier =
+                    <ContractTier as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let margin_ratio_initial: u32 =
+                    <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let margin_ratio_maintenance: u32 =
+                    <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let liquidator_fee: u32 =
+                    <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let if_liquidation_fee: u32 =
+                    <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let imf_factor: u32 = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let active_status: bool =
+                    <bool as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let base_spread: u32 = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let max_spread: u32 = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let max_open_interest: u128 =
+                    <u128 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let max_revenue_withdraw_per_period: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let quote_max_insurance: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let order_step_size: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let order_tick_size: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let min_order_size: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let concentration_coef_scale: u128 =
+                    <u128 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let curve_update_intensity: u8 =
+                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let amm_jit_intensity: u8 =
+                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let name: [u8; 32usize] =
+                    <[u8; 32usize] as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = InitializePerpMarketArguments {
+                    market_index,
+                    amm_base_asset_reserve,
+                    amm_quote_asset_reserve,
+                    amm_periodicity,
+                    amm_peg_multiplier,
+                    oracle_source,
+                    contract_tier,
+                    margin_ratio_initial,
+                    margin_ratio_maintenance,
+                    liquidator_fee,
+                    if_liquidation_fee,
+                    imf_factor,
+                    active_status,
+                    base_spread,
+                    max_spread,
+                    max_open_interest,
+                    max_revenue_withdraw_per_period,
+                    quote_max_insurance,
+                    order_step_size,
+                    order_tick_size,
+                    min_order_size,
+                    concentration_coef_scale,
+                    curve_update_intensity,
+                    amm_jit_intensity,
+                    name,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 6usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -6335,8 +7835,10 @@ impl Instruction {
             }
             [248u8, 70u8, 198u8, 224u8, 224u8, 105u8, 125u8, 195u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitializePredictionMarketArguments::deserialize(&mut rdr)?;
+                let args = InitializePredictionMarketArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -6351,8 +7853,11 @@ impl Instruction {
             }
             [91u8, 154u8, 24u8, 87u8, 106u8, 59u8, 190u8, 66u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = DeleteInitializedPerpMarketArguments::deserialize(&mut rdr)?;
+                let market_index: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = DeleteInitializedPerpMarketArguments { market_index };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -6367,8 +7872,19 @@ impl Instruction {
             }
             [235u8, 109u8, 2u8, 82u8, 219u8, 118u8, 6u8, 159u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = MoveAmmPriceArguments::deserialize(&mut rdr)?;
+                let base_asset_reserve: u128 =
+                    <u128 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let quote_asset_reserve: u128 =
+                    <u128 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let sqrt_k: u128 = <u128 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = MoveAmmPriceArguments {
+                    base_asset_reserve,
+                    quote_asset_reserve,
+                    sqrt_k,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -6383,8 +7899,16 @@ impl Instruction {
             }
             [24u8, 87u8, 10u8, 115u8, 165u8, 190u8, 80u8, 139u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = RecenterPerpMarketAmmArguments::deserialize(&mut rdr)?;
+                let peg_multiplier: u128 =
+                    <u128 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let sqrt_k: u128 = <u128 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = RecenterPerpMarketAmmArguments {
+                    peg_multiplier,
+                    sqrt_k,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -6397,10 +7921,45 @@ impl Instruction {
                 };
                 return Ok(Instruction::RecenterPerpMarketAmm { accounts, args });
             }
+            [166u8, 19u8, 64u8, 10u8, 14u8, 51u8, 101u8, 122u8] => {
+                let mut rdr: &[u8] = rest;
+                let depth: Option<u128> = parse_option(&mut rdr)?;
+                let args = RecenterPerpMarketAmmCrankArguments { depth };
+                let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 5usize;
+                let admin = keys.next().unwrap().clone();
+                let state = keys.next().unwrap().clone();
+                let perpMarket = keys.next().unwrap().clone();
+                let spotMarket = keys.next().unwrap().clone();
+                let oracle = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = RecenterPerpMarketAmmCrankAccounts {
+                    admin,
+                    state,
+                    perpMarket,
+                    spotMarket,
+                    oracle,
+                    remaining,
+                };
+                return Ok(Instruction::RecenterPerpMarketAmmCrank { accounts, args });
+            }
             [122u8, 101u8, 249u8, 238u8, 209u8, 9u8, 241u8, 245u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdatePerpMarketAmmSummaryStatsArguments::deserialize(&mut rdr)?;
+                let quote_asset_amount_with_unsettled_lp: Option<i64> = parse_option(&mut rdr)?;
+                let net_unsettled_funding_pnl: Option<i64> = parse_option(&mut rdr)?;
+                let update_amm_summary_stats: Option<bool> = parse_option(&mut rdr)?;
+                let exclude_total_liq_fee: Option<bool> = parse_option(&mut rdr)?;
+                let params = UpdatePerpMarketSummaryStatsParams {
+                    quote_asset_amount_with_unsettled_lp,
+                    net_unsettled_funding_pnl,
+                    update_amm_summary_stats,
+                    exclude_total_liq_fee,
+                };
+                let args = UpdatePerpMarketAmmSummaryStatsArguments { params };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 5usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -6419,8 +7978,11 @@ impl Instruction {
             }
             [44u8, 221u8, 227u8, 151u8, 131u8, 140u8, 22u8, 110u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdatePerpMarketExpiryArguments::deserialize(&mut rdr)?;
+                let expiry_ts: i64 = <i64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdatePerpMarketExpiryArguments { expiry_ts };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -6435,8 +7997,10 @@ impl Instruction {
             }
             [55u8, 19u8, 238u8, 169u8, 227u8, 90u8, 200u8, 184u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = SettleExpiredMarketPoolsToRevenuePoolArguments::deserialize(&mut rdr)?;
+                let args = SettleExpiredMarketPoolsToRevenuePoolArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 4usize;
                 let state = keys.next().unwrap().clone();
                 let admin = keys.next().unwrap().clone();
                 let spotMarket = keys.next().unwrap().clone();
@@ -6453,8 +8017,11 @@ impl Instruction {
             }
             [34u8, 58u8, 57u8, 68u8, 97u8, 80u8, 244u8, 6u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = DepositIntoPerpMarketFeePoolArguments::deserialize(&mut rdr)?;
+                let amount: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = DepositIntoPerpMarketFeePoolArguments { amount };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 8usize;
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
                 let admin = keys.next().unwrap().clone();
@@ -6479,8 +8046,11 @@ impl Instruction {
             }
             [48u8, 252u8, 119u8, 73u8, 255u8, 205u8, 174u8, 247u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = DepositIntoSpotMarketVaultArguments::deserialize(&mut rdr)?;
+                let amount: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = DepositIntoSpotMarketVaultArguments { amount };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 6usize;
                 let state = keys.next().unwrap().clone();
                 let spotMarket = keys.next().unwrap().clone();
                 let admin = keys.next().unwrap().clone();
@@ -6501,8 +8071,11 @@ impl Instruction {
             }
             [92u8, 40u8, 151u8, 42u8, 122u8, 254u8, 139u8, 246u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = DepositIntoSpotMarketRevenuePoolArguments::deserialize(&mut rdr)?;
+                let amount: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = DepositIntoSpotMarketRevenuePoolArguments { amount };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 6usize;
                 let state = keys.next().unwrap().clone();
                 let spotMarket = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
@@ -6523,8 +8096,12 @@ impl Instruction {
             }
             [3u8, 36u8, 102u8, 89u8, 180u8, 128u8, 120u8, 213u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = RepegAmmCurveArguments::deserialize(&mut rdr)?;
+                let new_peg_candidate: u128 =
+                    <u128 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = RepegAmmCurveArguments { new_peg_candidate };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 4usize;
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
                 let oracle = keys.next().unwrap().clone();
@@ -6541,8 +8118,10 @@ impl Instruction {
             }
             [241u8, 74u8, 114u8, 123u8, 206u8, 153u8, 24u8, 202u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdatePerpMarketAmmOracleTwapArguments::deserialize(&mut rdr)?;
+                let args = UpdatePerpMarketAmmOracleTwapArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 4usize;
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
                 let oracle = keys.next().unwrap().clone();
@@ -6559,8 +8138,10 @@ impl Instruction {
             }
             [127u8, 10u8, 55u8, 164u8, 123u8, 226u8, 47u8, 24u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = ResetPerpMarketAmmOracleTwapArguments::deserialize(&mut rdr)?;
+                let args = ResetPerpMarketAmmOracleTwapArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 4usize;
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
                 let oracle = keys.next().unwrap().clone();
@@ -6577,8 +8158,11 @@ impl Instruction {
             }
             [72u8, 98u8, 9u8, 139u8, 129u8, 229u8, 172u8, 56u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateKArguments::deserialize(&mut rdr)?;
+                let sqrt_k: u128 = <u128 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateKArguments { sqrt_k };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 4usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -6595,8 +8179,17 @@ impl Instruction {
             }
             [130u8, 173u8, 107u8, 45u8, 119u8, 105u8, 26u8, 113u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdatePerpMarketMarginRatioArguments::deserialize(&mut rdr)?;
+                let margin_ratio_initial: u32 =
+                    <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let margin_ratio_maintenance: u32 =
+                    <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdatePerpMarketMarginRatioArguments {
+                    margin_ratio_initial,
+                    margin_ratio_maintenance,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -6611,8 +8204,17 @@ impl Instruction {
             }
             [88u8, 112u8, 86u8, 49u8, 24u8, 116u8, 74u8, 157u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdatePerpMarketHighLeverageMarginRatioArguments::deserialize(&mut rdr)?;
+                let margin_ratio_initial: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let margin_ratio_maintenance: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdatePerpMarketHighLeverageMarginRatioArguments {
+                    margin_ratio_initial,
+                    margin_ratio_maintenance,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -6627,8 +8229,12 @@ impl Instruction {
             }
             [171u8, 161u8, 69u8, 91u8, 129u8, 139u8, 161u8, 28u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdatePerpMarketFundingPeriodArguments::deserialize(&mut rdr)?;
+                let funding_period: i64 =
+                    <i64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdatePerpMarketFundingPeriodArguments { funding_period };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -6643,8 +8249,20 @@ impl Instruction {
             }
             [15u8, 206u8, 73u8, 133u8, 60u8, 8u8, 86u8, 89u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdatePerpMarketMaxImbalancesArguments::deserialize(&mut rdr)?;
+                let unrealized_max_imbalance: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let max_revenue_withdraw_per_period: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let quote_max_insurance: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdatePerpMarketMaxImbalancesArguments {
+                    unrealized_max_imbalance,
+                    max_revenue_withdraw_per_period,
+                    quote_max_insurance,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -6659,8 +8277,17 @@ impl Instruction {
             }
             [90u8, 137u8, 9u8, 145u8, 41u8, 8u8, 148u8, 117u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdatePerpMarketLiquidationFeeArguments::deserialize(&mut rdr)?;
+                let liquidator_fee: u32 =
+                    <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let if_liquidation_fee: u32 =
+                    <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdatePerpMarketLiquidationFeeArguments {
+                    liquidator_fee,
+                    if_liquidation_fee,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -6675,8 +8302,14 @@ impl Instruction {
             }
             [44u8, 69u8, 43u8, 226u8, 204u8, 223u8, 202u8, 52u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateInsuranceFundUnstakingPeriodArguments::deserialize(&mut rdr)?;
+                let insurance_fund_unstaking_period: i64 =
+                    <i64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateInsuranceFundUnstakingPeriodArguments {
+                    insurance_fund_unstaking_period,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let spotMarket = keys.next().unwrap().clone();
@@ -6691,8 +8324,11 @@ impl Instruction {
             }
             [22u8, 213u8, 197u8, 160u8, 139u8, 193u8, 81u8, 149u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateSpotMarketPoolIdArguments::deserialize(&mut rdr)?;
+                let pool_id: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateSpotMarketPoolIdArguments { pool_id };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let spotMarket = keys.next().unwrap().clone();
@@ -6707,8 +8343,17 @@ impl Instruction {
             }
             [11u8, 13u8, 255u8, 53u8, 56u8, 136u8, 104u8, 177u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateSpotMarketLiquidationFeeArguments::deserialize(&mut rdr)?;
+                let liquidator_fee: u32 =
+                    <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let if_liquidation_fee: u32 =
+                    <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateSpotMarketLiquidationFeeArguments {
+                    liquidator_fee,
+                    if_liquidation_fee,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let spotMarket = keys.next().unwrap().clone();
@@ -6723,8 +8368,14 @@ impl Instruction {
             }
             [56u8, 18u8, 39u8, 61u8, 155u8, 211u8, 44u8, 133u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateWithdrawGuardThresholdArguments::deserialize(&mut rdr)?;
+                let withdraw_guard_threshold: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateWithdrawGuardThresholdArguments {
+                    withdraw_guard_threshold,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let spotMarket = keys.next().unwrap().clone();
@@ -6739,8 +8390,20 @@ impl Instruction {
             }
             [147u8, 30u8, 224u8, 34u8, 18u8, 230u8, 105u8, 4u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateSpotMarketIfFactorArguments::deserialize(&mut rdr)?;
+                let spot_market_index: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let user_if_factor: u32 =
+                    <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let total_if_factor: u32 =
+                    <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateSpotMarketIfFactorArguments {
+                    spot_market_index,
+                    user_if_factor,
+                    total_if_factor,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let spotMarket = keys.next().unwrap().clone();
@@ -6755,8 +8418,14 @@ impl Instruction {
             }
             [81u8, 92u8, 126u8, 41u8, 250u8, 225u8, 156u8, 219u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateSpotMarketRevenueSettlePeriodArguments::deserialize(&mut rdr)?;
+                let revenue_settle_period: i64 =
+                    <i64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateSpotMarketRevenueSettlePeriodArguments {
+                    revenue_settle_period,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let spotMarket = keys.next().unwrap().clone();
@@ -6771,8 +8440,12 @@ impl Instruction {
             }
             [78u8, 94u8, 16u8, 188u8, 193u8, 110u8, 231u8, 31u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateSpotMarketStatusArguments::deserialize(&mut rdr)?;
+                let status: MarketStatus =
+                    <MarketStatus as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateSpotMarketStatusArguments { status };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let spotMarket = keys.next().unwrap().clone();
@@ -6787,8 +8460,12 @@ impl Instruction {
             }
             [100u8, 61u8, 153u8, 81u8, 180u8, 12u8, 6u8, 248u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateSpotMarketPausedOperationsArguments::deserialize(&mut rdr)?;
+                let paused_operations: u8 =
+                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateSpotMarketPausedOperationsArguments { paused_operations };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let spotMarket = keys.next().unwrap().clone();
@@ -6803,8 +8480,12 @@ impl Instruction {
             }
             [253u8, 209u8, 231u8, 14u8, 242u8, 208u8, 243u8, 130u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateSpotMarketAssetTierArguments::deserialize(&mut rdr)?;
+                let asset_tier: AssetTier =
+                    <AssetTier as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateSpotMarketAssetTierArguments { asset_tier };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let spotMarket = keys.next().unwrap().clone();
@@ -6819,8 +8500,25 @@ impl Instruction {
             }
             [109u8, 33u8, 87u8, 195u8, 255u8, 36u8, 6u8, 81u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateSpotMarketMarginWeightsArguments::deserialize(&mut rdr)?;
+                let initial_asset_weight: u32 =
+                    <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let maintenance_asset_weight: u32 =
+                    <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let initial_liability_weight: u32 =
+                    <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let maintenance_liability_weight: u32 =
+                    <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let imf_factor: u32 = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateSpotMarketMarginWeightsArguments {
+                    initial_asset_weight,
+                    maintenance_asset_weight,
+                    initial_liability_weight,
+                    maintenance_liability_weight,
+                    imf_factor,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let spotMarket = keys.next().unwrap().clone();
@@ -6835,8 +8533,22 @@ impl Instruction {
             }
             [71u8, 239u8, 236u8, 153u8, 210u8, 62u8, 254u8, 76u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateSpotMarketBorrowRateArguments::deserialize(&mut rdr)?;
+                let optimal_utilization: u32 =
+                    <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let optimal_borrow_rate: u32 =
+                    <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let max_borrow_rate: u32 =
+                    <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let min_borrow_rate: Option<u8> = parse_option(&mut rdr)?;
+                let args = UpdateSpotMarketBorrowRateArguments {
+                    optimal_utilization,
+                    optimal_borrow_rate,
+                    max_borrow_rate,
+                    min_borrow_rate,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let spotMarket = keys.next().unwrap().clone();
@@ -6851,8 +8563,12 @@ impl Instruction {
             }
             [56u8, 191u8, 79u8, 18u8, 26u8, 121u8, 80u8, 208u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateSpotMarketMaxTokenDepositsArguments::deserialize(&mut rdr)?;
+                let max_token_deposits: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateSpotMarketMaxTokenDepositsArguments { max_token_deposits };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let spotMarket = keys.next().unwrap().clone();
@@ -6867,8 +8583,14 @@ impl Instruction {
             }
             [57u8, 102u8, 204u8, 212u8, 253u8, 95u8, 13u8, 199u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateSpotMarketMaxTokenBorrowsArguments::deserialize(&mut rdr)?;
+                let max_token_borrows_fraction: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateSpotMarketMaxTokenBorrowsArguments {
+                    max_token_borrows_fraction,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let spotMarket = keys.next().unwrap().clone();
@@ -6883,9 +8605,14 @@ impl Instruction {
             }
             [217u8, 204u8, 204u8, 118u8, 204u8, 130u8, 225u8, 147u8] => {
                 let mut rdr: &[u8] = rest;
-                let args =
-                    UpdateSpotMarketScaleInitialAssetWeightStartArguments::deserialize(&mut rdr)?;
+                let scale_initial_asset_weight_start: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateSpotMarketScaleInitialAssetWeightStartArguments {
+                    scale_initial_asset_weight_start,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let spotMarket = keys.next().unwrap().clone();
@@ -6903,13 +8630,34 @@ impl Instruction {
             }
             [114u8, 184u8, 102u8, 37u8, 246u8, 186u8, 180u8, 99u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateSpotMarketOracleArguments::deserialize(&mut rdr)?;
+                let oracle: [u8; 32usize] =
+                    <[u8; 32usize] as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let oracle_source: OracleSource =
+                    <OracleSource as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let skip_invariant_check = if !rdr.is_empty() {
+                    let tag = rdr[0];
+                    rdr = &rdr[1..];
+                    Some(tag == 1)
+                } else {
+                    None
+                };
+                let args = UpdateSpotMarketOracleArguments {
+                    oracle,
+                    oracle_source,
+                    skip_invariant_check,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 4usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let spotMarket = keys.next().unwrap().clone();
                 let oracle = keys.next().unwrap().clone();
-                let oldOracle = keys.next().unwrap().clone();
+                let oldOracle = if has_extra {
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let remaining = keys.cloned().collect();
                 let accounts = UpdateSpotMarketOracleAccounts {
                     admin,
@@ -6923,8 +8671,15 @@ impl Instruction {
             }
             [238u8, 153u8, 137u8, 80u8, 206u8, 59u8, 250u8, 61u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateSpotMarketStepSizeAndTickSizeArguments::deserialize(&mut rdr)?;
+                let step_size: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let tick_size: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateSpotMarketStepSizeAndTickSizeArguments {
+                    step_size,
+                    tick_size,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let spotMarket = keys.next().unwrap().clone();
@@ -6939,8 +8694,11 @@ impl Instruction {
             }
             [93u8, 128u8, 11u8, 119u8, 26u8, 20u8, 181u8, 50u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateSpotMarketMinOrderSizeArguments::deserialize(&mut rdr)?;
+                let order_size: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateSpotMarketMinOrderSizeArguments { order_size };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let spotMarket = keys.next().unwrap().clone();
@@ -6955,8 +8713,12 @@ impl Instruction {
             }
             [190u8, 79u8, 206u8, 15u8, 26u8, 229u8, 229u8, 43u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateSpotMarketOrdersEnabledArguments::deserialize(&mut rdr)?;
+                let orders_enabled: bool =
+                    <bool as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateSpotMarketOrdersEnabledArguments { orders_enabled };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let spotMarket = keys.next().unwrap().clone();
@@ -6971,8 +8733,12 @@ impl Instruction {
             }
             [101u8, 215u8, 79u8, 74u8, 59u8, 41u8, 79u8, 12u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateSpotMarketIfPausedOperationsArguments::deserialize(&mut rdr)?;
+                let paused_operations: u8 =
+                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateSpotMarketIfPausedOperationsArguments { paused_operations };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let spotMarket = keys.next().unwrap().clone();
@@ -6987,8 +8753,12 @@ impl Instruction {
             }
             [17u8, 208u8, 1u8, 1u8, 162u8, 211u8, 188u8, 224u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateSpotMarketNameArguments::deserialize(&mut rdr)?;
+                let name: [u8; 32usize] =
+                    <[u8; 32usize] as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateSpotMarketNameArguments { name };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let spotMarket = keys.next().unwrap().clone();
@@ -7003,8 +8773,12 @@ impl Instruction {
             }
             [71u8, 201u8, 175u8, 122u8, 255u8, 207u8, 196u8, 207u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdatePerpMarketStatusArguments::deserialize(&mut rdr)?;
+                let status: MarketStatus =
+                    <MarketStatus as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdatePerpMarketStatusArguments { status };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -7019,8 +8793,12 @@ impl Instruction {
             }
             [53u8, 16u8, 136u8, 132u8, 30u8, 220u8, 121u8, 85u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdatePerpMarketPausedOperationsArguments::deserialize(&mut rdr)?;
+                let paused_operations: u8 =
+                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdatePerpMarketPausedOperationsArguments { paused_operations };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -7035,8 +8813,12 @@ impl Instruction {
             }
             [236u8, 128u8, 15u8, 95u8, 203u8, 214u8, 68u8, 117u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdatePerpMarketContractTierArguments::deserialize(&mut rdr)?;
+                let contract_tier: ContractTier =
+                    <ContractTier as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdatePerpMarketContractTierArguments { contract_tier };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -7051,8 +8833,16 @@ impl Instruction {
             }
             [207u8, 194u8, 56u8, 132u8, 35u8, 67u8, 71u8, 244u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdatePerpMarketImfFactorArguments::deserialize(&mut rdr)?;
+                let imf_factor: u32 = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let unrealized_pnl_imf_factor: u32 =
+                    <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdatePerpMarketImfFactorArguments {
+                    imf_factor,
+                    unrealized_pnl_imf_factor,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -7067,8 +8857,17 @@ impl Instruction {
             }
             [135u8, 132u8, 205u8, 165u8, 109u8, 150u8, 166u8, 106u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdatePerpMarketUnrealizedAssetWeightArguments::deserialize(&mut rdr)?;
+                let unrealized_initial_asset_weight: u32 =
+                    <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let unrealized_maintenance_asset_weight: u32 =
+                    <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdatePerpMarketUnrealizedAssetWeightArguments {
+                    unrealized_initial_asset_weight,
+                    unrealized_maintenance_asset_weight,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -7083,8 +8882,14 @@ impl Instruction {
             }
             [24u8, 78u8, 232u8, 126u8, 169u8, 176u8, 230u8, 16u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdatePerpMarketConcentrationCoefArguments::deserialize(&mut rdr)?;
+                let concentration_scale: u128 =
+                    <u128 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdatePerpMarketConcentrationCoefArguments {
+                    concentration_scale,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -7099,8 +8904,14 @@ impl Instruction {
             }
             [50u8, 131u8, 6u8, 156u8, 226u8, 231u8, 189u8, 72u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdatePerpMarketCurveUpdateIntensityArguments::deserialize(&mut rdr)?;
+                let curve_update_intensity: u8 =
+                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdatePerpMarketCurveUpdateIntensityArguments {
+                    curve_update_intensity,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -7115,9 +8926,14 @@ impl Instruction {
             }
             [62u8, 87u8, 68u8, 115u8, 29u8, 150u8, 150u8, 165u8] => {
                 let mut rdr: &[u8] = rest;
-                let args =
-                    UpdatePerpMarketTargetBaseAssetAmountPerLpArguments::deserialize(&mut rdr)?;
+                let target_base_asset_amount_per_lp: i32 =
+                    <i32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdatePerpMarketTargetBaseAssetAmountPerLpArguments {
+                    target_base_asset_amount_per_lp,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -7135,8 +8951,11 @@ impl Instruction {
             }
             [103u8, 152u8, 103u8, 102u8, 89u8, 144u8, 193u8, 71u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdatePerpMarketPerLpBaseArguments::deserialize(&mut rdr)?;
+                let per_lp_base: i8 = <i8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdatePerpMarketPerLpBaseArguments { per_lp_base };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -7151,8 +8970,12 @@ impl Instruction {
             }
             [198u8, 133u8, 88u8, 41u8, 241u8, 119u8, 61u8, 14u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateLpCooldownTimeArguments::deserialize(&mut rdr)?;
+                let lp_cooldown_time: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateLpCooldownTimeArguments { lp_cooldown_time };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -7165,8 +8988,26 @@ impl Instruction {
             }
             [23u8, 178u8, 111u8, 203u8, 73u8, 22u8, 140u8, 75u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdatePerpFeeStructureArguments::deserialize(&mut rdr)?;
+                let fee_tiers: [FeeTier; 10usize] =
+                    <[FeeTier; 10usize] as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let filler_reward_structure: OrderFillerRewardStructure =
+                    <OrderFillerRewardStructure as ::borsh::BorshDeserialize>::deserialize(
+                        &mut rdr,
+                    )?;
+                let referrer_reward_epoch_upper_bound: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let flat_filler_fee: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let fee_structure = FeeStructure {
+                    fee_tiers,
+                    filler_reward_structure,
+                    referrer_reward_epoch_upper_bound,
+                    flat_filler_fee,
+                };
+                let args = UpdatePerpFeeStructureArguments { fee_structure };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -7179,8 +9020,26 @@ impl Instruction {
             }
             [97u8, 216u8, 105u8, 131u8, 113u8, 246u8, 142u8, 141u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateSpotFeeStructureArguments::deserialize(&mut rdr)?;
+                let fee_tiers: [FeeTier; 10usize] =
+                    <[FeeTier; 10usize] as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let filler_reward_structure: OrderFillerRewardStructure =
+                    <OrderFillerRewardStructure as ::borsh::BorshDeserialize>::deserialize(
+                        &mut rdr,
+                    )?;
+                let referrer_reward_epoch_upper_bound: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let flat_filler_fee: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let fee_structure = FeeStructure {
+                    fee_tiers,
+                    filler_reward_structure,
+                    referrer_reward_epoch_upper_bound,
+                    flat_filler_fee,
+                };
+                let args = UpdateSpotFeeStructureArguments { fee_structure };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -7193,8 +9052,14 @@ impl Instruction {
             }
             [210u8, 133u8, 225u8, 128u8, 194u8, 50u8, 13u8, 109u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateInitialPctToLiquidateArguments::deserialize(&mut rdr)?;
+                let initial_pct_to_liquidate: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateInitialPctToLiquidateArguments {
+                    initial_pct_to_liquidate,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -7207,8 +9072,14 @@ impl Instruction {
             }
             [28u8, 154u8, 20u8, 249u8, 102u8, 192u8, 73u8, 71u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateLiquidationDurationArguments::deserialize(&mut rdr)?;
+                let liquidation_duration: u8 =
+                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateLiquidationDurationArguments {
+                    liquidation_duration,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -7221,8 +9092,14 @@ impl Instruction {
             }
             [132u8, 224u8, 243u8, 160u8, 154u8, 82u8, 97u8, 215u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateLiquidationMarginBufferRatioArguments::deserialize(&mut rdr)?;
+                let liquidation_margin_buffer_ratio: u32 =
+                    <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateLiquidationMarginBufferRatioArguments {
+                    liquidation_margin_buffer_ratio,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -7235,8 +9112,20 @@ impl Instruction {
             }
             [131u8, 112u8, 10u8, 59u8, 32u8, 54u8, 40u8, 164u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateOracleGuardRailsArguments::deserialize(&mut rdr)?;
+                let price_divergence: PriceDivergenceGuardRails =
+                    <PriceDivergenceGuardRails as ::borsh::BorshDeserialize>::deserialize(
+                        &mut rdr,
+                    )?;
+                let validity: ValidityGuardRails =
+                    <ValidityGuardRails as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let oracle_guard_rails = OracleGuardRails {
+                    price_divergence,
+                    validity,
+                };
+                let args = UpdateOracleGuardRailsArguments { oracle_guard_rails };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -7249,8 +9138,14 @@ impl Instruction {
             }
             [97u8, 68u8, 199u8, 235u8, 131u8, 80u8, 61u8, 173u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateStateSettlementDurationArguments::deserialize(&mut rdr)?;
+                let settlement_duration: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateStateSettlementDurationArguments {
+                    settlement_duration,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -7263,8 +9158,14 @@ impl Instruction {
             }
             [155u8, 123u8, 214u8, 2u8, 221u8, 166u8, 204u8, 85u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateStateMaxNumberOfSubAccountsArguments::deserialize(&mut rdr)?;
+                let max_number_of_sub_accounts: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateStateMaxNumberOfSubAccountsArguments {
+                    max_number_of_sub_accounts,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -7277,8 +9178,14 @@ impl Instruction {
             }
             [237u8, 225u8, 25u8, 237u8, 193u8, 45u8, 77u8, 97u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateStateMaxInitializeUserFeeArguments::deserialize(&mut rdr)?;
+                let max_initialize_user_fee: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateStateMaxInitializeUserFeeArguments {
+                    max_initialize_user_fee,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -7291,13 +9198,34 @@ impl Instruction {
             }
             [182u8, 113u8, 111u8, 160u8, 67u8, 174u8, 89u8, 191u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdatePerpMarketOracleArguments::deserialize(&mut rdr)?;
+                let oracle: [u8; 32usize] =
+                    <[u8; 32usize] as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let oracle_source: OracleSource =
+                    <OracleSource as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let skip_invariant_check = if !rdr.is_empty() {
+                    let tag = rdr[0];
+                    rdr = &rdr[1..];
+                    Some(tag == 1)
+                } else {
+                    None
+                };
+                let args = UpdatePerpMarketOracleArguments {
+                    oracle,
+                    oracle_source,
+                    skip_invariant_check,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 4usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
                 let oracle = keys.next().unwrap().clone();
-                let oldOracle = keys.next().unwrap().clone();
+                let oldOracle = if has_extra {
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let remaining = keys.cloned().collect();
                 let accounts = UpdatePerpMarketOracleAccounts {
                     admin,
@@ -7311,8 +9239,11 @@ impl Instruction {
             }
             [71u8, 95u8, 84u8, 168u8, 9u8, 157u8, 198u8, 65u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdatePerpMarketBaseSpreadArguments::deserialize(&mut rdr)?;
+                let base_spread: u32 = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdatePerpMarketBaseSpreadArguments { base_spread };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -7327,8 +9258,12 @@ impl Instruction {
             }
             [181u8, 191u8, 53u8, 109u8, 166u8, 249u8, 55u8, 142u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateAmmJitIntensityArguments::deserialize(&mut rdr)?;
+                let amm_jit_intensity: u8 =
+                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateAmmJitIntensityArguments { amm_jit_intensity };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -7343,8 +9278,11 @@ impl Instruction {
             }
             [80u8, 252u8, 122u8, 62u8, 40u8, 218u8, 91u8, 100u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdatePerpMarketMaxSpreadArguments::deserialize(&mut rdr)?;
+                let max_spread: u32 = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdatePerpMarketMaxSpreadArguments { max_spread };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -7357,32 +9295,17 @@ impl Instruction {
                 };
                 return Ok(Instruction::UpdatePerpMarketMaxSpread { accounts, args });
             }
-            [210u8, 66u8, 65u8, 182u8, 102u8, 214u8, 176u8, 30u8] => {
-                let mut rdr: &[u8] = rest;
-                let args = AdminDepositArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let state = keys.next().unwrap().clone();
-                let user = keys.next().unwrap().clone();
-                let admin = keys.next().unwrap().clone();
-                let spotMarketVault = keys.next().unwrap().clone();
-                let adminTokenAccount = keys.next().unwrap().clone();
-                let tokenProgram = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
-                let accounts = AdminDepositAccounts {
-                    state,
-                    user,
-                    admin,
-                    spotMarketVault,
-                    adminTokenAccount,
-                    tokenProgram,
-                    remaining,
-                };
-                return Ok(Instruction::AdminDeposit { accounts, args });
-            }
             [231u8, 255u8, 97u8, 25u8, 146u8, 139u8, 174u8, 4u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdatePerpMarketStepSizeAndTickSizeArguments::deserialize(&mut rdr)?;
+                let step_size: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let tick_size: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdatePerpMarketStepSizeAndTickSizeArguments {
+                    step_size,
+                    tick_size,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -7397,8 +9320,12 @@ impl Instruction {
             }
             [211u8, 31u8, 21u8, 210u8, 64u8, 108u8, 66u8, 201u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdatePerpMarketNameArguments::deserialize(&mut rdr)?;
+                let name: [u8; 32usize] =
+                    <[u8; 32usize] as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdatePerpMarketNameArguments { name };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -7413,8 +9340,11 @@ impl Instruction {
             }
             [226u8, 74u8, 5u8, 89u8, 108u8, 223u8, 46u8, 141u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdatePerpMarketMinOrderSizeArguments::deserialize(&mut rdr)?;
+                let order_size: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdatePerpMarketMinOrderSizeArguments { order_size };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -7429,8 +9359,12 @@ impl Instruction {
             }
             [235u8, 37u8, 40u8, 196u8, 70u8, 146u8, 54u8, 201u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdatePerpMarketMaxSlippageRatioArguments::deserialize(&mut rdr)?;
+                let max_slippage_ratio: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdatePerpMarketMaxSlippageRatioArguments { max_slippage_ratio };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -7445,8 +9379,14 @@ impl Instruction {
             }
             [19u8, 172u8, 114u8, 154u8, 42u8, 135u8, 161u8, 133u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdatePerpMarketMaxFillReserveFractionArguments::deserialize(&mut rdr)?;
+                let max_fill_reserve_fraction: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdatePerpMarketMaxFillReserveFractionArguments {
+                    max_fill_reserve_fraction,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -7461,8 +9401,12 @@ impl Instruction {
             }
             [194u8, 79u8, 149u8, 224u8, 246u8, 102u8, 186u8, 140u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdatePerpMarketMaxOpenInterestArguments::deserialize(&mut rdr)?;
+                let max_open_interest: u128 =
+                    <u128 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdatePerpMarketMaxOpenInterestArguments { max_open_interest };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -7477,8 +9421,15 @@ impl Instruction {
             }
             [35u8, 62u8, 144u8, 177u8, 180u8, 62u8, 215u8, 196u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdatePerpMarketNumberOfUsersArguments::deserialize(&mut rdr)?;
+                let number_of_users: Option<u32> = parse_option(&mut rdr)?;
+                let number_of_users_with_base: Option<u32> = parse_option(&mut rdr)?;
+                let args = UpdatePerpMarketNumberOfUsersArguments {
+                    number_of_users,
+                    number_of_users_with_base,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -7493,8 +9444,12 @@ impl Instruction {
             }
             [194u8, 174u8, 87u8, 102u8, 43u8, 148u8, 32u8, 112u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdatePerpMarketFeeAdjustmentArguments::deserialize(&mut rdr)?;
+                let fee_adjustment: i16 =
+                    <i16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdatePerpMarketFeeAdjustmentArguments { fee_adjustment };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -7509,8 +9464,12 @@ impl Instruction {
             }
             [148u8, 182u8, 3u8, 126u8, 157u8, 114u8, 220u8, 99u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateSpotMarketFeeAdjustmentArguments::deserialize(&mut rdr)?;
+                let fee_adjustment: i16 =
+                    <i16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateSpotMarketFeeAdjustmentArguments { fee_adjustment };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let spotMarket = keys.next().unwrap().clone();
@@ -7525,8 +9484,17 @@ impl Instruction {
             }
             [252u8, 141u8, 110u8, 101u8, 27u8, 99u8, 182u8, 21u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdatePerpMarketFuelArguments::deserialize(&mut rdr)?;
+                let fuel_boost_taker: Option<u8> = parse_option(&mut rdr)?;
+                let fuel_boost_maker: Option<u8> = parse_option(&mut rdr)?;
+                let fuel_boost_position: Option<u8> = parse_option(&mut rdr)?;
+                let args = UpdatePerpMarketFuelArguments {
+                    fuel_boost_taker,
+                    fuel_boost_maker,
+                    fuel_boost_position,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -7539,10 +9507,115 @@ impl Instruction {
                 };
                 return Ok(Instruction::UpdatePerpMarketFuel { accounts, args });
             }
+            [249u8, 213u8, 115u8, 34u8, 253u8, 239u8, 75u8, 173u8] => {
+                let mut rdr: &[u8] = rest;
+                let protected_maker_limit_price_divisor: Option<u8> = parse_option(&mut rdr)?;
+                let protected_maker_dynamic_divisor: Option<u8> = parse_option(&mut rdr)?;
+                let args = UpdatePerpMarketProtectedMakerParamsArguments {
+                    protected_maker_limit_price_divisor,
+                    protected_maker_dynamic_divisor,
+                };
+                let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
+                let admin = keys.next().unwrap().clone();
+                let state = keys.next().unwrap().clone();
+                let perpMarket = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = UpdatePerpMarketProtectedMakerParamsAccounts {
+                    admin,
+                    state,
+                    perpMarket,
+                    remaining,
+                };
+                return Ok(Instruction::UpdatePerpMarketProtectedMakerParams { accounts, args });
+            }
+            [31u8, 39u8, 5u8, 25u8, 228u8, 50u8, 1u8, 0u8] => {
+                let mut rdr: &[u8] = rest;
+                let taker_speed_bump_override: i8 =
+                    <i8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdatePerpMarketTakerSpeedBumpOverrideArguments {
+                    taker_speed_bump_override,
+                };
+                let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
+                let admin = keys.next().unwrap().clone();
+                let state = keys.next().unwrap().clone();
+                let perpMarket = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = UpdatePerpMarketTakerSpeedBumpOverrideAccounts {
+                    admin,
+                    state,
+                    perpMarket,
+                    remaining,
+                };
+                return Ok(Instruction::UpdatePerpMarketTakerSpeedBumpOverride { accounts, args });
+            }
+            [155u8, 195u8, 149u8, 43u8, 220u8, 82u8, 173u8, 205u8] => {
+                let mut rdr: &[u8] = rest;
+                let amm_spread_adjustment: i8 =
+                    <i8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let amm_inventory_spread_adjustment: i8 =
+                    <i8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdatePerpMarketAmmSpreadAdjustmentArguments {
+                    amm_spread_adjustment,
+                    amm_inventory_spread_adjustment,
+                };
+                let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
+                let admin = keys.next().unwrap().clone();
+                let state = keys.next().unwrap().clone();
+                let perpMarket = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = UpdatePerpMarketAmmSpreadAdjustmentAccounts {
+                    admin,
+                    state,
+                    perpMarket,
+                    remaining,
+                };
+                return Ok(Instruction::UpdatePerpMarketAmmSpreadAdjustment { accounts, args });
+            }
+            [165u8, 91u8, 239u8, 227u8, 63u8, 172u8, 227u8, 8u8] => {
+                let mut rdr: &[u8] = rest;
+                let oracle_slot_delay_override: i8 =
+                    <i8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdatePerpMarketOracleSlotDelayOverrideArguments {
+                    oracle_slot_delay_override,
+                };
+                let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
+                let admin = keys.next().unwrap().clone();
+                let state = keys.next().unwrap().clone();
+                let perpMarket = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = UpdatePerpMarketOracleSlotDelayOverrideAccounts {
+                    admin,
+                    state,
+                    perpMarket,
+                    remaining,
+                };
+                return Ok(Instruction::UpdatePerpMarketOracleSlotDelayOverride { accounts, args });
+            }
             [226u8, 253u8, 76u8, 71u8, 17u8, 2u8, 171u8, 169u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateSpotMarketFuelArguments::deserialize(&mut rdr)?;
+                let fuel_boost_deposits: Option<u8> = parse_option(&mut rdr)?;
+                let fuel_boost_borrows: Option<u8> = parse_option(&mut rdr)?;
+                let fuel_boost_taker: Option<u8> = parse_option(&mut rdr)?;
+                let fuel_boost_maker: Option<u8> = parse_option(&mut rdr)?;
+                let fuel_boost_insurance: Option<u8> = parse_option(&mut rdr)?;
+                let args = UpdateSpotMarketFuelArguments {
+                    fuel_boost_deposits,
+                    fuel_boost_borrows,
+                    fuel_boost_taker,
+                    fuel_boost_maker,
+                    fuel_boost_insurance,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let spotMarket = keys.next().unwrap().clone();
@@ -7557,8 +9630,21 @@ impl Instruction {
             }
             [132u8, 191u8, 228u8, 141u8, 201u8, 138u8, 60u8, 48u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitUserFuelArguments::deserialize(&mut rdr)?;
+                let fuel_boost_deposits: Option<i32> = parse_option(&mut rdr)?;
+                let fuel_boost_borrows: Option<u32> = parse_option(&mut rdr)?;
+                let fuel_boost_taker: Option<u32> = parse_option(&mut rdr)?;
+                let fuel_boost_maker: Option<u32> = parse_option(&mut rdr)?;
+                let fuel_boost_insurance: Option<u32> = parse_option(&mut rdr)?;
+                let args = InitUserFuelArguments {
+                    fuel_boost_deposits,
+                    fuel_boost_borrows,
+                    fuel_boost_taker,
+                    fuel_boost_maker,
+                    fuel_boost_insurance,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 4usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let user = keys.next().unwrap().clone();
@@ -7575,8 +9661,12 @@ impl Instruction {
             }
             [161u8, 176u8, 40u8, 213u8, 60u8, 184u8, 179u8, 228u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateAdminArguments::deserialize(&mut rdr)?;
+                let admin: [u8; 32usize] =
+                    <[u8; 32usize] as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateAdminArguments { admin };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -7589,8 +9679,12 @@ impl Instruction {
             }
             [161u8, 15u8, 162u8, 19u8, 148u8, 120u8, 144u8, 151u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateWhitelistMintArguments::deserialize(&mut rdr)?;
+                let whitelist_mint: [u8; 32usize] =
+                    <[u8; 32usize] as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateWhitelistMintArguments { whitelist_mint };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -7603,8 +9697,12 @@ impl Instruction {
             }
             [32u8, 252u8, 122u8, 211u8, 66u8, 31u8, 47u8, 241u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateDiscountMintArguments::deserialize(&mut rdr)?;
+                let discount_mint: [u8; 32usize] =
+                    <[u8; 32usize] as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateDiscountMintArguments { discount_mint };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -7617,8 +9715,11 @@ impl Instruction {
             }
             [83u8, 160u8, 252u8, 250u8, 129u8, 116u8, 49u8, 223u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateExchangeStatusArguments::deserialize(&mut rdr)?;
+                let exchange_status: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateExchangeStatusArguments { exchange_status };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -7631,8 +9732,14 @@ impl Instruction {
             }
             [126u8, 110u8, 52u8, 174u8, 30u8, 206u8, 215u8, 90u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdatePerpAuctionDurationArguments::deserialize(&mut rdr)?;
+                let min_perp_auction_duration: u8 =
+                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdatePerpAuctionDurationArguments {
+                    min_perp_auction_duration,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -7645,8 +9752,14 @@ impl Instruction {
             }
             [182u8, 178u8, 203u8, 72u8, 187u8, 143u8, 157u8, 107u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateSpotAuctionDurationArguments::deserialize(&mut rdr)?;
+                let default_spot_auction_duration: u8 =
+                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateSpotAuctionDurationArguments {
+                    default_spot_auction_duration,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 2usize;
                 let admin = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
@@ -7659,9 +9772,10 @@ impl Instruction {
             }
             [89u8, 131u8, 239u8, 200u8, 178u8, 141u8, 106u8, 194u8] => {
                 let mut rdr: &[u8] = rest;
-                let args =
-                    InitializeProtocolIfSharesTransferConfigArguments::deserialize(&mut rdr)?;
+                let args = InitializeProtocolIfSharesTransferConfigArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 5usize;
                 let admin = keys.next().unwrap().clone();
                 let protocolIfSharesTransferConfig = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
@@ -7683,8 +9797,15 @@ impl Instruction {
             }
             [34u8, 135u8, 47u8, 91u8, 220u8, 24u8, 212u8, 53u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateProtocolIfSharesTransferConfigArguments::deserialize(&mut rdr)?;
+                let whitelisted_signers: Option<[[u8; 32usize]; 4usize]> = parse_option(&mut rdr)?;
+                let max_transfer_per_epoch: Option<u128> = parse_option(&mut rdr)?;
+                let args = UpdateProtocolIfSharesTransferConfigArguments {
+                    whitelisted_signers,
+                    max_transfer_per_epoch,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let protocolIfSharesTransferConfig = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
@@ -7699,8 +9820,19 @@ impl Instruction {
             }
             [169u8, 178u8, 84u8, 25u8, 175u8, 62u8, 29u8, 247u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitializePrelaunchOracleArguments::deserialize(&mut rdr)?;
+                let perp_market_index: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let price: Option<i64> = parse_option(&mut rdr)?;
+                let max_price: Option<i64> = parse_option(&mut rdr)?;
+                let params = PrelaunchOracleParams {
+                    perp_market_index,
+                    price,
+                    max_price,
+                };
+                let args = InitializePrelaunchOracleArguments { params };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 5usize;
                 let admin = keys.next().unwrap().clone();
                 let prelaunchOracle = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
@@ -7719,8 +9851,19 @@ impl Instruction {
             }
             [98u8, 205u8, 147u8, 243u8, 18u8, 75u8, 83u8, 207u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdatePrelaunchOracleParamsArguments::deserialize(&mut rdr)?;
+                let perp_market_index: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let price: Option<i64> = parse_option(&mut rdr)?;
+                let max_price: Option<i64> = parse_option(&mut rdr)?;
+                let params = PrelaunchOracleParams {
+                    perp_market_index,
+                    price,
+                    max_price,
+                };
+                let args = UpdatePrelaunchOracleParamsArguments { params };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 4usize;
                 let admin = keys.next().unwrap().clone();
                 let prelaunchOracle = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -7737,8 +9880,12 @@ impl Instruction {
             }
             [59u8, 169u8, 100u8, 49u8, 69u8, 17u8, 173u8, 253u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = DeletePrelaunchOracleArguments::deserialize(&mut rdr)?;
+                let perp_market_index: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = DeletePrelaunchOracleArguments { perp_market_index };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 4usize;
                 let admin = keys.next().unwrap().clone();
                 let prelaunchOracle = keys.next().unwrap().clone();
                 let perpMarket = keys.next().unwrap().clone();
@@ -7755,8 +9902,12 @@ impl Instruction {
             }
             [249u8, 140u8, 253u8, 243u8, 248u8, 74u8, 240u8, 238u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitializePythPullOracleArguments::deserialize(&mut rdr)?;
+                let feed_id: [u8; 32usize] =
+                    <[u8; 32usize] as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = InitializePythPullOracleArguments { feed_id };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 5usize;
                 let admin = keys.next().unwrap().clone();
                 let pythSolanaReceiver = keys.next().unwrap().clone();
                 let priceFeed = keys.next().unwrap().clone();
@@ -7775,8 +9926,11 @@ impl Instruction {
             }
             [140u8, 107u8, 33u8, 214u8, 235u8, 219u8, 103u8, 20u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitializePythLazerOracleArguments::deserialize(&mut rdr)?;
+                let feed_id: u32 = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = InitializePythLazerOracleArguments { feed_id };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 5usize;
                 let admin = keys.next().unwrap().clone();
                 let lazerOracle = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
@@ -7795,8 +9949,12 @@ impl Instruction {
             }
             [218u8, 237u8, 170u8, 245u8, 39u8, 143u8, 166u8, 33u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = PostPythLazerOracleUpdateArguments::deserialize(&mut rdr)?;
+                let pyth_message: Vec<u8> =
+                    <Vec<u8> as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = PostPythLazerOracleUpdateArguments { pyth_message };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let keeper = keys.next().unwrap().clone();
                 let pythLazerStorage = keys.next().unwrap().clone();
                 let ixSysvar = keys.next().unwrap().clone();
@@ -7811,8 +9969,11 @@ impl Instruction {
             }
             [213u8, 167u8, 93u8, 246u8, 208u8, 130u8, 90u8, 248u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitializeHighLeverageModeConfigArguments::deserialize(&mut rdr)?;
+                let max_users: u32 = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = InitializeHighLeverageModeConfigArguments { max_users };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 5usize;
                 let admin = keys.next().unwrap().clone();
                 let highLeverageModeConfig = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
@@ -7831,8 +9992,17 @@ impl Instruction {
             }
             [64u8, 122u8, 212u8, 93u8, 141u8, 217u8, 202u8, 55u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateHighLeverageModeConfigArguments::deserialize(&mut rdr)?;
+                let max_users: u32 = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let reduce_only: bool = <bool as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let current_users: Option<u32> = parse_option(&mut rdr)?;
+                let args = UpdateHighLeverageModeConfigArguments {
+                    max_users,
+                    reduce_only,
+                    current_users,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let highLeverageModeConfig = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
@@ -7847,8 +10017,11 @@ impl Instruction {
             }
             [67u8, 103u8, 220u8, 67u8, 88u8, 32u8, 252u8, 8u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitializeProtectedMakerModeConfigArguments::deserialize(&mut rdr)?;
+                let max_users: u32 = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = InitializeProtectedMakerModeConfigArguments { max_users };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 5usize;
                 let admin = keys.next().unwrap().clone();
                 let protectedMakerModeConfig = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
@@ -7867,8 +10040,17 @@ impl Instruction {
             }
             [86u8, 166u8, 235u8, 253u8, 67u8, 202u8, 223u8, 17u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateProtectedMakerModeConfigArguments::deserialize(&mut rdr)?;
+                let max_users: u32 = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let reduce_only: bool = <bool as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let current_users: Option<u32> = parse_option(&mut rdr)?;
+                let args = UpdateProtectedMakerModeConfigArguments {
+                    max_users,
+                    reduce_only,
+                    current_users,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
                 let admin = keys.next().unwrap().clone();
                 let protectedMakerModeConfig = keys.next().unwrap().clone();
                 let state = keys.next().unwrap().clone();
@@ -7880,6 +10062,123 @@ impl Instruction {
                     remaining,
                 };
                 return Ok(Instruction::UpdateProtectedMakerModeConfig { accounts, args });
+            }
+            [210u8, 66u8, 65u8, 182u8, 102u8, 214u8, 176u8, 30u8] => {
+                let mut rdr: &[u8] = rest;
+                let market_index: u16 = <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let amount: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = AdminDepositArguments {
+                    market_index,
+                    amount,
+                };
+                let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 6usize;
+                let state = keys.next().unwrap().clone();
+                let user = keys.next().unwrap().clone();
+                let admin = keys.next().unwrap().clone();
+                let spotMarketVault = keys.next().unwrap().clone();
+                let adminTokenAccount = keys.next().unwrap().clone();
+                let tokenProgram = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = AdminDepositAccounts {
+                    state,
+                    user,
+                    admin,
+                    spotMarketVault,
+                    adminTokenAccount,
+                    tokenProgram,
+                    remaining,
+                };
+                return Ok(Instruction::AdminDeposit { accounts, args });
+            }
+            [8u8, 85u8, 184u8, 167u8, 176u8, 61u8, 173u8, 226u8] => {
+                let mut rdr: &[u8] = rest;
+                let total_in_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let epoch_max_in_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let epoch_duration: i64 =
+                    <i64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let out_market_index: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let in_market_index: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let max_slippage_bps: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let swap_mode: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let status: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let params = IfRebalanceConfigParams {
+                    total_in_amount,
+                    epoch_max_in_amount,
+                    epoch_duration,
+                    out_market_index,
+                    in_market_index,
+                    max_slippage_bps,
+                    swap_mode,
+                    status,
+                };
+                let args = InitializeIfRebalanceConfigArguments { params };
+                let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 5usize;
+                let admin = keys.next().unwrap().clone();
+                let ifRebalanceConfig = keys.next().unwrap().clone();
+                let state = keys.next().unwrap().clone();
+                let rent = keys.next().unwrap().clone();
+                let systemProgram = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = InitializeIfRebalanceConfigAccounts {
+                    admin,
+                    ifRebalanceConfig,
+                    state,
+                    rent,
+                    systemProgram,
+                    remaining,
+                };
+                return Ok(Instruction::InitializeIfRebalanceConfig { accounts, args });
+            }
+            [142u8, 245u8, 249u8, 66u8, 249u8, 181u8, 22u8, 83u8] => {
+                let mut rdr: &[u8] = rest;
+                let total_in_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let epoch_max_in_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let epoch_duration: i64 =
+                    <i64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let out_market_index: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let in_market_index: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let max_slippage_bps: u16 =
+                    <u16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let swap_mode: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let status: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let params = IfRebalanceConfigParams {
+                    total_in_amount,
+                    epoch_max_in_amount,
+                    epoch_duration,
+                    out_market_index,
+                    in_market_index,
+                    max_slippage_bps,
+                    swap_mode,
+                    status,
+                };
+                let args = UpdateIfRebalanceConfigArguments { params };
+                let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let has_extra = account_keys.len() > 3usize;
+                let admin = keys.next().unwrap().clone();
+                let ifRebalanceConfig = keys.next().unwrap().clone();
+                let state = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = UpdateIfRebalanceConfigAccounts {
+                    admin,
+                    ifRebalanceConfig,
+                    state,
+                    remaining,
+                };
+                return Ok(Instruction::UpdateIfRebalanceConfig { accounts, args });
             }
             _ => anyhow::bail!("Unknown discriminator: {:?}", disc),
         }
@@ -8040,6 +10339,11 @@ pub mod events {
         pub maker_order_cumulative_base_asset_amount_filled: Option<u64>,
         pub maker_order_cumulative_quote_asset_amount_filled: Option<u64>,
         pub oracle_price: i64,
+        pub bit_flags: u8,
+        pub taker_existing_quote_entry_amount: Option<u64>,
+        pub taker_existing_base_asset_amount: Option<u64>,
+        pub maker_existing_quote_entry_amount: Option<u64>,
+        pub maker_existing_base_asset_amount: Option<u64>,
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct LpRecord {
@@ -8117,6 +10421,40 @@ pub mod events {
         pub total_if_shares_after: u128,
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct InsuranceFundSwapRecord {
+        #[serde(with = "pubkey_serde")]
+        pub rebalance_config: [u8; 32usize],
+        pub in_if_total_shares_before: u128,
+        pub out_if_total_shares_before: u128,
+        pub in_if_user_shares_before: u128,
+        pub out_if_user_shares_before: u128,
+        pub in_if_total_shares_after: u128,
+        pub out_if_total_shares_after: u128,
+        pub in_if_user_shares_after: u128,
+        pub out_if_user_shares_after: u128,
+        pub ts: i64,
+        pub in_amount: u64,
+        pub out_amount: u64,
+        pub out_oracle_price: u64,
+        pub out_oracle_price_twap: i64,
+        pub in_vault_amount_before: u64,
+        pub out_vault_amount_before: u64,
+        pub in_fund_vault_amount_after: u64,
+        pub out_fund_vault_amount_after: u64,
+        pub in_market_index: u16,
+        pub out_market_index: u16,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct TransferProtocolIfSharesToRevenuePoolRecord {
+        pub ts: i64,
+        pub market_index: u16,
+        pub amount: u64,
+        pub shares: u128,
+        pub if_vault_amount_before: u64,
+        pub protocol_shares_before: u128,
+        pub transfer_amount: u64,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct SwapRecord {
         pub ts: i64,
         #[serde(with = "pubkey_serde")]
@@ -8184,25 +10522,69 @@ pub mod events {
     #[derive(Debug, Serialize)]
     #[serde(tag = "event_type")]
     pub enum Event {
-        NewUserRecord { args: NewUserRecord },
-        DepositRecord { args: DepositRecord },
-        SpotInterestRecord { args: SpotInterestRecord },
-        FundingPaymentRecord { args: FundingPaymentRecord },
-        FundingRateRecord { args: FundingRateRecord },
-        CurveRecord { args: CurveRecord },
-        SignedMsgOrderRecord { args: SignedMsgOrderRecord },
-        OrderRecord { args: OrderRecord },
-        OrderActionRecord { args: OrderActionRecord },
-        LpRecord { args: LpRecord },
-        LiquidationRecord { args: LiquidationRecord },
-        SettlePnlRecord { args: SettlePnlRecord },
-        InsuranceFundRecord { args: InsuranceFundRecord },
-        InsuranceFundStakeRecord { args: InsuranceFundStakeRecord },
-        SwapRecord { args: SwapRecord },
-        SpotMarketVaultDepositRecord { args: SpotMarketVaultDepositRecord },
-        DeleteUserRecord { args: DeleteUserRecord },
-        FuelSweepRecord { args: FuelSweepRecord },
-        FuelSeasonRecord { args: FuelSeasonRecord },
+        NewUserRecord {
+            args: NewUserRecord,
+        },
+        DepositRecord {
+            args: DepositRecord,
+        },
+        SpotInterestRecord {
+            args: SpotInterestRecord,
+        },
+        FundingPaymentRecord {
+            args: FundingPaymentRecord,
+        },
+        FundingRateRecord {
+            args: FundingRateRecord,
+        },
+        CurveRecord {
+            args: CurveRecord,
+        },
+        SignedMsgOrderRecord {
+            args: SignedMsgOrderRecord,
+        },
+        OrderRecord {
+            args: OrderRecord,
+        },
+        OrderActionRecord {
+            args: OrderActionRecord,
+        },
+        LpRecord {
+            args: LpRecord,
+        },
+        LiquidationRecord {
+            args: LiquidationRecord,
+        },
+        SettlePnlRecord {
+            args: SettlePnlRecord,
+        },
+        InsuranceFundRecord {
+            args: InsuranceFundRecord,
+        },
+        InsuranceFundStakeRecord {
+            args: InsuranceFundStakeRecord,
+        },
+        InsuranceFundSwapRecord {
+            args: InsuranceFundSwapRecord,
+        },
+        TransferProtocolIfSharesToRevenuePoolRecord {
+            args: TransferProtocolIfSharesToRevenuePoolRecord,
+        },
+        SwapRecord {
+            args: SwapRecord,
+        },
+        SpotMarketVaultDepositRecord {
+            args: SpotMarketVaultDepositRecord,
+        },
+        DeleteUserRecord {
+            args: DeleteUserRecord,
+        },
+        FuelSweepRecord {
+            args: FuelSweepRecord,
+        },
+        FuelSeasonRecord {
+            args: FuelSeasonRecord,
+        },
     }
     pub const EVENT_LOG_DISCRIMINATOR: [u8; 8] = [228, 69, 165, 46, 81, 203, 154, 29];
     impl Event {
@@ -8294,6 +10676,16 @@ pub mod events {
                     let mut rdr = &payload[..];
                     let args = InsuranceFundStakeRecord::deserialize(&mut rdr)?;
                     return Ok(Event::InsuranceFundStakeRecord { args });
+                }
+                [85u8, 190u8, 99u8, 203u8, 237u8, 33u8, 227u8, 100u8] => {
+                    let mut rdr = &payload[..];
+                    let args = InsuranceFundSwapRecord::deserialize(&mut rdr)?;
+                    return Ok(Event::InsuranceFundSwapRecord { args });
+                }
+                [209u8, 118u8, 142u8, 167u8, 130u8, 46u8, 164u8, 151u8] => {
+                    let mut rdr = &payload[..];
+                    let args = TransferProtocolIfSharesToRevenuePoolRecord::deserialize(&mut rdr)?;
+                    return Ok(Event::TransferProtocolIfSharesToRevenuePoolRecord { args });
                 }
                 [162u8, 187u8, 123u8, 194u8, 138u8, 56u8, 250u8, 241u8] => {
                     let mut rdr = &payload[..];

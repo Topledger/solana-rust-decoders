@@ -1,12 +1,13 @@
 // build.rs
 
-use anchor_idl::{EnumFields, GeneratorOptions, Idl, IdlAccountItem, IdlTypeDefinitionTy};
+use anchor_idl::{EnumFields, GeneratorOptions, Idl, IdlAccountItem, IdlTypeDefinitionTy, IdlType};
 use anyhow::Result;
 use heck::{ToSnakeCase, ToUpperCamelCase};
 use quote::{format_ident, quote};
 use serde_json::from_str;
 use sha2::{Digest, Sha256};
 use std::{fs, process::Command};
+use serde_json::Value;
 
 fn main() -> Result<()> {
     let path = "idls/drift_v2.json";
@@ -14,6 +15,7 @@ fn main() -> Result<()> {
     // 1) load the IDL JSON
     let idl_json = fs::read_to_string(path)?;
     let idl: Idl = from_str(&idl_json)?;
+    let raw: Value = from_str(&idl_json)?;
 
     // 2) hand‐roll typedefs so that enums with fields work correctly
     let typedefs_rs = {
@@ -25,9 +27,38 @@ fn main() -> Result<()> {
                 // Structs are unchanged
                 IdlTypeDefinitionTy::Struct { fields } => {
                     let fields_ts = fields.iter().map(|f| {
-                        let f_ident = format_ident!("{}", f.name.to_snake_case());
+                        let field_ident = format_ident!("{}", f.name.to_snake_case());
                         let ty = map_idl_type(&f.ty);
-                        quote! { pub #f_ident: #ty, }
+                        let field_tokens = match &f.ty {
+                            anchor_idl::IdlType::U64 | anchor_idl::IdlType::U128 => {
+                                quote! {
+                                    #[serde(serialize_with = "crate::serialize_to_string")]
+                                    pub #field_ident: #ty,
+                                }
+                            }
+                            &anchor_idl::IdlType::PublicKey => {
+                                quote! {
+                                    #[serde(with = "pubkey_serde")]
+                                    pub #field_ident: [u8; 32usize],
+                                }
+                            }
+                            // Option<PublicKey> → Option<[u8;32]> + its serde
+                            anchor_idl::IdlType::Option(inner)
+                                if matches!(inner.as_ref(), &anchor_idl::IdlType::PublicKey) =>
+                            {
+                                quote! {
+                                    #[serde(with = "pubkey_serde_option")]
+                                    pub #field_ident: Option<[u8; 32usize]>,
+                                }
+                            }
+                            _ => {
+                                quote! {
+                                    pub #field_ident: #ty,
+                                }
+                            }
+                        };
+            
+                        field_tokens
                     });
                     tts.push(quote! {
                         #[derive(::borsh::BorshSerialize, ::borsh::BorshDeserialize, Clone, Debug, Serialize)]
@@ -141,17 +172,173 @@ fn main() -> Result<()> {
             field_tokens
         });
         args_structs.push(quote! {
-            #[derive(::borsh::BorshDeserialize, Debug, Serialize)]
+            #[derive(Debug, serde::Serialize)]
             pub struct #args_ty {
                 #(#args_fields)*
             }
         });
 
+        // let mut req_idents = Vec::new();
+        // let mut req_tys = Vec::new();
+        // let mut opt_idents = Vec::new();
+        // let mut opt_inner_tys = Vec::new();
+        // for arg in &ix.args {
+        //     let id = format_ident!("{}", arg.name.to_snake_case());
+        //     let ty_ts = map_idl_type(&arg.ty);
+        //     match &arg.ty {
+        //         IdlType::Option(inner) => {
+        //             opt_idents.push(id.clone());
+        //             opt_inner_tys.push(map_idl_type(inner));
+        //         }
+        //         _ => {
+        //             req_idents.push(id.clone());
+        //             req_tys.push(ty_ts.clone());
+        //         }
+        //     }
+        // }
+
+        // let mut all_idents = req_idents.clone();
+        // all_idents.extend(opt_idents.clone());
+
+        // args_structs.push(quote! {
+        //     impl ::borsh::BorshDeserialize for #args_ty {
+        //         fn deserialize_reader<R: ::std::io::Read>(reader: &mut R) -> ::std::io::Result<Self> {
+        //             use ::borsh::BorshDeserialize;
+        //             // required fields
+        //             #(let #req_idents = <#req_tys as BorshDeserialize>::deserialize_reader(reader)?;)*
+        //             // optional fields
+        //             #(let #opt_idents = match <u8 as BorshDeserialize>::deserialize_reader(reader) {
+        //                 Ok(1) => Some(<#opt_inner_tys as BorshDeserialize>::deserialize_reader(reader)?),
+        //                 _ => None,
+        //             };)*
+        //             Ok(#args_ty { #(#all_idents),* })
+        //         }
+        //     }
+        // });
+
+        let mut parse_args = Vec::new();
+        let mut arg_idents= Vec::new();
+        let all_types = &idl.types;
+
+        for arg in &ix.args {
+            let fname = format_ident!("{}", arg.name.to_snake_case());
+            let fty   = map_idl_type(&arg.ty);
+
+            let snippet = match &arg.ty {
+                // direct Option<T>
+                IdlType::Option(inner) if matches!(inner.as_ref(), &IdlType::Bool) => {
+                    // Option<bool> is encoded as one byte: 0 = None, 1 = Some(true)
+                    quote! {
+                        let #fname = if !rdr.is_empty() {
+                            let tag = rdr[0];
+                            rdr = &rdr[1..];
+                            Some(tag == 1)
+                        } else {
+                            None
+                        };
+                    }
+                }
+                
+                IdlType::Option(inner) => {
+                    // everything else (Option<u32>, Option<i64>, Option<PublicKey>, …)
+                    let inner_ty = map_idl_type(inner);
+                    quote! {
+                        let #fname: Option<#inner_ty> = parse_option(&mut rdr)?;
+                    }
+                }
+                
+
+                // a `defined` custom type
+                IdlType::Defined(name) => {
+                    // find that type in idl.types
+                    if let Some(type_def) = all_types.iter()
+                        .find(|t| t.name == name.as_str())
+                    {
+                        if let anchor_idl::IdlTypeDefinitionTy::Struct { fields } = &type_def.ty {
+                            // unroll each field of the struct
+                            let mut field_snips = Vec::new();
+                            let mut field_idents = Vec::new();
+                            for f in fields {
+                                let field_ident = format_ident!("{}", f.name.to_snake_case());
+                                let field_ty_ts = map_idl_type(&f.ty);
+                                let field_parse = match &f.ty {
+                                    IdlType::Option(inner2) => {
+                                        let inner2_ts = map_idl_type(inner2);
+                                        quote! {
+                                            let #field_ident: Option<#inner2_ts> = parse_option(&mut rdr)?;
+                                        }
+                                    }
+                                    _ => quote! {
+                                        let #field_ident: #field_ty_ts =
+                                            <#field_ty_ts as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                                    },
+                                };
+                                field_snips.push(field_parse);
+                                field_idents.push(field_ident);
+                            }
+
+                            let type_ident = format_ident!("{}", name.to_upper_camel_case());
+                            // now construct the struct
+                            quote! {
+                                #(#field_snips)*
+                                let #fname = #type_ident {
+                                    #(#field_idents),*
+                                };
+                            }
+                        } else {
+                            // fallback to default deserialize
+                            quote! {
+                                let #fname: #fty =
+                                    <#fty as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                            }
+                        }
+                    } else {
+                        // missing type in IDL—fallback
+                        quote! {
+                            let #fname: #fty =
+                                <#fty as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                        }
+                    }
+                }
+
+                // everything else: plain BorshDeserialize
+                _ => quote! {
+                    let #fname: #fty =
+                        <#fty as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                }
+            };
+
+            parse_args.push(snippet);
+            arg_idents.push(fname);
+        }
+
         // 3c) Accounts struct
         let flat = flatten_accounts(&ix.accounts);
         let acc_fields = flat.iter().map(|acc| {
+            let is_optional = raw["instructions"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|instr| instr["name"] == ix.name)
+                .and_then(|instr| {
+                    instr["accounts"]
+                        .as_array()
+                        .unwrap()
+                        .iter()
+                        .find(|a| a["name"] == acc.name)
+                        .and_then(|a| a["optional"].as_bool())
+                })
+                .unwrap_or(false);
+
             let f = format_ident!("{}", acc.name);
-            quote! { pub #f: String, }
+            if is_optional {
+                quote! {
+                    #[serde(skip_serializing_if = "Option::is_none")]
+                    pub #f: Option<String>,
+                }
+            } else {
+                quote! { pub #f: String, }
+            }
         });
         accounts_structs.push(quote! {
             #[derive(Debug, Serialize)]
@@ -161,20 +348,64 @@ fn main() -> Result<()> {
             }
         });
 
+        let mut extract = Vec::new();
+        let mandatory_count = raw["instructions"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|instr| instr["name"] == ix.name)
+            .and_then(|instr| instr["accounts"].as_array())
+            .unwrap()
+            .iter()
+            .filter(|a| !a.get("optional").and_then(|b| b.as_bool()).unwrap_or(false))
+            .count();
+
+        // iterate the keys once
+        extract.push(quote! { let mut keys = account_keys.iter(); });
+        // true if this invocation has the extra slot
+        extract.push(quote! { let has_extra = account_keys.len() > #mandatory_count; });
+
+        for acc in &flat {
+            let name = format_ident!("{}", acc.name);
+            // check optional flag again
+            let is_opt = raw["instructions"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|instr| instr["name"] == ix.name)
+                .and_then(|instr| instr["accounts"].as_array())
+                .unwrap()
+                .iter()
+                .find(|a| a["name"] == acc.name)
+                .and_then(|a| a["optional"].as_bool())
+                .unwrap_or(false);
+
+            if is_opt {
+                extract.push(quote! {
+                    let #name = if has_extra {
+                        Some(keys.next().unwrap().clone())
+                    } else {
+                        None
+                    };
+                });
+            } else {
+                extract.push(quote! {
+                    let #name = keys.next().unwrap().clone();
+                });
+            }
+        }
+
         // 3d) decoder arm
         let idents = flat
             .iter()
             .map(|acc| format_ident!("{}", acc.name))
             .collect::<Vec<_>>();
-        let extract = idents.iter().map(|id| {
-            quote! {
-                let #id = keys.next().unwrap().clone();
-            }
-        });
         arms.push(quote! {
             [#(#disc_tokens),*] => {
                 let mut rdr: &[u8] = rest;
-                let args = #args_ty::deserialize(&mut rdr)?;
+                // let args = #args_ty::deserialize_reader(&mut rdr)?;
+                #(#parse_args)*
+                let args = #args_ty { #(#arg_idents),* };
                 let mut keys = account_keys.iter();
                 #(#extract)*
                 let remaining = keys.cloned().collect();
@@ -347,6 +578,28 @@ fn main() -> Result<()> {
         None
     };
 
+    let parse_option_fn = quote! {
+        /// Parse an Option<T> in either old‑IDL (no tag) or new‑IDL (0x00/0x01 prefix) form
+        fn parse_option<T: ::borsh::BorshDeserialize>(
+            rdr: &mut &[u8],
+        ) -> anyhow::Result<Option<T>> {
+            if rdr.is_empty() {
+                return Ok(None);
+            }
+            let tag = rdr[0];
+            if tag == 0 {
+                *rdr = &rdr[1..];
+                return Ok(None);
+            } else if tag == 1 {
+                *rdr = &rdr[1..];
+                let v = T::deserialize(rdr)?;
+                return Ok(Some(v));
+            }
+            let v = T::deserialize(rdr)?;
+            Ok(Some(v))
+        }
+    };
+
     // 6) write out
     let out = quote! {
         // @generated by build.rs — DO NOT EDIT
@@ -363,11 +616,15 @@ fn main() -> Result<()> {
             s.serialize_str(&x.to_string())
         }
 
+        #parse_option_fn
+
         pub use ix_data::*;
         pub use typedefs::*;
         pub use accounts_data::*;
 
         pub mod typedefs {
+            use crate::pubkey_serializer::pubkey_serde;
+            use crate::pubkey_serializer::pubkey_serde_option;
             use ::borsh::{BorshSerialize, BorshDeserialize};
             use anchor_lang::prelude::*;
             use serde::Serialize;
@@ -375,6 +632,7 @@ fn main() -> Result<()> {
         }
 
         pub mod accounts_data {
+            
             use serde::Serialize;
             #(#accounts_structs)*
         }
