@@ -167,8 +167,7 @@ pub mod accounts_data {
     }
     #[derive(Debug, Serialize)]
     pub struct InitializeTipDistributionAccountAccounts {
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub config: Option<String>,
+        pub config: String,
         pub tip_distribution_account: String,
         pub validator_vote_account: String,
         pub signer: String,
@@ -476,12 +475,8 @@ impl Instruction {
                 };
                 let mut keys = account_keys.iter();
                 let mut keys = account_keys.iter();
-                let has_extra = account_keys.len() > 4usize;
-                let config = if has_extra {
-                    Some(keys.next().unwrap().clone())
-                } else {
-                    None
-                };
+                let has_extra = account_keys.len() > 5usize;
+                let config = keys.next().unwrap().clone();
                 let tip_distribution_account = keys.next().unwrap().clone();
                 let validator_vote_account = keys.next().unwrap().clone();
                 let signer = keys.next().unwrap().clone();
