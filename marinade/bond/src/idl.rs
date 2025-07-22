@@ -8,6 +8,23 @@ where
 {
     s.serialize_str(&x.to_string())
 }
+#[doc = r" Parse an Option<T> in either old‑IDL (no tag) or new‑IDL (0x00/0x01 prefix) form"]
+fn parse_option<T: ::borsh::BorshDeserialize>(rdr: &mut &[u8]) -> anyhow::Result<Option<T>> {
+    if rdr.is_empty() {
+        return Ok(None);
+    }
+    let tag = rdr[0];
+    if tag == 0 {
+        *rdr = &rdr[1..];
+        return Ok(None);
+    } else if tag == 1 {
+        *rdr = &rdr[1..];
+        let v = T::deserialize(rdr)?;
+        return Ok(Some(v));
+    }
+    let v = T::deserialize(rdr)?;
+    Ok(Some(v))
+}
 use crate::pubkey_serializer::pubkey_serde;
 use crate::pubkey_serializer::pubkey_serde_option;
 pub use accounts_data::*;
@@ -683,7 +700,8 @@ impl Instruction {
         match disc {
             [23u8, 235u8, 115u8, 232u8, 168u8, 96u8, 1u8, 231u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitConfigArguments::deserialize(&mut rdr)?;
+                let init_config_args: InitConfigArgs = InitConfigArgs::deserialize(&mut rdr)?;
+                let args = InitConfigArguments { init_config_args };
                 let mut keys = account_keys.iter();
                 let mut keys = account_keys.iter();
                 let has_extra = account_keys.len() > 3usize;
@@ -713,7 +731,11 @@ impl Instruction {
             }
             [198u8, 98u8, 161u8, 165u8, 137u8, 200u8, 230u8, 203u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = ConfigureConfigArguments::deserialize(&mut rdr)?;
+                let configure_config_args: ConfigureConfigArgs =
+                    ConfigureConfigArgs::deserialize(&mut rdr)?;
+                let args = ConfigureConfigArguments {
+                    configure_config_args,
+                };
                 let mut keys = account_keys.iter();
                 let mut keys = account_keys.iter();
                 let has_extra = account_keys.len() > 2usize;
@@ -741,7 +763,7 @@ impl Instruction {
             }
             [103u8, 26u8, 247u8, 104u8, 254u8, 134u8, 218u8, 94u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = CloseSettlementClaimArguments::deserialize(&mut rdr)?;
+                let args = CloseSettlementClaimArguments {};
                 let mut keys = account_keys.iter();
                 let mut keys = account_keys.iter();
                 let has_extra = account_keys.len() > 5usize;
@@ -763,7 +785,8 @@ impl Instruction {
             }
             [95u8, 93u8, 93u8, 181u8, 221u8, 36u8, 126u8, 64u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitBondArguments::deserialize(&mut rdr)?;
+                let init_bond_args: InitBondArgs = InitBondArgs::deserialize(&mut rdr)?;
+                let args = InitBondArguments { init_bond_args };
                 let mut keys = account_keys.iter();
                 let mut keys = account_keys.iter();
                 let has_extra = account_keys.len() > 6usize;
@@ -799,7 +822,11 @@ impl Instruction {
             }
             [228u8, 108u8, 79u8, 242u8, 82u8, 54u8, 105u8, 65u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = ConfigureBondArguments::deserialize(&mut rdr)?;
+                let configure_bond_args: ConfigureBondArgs =
+                    ConfigureBondArgs::deserialize(&mut rdr)?;
+                let args = ConfigureBondArguments {
+                    configure_bond_args,
+                };
                 let mut keys = account_keys.iter();
                 let mut keys = account_keys.iter();
                 let has_extra = account_keys.len() > 3usize;
@@ -835,7 +862,9 @@ impl Instruction {
             }
             [48u8, 189u8, 230u8, 39u8, 112u8, 33u8, 227u8, 8u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = ConfigureBondWithMintArguments::deserialize(&mut rdr)?;
+                let args: ConfigureBondWithMintArgs =
+                    ConfigureBondWithMintArgs::deserialize(&mut rdr)?;
+                let args = ConfigureBondWithMintArguments { args };
                 let mut keys = account_keys.iter();
                 let mut keys = account_keys.iter();
                 let has_extra = account_keys.len() > 9usize;
@@ -865,7 +894,7 @@ impl Instruction {
             }
             [234u8, 94u8, 85u8, 225u8, 167u8, 102u8, 169u8, 32u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = MintBondArguments::deserialize(&mut rdr)?;
+                let args = MintBondArguments {};
                 let mut keys = account_keys.iter();
                 let mut keys = account_keys.iter();
                 let has_extra = account_keys.len() > 13usize;
@@ -915,7 +944,7 @@ impl Instruction {
             }
             [58u8, 44u8, 212u8, 175u8, 30u8, 17u8, 68u8, 62u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = FundBondArguments::deserialize(&mut rdr)?;
+                let args = FundBondArguments {};
                 let mut keys = account_keys.iter();
                 let mut keys = account_keys.iter();
                 let has_extra = account_keys.len() > 8usize;
@@ -955,7 +984,11 @@ impl Instruction {
             }
             [142u8, 31u8, 222u8, 215u8, 83u8, 79u8, 34u8, 49u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitWithdrawRequestArguments::deserialize(&mut rdr)?;
+                let create_withdraw_request_args: InitWithdrawRequestArgs =
+                    InitWithdrawRequestArgs::deserialize(&mut rdr)?;
+                let args = InitWithdrawRequestArguments {
+                    create_withdraw_request_args,
+                };
                 let mut keys = account_keys.iter();
                 let mut keys = account_keys.iter();
                 let has_extra = account_keys.len() > 9usize;
@@ -985,7 +1018,7 @@ impl Instruction {
             }
             [167u8, 100u8, 110u8, 128u8, 113u8, 154u8, 224u8, 77u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = CancelWithdrawRequestArguments::deserialize(&mut rdr)?;
+                let args = CancelWithdrawRequestArguments {};
                 let mut keys = account_keys.iter();
                 let mut keys = account_keys.iter();
                 let has_extra = account_keys.len() > 8usize;
@@ -1013,7 +1046,7 @@ impl Instruction {
             }
             [48u8, 232u8, 23u8, 52u8, 20u8, 134u8, 122u8, 118u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = ClaimWithdrawRequestArguments::deserialize(&mut rdr)?;
+                let args = ClaimWithdrawRequestArguments {};
                 let mut keys = account_keys.iter();
                 let mut keys = account_keys.iter();
                 let has_extra = account_keys.len() > 16usize;
@@ -1057,7 +1090,11 @@ impl Instruction {
             }
             [152u8, 178u8, 0u8, 65u8, 52u8, 210u8, 247u8, 58u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitSettlementArguments::deserialize(&mut rdr)?;
+                let init_settlement_args: InitSettlementArgs =
+                    InitSettlementArgs::deserialize(&mut rdr)?;
+                let args = InitSettlementArguments {
+                    init_settlement_args,
+                };
                 let mut keys = account_keys.iter();
                 let mut keys = account_keys.iter();
                 let has_extra = account_keys.len() > 8usize;
@@ -1091,7 +1128,7 @@ impl Instruction {
             }
             [207u8, 46u8, 34u8, 88u8, 141u8, 36u8, 63u8, 132u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpsizeSettlementClaimsArguments::deserialize(&mut rdr)?;
+                let args = UpsizeSettlementClaimsArguments {};
                 let mut keys = account_keys.iter();
                 let mut keys = account_keys.iter();
                 let has_extra = account_keys.len() > 3usize;
@@ -1109,7 +1146,7 @@ impl Instruction {
             }
             [33u8, 241u8, 96u8, 62u8, 228u8, 178u8, 1u8, 120u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = CancelSettlementArguments::deserialize(&mut rdr)?;
+                let args = CancelSettlementArguments {};
                 let mut keys = account_keys.iter();
                 let mut keys = account_keys.iter();
                 let has_extra = account_keys.len() > 14usize;
@@ -1149,7 +1186,7 @@ impl Instruction {
             }
             [179u8, 146u8, 113u8, 34u8, 30u8, 92u8, 26u8, 19u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = FundSettlementArguments::deserialize(&mut rdr)?;
+                let args = FundSettlementArguments {};
                 let mut keys = account_keys.iter();
                 let mut keys = account_keys.iter();
                 let has_extra = account_keys.len() > 16usize;
@@ -1205,7 +1242,8 @@ impl Instruction {
             }
             [14u8, 3u8, 146u8, 23u8, 163u8, 105u8, 246u8, 99u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = MergeStakeArguments::deserialize(&mut rdr)?;
+                let merge_args: MergeStakeArgs = MergeStakeArgs::deserialize(&mut rdr)?;
+                let args = MergeStakeArguments { merge_args };
                 let mut keys = account_keys.iter();
                 let mut keys = account_keys.iter();
                 let has_extra = account_keys.len() > 9usize;
@@ -1235,7 +1273,7 @@ impl Instruction {
             }
             [183u8, 37u8, 69u8, 159u8, 163u8, 139u8, 212u8, 235u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = ResetStakeArguments::deserialize(&mut rdr)?;
+                let args = ResetStakeArguments {};
                 let mut keys = account_keys.iter();
                 let mut keys = account_keys.iter();
                 let has_extra = account_keys.len() > 12usize;
@@ -1271,7 +1309,7 @@ impl Instruction {
             }
             [153u8, 8u8, 22u8, 138u8, 105u8, 176u8, 87u8, 66u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = WithdrawStakeArguments::deserialize(&mut rdr)?;
+                let args = WithdrawStakeArguments {};
                 let mut keys = account_keys.iter();
                 let mut keys = account_keys.iter();
                 let has_extra = account_keys.len() > 11usize;
@@ -1305,7 +1343,7 @@ impl Instruction {
             }
             [21u8, 143u8, 27u8, 142u8, 200u8, 181u8, 210u8, 255u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = EmergencyPauseArguments::deserialize(&mut rdr)?;
+                let args = EmergencyPauseArguments {};
                 let mut keys = account_keys.iter();
                 let mut keys = account_keys.iter();
                 let has_extra = account_keys.len() > 4usize;
@@ -1325,7 +1363,7 @@ impl Instruction {
             }
             [0u8, 243u8, 48u8, 185u8, 6u8, 73u8, 190u8, 83u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = EmergencyResumeArguments::deserialize(&mut rdr)?;
+                let args = EmergencyResumeArguments {};
                 let mut keys = account_keys.iter();
                 let mut keys = account_keys.iter();
                 let has_extra = account_keys.len() > 4usize;
@@ -1345,7 +1383,7 @@ impl Instruction {
             }
             [45u8, 247u8, 83u8, 183u8, 24u8, 102u8, 0u8, 68u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = CloseSettlementArguments::deserialize(&mut rdr)?;
+                let args = CloseSettlementArguments {};
                 let mut keys = account_keys.iter();
                 let mut keys = account_keys.iter();
                 let has_extra = account_keys.len() > 12usize;
@@ -1381,7 +1419,7 @@ impl Instruction {
             }
             [125u8, 212u8, 89u8, 37u8, 31u8, 244u8, 191u8, 179u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = CloseSettlementV2Arguments::deserialize(&mut rdr)?;
+                let args = CloseSettlementV2Arguments {};
                 let mut keys = account_keys.iter();
                 let mut keys = account_keys.iter();
                 let has_extra = account_keys.len() > 13usize;
@@ -1419,7 +1457,11 @@ impl Instruction {
             }
             [188u8, 53u8, 132u8, 151u8, 88u8, 50u8, 52u8, 238u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = ClaimSettlementV2Arguments::deserialize(&mut rdr)?;
+                let claim_settlement_args: ClaimSettlementV2Args =
+                    ClaimSettlementV2Args::deserialize(&mut rdr)?;
+                let args = ClaimSettlementV2Arguments {
+                    claim_settlement_args,
+                };
                 let mut keys = account_keys.iter();
                 let mut keys = account_keys.iter();
                 let has_extra = account_keys.len() > 12usize;
@@ -1455,7 +1497,11 @@ impl Instruction {
             }
             [85u8, 208u8, 73u8, 229u8, 143u8, 98u8, 83u8, 212u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = ClaimSettlementArguments::deserialize(&mut rdr)?;
+                let claim_settlement_args: ClaimSettlementArgs =
+                    ClaimSettlementArgs::deserialize(&mut rdr)?;
+                let args = ClaimSettlementArguments {
+                    claim_settlement_args,
+                };
                 let mut keys = account_keys.iter();
                 let mut keys = account_keys.iter();
                 let has_extra = account_keys.len() > 12usize;
