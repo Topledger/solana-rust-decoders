@@ -140,6 +140,7 @@
           {
             "name": "initialLiquiditySource",
             "isMut": true,
+            "optional": true,
             "isSigner": false
           },
           {
@@ -160,6 +161,7 @@
           {
             "name": "systemProgram",
             "isMut": false,
+            "optional": true,
             "isSigner": false
           }
         ],
@@ -237,6 +239,7 @@
           {
             "name": "globalConfig",
             "isMut": false,
+            "optional": true,
             "isSigner": false
           },
           {
@@ -302,6 +305,7 @@
           },
           {
             "name": "tokenProgram",
+            "optional": true,
             "isMut": false,
             "isSigner": false
           }
@@ -344,6 +348,7 @@
           {
             "name": "feeCollectorAta",
             "isMut": true,
+            "optional": true,
             "isSigner": false
           },
           {
@@ -513,6 +518,7 @@
           {
             "name": "scopePrices",
             "isMut": false,
+            "optional": true,
             "isSigner": false,
             "isOptional": true
           }
@@ -580,16 +586,19 @@
           {
             "name": "collateralTokenProgram",
             "isMut": false,
+            "optional": true,
             "isSigner": false
           },
           {
             "name": "liquidityTokenProgram",
             "isMut": false,
+            "optional": true,
             "isSigner": false
           },
           {
             "name": "instructionSysvarAccount",
             "isMut": false,
+            "optional": true,
             "isSigner": false
           }
         ],
@@ -646,6 +655,7 @@
           {
             "name": "userDestinationLiquidity",
             "isMut": true,
+            "optional": true,
             "isSigner": false
           },
           {
@@ -656,10 +666,12 @@
           {
             "name": "liquidityTokenProgram",
             "isMut": false,
+            "optional": true,
             "isSigner": false
           },
           {
             "name": "instructionSysvarAccount",
+            "optional": true,
             "isMut": false,
             "isSigner": false
           }
@@ -697,15 +709,18 @@
           {
             "name": "seed1Account",
             "isMut": false,
+            "optional": true,
             "isSigner": false
           },
           {
             "name": "seed2Account",
             "isMut": false,
+            "optional": true,
             "isSigner": false
           },
           {
             "name": "ownerUserMetadata",
+            "optional": true,
             "isMut": false,
             "isSigner": false
           },
@@ -975,13 +990,15 @@
             "name": "obligationFarmUserState",
             "isMut": true,
             "isSigner": false,
-            "isOptional": true
+            "isOptional": true,
+            "optional": true
           },
           {
             "name": "reserveFarmState",
             "isMut": true,
             "isSigner": false,
-            "isOptional": true
+            "isOptional": true,
+            "optional": true
           },
           {
             "name": "farmsProgram",
@@ -1104,13 +1121,15 @@
             "name": "obligationFarmUserState",
             "isMut": true,
             "isSigner": false,
-            "isOptional": true
+            "isOptional": true,
+            "optional": true
           },
           {
             "name": "reserveFarmState",
             "isMut": true,
             "isSigner": false,
-            "isOptional": true
+            "isOptional": true,
+            "optional": true
           },
           {
             "name": "farmsProgram",
@@ -1171,12 +1190,14 @@
           {
             "name": "userDestinationLiquidity",
             "isMut": true,
+            "optional": true,
             "isSigner": false
           },
           {
             "name": "referrerTokenState",
             "isMut": true,
             "isSigner": false,
+            "optional": true,
             "isOptional": true
           },
           {
@@ -1186,6 +1207,7 @@
           },
           {
             "name": "instructionSysvarAccount",
+            "optional": true,
             "isMut": false,
             "isSigner": false
           }
@@ -1249,7 +1271,8 @@
             "name": "referrerTokenState",
             "isMut": true,
             "isSigner": false,
-            "isOptional": true
+            "isOptional": true,
+            "optional": true
           },
           {
             "name": "tokenProgram",
@@ -1265,13 +1288,15 @@
             "name": "obligationFarmUserState",
             "isMut": true,
             "isSigner": false,
-            "isOptional": true
+            "isOptional": true,
+            "optional": true
           },
           {
             "name": "reserveFarmState",
             "isMut": true,
             "isSigner": false,
-            "isOptional": true
+            "isOptional": true,
+            "optional": true
           },
           {
             "name": "farmsProgram",
@@ -1317,11 +1342,13 @@
           {
             "name": "reserveDestinationLiquidity",
             "isMut": true,
+            "optional": true,
             "isSigner": false
           },
           {
             "name": "userSourceLiquidity",
             "isMut": true,
+            "optional": true,
             "isSigner": false
           },
           {
@@ -1394,13 +1421,15 @@
             "name": "obligationFarmUserState",
             "isMut": true,
             "isSigner": false,
-            "isOptional": true
+            "isOptional": true,
+            "optional": true
           },
           {
             "name": "reserveFarmState",
             "isMut": true,
             "isSigner": false,
-            "isOptional": true
+            "isOptional": true,
+            "optional": true
           },
           {
             "name": "lendingMarketAuthority",
@@ -1502,7 +1531,8 @@
             "name": "placeholderUserDestinationCollateral",
             "isMut": false,
             "isSigner": false,
-            "isOptional": true
+            "isOptional": true,
+            "optional": true
           },
           {
             "name": "collateralTokenProgram",
@@ -1518,13 +1548,15 @@
             "name": "obligationFarmUserState",
             "isMut": true,
             "isSigner": false,
-            "isOptional": true
+            "isOptional": true,
+            "optional": true
           },
           {
             "name": "reserveFarmState",
             "isMut": true,
             "isSigner": false,
-            "isOptional": true
+            "isOptional": true,
+            "optional": true
           },
           {
             "name": "farmsProgram",
@@ -1600,7 +1632,8 @@
             "name": "placeholderUserDestinationCollateral",
             "isMut": false,
             "isSigner": false,
-            "isOptional": true
+            "isOptional": true,
+            "optional": true
           },
           {
             "name": "collateralTokenProgram",
@@ -1636,13 +1669,15 @@
             "name": "obligationFarmUserState",
             "isMut": true,
             "isSigner": false,
-            "isOptional": true
+            "isOptional": true,
+            "optional": true
           },
           {
             "name": "reserveFarmState",
             "isMut": true,
             "isSigner": false,
-            "isOptional": true
+            "isOptional": true,
+            "optional": true
           },
           {
             "name": "farmsProgram",
@@ -1718,11 +1753,13 @@
             "name": "placeholderUserDestinationCollateral",
             "isMut": false,
             "isSigner": false,
-            "isOptional": true
+            "isOptional": true,
+            "optional": true
           },
           {
             "name": "collateralTokenProgram",
             "isMut": false,
+            "optional": true,
             "isSigner": false
           },
           {
@@ -1733,6 +1770,7 @@
           {
             "name": "instructionSysvarAccount",
             "isMut": false,
+            "optional": true,
             "isSigner": false
           }
         ],
@@ -1800,7 +1838,8 @@
             "name": "placeholderUserDestinationCollateral",
             "isMut": false,
             "isSigner": false,
-            "isOptional": true
+            "isOptional": true,
+            "optional": true
           },
           {
             "name": "collateralTokenProgram",
@@ -1899,16 +1938,19 @@
             "name": "placeholderUserDestinationCollateral",
             "isMut": false,
             "isSigner": false,
+            "optional": true,
             "isOptional": true
           },
           {
             "name": "collateralTokenProgram",
             "isMut": false,
+            "optional": true,
             "isSigner": false
           },
           {
             "name": "liquidityTokenProgram",
             "isMut": false,
+            "optional": true,
             "isSigner": false
           },
           {
@@ -2002,13 +2044,15 @@
             "name": "obligationFarmUserState",
             "isMut": true,
             "isSigner": false,
-            "isOptional": true
+            "isOptional": true,
+            "optional": true
           },
           {
             "name": "reserveFarmState",
             "isMut": true,
             "isSigner": false,
-            "isOptional": true
+            "isOptional": true,
+            "optional": true
           },
           {
             "name": "farmsProgram",
@@ -2109,21 +2153,25 @@
           {
             "name": "collateralTokenProgram",
             "isMut": false,
+            "optional": true,
             "isSigner": false
           },
           {
             "name": "repayLiquidityTokenProgram",
             "isMut": false,
+            "optional": true,
             "isSigner": false
           },
           {
             "name": "withdrawLiquidityTokenProgram",
             "isMut": false,
+            "optional": true,
             "isSigner": false
           },
           {
             "name": "instructionSysvarAccount",
             "isMut": false,
+            "optional": true,
             "isSigner": false
           }
         ],
@@ -2249,13 +2297,15 @@
             "name": "obligationFarmUserState",
             "isMut": true,
             "isSigner": false,
-            "isOptional": true
+            "isOptional": true,
+            "optional": true
           },
           {
             "name": "reserveFarmState",
             "isMut": true,
             "isSigner": false,
-            "isOptional": true
+            "isOptional": true,
+            "optional": true
           },
           {
             "name": "farmsProgram",
@@ -2304,6 +2354,7 @@
           {
             "name": "reserveLiquidityMint",
             "isMut": false,
+            "optional": true,
             "isSigner": false
           },
           {
@@ -2325,13 +2376,15 @@
             "name": "referrerTokenState",
             "isMut": true,
             "isSigner": false,
-            "isOptional": true
+            "isOptional": true,
+            "optional": true
           },
           {
             "name": "referrerAccount",
             "isMut": true,
             "isSigner": false,
-            "isOptional": true
+            "isOptional": true,
+            "optional": true
           },
           {
             "name": "sysvarInfo",
@@ -2371,16 +2424,19 @@
           {
             "name": "lendingMarket",
             "isMut": false,
+            "optional": true,
             "isSigner": false
           },
           {
             "name": "reserve",
             "isMut": true,
+            "optional": true,
             "isSigner": false
           },
           {
             "name": "reserveLiquidityMint",
             "isMut": false,
+            "optional": true,
             "isSigner": false
           },
           {
@@ -2402,13 +2458,16 @@
             "name": "referrerTokenState",
             "isMut": true,
             "isSigner": false,
+            "optional": true,
             "isOptional": true
+            
           },
           {
             "name": "referrerAccount",
             "isMut": true,
             "isSigner": false,
-            "isOptional": true
+            "isOptional": true,
+            "optional": true
           },
           {
             "name": "sysvarInfo",
@@ -2465,6 +2524,7 @@
           {
             "name": "lendingMarket",
             "isMut": false,
+            "optional": true,
             "isSigner": false
           },
           {
@@ -2511,12 +2571,14 @@
           {
             "name": "userMetadata",
             "isMut": true,
+            "optional": true,
             "isSigner": false
           },
           {
             "name": "referrerUserMetadata",
             "isMut": false,
             "isSigner": false,
+            "optional": true,
             "isOptional": true
           },
           {
@@ -2609,6 +2671,7 @@
           {
             "name": "referrerUserMetadata",
             "isMut": false,
+            "optional": true,
             "isSigner": false
           },
           {

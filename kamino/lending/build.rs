@@ -6,6 +6,7 @@ use heck::{ToSnakeCase, ToUpperCamelCase};
 use proc_macro2::Literal;
 use quote::{format_ident, quote};
 use serde_json::from_str;
+use serde_json::Value;
 use sha2::{Digest, Sha256};
 use std::{fs, process::Command};
 
@@ -15,6 +16,7 @@ fn main() -> Result<()> {
     // 1) load the IDL JSON
     let idl_json = fs::read_to_string(path)?;
     let idl: Idl = from_str(&idl_json)?;
+    let raw: Value = from_str(&idl_json)?;
 
     // 2) hand‐roll typedefs so that enums with fields work correctly
     let typedefs_rs = {
@@ -47,7 +49,7 @@ fn main() -> Result<()> {
                             anchor_idl::IdlType::Array(inner, len) => {
                                 let l = *len as usize;
                                 let inner_type_ts = map_idl_type(inner);
-            
+
                                 if l > 32 {
                                     quote! {
                                         #[serde(with = "BigArray")]
@@ -99,7 +101,10 @@ fn main() -> Result<()> {
                                             }
                                             // Option<PublicKey>
                                             anchor_idl::IdlType::Option(inner)
-                                                if matches!(**inner, anchor_idl::IdlType::PublicKey) =>
+                                                if matches!(
+                                                    **inner,
+                                                    anchor_idl::IdlType::PublicKey
+                                                ) =>
                                             {
                                                 quote! {
                                                     #[serde(with = "pubkey_serde_option")]
@@ -109,7 +114,7 @@ fn main() -> Result<()> {
                                             anchor_idl::IdlType::Array(inner, len) => {
                                                 let l = *len as usize;
                                                 let inner_type_ts = map_idl_type(inner);
-                            
+
                                                 if l > 32 {
                                                     quote! {
                                                         #[serde(with = "BigArray")]
@@ -127,7 +132,6 @@ fn main() -> Result<()> {
                                                 quote! { #f_ident: #ty, }
                                             }
                                         }
-                                        
                                     });
                                     quote! { #v_ident { #(#named)* }, }
                                 }
@@ -141,8 +145,7 @@ fn main() -> Result<()> {
                                 }
                             }
                         })
-                        .collect::<Vec<_>>();    // Pick the first variant as default
-                
+                        .collect::<Vec<_>>(); // Pick the first variant as default
 
                     tts.push(quote! {
                         #[derive(::borsh::BorshSerialize, ::borsh::BorshDeserialize, Clone, Debug, Serialize)]
@@ -156,7 +159,6 @@ fn main() -> Result<()> {
 
         quote! { #(#tts)* }
     };
-
 
     // 3) build each Args and Accounts struct + decoder arms (unchanged)
     let mut args_structs = Vec::new();
@@ -238,8 +240,30 @@ fn main() -> Result<()> {
         // 3c) Accounts struct
         let flat = flatten_accounts(&ix.accounts);
         let acc_fields = flat.iter().map(|acc| {
+            let is_optional = raw["instructions"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|instr| instr["name"] == ix.name)
+                .and_then(|instr| {
+                    instr["accounts"]
+                        .as_array()
+                        .unwrap()
+                        .iter()
+                        .find(|a| a["name"] == acc.name)
+                        .and_then(|a| a["optional"].as_bool())
+                })
+                .unwrap_or(false);
+
             let f = format_ident!("{}", acc.name);
-            quote! { pub #f: String, }
+            if is_optional {
+                quote! {
+                    #[serde(skip_serializing_if = "Option::is_none")]
+                    pub #f: Option<String>,
+                }
+            } else {
+                quote! { pub #f: String, }
+            }
         });
         accounts_structs.push(quote! {
             #[derive(Debug, Serialize)]
@@ -249,43 +273,94 @@ fn main() -> Result<()> {
             }
         });
 
+        let mut parse_args = Vec::new();
+        let mut arg_idents = Vec::new();
+        for arg in &ix.args {
+            let fname = format_ident!("{}", arg.name.to_snake_case());
+            let fty = map_idl_type(&arg.ty);
+            let snippet = match &arg.ty {
+                anchor_idl::IdlType::Option(inner) => {
+                    let inner_ty = map_idl_type(inner);
+                    quote! {
+                        let #fname: Option<#inner_ty> = parse_option(&mut rdr)?;
+                    }
+                }
+                _ => quote! {
+                    let #fname: #fty = <#fty as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                },
+            };
+            parse_args.push(snippet);
+            arg_idents.push(fname);
+        }
+
         // 3d) decoder arm
+        let mut extract = Vec::new();
+        let mandatory_count = raw["instructions"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|instr| instr["name"] == ix.name)
+            .and_then(|instr| instr["accounts"].as_array())
+            .unwrap()
+            .iter()
+            .filter(|a| !a.get("optional").and_then(|b| b.as_bool()).unwrap_or(false))
+            .count();
+
+        // iterate the keys once
+        extract.push(quote! {
+            let mut keys = account_keys.iter();
+            // How many optional slots were actually supplied?
+            let mut opt_budget = account_keys.len().saturating_sub(#mandatory_count);
+        });
+
+        for acc in &flat {
+            let name = format_ident!("{}", acc.name);
+            // check optional flag again
+            let is_opt = raw["instructions"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|instr| instr["name"] == ix.name)
+                .and_then(|instr| instr["accounts"].as_array())
+                .unwrap()
+                .iter()
+                .find(|a| a["name"] == acc.name)
+                .and_then(|a| a["optional"].as_bool())
+                .unwrap_or(false);
+
+            if is_opt {
+                extract.push(quote! {
+                    let #name = if opt_budget > 0 {
+                        opt_budget -= 1;
+                        Some(keys.next().unwrap().clone())
+                    } else {
+                        None
+                    };
+                });
+            } else {
+                extract.push(quote! {
+                    let #name = keys.next().unwrap().clone();
+                });
+            }
+        }
+
         let idents = flat
             .iter()
             .map(|acc| format_ident!("{}", acc.name))
             .collect::<Vec<_>>();
-        let extract = idents.iter().map(|id| {
-            quote! {
-                let #id = keys.next().unwrap().clone();
+
+        arms.push(quote! {
+            [#(#disc_tokens),*] => {
+                let mut rdr: &[u8] = rest;
+                #(#parse_args)*
+                let args = #args_ty { #(#arg_idents),* };
+                let mut keys = account_keys.iter();
+                #(#extract)*
+                let remaining = keys.cloned().collect();
+                let accounts = #accounts_ty { remaining, #(#idents),* };
+                return Ok(Instruction::#variant { accounts, args });
             }
         });
-        if idents.is_empty() {
-            // No accounts at all → only remaining = account_keys.iter().cloned().collect()
-            arms.push(quote! {
-                [#(#disc_tokens),*] => {
-                    let mut rdr: &[u8] = rest;
-                    let args = #args_ty::deserialize(&mut rdr)?;
-                    // Since there are no named accounts, we skip the `keys.next().unwrap()` calls
-                    let accounts = #accounts_ty {
-                        remaining: account_keys.iter().cloned().collect(),
-                    };
-                    return Ok(Instruction::#variant { accounts, args });
-                }
-            });
-        } else {
-            // One or more accounts → extract each in turn, then collect remaining
-            arms.push(quote! {
-                [#(#disc_tokens),*] => {
-                    let mut rdr: &[u8] = rest;
-                    let args = #args_ty::deserialize(&mut rdr)?;
-                    let mut keys = account_keys.iter();
-                    #(#extract)*
-                    let remaining = keys.cloned().collect();
-                    let accounts = #accounts_ty { #(#idents),*, remaining };
-                    return Ok(Instruction::#variant { accounts, args });
-                }
-            });
-        }
     }
 
     // 4) enum Instruction
@@ -451,6 +526,28 @@ fn main() -> Result<()> {
         None
     };
 
+    let parse_option_fn = quote! {
+        /// Parse an Option<T> in either old‑IDL (no tag) or new‑IDL (0x00/0x01 prefix) form
+        fn parse_option<T: ::borsh::BorshDeserialize>(
+            rdr: &mut &[u8],
+        ) -> anyhow::Result<Option<T>> {
+            if rdr.is_empty() {
+                return Ok(None);
+            }
+            let tag = rdr[0];
+            if tag == 0 {
+                *rdr = &rdr[1..];
+                return Ok(None);
+            } else if tag == 1 {
+                *rdr = &rdr[1..];
+                let v = T::deserialize(rdr)?;
+                return Ok(Some(v));
+            }
+            let v = T::deserialize(rdr)?;
+            Ok(Some(v))
+        }
+    };
+
     // 6) write out
     let out = quote! {
         // @generated by build.rs — DO NOT EDIT
@@ -464,6 +561,8 @@ fn main() -> Result<()> {
         {
             s.serialize_str(&x.to_string())
         }
+
+        #parse_option_fn
 
         pub use ix_data::*;
         pub use typedefs::*;

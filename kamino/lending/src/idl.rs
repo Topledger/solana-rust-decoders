@@ -8,6 +8,23 @@ where
 {
     s.serialize_str(&x.to_string())
 }
+#[doc = r" Parse an Option<T> in either old‑IDL (no tag) or new‑IDL (0x00/0x01 prefix) form"]
+fn parse_option<T: ::borsh::BorshDeserialize>(rdr: &mut &[u8]) -> anyhow::Result<Option<T>> {
+    if rdr.is_empty() {
+        return Ok(None);
+    }
+    let tag = rdr[0];
+    if tag == 0 {
+        *rdr = &rdr[1..];
+        return Ok(None);
+    } else if tag == 1 {
+        *rdr = &rdr[1..];
+        let v = T::deserialize(rdr)?;
+        return Ok(Some(v));
+    }
+    let v = T::deserialize(rdr)?;
+    Ok(Some(v))
+}
 pub use accounts_data::*;
 pub use ix_data::*;
 pub use typedefs::*;
@@ -365,11 +382,13 @@ pub mod accounts_data {
         pub feeReceiver: String,
         pub reserveCollateralMint: String,
         pub reserveCollateralSupply: String,
-        pub initialLiquiditySource: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub initialLiquiditySource: Option<String>,
         pub rent: String,
         pub liquidityTokenProgram: String,
         pub collateralTokenProgram: String,
-        pub systemProgram: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub systemProgram: Option<String>,
         pub remaining: Vec<String>,
     }
     #[derive(Debug, Serialize)]
@@ -389,7 +408,8 @@ pub mod accounts_data {
     #[derive(Debug, Serialize)]
     pub struct UpdateReserveConfigAccounts {
         pub signer: String,
-        pub globalConfig: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub globalConfig: Option<String>,
         pub lendingMarket: String,
         pub reserve: String,
         pub remaining: Vec<String>,
@@ -402,7 +422,8 @@ pub mod accounts_data {
         pub reserveSupplyLiquidity: String,
         pub lendingMarket: String,
         pub lendingMarketAuthority: String,
-        pub tokenProgram: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub tokenProgram: Option<String>,
         pub remaining: Vec<String>,
     }
     #[derive(Debug, Serialize)]
@@ -413,7 +434,8 @@ pub mod accounts_data {
         pub reserveLiquidityMint: String,
         pub lendingMarketAuthority: String,
         pub feeVault: String,
-        pub feeCollectorAta: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub feeCollectorAta: Option<String>,
         pub tokenProgram: String,
         pub remaining: Vec<String>,
     }
@@ -453,7 +475,8 @@ pub mod accounts_data {
         pub pythOracle: String,
         pub switchboardPriceOracle: String,
         pub switchboardTwapOracle: String,
-        pub scopePrices: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub scopePrices: Option<String>,
         pub remaining: Vec<String>,
     }
     #[derive(Debug, Serialize)]
@@ -471,9 +494,12 @@ pub mod accounts_data {
         pub reserveCollateralMint: String,
         pub userSourceLiquidity: String,
         pub userDestinationCollateral: String,
-        pub collateralTokenProgram: String,
-        pub liquidityTokenProgram: String,
-        pub instructionSysvarAccount: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub collateralTokenProgram: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub liquidityTokenProgram: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub instructionSysvarAccount: Option<String>,
         pub remaining: Vec<String>,
     }
     #[derive(Debug, Serialize)]
@@ -486,10 +512,13 @@ pub mod accounts_data {
         pub reserveCollateralMint: String,
         pub reserveLiquiditySupply: String,
         pub userSourceCollateral: String,
-        pub userDestinationLiquidity: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub userDestinationLiquidity: Option<String>,
         pub collateralTokenProgram: String,
-        pub liquidityTokenProgram: String,
-        pub instructionSysvarAccount: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub liquidityTokenProgram: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub instructionSysvarAccount: Option<String>,
         pub remaining: Vec<String>,
     }
     #[derive(Debug, Serialize)]
@@ -498,9 +527,12 @@ pub mod accounts_data {
         pub feePayer: String,
         pub obligation: String,
         pub lendingMarket: String,
-        pub seed1Account: String,
-        pub seed2Account: String,
-        pub ownerUserMetadata: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub seed1Account: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub seed2Account: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub ownerUserMetadata: Option<String>,
         pub rent: String,
         pub systemProgram: String,
         pub remaining: Vec<String>,
@@ -563,8 +595,10 @@ pub mod accounts_data {
         pub tokenProgram: String,
         pub instructionSysvarAccount: String,
         pub lendingMarketAuthority: String,
-        pub obligationFarmUserState: String,
-        pub reserveFarmState: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub obligationFarmUserState: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub reserveFarmState: Option<String>,
         pub farmsProgram: String,
         pub remaining: Vec<String>,
     }
@@ -592,8 +626,10 @@ pub mod accounts_data {
         pub userDestinationCollateral: String,
         pub tokenProgram: String,
         pub instructionSysvarAccount: String,
-        pub obligationFarmUserState: String,
-        pub reserveFarmState: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub obligationFarmUserState: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub reserveFarmState: Option<String>,
         pub farmsProgram: String,
         pub remaining: Vec<String>,
     }
@@ -607,10 +643,13 @@ pub mod accounts_data {
         pub borrowReserveLiquidityMint: String,
         pub reserveSourceLiquidity: String,
         pub borrowReserveLiquidityFeeReceiver: String,
-        pub userDestinationLiquidity: String,
-        pub referrerTokenState: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub userDestinationLiquidity: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub referrerTokenState: Option<String>,
         pub tokenProgram: String,
-        pub instructionSysvarAccount: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub instructionSysvarAccount: Option<String>,
         pub remaining: Vec<String>,
     }
     #[derive(Debug, Serialize)]
@@ -624,11 +663,14 @@ pub mod accounts_data {
         pub reserveSourceLiquidity: String,
         pub borrowReserveLiquidityFeeReceiver: String,
         pub userDestinationLiquidity: String,
-        pub referrerTokenState: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub referrerTokenState: Option<String>,
         pub tokenProgram: String,
         pub instructionSysvarAccount: String,
-        pub obligationFarmUserState: String,
-        pub reserveFarmState: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub obligationFarmUserState: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub reserveFarmState: Option<String>,
         pub farmsProgram: String,
         pub remaining: Vec<String>,
     }
@@ -639,8 +681,10 @@ pub mod accounts_data {
         pub lendingMarket: String,
         pub repayReserve: String,
         pub reserveLiquidityMint: String,
-        pub reserveDestinationLiquidity: String,
-        pub userSourceLiquidity: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub reserveDestinationLiquidity: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub userSourceLiquidity: Option<String>,
         pub tokenProgram: String,
         pub instructionSysvarAccount: String,
         pub remaining: Vec<String>,
@@ -656,8 +700,10 @@ pub mod accounts_data {
         pub userSourceLiquidity: String,
         pub tokenProgram: String,
         pub instructionSysvarAccount: String,
-        pub obligationFarmUserState: String,
-        pub reserveFarmState: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub obligationFarmUserState: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub reserveFarmState: Option<String>,
         pub lendingMarketAuthority: String,
         pub farmsProgram: String,
         pub remaining: Vec<String>,
@@ -679,11 +725,14 @@ pub mod accounts_data {
         pub reserveCollateralMint: String,
         pub reserveLiquiditySupply: String,
         pub userDestinationLiquidity: String,
-        pub placeholderUserDestinationCollateral: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub placeholderUserDestinationCollateral: Option<String>,
         pub collateralTokenProgram: String,
         pub liquidityTokenProgram: String,
-        pub obligationFarmUserState: String,
-        pub reserveFarmState: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub obligationFarmUserState: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub reserveFarmState: Option<String>,
         pub farmsProgram: String,
         pub remaining: Vec<String>,
     }
@@ -699,15 +748,18 @@ pub mod accounts_data {
         pub reserveCollateralMint: String,
         pub reserveDestinationDepositCollateral: String,
         pub userSourceLiquidity: String,
-        pub placeholderUserDestinationCollateral: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub placeholderUserDestinationCollateral: Option<String>,
         pub collateralTokenProgram: String,
         pub liquidityTokenProgram: String,
         pub instructionSysvarAccount: String,
         pub withdrawReserve: String,
         pub reserveSourceCollateral: String,
         pub userDestinationLiquidity: String,
-        pub obligationFarmUserState: String,
-        pub reserveFarmState: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub obligationFarmUserState: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub reserveFarmState: Option<String>,
         pub farmsProgram: String,
         pub remaining: Vec<String>,
     }
@@ -723,10 +775,13 @@ pub mod accounts_data {
         pub reserveCollateralMint: String,
         pub reserveDestinationDepositCollateral: String,
         pub userSourceLiquidity: String,
-        pub placeholderUserDestinationCollateral: String,
-        pub collateralTokenProgram: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub placeholderUserDestinationCollateral: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub collateralTokenProgram: Option<String>,
         pub liquidityTokenProgram: String,
-        pub instructionSysvarAccount: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub instructionSysvarAccount: Option<String>,
         pub remaining: Vec<String>,
     }
     #[derive(Debug, Serialize)]
@@ -741,7 +796,8 @@ pub mod accounts_data {
         pub reserveCollateralMint: String,
         pub reserveDestinationDepositCollateral: String,
         pub userSourceLiquidity: String,
-        pub placeholderUserDestinationCollateral: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub placeholderUserDestinationCollateral: Option<String>,
         pub collateralTokenProgram: String,
         pub liquidityTokenProgram: String,
         pub instructionSysvarAccount: String,
@@ -762,9 +818,12 @@ pub mod accounts_data {
         pub reserveCollateralMint: String,
         pub reserveLiquiditySupply: String,
         pub userDestinationLiquidity: String,
-        pub placeholderUserDestinationCollateral: String,
-        pub collateralTokenProgram: String,
-        pub liquidityTokenProgram: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub placeholderUserDestinationCollateral: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub collateralTokenProgram: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub liquidityTokenProgram: Option<String>,
         pub instructionSysvarAccount: String,
         pub remaining: Vec<String>,
     }
@@ -784,8 +843,10 @@ pub mod accounts_data {
         pub collateralTokenProgram: String,
         pub liquidityTokenProgram: String,
         pub instructionSysvarAccount: String,
-        pub obligationFarmUserState: String,
-        pub reserveFarmState: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub obligationFarmUserState: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub reserveFarmState: Option<String>,
         pub farmsProgram: String,
         pub remaining: Vec<String>,
     }
@@ -807,10 +868,14 @@ pub mod accounts_data {
         pub userSourceLiquidity: String,
         pub userDestinationCollateral: String,
         pub userDestinationLiquidity: String,
-        pub collateralTokenProgram: String,
-        pub repayLiquidityTokenProgram: String,
-        pub withdrawLiquidityTokenProgram: String,
-        pub instructionSysvarAccount: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub collateralTokenProgram: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub repayLiquidityTokenProgram: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub withdrawLiquidityTokenProgram: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub instructionSysvarAccount: Option<String>,
         pub remaining: Vec<String>,
     }
     #[derive(Debug, Serialize)]
@@ -835,8 +900,10 @@ pub mod accounts_data {
         pub repayLiquidityTokenProgram: String,
         pub withdrawLiquidityTokenProgram: String,
         pub instructionSysvarAccount: String,
-        pub obligationFarmUserState: String,
-        pub reserveFarmState: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub obligationFarmUserState: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub reserveFarmState: Option<String>,
         pub farmsProgram: String,
         pub remaining: Vec<String>,
     }
@@ -846,12 +913,15 @@ pub mod accounts_data {
         pub lendingMarketAuthority: String,
         pub lendingMarket: String,
         pub reserve: String,
-        pub reserveLiquidityMint: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub reserveLiquidityMint: Option<String>,
         pub reserveDestinationLiquidity: String,
         pub userSourceLiquidity: String,
         pub reserveLiquidityFeeReceiver: String,
-        pub referrerTokenState: String,
-        pub referrerAccount: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub referrerTokenState: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub referrerAccount: Option<String>,
         pub sysvarInfo: String,
         pub tokenProgram: String,
         pub remaining: Vec<String>,
@@ -860,14 +930,19 @@ pub mod accounts_data {
     pub struct FlashBorrowReserveLiquidityAccounts {
         pub userTransferAuthority: String,
         pub lendingMarketAuthority: String,
-        pub lendingMarket: String,
-        pub reserve: String,
-        pub reserveLiquidityMint: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub lendingMarket: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub reserve: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub reserveLiquidityMint: Option<String>,
         pub reserveSourceLiquidity: String,
         pub userDestinationLiquidity: String,
         pub reserveLiquidityFeeReceiver: String,
-        pub referrerTokenState: String,
-        pub referrerAccount: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub referrerTokenState: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub referrerAccount: Option<String>,
         pub sysvarInfo: String,
         pub tokenProgram: String,
         pub remaining: Vec<String>,
@@ -882,7 +957,8 @@ pub mod accounts_data {
     #[derive(Debug, Serialize)]
     pub struct InitReferrerTokenStateAccounts {
         pub payer: String,
-        pub lendingMarket: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub lendingMarket: Option<String>,
         pub reserve: String,
         pub referrer: String,
         pub referrerTokenState: String,
@@ -894,8 +970,10 @@ pub mod accounts_data {
     pub struct InitUserMetadataAccounts {
         pub owner: String,
         pub feePayer: String,
-        pub userMetadata: String,
-        pub referrerUserMetadata: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub userMetadata: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub referrerUserMetadata: Option<String>,
         pub rent: String,
         pub systemProgram: String,
         pub remaining: Vec<String>,
@@ -918,7 +996,8 @@ pub mod accounts_data {
         pub referrer: String,
         pub referrerState: String,
         pub referrerShortUrl: String,
-        pub referrerUserMetadata: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub referrerUserMetadata: Option<String>,
         pub rent: String,
         pub systemProgram: String,
         pub remaining: Vec<String>,
@@ -1404,8 +1483,12 @@ impl Instruction {
         match disc {
             [34u8, 162u8, 116u8, 14u8, 101u8, 137u8, 94u8, 239u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitLendingMarketArguments::deserialize(&mut rdr)?;
+                let quote_currency: [u8; 32usize] =
+                    <[u8; 32usize] as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = InitLendingMarketArguments { quote_currency };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(5usize);
                 let lendingMarketOwner = keys.next().unwrap().clone();
                 let lendingMarket = keys.next().unwrap().clone();
                 let lendingMarketAuthority = keys.next().unwrap().clone();
@@ -1413,47 +1496,56 @@ impl Instruction {
                 let rent = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = InitLendingMarketAccounts {
+                    remaining,
                     lendingMarketOwner,
                     lendingMarket,
                     lendingMarketAuthority,
                     systemProgram,
                     rent,
-                    remaining,
                 };
                 return Ok(Instruction::InitLendingMarket { accounts, args });
             }
             [209u8, 157u8, 53u8, 210u8, 97u8, 180u8, 31u8, 45u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateLendingMarketArguments::deserialize(&mut rdr)?;
+                let mode: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let value: [u8; 72usize] =
+                    <[u8; 72usize] as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateLendingMarketArguments { mode, value };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(2usize);
                 let lendingMarketOwner = keys.next().unwrap().clone();
                 let lendingMarket = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = UpdateLendingMarketAccounts {
+                    remaining,
                     lendingMarketOwner,
                     lendingMarket,
-                    remaining,
                 };
                 return Ok(Instruction::UpdateLendingMarket { accounts, args });
             }
             [118u8, 224u8, 10u8, 62u8, 196u8, 230u8, 184u8, 89u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateLendingMarketOwnerArguments::deserialize(&mut rdr)?;
+                let args = UpdateLendingMarketOwnerArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(2usize);
                 let lendingMarketOwnerCached = keys.next().unwrap().clone();
                 let lendingMarket = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = UpdateLendingMarketOwnerAccounts {
+                    remaining,
                     lendingMarketOwnerCached,
                     lendingMarket,
-                    remaining,
                 };
                 return Ok(Instruction::UpdateLendingMarketOwner { accounts, args });
             }
             [138u8, 245u8, 71u8, 225u8, 153u8, 4u8, 3u8, 43u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitReserveArguments::deserialize(&mut rdr)?;
+                let args = InitReserveArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(12usize);
                 let lendingMarketOwner = keys.next().unwrap().clone();
                 let lendingMarket = keys.next().unwrap().clone();
                 let lendingMarketAuthority = keys.next().unwrap().clone();
@@ -1463,13 +1555,24 @@ impl Instruction {
                 let feeReceiver = keys.next().unwrap().clone();
                 let reserveCollateralMint = keys.next().unwrap().clone();
                 let reserveCollateralSupply = keys.next().unwrap().clone();
-                let initialLiquiditySource = keys.next().unwrap().clone();
+                let initialLiquiditySource = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let rent = keys.next().unwrap().clone();
                 let liquidityTokenProgram = keys.next().unwrap().clone();
                 let collateralTokenProgram = keys.next().unwrap().clone();
-                let systemProgram = keys.next().unwrap().clone();
+                let systemProgram = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let remaining = keys.cloned().collect();
                 let accounts = InitReserveAccounts {
+                    remaining,
                     lendingMarketOwner,
                     lendingMarket,
                     lendingMarketAuthority,
@@ -1484,14 +1587,16 @@ impl Instruction {
                     liquidityTokenProgram,
                     collateralTokenProgram,
                     systemProgram,
-                    remaining,
                 };
                 return Ok(Instruction::InitReserve { accounts, args });
             }
             [218u8, 6u8, 62u8, 233u8, 1u8, 33u8, 232u8, 82u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitFarmsForReserveArguments::deserialize(&mut rdr)?;
+                let mode: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = InitFarmsForReserveArguments { mode };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(10usize);
                 let lendingMarketOwner = keys.next().unwrap().clone();
                 let lendingMarket = keys.next().unwrap().clone();
                 let lendingMarketAuthority = keys.next().unwrap().clone();
@@ -1504,6 +1609,7 @@ impl Instruction {
                 let systemProgram = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = InitFarmsForReserveAccounts {
+                    remaining,
                     lendingMarketOwner,
                     lendingMarket,
                     lendingMarketAuthority,
@@ -1514,41 +1620,64 @@ impl Instruction {
                     farmsVaultAuthority,
                     rent,
                     systemProgram,
-                    remaining,
                 };
                 return Ok(Instruction::InitFarmsForReserve { accounts, args });
             }
             [61u8, 148u8, 100u8, 70u8, 143u8, 107u8, 17u8, 13u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateReserveConfigArguments::deserialize(&mut rdr)?;
+                let mode: UpdateConfigMode =
+                    <UpdateConfigMode as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let value: Vec<u8> = <Vec<u8> as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let skip_config_integrity_validation: bool =
+                    <bool as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateReserveConfigArguments {
+                    mode,
+                    value,
+                    skip_config_integrity_validation,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(3usize);
                 let signer = keys.next().unwrap().clone();
-                let globalConfig = keys.next().unwrap().clone();
+                let globalConfig = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let lendingMarket = keys.next().unwrap().clone();
                 let reserve = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = UpdateReserveConfigAccounts {
+                    remaining,
                     signer,
                     globalConfig,
                     lendingMarket,
                     reserve,
-                    remaining,
                 };
                 return Ok(Instruction::UpdateReserveConfig { accounts, args });
             }
             [215u8, 39u8, 180u8, 41u8, 173u8, 46u8, 248u8, 220u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = RedeemFeesArguments::deserialize(&mut rdr)?;
+                let args = RedeemFeesArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(6usize);
                 let reserve = keys.next().unwrap().clone();
                 let reserveLiquidityMint = keys.next().unwrap().clone();
                 let reserveLiquidityFeeReceiver = keys.next().unwrap().clone();
                 let reserveSupplyLiquidity = keys.next().unwrap().clone();
                 let lendingMarket = keys.next().unwrap().clone();
                 let lendingMarketAuthority = keys.next().unwrap().clone();
-                let tokenProgram = keys.next().unwrap().clone();
+                let tokenProgram = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let remaining = keys.cloned().collect();
                 let accounts = RedeemFeesAccounts {
+                    remaining,
                     reserve,
                     reserveLiquidityMint,
                     reserveLiquidityFeeReceiver,
@@ -1556,24 +1685,32 @@ impl Instruction {
                     lendingMarket,
                     lendingMarketAuthority,
                     tokenProgram,
-                    remaining,
                 };
                 return Ok(Instruction::RedeemFees { accounts, args });
             }
             [158u8, 201u8, 158u8, 189u8, 33u8, 93u8, 162u8, 103u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = WithdrawProtocolFeeArguments::deserialize(&mut rdr)?;
+                let amount: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = WithdrawProtocolFeeArguments { amount };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(7usize);
                 let globalConfig = keys.next().unwrap().clone();
                 let lendingMarket = keys.next().unwrap().clone();
                 let reserve = keys.next().unwrap().clone();
                 let reserveLiquidityMint = keys.next().unwrap().clone();
                 let lendingMarketAuthority = keys.next().unwrap().clone();
                 let feeVault = keys.next().unwrap().clone();
-                let feeCollectorAta = keys.next().unwrap().clone();
+                let feeCollectorAta = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let tokenProgram = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = WithdrawProtocolFeeAccounts {
+                    remaining,
                     globalConfig,
                     lendingMarket,
                     reserve,
@@ -1582,14 +1719,17 @@ impl Instruction {
                     feeVault,
                     feeCollectorAta,
                     tokenProgram,
-                    remaining,
                 };
                 return Ok(Instruction::WithdrawProtocolFee { accounts, args });
             }
             [245u8, 75u8, 91u8, 0u8, 236u8, 97u8, 19u8, 3u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = SocializeLossArguments::deserialize(&mut rdr)?;
+                let liquidity_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = SocializeLossArguments { liquidity_amount };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(5usize);
                 let riskCouncil = keys.next().unwrap().clone();
                 let obligation = keys.next().unwrap().clone();
                 let lendingMarket = keys.next().unwrap().clone();
@@ -1597,19 +1737,23 @@ impl Instruction {
                 let instructionSysvarAccount = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = SocializeLossAccounts {
+                    remaining,
                     riskCouncil,
                     obligation,
                     lendingMarket,
                     reserve,
                     instructionSysvarAccount,
-                    remaining,
                 };
                 return Ok(Instruction::SocializeLoss { accounts, args });
             }
             [238u8, 95u8, 98u8, 220u8, 187u8, 40u8, 204u8, 154u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = SocializeLossV2Arguments::deserialize(&mut rdr)?;
+                let liquidity_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = SocializeLossV2Arguments { liquidity_amount };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(9usize);
                 let riskCouncil = keys.next().unwrap().clone();
                 let obligation = keys.next().unwrap().clone();
                 let lendingMarket = keys.next().unwrap().clone();
@@ -1621,6 +1765,7 @@ impl Instruction {
                 let farmsProgram = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = SocializeLossV2Accounts {
+                    remaining,
                     riskCouncil,
                     obligation,
                     lendingMarket,
@@ -1630,60 +1775,80 @@ impl Instruction {
                     reserveFarmState,
                     lendingMarketAuthority,
                     farmsProgram,
-                    remaining,
                 };
                 return Ok(Instruction::SocializeLossV2 { accounts, args });
             }
             [164u8, 35u8, 182u8, 19u8, 0u8, 116u8, 243u8, 127u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = MarkObligationForDeleveragingArguments::deserialize(&mut rdr)?;
+                let autodeleverage_target_ltv_pct: u8 =
+                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = MarkObligationForDeleveragingArguments {
+                    autodeleverage_target_ltv_pct,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(3usize);
                 let riskCouncil = keys.next().unwrap().clone();
                 let obligation = keys.next().unwrap().clone();
                 let lendingMarket = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = MarkObligationForDeleveragingAccounts {
+                    remaining,
                     riskCouncil,
                     obligation,
                     lendingMarket,
-                    remaining,
                 };
                 return Ok(Instruction::MarkObligationForDeleveraging { accounts, args });
             }
             [2u8, 218u8, 138u8, 235u8, 79u8, 201u8, 25u8, 102u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = RefreshReserveArguments::deserialize(&mut rdr)?;
+                let args = RefreshReserveArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(5usize);
                 let reserve = keys.next().unwrap().clone();
                 let lendingMarket = keys.next().unwrap().clone();
                 let pythOracle = keys.next().unwrap().clone();
                 let switchboardPriceOracle = keys.next().unwrap().clone();
                 let switchboardTwapOracle = keys.next().unwrap().clone();
-                let scopePrices = keys.next().unwrap().clone();
+                let scopePrices = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let remaining = keys.cloned().collect();
                 let accounts = RefreshReserveAccounts {
+                    remaining,
                     reserve,
                     lendingMarket,
                     pythOracle,
                     switchboardPriceOracle,
                     switchboardTwapOracle,
                     scopePrices,
-                    remaining,
                 };
                 return Ok(Instruction::RefreshReserve { accounts, args });
             }
             [144u8, 110u8, 26u8, 103u8, 162u8, 204u8, 252u8, 147u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = RefreshReservesBatchArguments::deserialize(&mut rdr)?;
-                let accounts = RefreshReservesBatchAccounts {
-                    remaining: account_keys.iter().cloned().collect(),
-                };
+                let skip_price_updates: bool =
+                    <bool as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = RefreshReservesBatchArguments { skip_price_updates };
+                let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(0usize);
+                let remaining = keys.cloned().collect();
+                let accounts = RefreshReservesBatchAccounts { remaining };
                 return Ok(Instruction::RefreshReservesBatch { accounts, args });
             }
             [169u8, 201u8, 30u8, 126u8, 6u8, 205u8, 102u8, 68u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = DepositReserveLiquidityArguments::deserialize(&mut rdr)?;
+                let liquidity_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = DepositReserveLiquidityArguments { liquidity_amount };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(9usize);
                 let owner = keys.next().unwrap().clone();
                 let reserve = keys.next().unwrap().clone();
                 let lendingMarket = keys.next().unwrap().clone();
@@ -1693,11 +1858,27 @@ impl Instruction {
                 let reserveCollateralMint = keys.next().unwrap().clone();
                 let userSourceLiquidity = keys.next().unwrap().clone();
                 let userDestinationCollateral = keys.next().unwrap().clone();
-                let collateralTokenProgram = keys.next().unwrap().clone();
-                let liquidityTokenProgram = keys.next().unwrap().clone();
-                let instructionSysvarAccount = keys.next().unwrap().clone();
+                let collateralTokenProgram = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
+                let liquidityTokenProgram = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
+                let instructionSysvarAccount = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let remaining = keys.cloned().collect();
                 let accounts = DepositReserveLiquidityAccounts {
+                    remaining,
                     owner,
                     reserve,
                     lendingMarket,
@@ -1710,14 +1891,17 @@ impl Instruction {
                     collateralTokenProgram,
                     liquidityTokenProgram,
                     instructionSysvarAccount,
-                    remaining,
                 };
                 return Ok(Instruction::DepositReserveLiquidity { accounts, args });
             }
             [234u8, 117u8, 181u8, 125u8, 185u8, 142u8, 220u8, 29u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = RedeemReserveCollateralArguments::deserialize(&mut rdr)?;
+                let collateral_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = RedeemReserveCollateralArguments { collateral_amount };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(9usize);
                 let owner = keys.next().unwrap().clone();
                 let lendingMarket = keys.next().unwrap().clone();
                 let reserve = keys.next().unwrap().clone();
@@ -1726,12 +1910,28 @@ impl Instruction {
                 let reserveCollateralMint = keys.next().unwrap().clone();
                 let reserveLiquiditySupply = keys.next().unwrap().clone();
                 let userSourceCollateral = keys.next().unwrap().clone();
-                let userDestinationLiquidity = keys.next().unwrap().clone();
+                let userDestinationLiquidity = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let collateralTokenProgram = keys.next().unwrap().clone();
-                let liquidityTokenProgram = keys.next().unwrap().clone();
-                let instructionSysvarAccount = keys.next().unwrap().clone();
+                let liquidityTokenProgram = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
+                let instructionSysvarAccount = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let remaining = keys.cloned().collect();
                 let accounts = RedeemReserveCollateralAccounts {
+                    remaining,
                     owner,
                     lendingMarket,
                     reserve,
@@ -1744,25 +1944,44 @@ impl Instruction {
                     collateralTokenProgram,
                     liquidityTokenProgram,
                     instructionSysvarAccount,
-                    remaining,
                 };
                 return Ok(Instruction::RedeemReserveCollateral { accounts, args });
             }
             [251u8, 10u8, 231u8, 76u8, 27u8, 11u8, 159u8, 96u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitObligationArguments::deserialize(&mut rdr)?;
+                let args: InitObligationArgs =
+                    <InitObligationArgs as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = InitObligationArguments { args };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(6usize);
                 let obligationOwner = keys.next().unwrap().clone();
                 let feePayer = keys.next().unwrap().clone();
                 let obligation = keys.next().unwrap().clone();
                 let lendingMarket = keys.next().unwrap().clone();
-                let seed1Account = keys.next().unwrap().clone();
-                let seed2Account = keys.next().unwrap().clone();
-                let ownerUserMetadata = keys.next().unwrap().clone();
+                let seed1Account = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
+                let seed2Account = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
+                let ownerUserMetadata = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let rent = keys.next().unwrap().clone();
                 let systemProgram = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = InitObligationAccounts {
+                    remaining,
                     obligationOwner,
                     feePayer,
                     obligation,
@@ -1772,14 +1991,16 @@ impl Instruction {
                     ownerUserMetadata,
                     rent,
                     systemProgram,
-                    remaining,
                 };
                 return Ok(Instruction::InitObligation { accounts, args });
             }
             [136u8, 63u8, 15u8, 186u8, 211u8, 152u8, 168u8, 164u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitObligationFarmsForReserveArguments::deserialize(&mut rdr)?;
+                let mode: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = InitObligationFarmsForReserveArguments { mode };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(11usize);
                 let payer = keys.next().unwrap().clone();
                 let owner = keys.next().unwrap().clone();
                 let obligation = keys.next().unwrap().clone();
@@ -1793,6 +2014,7 @@ impl Instruction {
                 let systemProgram = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = InitObligationFarmsForReserveAccounts {
+                    remaining,
                     payer,
                     owner,
                     obligation,
@@ -1804,14 +2026,16 @@ impl Instruction {
                     farmsProgram,
                     rent,
                     systemProgram,
-                    remaining,
                 };
                 return Ok(Instruction::InitObligationFarmsForReserve { accounts, args });
             }
             [140u8, 144u8, 253u8, 21u8, 10u8, 74u8, 248u8, 3u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = RefreshObligationFarmsForReserveArguments::deserialize(&mut rdr)?;
+                let mode: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = RefreshObligationFarmsForReserveArguments { mode };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(10usize);
                 let crank = keys.next().unwrap().clone();
                 let obligation = keys.next().unwrap().clone();
                 let lendingMarketAuthority = keys.next().unwrap().clone();
@@ -1824,6 +2048,7 @@ impl Instruction {
                 let systemProgram = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = RefreshObligationFarmsForReserveAccounts {
+                    remaining,
                     crank,
                     obligation,
                     lendingMarketAuthority,
@@ -1834,28 +2059,33 @@ impl Instruction {
                     farmsProgram,
                     rent,
                     systemProgram,
-                    remaining,
                 };
                 return Ok(Instruction::RefreshObligationFarmsForReserve { accounts, args });
             }
             [33u8, 132u8, 147u8, 228u8, 151u8, 192u8, 72u8, 89u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = RefreshObligationArguments::deserialize(&mut rdr)?;
+                let args = RefreshObligationArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(2usize);
                 let lendingMarket = keys.next().unwrap().clone();
                 let obligation = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = RefreshObligationAccounts {
+                    remaining,
                     lendingMarket,
                     obligation,
-                    remaining,
                 };
                 return Ok(Instruction::RefreshObligation { accounts, args });
             }
             [108u8, 209u8, 4u8, 72u8, 21u8, 22u8, 118u8, 133u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = DepositObligationCollateralArguments::deserialize(&mut rdr)?;
+                let collateral_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = DepositObligationCollateralArguments { collateral_amount };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(8usize);
                 let owner = keys.next().unwrap().clone();
                 let obligation = keys.next().unwrap().clone();
                 let lendingMarket = keys.next().unwrap().clone();
@@ -1866,6 +2096,7 @@ impl Instruction {
                 let instructionSysvarAccount = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = DepositObligationCollateralAccounts {
+                    remaining,
                     owner,
                     obligation,
                     lendingMarket,
@@ -1874,14 +2105,17 @@ impl Instruction {
                     userSourceCollateral,
                     tokenProgram,
                     instructionSysvarAccount,
-                    remaining,
                 };
                 return Ok(Instruction::DepositObligationCollateral { accounts, args });
             }
             [137u8, 145u8, 151u8, 94u8, 167u8, 113u8, 4u8, 145u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = DepositObligationCollateralV2Arguments::deserialize(&mut rdr)?;
+                let collateral_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = DepositObligationCollateralV2Arguments { collateral_amount };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(10usize);
                 let owner = keys.next().unwrap().clone();
                 let obligation = keys.next().unwrap().clone();
                 let lendingMarket = keys.next().unwrap().clone();
@@ -1891,11 +2125,22 @@ impl Instruction {
                 let tokenProgram = keys.next().unwrap().clone();
                 let instructionSysvarAccount = keys.next().unwrap().clone();
                 let lendingMarketAuthority = keys.next().unwrap().clone();
-                let obligationFarmUserState = keys.next().unwrap().clone();
-                let reserveFarmState = keys.next().unwrap().clone();
+                let obligationFarmUserState = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
+                let reserveFarmState = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let farmsProgram = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = DepositObligationCollateralV2Accounts {
+                    remaining,
                     owner,
                     obligation,
                     lendingMarket,
@@ -1908,14 +2153,17 @@ impl Instruction {
                     obligationFarmUserState,
                     reserveFarmState,
                     farmsProgram,
-                    remaining,
                 };
                 return Ok(Instruction::DepositObligationCollateralV2 { accounts, args });
             }
             [37u8, 116u8, 205u8, 103u8, 243u8, 192u8, 92u8, 198u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = WithdrawObligationCollateralArguments::deserialize(&mut rdr)?;
+                let collateral_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = WithdrawObligationCollateralArguments { collateral_amount };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(9usize);
                 let owner = keys.next().unwrap().clone();
                 let obligation = keys.next().unwrap().clone();
                 let lendingMarket = keys.next().unwrap().clone();
@@ -1927,6 +2175,7 @@ impl Instruction {
                 let instructionSysvarAccount = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = WithdrawObligationCollateralAccounts {
+                    remaining,
                     owner,
                     obligation,
                     lendingMarket,
@@ -1936,14 +2185,17 @@ impl Instruction {
                     userDestinationCollateral,
                     tokenProgram,
                     instructionSysvarAccount,
-                    remaining,
                 };
                 return Ok(Instruction::WithdrawObligationCollateral { accounts, args });
             }
             [202u8, 249u8, 117u8, 114u8, 231u8, 192u8, 47u8, 138u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = WithdrawObligationCollateralV2Arguments::deserialize(&mut rdr)?;
+                let collateral_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = WithdrawObligationCollateralV2Arguments { collateral_amount };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(10usize);
                 let owner = keys.next().unwrap().clone();
                 let obligation = keys.next().unwrap().clone();
                 let lendingMarket = keys.next().unwrap().clone();
@@ -1953,11 +2205,22 @@ impl Instruction {
                 let userDestinationCollateral = keys.next().unwrap().clone();
                 let tokenProgram = keys.next().unwrap().clone();
                 let instructionSysvarAccount = keys.next().unwrap().clone();
-                let obligationFarmUserState = keys.next().unwrap().clone();
-                let reserveFarmState = keys.next().unwrap().clone();
+                let obligationFarmUserState = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
+                let reserveFarmState = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let farmsProgram = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = WithdrawObligationCollateralV2Accounts {
+                    remaining,
                     owner,
                     obligation,
                     lendingMarket,
@@ -1970,14 +2233,17 @@ impl Instruction {
                     obligationFarmUserState,
                     reserveFarmState,
                     farmsProgram,
-                    remaining,
                 };
                 return Ok(Instruction::WithdrawObligationCollateralV2 { accounts, args });
             }
             [121u8, 127u8, 18u8, 204u8, 73u8, 245u8, 225u8, 65u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = BorrowObligationLiquidityArguments::deserialize(&mut rdr)?;
+                let liquidity_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = BorrowObligationLiquidityArguments { liquidity_amount };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(9usize);
                 let owner = keys.next().unwrap().clone();
                 let obligation = keys.next().unwrap().clone();
                 let lendingMarket = keys.next().unwrap().clone();
@@ -1986,12 +2252,28 @@ impl Instruction {
                 let borrowReserveLiquidityMint = keys.next().unwrap().clone();
                 let reserveSourceLiquidity = keys.next().unwrap().clone();
                 let borrowReserveLiquidityFeeReceiver = keys.next().unwrap().clone();
-                let userDestinationLiquidity = keys.next().unwrap().clone();
-                let referrerTokenState = keys.next().unwrap().clone();
+                let userDestinationLiquidity = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
+                let referrerTokenState = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let tokenProgram = keys.next().unwrap().clone();
-                let instructionSysvarAccount = keys.next().unwrap().clone();
+                let instructionSysvarAccount = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let remaining = keys.cloned().collect();
                 let accounts = BorrowObligationLiquidityAccounts {
+                    remaining,
                     owner,
                     obligation,
                     lendingMarket,
@@ -2004,14 +2286,17 @@ impl Instruction {
                     referrerTokenState,
                     tokenProgram,
                     instructionSysvarAccount,
-                    remaining,
                 };
                 return Ok(Instruction::BorrowObligationLiquidity { accounts, args });
             }
             [161u8, 128u8, 143u8, 245u8, 171u8, 199u8, 194u8, 6u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = BorrowObligationLiquidityV2Arguments::deserialize(&mut rdr)?;
+                let liquidity_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = BorrowObligationLiquidityV2Arguments { liquidity_amount };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(12usize);
                 let owner = keys.next().unwrap().clone();
                 let obligation = keys.next().unwrap().clone();
                 let lendingMarket = keys.next().unwrap().clone();
@@ -2021,14 +2306,30 @@ impl Instruction {
                 let reserveSourceLiquidity = keys.next().unwrap().clone();
                 let borrowReserveLiquidityFeeReceiver = keys.next().unwrap().clone();
                 let userDestinationLiquidity = keys.next().unwrap().clone();
-                let referrerTokenState = keys.next().unwrap().clone();
+                let referrerTokenState = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let tokenProgram = keys.next().unwrap().clone();
                 let instructionSysvarAccount = keys.next().unwrap().clone();
-                let obligationFarmUserState = keys.next().unwrap().clone();
-                let reserveFarmState = keys.next().unwrap().clone();
+                let obligationFarmUserState = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
+                let reserveFarmState = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let farmsProgram = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = BorrowObligationLiquidityV2Accounts {
+                    remaining,
                     owner,
                     obligation,
                     lendingMarket,
@@ -2044,25 +2345,39 @@ impl Instruction {
                     obligationFarmUserState,
                     reserveFarmState,
                     farmsProgram,
-                    remaining,
                 };
                 return Ok(Instruction::BorrowObligationLiquidityV2 { accounts, args });
             }
             [145u8, 178u8, 13u8, 225u8, 76u8, 240u8, 147u8, 72u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = RepayObligationLiquidityArguments::deserialize(&mut rdr)?;
+                let liquidity_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = RepayObligationLiquidityArguments { liquidity_amount };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(7usize);
                 let owner = keys.next().unwrap().clone();
                 let obligation = keys.next().unwrap().clone();
                 let lendingMarket = keys.next().unwrap().clone();
                 let repayReserve = keys.next().unwrap().clone();
                 let reserveLiquidityMint = keys.next().unwrap().clone();
-                let reserveDestinationLiquidity = keys.next().unwrap().clone();
-                let userSourceLiquidity = keys.next().unwrap().clone();
+                let reserveDestinationLiquidity = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
+                let userSourceLiquidity = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let tokenProgram = keys.next().unwrap().clone();
                 let instructionSysvarAccount = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = RepayObligationLiquidityAccounts {
+                    remaining,
                     owner,
                     obligation,
                     lendingMarket,
@@ -2072,14 +2387,17 @@ impl Instruction {
                     userSourceLiquidity,
                     tokenProgram,
                     instructionSysvarAccount,
-                    remaining,
                 };
                 return Ok(Instruction::RepayObligationLiquidity { accounts, args });
             }
             [116u8, 174u8, 213u8, 76u8, 180u8, 53u8, 210u8, 144u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = RepayObligationLiquidityV2Arguments::deserialize(&mut rdr)?;
+                let liquidity_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = RepayObligationLiquidityV2Arguments { liquidity_amount };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(11usize);
                 let owner = keys.next().unwrap().clone();
                 let obligation = keys.next().unwrap().clone();
                 let lendingMarket = keys.next().unwrap().clone();
@@ -2089,12 +2407,23 @@ impl Instruction {
                 let userSourceLiquidity = keys.next().unwrap().clone();
                 let tokenProgram = keys.next().unwrap().clone();
                 let instructionSysvarAccount = keys.next().unwrap().clone();
-                let obligationFarmUserState = keys.next().unwrap().clone();
-                let reserveFarmState = keys.next().unwrap().clone();
+                let obligationFarmUserState = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
+                let reserveFarmState = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let lendingMarketAuthority = keys.next().unwrap().clone();
                 let farmsProgram = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = RepayObligationLiquidityV2Accounts {
+                    remaining,
                     owner,
                     obligation,
                     lendingMarket,
@@ -2108,14 +2437,21 @@ impl Instruction {
                     reserveFarmState,
                     lendingMarketAuthority,
                     farmsProgram,
-                    remaining,
                 };
                 return Ok(Instruction::RepayObligationLiquidityV2 { accounts, args });
             }
             [2u8, 54u8, 152u8, 3u8, 148u8, 96u8, 109u8, 218u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = RepayAndWithdrawAndRedeemArguments::deserialize(&mut rdr)?;
+                let repay_amount: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let withdraw_collateral_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = RepayAndWithdrawAndRedeemArguments {
+                    repay_amount,
+                    withdraw_collateral_amount,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(18usize);
                 let owner = keys.next().unwrap().clone();
                 let obligation = keys.next().unwrap().clone();
                 let lendingMarket = keys.next().unwrap().clone();
@@ -2131,14 +2467,30 @@ impl Instruction {
                 let reserveCollateralMint = keys.next().unwrap().clone();
                 let reserveLiquiditySupply = keys.next().unwrap().clone();
                 let userDestinationLiquidity = keys.next().unwrap().clone();
-                let placeholderUserDestinationCollateral = keys.next().unwrap().clone();
+                let placeholderUserDestinationCollateral = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let collateralTokenProgram = keys.next().unwrap().clone();
                 let liquidityTokenProgram = keys.next().unwrap().clone();
-                let obligationFarmUserState = keys.next().unwrap().clone();
-                let reserveFarmState = keys.next().unwrap().clone();
+                let obligationFarmUserState = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
+                let reserveFarmState = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let farmsProgram = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = RepayAndWithdrawAndRedeemAccounts {
+                    remaining,
                     owner,
                     obligation,
                     lendingMarket,
@@ -2160,14 +2512,22 @@ impl Instruction {
                     obligationFarmUserState,
                     reserveFarmState,
                     farmsProgram,
-                    remaining,
                 };
                 return Ok(Instruction::RepayAndWithdrawAndRedeem { accounts, args });
             }
             [141u8, 153u8, 39u8, 15u8, 64u8, 61u8, 88u8, 84u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = DepositAndWithdrawArguments::deserialize(&mut rdr)?;
+                let liquidity_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let withdraw_collateral_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = DepositAndWithdrawArguments {
+                    liquidity_amount,
+                    withdraw_collateral_amount,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(17usize);
                 let owner = keys.next().unwrap().clone();
                 let obligation = keys.next().unwrap().clone();
                 let lendingMarket = keys.next().unwrap().clone();
@@ -2178,18 +2538,34 @@ impl Instruction {
                 let reserveCollateralMint = keys.next().unwrap().clone();
                 let reserveDestinationDepositCollateral = keys.next().unwrap().clone();
                 let userSourceLiquidity = keys.next().unwrap().clone();
-                let placeholderUserDestinationCollateral = keys.next().unwrap().clone();
+                let placeholderUserDestinationCollateral = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let collateralTokenProgram = keys.next().unwrap().clone();
                 let liquidityTokenProgram = keys.next().unwrap().clone();
                 let instructionSysvarAccount = keys.next().unwrap().clone();
                 let withdrawReserve = keys.next().unwrap().clone();
                 let reserveSourceCollateral = keys.next().unwrap().clone();
                 let userDestinationLiquidity = keys.next().unwrap().clone();
-                let obligationFarmUserState = keys.next().unwrap().clone();
-                let reserveFarmState = keys.next().unwrap().clone();
+                let obligationFarmUserState = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
+                let reserveFarmState = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let farmsProgram = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = DepositAndWithdrawAccounts {
+                    remaining,
                     owner,
                     obligation,
                     lendingMarket,
@@ -2210,15 +2586,18 @@ impl Instruction {
                     obligationFarmUserState,
                     reserveFarmState,
                     farmsProgram,
-                    remaining,
                 };
                 return Ok(Instruction::DepositAndWithdraw { accounts, args });
             }
             [129u8, 199u8, 4u8, 2u8, 222u8, 39u8, 26u8, 46u8] => {
                 let mut rdr: &[u8] = rest;
+                let liquidity_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
                 let args =
-                    DepositReserveLiquidityAndObligationCollateralArguments::deserialize(&mut rdr)?;
+                    DepositReserveLiquidityAndObligationCollateralArguments { liquidity_amount };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(11usize);
                 let owner = keys.next().unwrap().clone();
                 let obligation = keys.next().unwrap().clone();
                 let lendingMarket = keys.next().unwrap().clone();
@@ -2229,12 +2608,28 @@ impl Instruction {
                 let reserveCollateralMint = keys.next().unwrap().clone();
                 let reserveDestinationDepositCollateral = keys.next().unwrap().clone();
                 let userSourceLiquidity = keys.next().unwrap().clone();
-                let placeholderUserDestinationCollateral = keys.next().unwrap().clone();
-                let collateralTokenProgram = keys.next().unwrap().clone();
+                let placeholderUserDestinationCollateral = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
+                let collateralTokenProgram = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let liquidityTokenProgram = keys.next().unwrap().clone();
-                let instructionSysvarAccount = keys.next().unwrap().clone();
+                let instructionSysvarAccount = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let remaining = keys.cloned().collect();
                 let accounts = DepositReserveLiquidityAndObligationCollateralAccounts {
+                    remaining,
                     owner,
                     obligation,
                     lendingMarket,
@@ -2249,7 +2644,6 @@ impl Instruction {
                     collateralTokenProgram,
                     liquidityTokenProgram,
                     instructionSysvarAccount,
-                    remaining,
                 };
                 return Ok(
                     Instruction::DepositReserveLiquidityAndObligationCollateral { accounts, args },
@@ -2257,10 +2651,13 @@ impl Instruction {
             }
             [216u8, 224u8, 191u8, 27u8, 204u8, 151u8, 102u8, 175u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = DepositReserveLiquidityAndObligationCollateralV2Arguments::deserialize(
-                    &mut rdr,
-                )?;
+                let liquidity_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args =
+                    DepositReserveLiquidityAndObligationCollateralV2Arguments { liquidity_amount };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(16usize);
                 let owner = keys.next().unwrap().clone();
                 let obligation = keys.next().unwrap().clone();
                 let lendingMarket = keys.next().unwrap().clone();
@@ -2271,7 +2668,12 @@ impl Instruction {
                 let reserveCollateralMint = keys.next().unwrap().clone();
                 let reserveDestinationDepositCollateral = keys.next().unwrap().clone();
                 let userSourceLiquidity = keys.next().unwrap().clone();
-                let placeholderUserDestinationCollateral = keys.next().unwrap().clone();
+                let placeholderUserDestinationCollateral = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let collateralTokenProgram = keys.next().unwrap().clone();
                 let liquidityTokenProgram = keys.next().unwrap().clone();
                 let instructionSysvarAccount = keys.next().unwrap().clone();
@@ -2280,6 +2682,7 @@ impl Instruction {
                 let farmsProgram = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = DepositReserveLiquidityAndObligationCollateralV2Accounts {
+                    remaining,
                     owner,
                     obligation,
                     lendingMarket,
@@ -2297,7 +2700,6 @@ impl Instruction {
                     obligationFarmUserState,
                     reserveFarmState,
                     farmsProgram,
-                    remaining,
                 };
                 return Ok(
                     Instruction::DepositReserveLiquidityAndObligationCollateralV2 {
@@ -2308,11 +2710,14 @@ impl Instruction {
             }
             [75u8, 93u8, 93u8, 220u8, 34u8, 150u8, 218u8, 196u8] => {
                 let mut rdr: &[u8] = rest;
-                let args =
-                    WithdrawObligationCollateralAndRedeemReserveCollateralArguments::deserialize(
-                        &mut rdr,
-                    )?;
+                let collateral_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = WithdrawObligationCollateralAndRedeemReserveCollateralArguments {
+                    collateral_amount,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(11usize);
                 let owner = keys.next().unwrap().clone();
                 let obligation = keys.next().unwrap().clone();
                 let lendingMarket = keys.next().unwrap().clone();
@@ -2323,12 +2728,28 @@ impl Instruction {
                 let reserveCollateralMint = keys.next().unwrap().clone();
                 let reserveLiquiditySupply = keys.next().unwrap().clone();
                 let userDestinationLiquidity = keys.next().unwrap().clone();
-                let placeholderUserDestinationCollateral = keys.next().unwrap().clone();
-                let collateralTokenProgram = keys.next().unwrap().clone();
-                let liquidityTokenProgram = keys.next().unwrap().clone();
+                let placeholderUserDestinationCollateral = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
+                let collateralTokenProgram = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
+                let liquidityTokenProgram = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let instructionSysvarAccount = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = WithdrawObligationCollateralAndRedeemReserveCollateralAccounts {
+                    remaining,
                     owner,
                     obligation,
                     lendingMarket,
@@ -2343,7 +2764,6 @@ impl Instruction {
                     collateralTokenProgram,
                     liquidityTokenProgram,
                     instructionSysvarAccount,
-                    remaining,
                 };
                 return Ok(
                     Instruction::WithdrawObligationCollateralAndRedeemReserveCollateral {
@@ -2354,11 +2774,14 @@ impl Instruction {
             }
             [235u8, 52u8, 119u8, 152u8, 149u8, 197u8, 20u8, 7u8] => {
                 let mut rdr: &[u8] = rest;
-                let args =
-                    WithdrawObligationCollateralAndRedeemReserveCollateralV2Arguments::deserialize(
-                        &mut rdr,
-                    )?;
+                let collateral_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = WithdrawObligationCollateralAndRedeemReserveCollateralV2Arguments {
+                    collateral_amount,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(15usize);
                 let owner = keys.next().unwrap().clone();
                 let obligation = keys.next().unwrap().clone();
                 let lendingMarket = keys.next().unwrap().clone();
@@ -2373,11 +2796,22 @@ impl Instruction {
                 let collateralTokenProgram = keys.next().unwrap().clone();
                 let liquidityTokenProgram = keys.next().unwrap().clone();
                 let instructionSysvarAccount = keys.next().unwrap().clone();
-                let obligationFarmUserState = keys.next().unwrap().clone();
-                let reserveFarmState = keys.next().unwrap().clone();
+                let obligationFarmUserState = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
+                let reserveFarmState = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let farmsProgram = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = WithdrawObligationCollateralAndRedeemReserveCollateralV2Accounts {
+                    remaining,
                     owner,
                     obligation,
                     lendingMarket,
@@ -2395,7 +2829,6 @@ impl Instruction {
                     obligationFarmUserState,
                     reserveFarmState,
                     farmsProgram,
-                    remaining,
                 };
                 return Ok(
                     Instruction::WithdrawObligationCollateralAndRedeemReserveCollateralV2 {
@@ -2406,9 +2839,20 @@ impl Instruction {
             }
             [177u8, 71u8, 154u8, 188u8, 226u8, 133u8, 74u8, 55u8] => {
                 let mut rdr: &[u8] = rest;
-                let args =
-                    LiquidateObligationAndRedeemReserveCollateralArguments::deserialize(&mut rdr)?;
+                let liquidity_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let min_acceptable_received_liquidity_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let max_allowed_ltv_override_percent: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = LiquidateObligationAndRedeemReserveCollateralArguments {
+                    liquidity_amount,
+                    min_acceptable_received_liquidity_amount,
+                    max_allowed_ltv_override_percent,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(16usize);
                 let liquidator = keys.next().unwrap().clone();
                 let obligation = keys.next().unwrap().clone();
                 let lendingMarket = keys.next().unwrap().clone();
@@ -2425,12 +2869,33 @@ impl Instruction {
                 let userSourceLiquidity = keys.next().unwrap().clone();
                 let userDestinationCollateral = keys.next().unwrap().clone();
                 let userDestinationLiquidity = keys.next().unwrap().clone();
-                let collateralTokenProgram = keys.next().unwrap().clone();
-                let repayLiquidityTokenProgram = keys.next().unwrap().clone();
-                let withdrawLiquidityTokenProgram = keys.next().unwrap().clone();
-                let instructionSysvarAccount = keys.next().unwrap().clone();
+                let collateralTokenProgram = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
+                let repayLiquidityTokenProgram = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
+                let withdrawLiquidityTokenProgram = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
+                let instructionSysvarAccount = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let remaining = keys.cloned().collect();
                 let accounts = LiquidateObligationAndRedeemReserveCollateralAccounts {
+                    remaining,
                     liquidator,
                     obligation,
                     lendingMarket,
@@ -2451,7 +2916,6 @@ impl Instruction {
                     repayLiquidityTokenProgram,
                     withdrawLiquidityTokenProgram,
                     instructionSysvarAccount,
-                    remaining,
                 };
                 return Ok(Instruction::LiquidateObligationAndRedeemReserveCollateral {
                     accounts,
@@ -2460,10 +2924,20 @@ impl Instruction {
             }
             [162u8, 161u8, 35u8, 143u8, 30u8, 187u8, 185u8, 103u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = LiquidateObligationAndRedeemReserveCollateralV2Arguments::deserialize(
-                    &mut rdr,
-                )?;
+                let liquidity_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let min_acceptable_received_liquidity_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let max_allowed_ltv_override_percent: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = LiquidateObligationAndRedeemReserveCollateralV2Arguments {
+                    liquidity_amount,
+                    min_acceptable_received_liquidity_amount,
+                    max_allowed_ltv_override_percent,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(21usize);
                 let liquidator = keys.next().unwrap().clone();
                 let obligation = keys.next().unwrap().clone();
                 let lendingMarket = keys.next().unwrap().clone();
@@ -2484,11 +2958,22 @@ impl Instruction {
                 let repayLiquidityTokenProgram = keys.next().unwrap().clone();
                 let withdrawLiquidityTokenProgram = keys.next().unwrap().clone();
                 let instructionSysvarAccount = keys.next().unwrap().clone();
-                let obligationFarmUserState = keys.next().unwrap().clone();
-                let reserveFarmState = keys.next().unwrap().clone();
+                let obligationFarmUserState = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
+                let reserveFarmState = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let farmsProgram = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = LiquidateObligationAndRedeemReserveCollateralV2Accounts {
+                    remaining,
                     liquidator,
                     obligation,
                     lendingMarket,
@@ -2512,7 +2997,6 @@ impl Instruction {
                     obligationFarmUserState,
                     reserveFarmState,
                     farmsProgram,
-                    remaining,
                 };
                 return Ok(
                     Instruction::LiquidateObligationAndRedeemReserveCollateralV2 { accounts, args },
@@ -2520,22 +3004,47 @@ impl Instruction {
             }
             [185u8, 117u8, 0u8, 203u8, 96u8, 245u8, 180u8, 186u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = FlashRepayReserveLiquidityArguments::deserialize(&mut rdr)?;
+                let liquidity_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let borrow_instruction_index: u8 =
+                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = FlashRepayReserveLiquidityArguments {
+                    liquidity_amount,
+                    borrow_instruction_index,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(9usize);
                 let userTransferAuthority = keys.next().unwrap().clone();
                 let lendingMarketAuthority = keys.next().unwrap().clone();
                 let lendingMarket = keys.next().unwrap().clone();
                 let reserve = keys.next().unwrap().clone();
-                let reserveLiquidityMint = keys.next().unwrap().clone();
+                let reserveLiquidityMint = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let reserveDestinationLiquidity = keys.next().unwrap().clone();
                 let userSourceLiquidity = keys.next().unwrap().clone();
                 let reserveLiquidityFeeReceiver = keys.next().unwrap().clone();
-                let referrerTokenState = keys.next().unwrap().clone();
-                let referrerAccount = keys.next().unwrap().clone();
+                let referrerTokenState = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
+                let referrerAccount = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let sysvarInfo = keys.next().unwrap().clone();
                 let tokenProgram = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = FlashRepayReserveLiquidityAccounts {
+                    remaining,
                     userTransferAuthority,
                     lendingMarketAuthority,
                     lendingMarket,
@@ -2548,28 +3057,57 @@ impl Instruction {
                     referrerAccount,
                     sysvarInfo,
                     tokenProgram,
-                    remaining,
                 };
                 return Ok(Instruction::FlashRepayReserveLiquidity { accounts, args });
             }
             [135u8, 231u8, 52u8, 167u8, 7u8, 52u8, 212u8, 193u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = FlashBorrowReserveLiquidityArguments::deserialize(&mut rdr)?;
+                let liquidity_amount: u64 =
+                    <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = FlashBorrowReserveLiquidityArguments { liquidity_amount };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(7usize);
                 let userTransferAuthority = keys.next().unwrap().clone();
                 let lendingMarketAuthority = keys.next().unwrap().clone();
-                let lendingMarket = keys.next().unwrap().clone();
-                let reserve = keys.next().unwrap().clone();
-                let reserveLiquidityMint = keys.next().unwrap().clone();
+                let lendingMarket = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
+                let reserve = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
+                let reserveLiquidityMint = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let reserveSourceLiquidity = keys.next().unwrap().clone();
                 let userDestinationLiquidity = keys.next().unwrap().clone();
                 let reserveLiquidityFeeReceiver = keys.next().unwrap().clone();
-                let referrerTokenState = keys.next().unwrap().clone();
-                let referrerAccount = keys.next().unwrap().clone();
+                let referrerTokenState = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
+                let referrerAccount = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let sysvarInfo = keys.next().unwrap().clone();
                 let tokenProgram = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = FlashBorrowReserveLiquidityAccounts {
+                    remaining,
                     userTransferAuthority,
                     lendingMarketAuthority,
                     lendingMarket,
@@ -2582,32 +3120,41 @@ impl Instruction {
                     referrerAccount,
                     sysvarInfo,
                     tokenProgram,
-                    remaining,
                 };
                 return Ok(Instruction::FlashBorrowReserveLiquidity { accounts, args });
             }
             [36u8, 119u8, 251u8, 129u8, 34u8, 240u8, 7u8, 147u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = RequestElevationGroupArguments::deserialize(&mut rdr)?;
+                let elevation_group: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = RequestElevationGroupArguments { elevation_group };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(3usize);
                 let owner = keys.next().unwrap().clone();
                 let obligation = keys.next().unwrap().clone();
                 let lendingMarket = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = RequestElevationGroupAccounts {
+                    remaining,
                     owner,
                     obligation,
                     lendingMarket,
-                    remaining,
                 };
                 return Ok(Instruction::RequestElevationGroup { accounts, args });
             }
             [116u8, 45u8, 66u8, 148u8, 58u8, 13u8, 218u8, 115u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitReferrerTokenStateArguments::deserialize(&mut rdr)?;
+                let args = InitReferrerTokenStateArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(6usize);
                 let payer = keys.next().unwrap().clone();
-                let lendingMarket = keys.next().unwrap().clone();
+                let lendingMarket = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let reserve = keys.next().unwrap().clone();
                 let referrer = keys.next().unwrap().clone();
                 let referrerTokenState = keys.next().unwrap().clone();
@@ -2615,6 +3162,7 @@ impl Instruction {
                 let systemProgram = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = InitReferrerTokenStateAccounts {
+                    remaining,
                     payer,
                     lendingMarket,
                     reserve,
@@ -2622,36 +3170,51 @@ impl Instruction {
                     referrerTokenState,
                     rent,
                     systemProgram,
-                    remaining,
                 };
                 return Ok(Instruction::InitReferrerTokenState { accounts, args });
             }
             [117u8, 169u8, 176u8, 69u8, 197u8, 23u8, 15u8, 162u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitUserMetadataArguments::deserialize(&mut rdr)?;
+                let user_lookup_table: [u8; 32usize] =
+                    <[u8; 32usize] as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = InitUserMetadataArguments { user_lookup_table };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(4usize);
                 let owner = keys.next().unwrap().clone();
                 let feePayer = keys.next().unwrap().clone();
-                let userMetadata = keys.next().unwrap().clone();
-                let referrerUserMetadata = keys.next().unwrap().clone();
+                let userMetadata = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
+                let referrerUserMetadata = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let rent = keys.next().unwrap().clone();
                 let systemProgram = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = InitUserMetadataAccounts {
+                    remaining,
                     owner,
                     feePayer,
                     userMetadata,
                     referrerUserMetadata,
                     rent,
                     systemProgram,
-                    remaining,
                 };
                 return Ok(Instruction::InitUserMetadata { accounts, args });
             }
             [171u8, 118u8, 121u8, 201u8, 233u8, 140u8, 23u8, 228u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = WithdrawReferrerFeesArguments::deserialize(&mut rdr)?;
+                let args = WithdrawReferrerFeesArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(9usize);
                 let referrer = keys.next().unwrap().clone();
                 let referrerTokenState = keys.next().unwrap().clone();
                 let reserve = keys.next().unwrap().clone();
@@ -2663,6 +3226,7 @@ impl Instruction {
                 let tokenProgram = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = WithdrawReferrerFeesAccounts {
+                    remaining,
                     referrer,
                     referrerTokenState,
                     reserve,
@@ -2672,36 +3236,46 @@ impl Instruction {
                     lendingMarket,
                     lendingMarketAuthority,
                     tokenProgram,
-                    remaining,
                 };
                 return Ok(Instruction::WithdrawReferrerFees { accounts, args });
             }
             [165u8, 19u8, 25u8, 127u8, 100u8, 55u8, 31u8, 90u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitReferrerStateAndShortUrlArguments::deserialize(&mut rdr)?;
+                let short_url: String =
+                    <String as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = InitReferrerStateAndShortUrlArguments { short_url };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(5usize);
                 let referrer = keys.next().unwrap().clone();
                 let referrerState = keys.next().unwrap().clone();
                 let referrerShortUrl = keys.next().unwrap().clone();
-                let referrerUserMetadata = keys.next().unwrap().clone();
+                let referrerUserMetadata = if opt_budget > 0 {
+                    opt_budget -= 1;
+                    Some(keys.next().unwrap().clone())
+                } else {
+                    None
+                };
                 let rent = keys.next().unwrap().clone();
                 let systemProgram = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = InitReferrerStateAndShortUrlAccounts {
+                    remaining,
                     referrer,
                     referrerState,
                     referrerShortUrl,
                     referrerUserMetadata,
                     rent,
                     systemProgram,
-                    remaining,
                 };
                 return Ok(Instruction::InitReferrerStateAndShortUrl { accounts, args });
             }
             [153u8, 185u8, 99u8, 28u8, 228u8, 179u8, 187u8, 150u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = DeleteReferrerStateAndShortUrlArguments::deserialize(&mut rdr)?;
+                let args = DeleteReferrerStateAndShortUrlArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(5usize);
                 let referrer = keys.next().unwrap().clone();
                 let referrerState = keys.next().unwrap().clone();
                 let shortUrl = keys.next().unwrap().clone();
@@ -2709,35 +3283,42 @@ impl Instruction {
                 let systemProgram = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = DeleteReferrerStateAndShortUrlAccounts {
+                    remaining,
                     referrer,
                     referrerState,
                     shortUrl,
                     rent,
                     systemProgram,
-                    remaining,
                 };
                 return Ok(Instruction::DeleteReferrerStateAndShortUrl { accounts, args });
             }
             [81u8, 1u8, 99u8, 156u8, 211u8, 83u8, 78u8, 46u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = SetObligationOrderArguments::deserialize(&mut rdr)?;
+                let index: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let order: ObligationOrder =
+                    <ObligationOrder as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = SetObligationOrderArguments { index, order };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(3usize);
                 let owner = keys.next().unwrap().clone();
                 let obligation = keys.next().unwrap().clone();
                 let lendingMarket = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = SetObligationOrderAccounts {
+                    remaining,
                     owner,
                     obligation,
                     lendingMarket,
-                    remaining,
                 };
                 return Ok(Instruction::SetObligationOrder { accounts, args });
             }
             [140u8, 136u8, 214u8, 48u8, 87u8, 0u8, 120u8, 255u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitGlobalConfigArguments::deserialize(&mut rdr)?;
+                let args = InitGlobalConfigArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(5usize);
                 let payer = keys.next().unwrap().clone();
                 let globalConfig = keys.next().unwrap().clone();
                 let programData = keys.next().unwrap().clone();
@@ -2745,58 +3326,91 @@ impl Instruction {
                 let rent = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = InitGlobalConfigAccounts {
+                    remaining,
                     payer,
                     globalConfig,
                     programData,
                     systemProgram,
                     rent,
-                    remaining,
                 };
                 return Ok(Instruction::InitGlobalConfig { accounts, args });
             }
             [164u8, 84u8, 130u8, 189u8, 111u8, 58u8, 250u8, 200u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateGlobalConfigArguments::deserialize(&mut rdr)?;
+                let mode: UpdateGlobalConfigMode =
+                    <UpdateGlobalConfigMode as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let value: Vec<u8> = <Vec<u8> as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = UpdateGlobalConfigArguments { mode, value };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(2usize);
                 let globalAdmin = keys.next().unwrap().clone();
                 let globalConfig = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = UpdateGlobalConfigAccounts {
+                    remaining,
                     globalAdmin,
                     globalConfig,
-                    remaining,
                 };
                 return Ok(Instruction::UpdateGlobalConfig { accounts, args });
             }
             [184u8, 87u8, 23u8, 193u8, 156u8, 238u8, 175u8, 119u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateGlobalConfigAdminArguments::deserialize(&mut rdr)?;
+                let args = UpdateGlobalConfigAdminArguments {};
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(2usize);
                 let pendingAdmin = keys.next().unwrap().clone();
                 let globalConfig = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = UpdateGlobalConfigAdminAccounts {
+                    remaining,
                     pendingAdmin,
                     globalConfig,
-                    remaining,
                 };
                 return Ok(Instruction::UpdateGlobalConfigAdmin { accounts, args });
             }
             [130u8, 80u8, 38u8, 153u8, 80u8, 212u8, 182u8, 253u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = IdlMissingTypesArguments::deserialize(&mut rdr)?;
+                let reserve_farm_kind: ReserveFarmKind =
+                    <ReserveFarmKind as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let asset_tier: AssetTier =
+                    <AssetTier as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let fee_calculation: FeeCalculation =
+                    <FeeCalculation as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let reserve_status: ReserveStatus =
+                    <ReserveStatus as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let update_config_mode: UpdateConfigMode =
+                    <UpdateConfigMode as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let update_lending_market_config_value: UpdateLendingMarketConfigValue =
+                    <UpdateLendingMarketConfigValue as ::borsh::BorshDeserialize>::deserialize(
+                        &mut rdr,
+                    )?;
+                let update_lending_market_config_mode: UpdateLendingMarketMode =
+                    <UpdateLendingMarketMode as ::borsh::BorshDeserialize>::deserialize(&mut rdr)?;
+                let args = IdlMissingTypesArguments {
+                    reserve_farm_kind,
+                    asset_tier,
+                    fee_calculation,
+                    reserve_status,
+                    update_config_mode,
+                    update_lending_market_config_value,
+                    update_lending_market_config_mode,
+                };
                 let mut keys = account_keys.iter();
+                let mut keys = account_keys.iter();
+                let mut opt_budget = account_keys.len().saturating_sub(4usize);
                 let signer = keys.next().unwrap().clone();
                 let globalConfig = keys.next().unwrap().clone();
                 let lendingMarket = keys.next().unwrap().clone();
                 let reserve = keys.next().unwrap().clone();
                 let remaining = keys.cloned().collect();
                 let accounts = IdlMissingTypesAccounts {
+                    remaining,
                     signer,
                     globalConfig,
                     lendingMarket,
                     reserve,
-                    remaining,
                 };
                 return Ok(Instruction::IdlMissingTypes { accounts, args });
             }
