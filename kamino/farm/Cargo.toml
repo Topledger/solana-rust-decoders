@@ -16,6 +16,7 @@ serde-wasm-bindgen       = "0.5"   # serde ↔ Wasm bindings
 wasm-bindgen             = { version = "0.2", features = ["serde-serialize"] }
 console_error_panic_hook = "0.1"   # nicer panic messages in Wasm
 anchor-lang = { version = "0.31.1", features = ["idl-build", "derive"] }
+serde-big-array = "0.3"
 
 
 [build-dependencies]

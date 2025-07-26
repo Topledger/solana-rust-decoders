@@ -248,6 +248,7 @@
           "name": "scopePrices",
           "isMut": false,
           "isSigner": false,
+          "optional": true,
           "isOptional": true
         },
         {
@@ -284,6 +285,7 @@
           "name": "scopePrices",
           "isMut": false,
           "isSigner": false,
+          "optional": true,
           "isOptional": true
         }
       ],
@@ -324,11 +326,13 @@
         {
           "name": "userState",
           "isMut": true,
+          "optional": true,
           "isSigner": false
         },
         {
           "name": "farmState",
           "isMut": true,
+          "optional": true,
           "isSigner": false
         },
         {
@@ -536,12 +540,14 @@
         {
           "name": "farmVaultsAuthority",
           "isMut": false,
+          "optional": true,
           "isSigner": false
         },
         {
           "name": "scopePrices",
           "isMut": false,
           "isSigner": false,
+          "optional": true,
           "isOptional": true
         },
         {
@@ -880,6 +886,7 @@
           "name": "scopePrices",
           "isMut": false,
           "isSigner": false,
+          "optional": true,
           "isOptional": true
         },
         {

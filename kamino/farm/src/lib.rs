@@ -1,6 +1,7 @@
 use bs58::decode;
 use borsh::BorshDeserialize;
 use serde::Serialize;
+mod pubkey_serializer;
 include!("idl.rs");
 
 use serde_wasm_bindgen::{to_value, from_value};
