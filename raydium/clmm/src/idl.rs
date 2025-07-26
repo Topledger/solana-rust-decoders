@@ -673,7 +673,7 @@ pub mod ix_data {
         pub liquidity: u128,
         pub amount_0_max: u64,
         pub amount_1_max: u64,
-        pub base_flag: Option<bool>,
+        pub base_flag: bool,
     }
     #[derive(:: borsh :: BorshDeserialize, Debug)]
     pub struct InitializeRewardArguments {
@@ -699,7 +699,7 @@ pub mod ix_data {
         pub amount_0_max: u64,
         pub amount_1_max: u64,
         pub with_metadata: bool,
-        pub base_flag: Option<bool>,
+        pub base_flag: bool,
     }
     #[derive(:: borsh :: BorshDeserialize, Debug)]
     pub struct OpenPositionWithToken22NftArguments {
@@ -711,7 +711,7 @@ pub mod ix_data {
         pub amount_0_max: u64,
         pub amount_1_max: u64,
         pub with_metadata: bool,
-        pub base_flag: Option<bool>,
+        pub base_flag: bool,
     }
     #[derive(:: borsh :: BorshDeserialize, Debug)]
     pub struct SetRewardParamsArguments {

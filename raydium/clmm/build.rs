@@ -222,8 +222,13 @@ fn map_idl_type(ty: &IdlType) -> proc_macro2::TokenStream {
             quote! { #id }
         }
         IdlType::Option(inner) => {
-            let i = map_idl_type(inner);
-            quote! { Option<#i> }
+            match &**inner {
+                IdlType::Bool => quote! { bool },
+                _ => {
+                    let i = map_idl_type(inner);
+                    quote! { Option<#i> }
+                }
+            }
         }
         _ => {
             // For any unsupported types, fall back to Vec<u8>
