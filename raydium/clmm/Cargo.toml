@@ -1,0 +1,37 @@
+[package]
+name = "raydium"
+version = "1.0.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+name = "clmm"
+
+[dependencies]
+bs58                     = "0.5"   # base58 decode
+borsh                    = "0.10"  # Borsh (de)serialization
+anyhow                   = "1.0"   # ergonomic error handling
+serde                    = { version = "1.0", features = ["derive"] }
+serde_json               = "1.0"   # JSON serialization
+serde-wasm-bindgen       = "0.5"   # serde ↔ Wasm bindings
+wasm-bindgen             = { version = "0.2", features = ["serde-serialize"] }
+console_error_panic_hook = "0.1"   # nicer panic messages in Wasm
+anchor-lang = { version = "0.31.1", features = ["idl-build", "derive"] }
+
+
+[build-dependencies]
+anchor-idl = "0.4.1"        # for GeneratorOptions
+serde_json = "1.0"
+proc-macro2 = "1"
+darling = "0.14"
+quote = "1"
+syn = { version = "1", features = ["full", "parsing"] }
+anyhow      = "1.0"
+borsh = "0.10.3"
+sha2        = "0.10"
+heck = "0.4"
+
+[profile.release]
+lto = true
+opt-level = 's'
+strip = "debuginfo" 
