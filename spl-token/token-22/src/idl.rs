@@ -311,7 +311,6 @@ pub struct InitializePermanentDelegateArguments {
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct InitializeTransferHookArguments {
-    pub transfer_hook_discriminator: u8,
     #[serde(with = "pubkey_serde_option")]
     pub authority: Option<[u8; 32usize]>,
     #[serde(with = "pubkey_serde_option")]
@@ -319,7 +318,6 @@ pub struct InitializeTransferHookArguments {
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct UpdateTransferHookArguments {
-    pub transfer_hook_discriminator: u8,
     #[serde(with = "pubkey_serde_option")]
     pub program_id: Option<[u8; 32usize]>,
 }
@@ -3204,14 +3202,6 @@ impl Instruction {
                 }
                 [36u8, 0u8] => {
                     let mut rdr: &[u8] = rest;
-                    let transfer_hook_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(transfer_hook_discriminator),
-                                e
-                            )
-                        })?;
                     let mut pubkey_bytes = [0u8; 32];
                     rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
                         format!(
@@ -3239,7 +3229,6 @@ impl Instruction {
                         Some(pubkey_bytes)
                     };
                     let args = InitializeTransferHookArguments {
-                        transfer_hook_discriminator,
                         authority,
                         program_id,
                     };
@@ -3252,14 +3241,6 @@ impl Instruction {
                 }
                 [36u8, 1u8] => {
                     let mut rdr: &[u8] = rest;
-                    let transfer_hook_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(transfer_hook_discriminator),
-                                e
-                            )
-                        })?;
                     let mut pubkey_bytes = [0u8; 32];
                     rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
                         format!(
@@ -3273,10 +3254,7 @@ impl Instruction {
                     } else {
                         Some(pubkey_bytes)
                     };
-                    let args = UpdateTransferHookArguments {
-                        transfer_hook_discriminator,
-                        program_id,
-                    };
+                    let args = UpdateTransferHookArguments { program_id };
                     let mut keys = account_keys.iter();
                     let mut opt_budget = account_keys.len().saturating_sub(2usize);
                     let mint = keys.next().unwrap().clone();
@@ -6050,14 +6028,6 @@ impl Instruction {
                 }
                 [36u8, 0u8] => {
                     let mut rdr: &[u8] = rest;
-                    let transfer_hook_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(transfer_hook_discriminator),
-                                e
-                            )
-                        })?;
                     let mut pubkey_bytes = [0u8; 32];
                     rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
                         format!(
@@ -6085,7 +6055,6 @@ impl Instruction {
                         Some(pubkey_bytes)
                     };
                     let args = InitializeTransferHookArguments {
-                        transfer_hook_discriminator,
                         authority,
                         program_id,
                     };
@@ -6098,14 +6067,6 @@ impl Instruction {
                 }
                 [36u8, 1u8] => {
                     let mut rdr: &[u8] = rest;
-                    let transfer_hook_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(transfer_hook_discriminator),
-                                e
-                            )
-                        })?;
                     let mut pubkey_bytes = [0u8; 32];
                     rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
                         format!(
@@ -6119,10 +6080,7 @@ impl Instruction {
                     } else {
                         Some(pubkey_bytes)
                     };
-                    let args = UpdateTransferHookArguments {
-                        transfer_hook_discriminator,
-                        program_id,
-                    };
+                    let args = UpdateTransferHookArguments { program_id };
                     let mut keys = account_keys.iter();
                     let mut opt_budget = account_keys.len().saturating_sub(2usize);
                     let mint = keys.next().unwrap().clone();
@@ -8852,14 +8810,6 @@ impl Instruction {
             }
             [36u8, 0u8] => {
                 let mut rdr: &[u8] = rest;
-                let transfer_hook_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(transfer_hook_discriminator),
-                            e
-                        )
-                    })?;
                 let mut pubkey_bytes = [0u8; 32];
                 rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
                     format!(
@@ -8887,7 +8837,6 @@ impl Instruction {
                     Some(pubkey_bytes)
                 };
                 let args = InitializeTransferHookArguments {
-                    transfer_hook_discriminator,
                     authority,
                     program_id,
                 };
@@ -8900,14 +8849,6 @@ impl Instruction {
             }
             [36u8, 1u8] => {
                 let mut rdr: &[u8] = rest;
-                let transfer_hook_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(transfer_hook_discriminator),
-                            e
-                        )
-                    })?;
                 let mut pubkey_bytes = [0u8; 32];
                 rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
                     format!(
@@ -8921,10 +8862,7 @@ impl Instruction {
                 } else {
                     Some(pubkey_bytes)
                 };
-                let args = UpdateTransferHookArguments {
-                    transfer_hook_discriminator,
-                    program_id,
-                };
+                let args = UpdateTransferHookArguments { program_id };
                 let mut keys = account_keys.iter();
                 let mut opt_budget = account_keys.len().saturating_sub(2usize);
                 let mint = keys.next().unwrap().clone();

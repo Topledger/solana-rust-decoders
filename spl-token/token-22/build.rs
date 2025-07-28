@@ -286,6 +286,11 @@ fn main() -> Result<()> {
                 return None; // Skip this field as it's part of the discriminator
             }
 
+            // Skip transferHookDiscriminator if we're using compound discriminators
+            if arg.name == "transferHookDiscriminator" && discriminator.len() > 1 {
+                return None; // Skip this field as it's part of the discriminator
+            }
+
             let field_name = format_ident!("{}", arg.name.to_snake_case());
             let field_type = map_codama_type(&arg.arg_type);
 
@@ -372,6 +377,11 @@ fn main() -> Result<()> {
 
             // Skip transferFeeDiscriminator if we're using compound discriminators
             if arg.name == "transferFeeDiscriminator" && discriminator.len() > 1 {
+                continue; // Skip this field as it's already consumed by the match pattern
+            }
+
+            // Skip transferHookDiscriminator if we're using compound discriminators
+            if arg.name == "transferHookDiscriminator" && discriminator.len() > 1 {
                 continue; // Skip this field as it's already consumed by the match pattern
             }
 
