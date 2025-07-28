@@ -7,6 +7,28 @@ use quote::{format_ident, quote};
 use serde_json::from_str;
 use std::{fs, process::Command};
 
+use syn;
+
+fn add_serialize_to_typedefs(tokens: proc_macro2::TokenStream) -> proc_macro2::TokenStream {
+    // Debug: let's see what the actual tokens look like
+    let tokens_str = tokens.to_string();
+    println!("Original tokens: {}", &tokens_str[..tokens_str.len().min(500)]);
+    
+    // Use regex for more flexible pattern matching
+    let result = tokens_str
+        .replace("# [derive (AnchorSerialize , AnchorDeserialize , Clone , Copy , Debug , Default)]", 
+                 "# [derive (AnchorSerialize , AnchorDeserialize , Clone , Copy , Debug , Default , Serialize)]")
+        .replace("# [derive (AnchorSerialize , AnchorDeserialize , Clone , Debug)]", 
+                 "# [derive (AnchorSerialize , AnchorDeserialize , Clone , Debug , Serialize)]")
+        .replace("# [derive (AnchorSerialize , AnchorDeserialize , Clone , Copy , Debug)]", 
+                 "# [derive (AnchorSerialize , AnchorDeserialize , Clone , Copy , Debug , Serialize)]")
+        .replace("# [derive (AnchorSerialize , AnchorDeserialize , Debug)]", 
+                 "# [derive (AnchorSerialize , AnchorDeserialize , Debug , Serialize)]");
+    
+    println!("Modified tokens: {}", &result[..result.len().min(500)]);
+    result.parse().unwrap_or_else(|_| tokens)
+}
+
 fn main() -> Result<()> {
     let path = "idls/raydium_clmm.json";
     let idl_json = fs::read_to_string(path)?;
@@ -21,8 +43,68 @@ fn main() -> Result<()> {
     let gen = opts.to_generator();
     let typedefs_tokens = anchor_idl::generate_typedefs(&gen.idl.types, &gen.struct_opts);
 
-    // Keep typedefs simple without adding Serialize to avoid Pubkey type conflicts
-    let typedefs_with_serde = typedefs_tokens;
+    // Generate typedefs with Serialize support for JSON output
+    println!("cargo:warning=About to process typedefs for serialization");
+    let mut file = syn::parse2::<syn::File>(typedefs_tokens)?;
+    for item in &mut file.items {
+        if let syn::Item::Struct(s) = item {
+            // ensure Serialize derive
+            let derive_attr: syn::Attribute = syn::parse_quote!(#[derive(Serialize)]);
+            s.attrs.insert(0, derive_attr);
+            // annotate Pubkey and Option<Pubkey> fields
+            for field in &mut s.fields {
+                match &field.ty {
+                    // plain Pubkey
+                    syn::Type::Path(path) if path.path.segments.last().unwrap().ident == "Pubkey" => {
+                        let attr: syn::Attribute = syn::parse_quote!(#[serde(with = "pubkey_serde")]);
+                        field.attrs.insert(0, attr);
+                    }
+                    // Option<Pubkey>
+                    syn::Type::Path(path) if path.path.segments.len() == 1 && path.path.segments[0].ident == "Option" => {
+                        if let syn::PathArguments::AngleBracketed(ab) = &path.path.segments[0].arguments {
+                            if let Some(syn::GenericArgument::Type(inner_ty)) = ab.args.first() {
+                                if let syn::Type::Path(inner_path) = inner_ty {
+                                    if inner_path.path.segments.last().unwrap().ident == "Pubkey" {
+                                        let attr: syn::Attribute = syn::parse_quote!(#[serde(with = "pubkey_serde_option")]);
+                                        field.attrs.insert(0, attr);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    syn::Type::Array(arr) => {
+                        // skip serializing very large fixed arrays (len > 32) to avoid serde limitations
+                        if let syn::Expr::Lit(expr_lit) = &arr.len {
+                            if let syn::Lit::Int(lit_int) = &expr_lit.lit {
+                                if let Ok(len_val) = lit_int.base10_parse::<usize>() {
+                                    if len_val > 32 {
+                                        let attr: syn::Attribute = syn::parse_quote!(#[serde(skip_serializing)]);
+                                        field.attrs.insert(0, attr);
+                                        continue;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    syn::Type::Path(path) if {
+                        let id = &path.path.segments.last().unwrap().ident;
+                        id == "u64" || id == "u128"
+                    } => {
+                        let attr: syn::Attribute = syn::parse_quote!(#[serde(serialize_with = "crate::serialize_to_string")]);
+                        field.attrs.insert(0, attr);
+                    }
+                    _ => {}
+                }
+            }
+        }
+        if let syn::Item::Enum(e) = item {
+            // ensure Serialize derive on enums too
+            let derive_attr: syn::Attribute = syn::parse_quote!(#[derive(Serialize)]);
+            e.attrs.insert(0, derive_attr);
+        }
+    }
+    let typedefs_with_serde = quote! { #file };
+    println!("cargo:warning=Finished processing typedefs");
 
     // Generate all instruction structs and decoders
     let (args_structs, accounts_structs, instruction_variants, decode_arms) = generate_all_instructions(&idl)?;
@@ -35,7 +117,6 @@ fn main() -> Result<()> {
 
         use ::borsh::BorshDeserialize;
         use anchor_lang::prelude::*;
-        use serde::Serialize;
 
         pub use ix_data::*;
         pub use typedefs::*;
@@ -43,6 +124,9 @@ fn main() -> Result<()> {
 
         pub mod typedefs {
             use anchor_lang::prelude::*;
+            use serde::Serialize;
+            use crate::pubkey_serializer::pubkey_serde;
+            use crate::pubkey_serializer::pubkey_serde_option;
             
             #typedefs_with_serde
         }
@@ -54,10 +138,13 @@ fn main() -> Result<()> {
 
         pub mod ix_data {
             use super::*;
+            use crate::pubkey_serializer::pubkey_serde;
+            use crate::pubkey_serializer::pubkey_serde_option;
             #(#args_structs)*
         }
 
-        #[derive(Debug)]
+        #[derive(Debug, Serialize)]
+        #[serde(tag = "instruction_type")]
         pub enum Instruction {
             #(#instruction_variants)*
         }
@@ -79,33 +166,54 @@ fn main() -> Result<()> {
             }
         }
 
-        pub mod events {
-            use serde::Serialize;
 
-            #[derive(Debug, Serialize)]
-            #[serde(tag = "event_type")]
-            pub enum Event {
-                // Events skipped for CLMM - focus on instructions only
-            }
-
-            // Anchor's fixed "log prefix" for events
-            pub const EVENT_LOG_DISCRIMINATOR: [u8; 8] = [228, 69, 165, 46, 81, 203, 154, 29];
-
-            impl Event {
-                pub fn decode(_data: &[u8]) -> anyhow::Result<Self> {
-                    anyhow::bail!("Event decoding not implemented for CLMM")
-                }
-            }
-        }
     };
 
-    fs::write("src/idl.rs", out.to_string())?;
+    let generated_code = out.to_string();
+    fs::write("src/idl.rs", generated_code)?;
+    
+    // Post-process the generated file to add Serialize to typedefs
+    let idl_content = fs::read_to_string("src/idl.rs")?;
+    
+    // Count how many replacements we're making for debugging
+    let pattern = "    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]";
+    let count = idl_content.matches(pattern).count();
+    println!("cargo:warning=Found {} instances of AnchorSerialize pattern to replace", count);
+    
+    // Debug: show a snippet around InitializeRewardParam
+    if let Some(pos) = idl_content.find("InitializeRewardParam") {
+        let start = pos.saturating_sub(100);
+        let end = (pos + 100).min(idl_content.len());
+        let snippet = &idl_content[start..end];
+        println!("cargo:warning=Context around InitializeRewardParam: {}", snippet.replace('\n', " "));
+    }
+    
+    // Simple approach: find any line with AnchorSerialize and add Serialize to it
+    let lines: Vec<&str> = idl_content.lines().collect();
+    let mut processed_lines = Vec::new();
+    
+    for line in lines {
+        if line.contains("derive(AnchorSerialize") && !line.contains("Serialize") {
+            // Add Serialize before the closing parenthesis
+            let new_line = line.replace(")]", ", Serialize)]");
+            processed_lines.push(new_line);
+        } else {
+            processed_lines.push(line.to_string());
+        }
+    }
+    
+    let processed_content = processed_lines.join("\n");
+    
+    let new_count = processed_content.matches("Serialize)]").count();
+    println!("cargo:warning=After processing, found {} instances with Serialize", new_count);
+    
+    fs::write("src/idl.rs", processed_content)?;
     Command::new("rustfmt").arg("src/idl.rs").status()?;
     println!("cargo:warning=Generated comprehensive parser for all {} raydium CLMM instructions!", idl.instructions.len());
     Ok(())
 }
 
-// Events generation skipped for CLMM - focusing on instructions only
+
 
 fn generate_all_instructions(idl: &Idl) -> Result<(Vec<proc_macro2::TokenStream>, Vec<proc_macro2::TokenStream>, Vec<proc_macro2::TokenStream>, Vec<proc_macro2::TokenStream>)> {
     let mut args_structs = Vec::new();
@@ -124,15 +232,40 @@ fn generate_all_instructions(idl: &Idl) -> Result<(Vec<proc_macro2::TokenStream>
             .map_err(|_| anyhow::anyhow!("Invalid discriminator length for instruction {}", ix.name))?;
         let disc_tokens = disc_bytes.iter().map(|b| quote! { #b }).collect::<Vec<_>>();
 
-        // Generate args struct
+        // Generate args struct with serde annotations
         let args_fields: Vec<_> = ix.args.iter().map(|arg| {
             let field_ident = format_ident!("{}", arg.name.to_snake_case());
             let ty = map_idl_type(&arg.ty);
-            quote! { pub #field_ident: #ty, }
+
+            match &arg.ty {
+                anchor_idl::IdlType::U64 | anchor_idl::IdlType::U128 => {
+                    quote! {
+                        #[serde(serialize_with = "crate::serialize_to_string")]
+                        pub #field_ident: #ty,
+                    }
+                }
+                anchor_idl::IdlType::Pubkey => {
+                    quote! {
+                        #[serde(with = "pubkey_serde")]
+                        pub #field_ident: #ty,
+                    }
+                }
+                anchor_idl::IdlType::Option(inner) if matches!(**inner, anchor_idl::IdlType::Pubkey) => {
+                    quote! {
+                        #[serde(with = "pubkey_serde_option")]
+                        pub #field_ident: #ty,
+                    }
+                }
+                _ => {
+                    quote! {
+                        pub #field_ident: #ty,
+                    }
+                }
+            }
         }).collect();
 
         args_structs.push(quote! {
-            #[derive(::borsh::BorshDeserialize, Debug)]
+            #[derive(::borsh::BorshDeserialize, Debug, Serialize)]
             pub struct #args_ty {
                 #(#args_fields)*
             }

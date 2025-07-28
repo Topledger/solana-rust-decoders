@@ -1,6 +1,7 @@
 use bs58::decode;
-use serde::Serializer;
+use serde::{Serialize, Serializer};
 use anchor_lang::prelude::*;
+use serde_wasm_bindgen::{from_value, to_value};
 mod pubkey_serializer;
 
 // Utility function for serializing large numbers as strings
@@ -18,6 +19,12 @@ use console_error_panic_hook;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsValue;
 
+// A simple struct to serialize errors back into JS
+#[derive(Serialize)]
+struct ErrorObj {
+    error: String,
+}
+
 #[wasm_bindgen(start)]
 pub fn run() {
     console_error_panic_hook::set_once();
@@ -29,28 +36,38 @@ pub fn parse(base58_str: &str, accounts_js: JsValue) -> JsValue {
     let decoded = match decode(base58_str).into_vec() {
         Ok(b) => b,
         Err(e) => {
-            return JsValue::from_str(&format!("base58 decode failed: {}", e));
+            let err = ErrorObj {
+                error: format!("base58 decode failed: {}", e),
+            };
+            return to_value(&err).unwrap();
         }
     };
 
-    // 2) Is it an Anchor‐logged event?
-    if decoded.len() >= 8 && &decoded[..8] == &events::EVENT_LOG_DISCRIMINATOR {
-        match events::Event::decode(&decoded) {
-            Ok(ev) => {
-                return JsValue::from_str(&format!("{:?}", ev));
-            }
-            Err(e) => {
-                return JsValue::from_str(&format!("Event decode failed: {}", e));
-            }
+    // 2) Parse accounts from JavaScript
+    let accounts: Vec<String> = match from_value(accounts_js) {
+        Ok(v) => v,
+        Err(e) => {
+            let err = ErrorObj {
+                error: format!("accounts deserialize failed: {}", e),
+            };
+            return to_value(&err).unwrap();
         }
-    }
+    };
 
-    // 3) Try instruction decode (accounts not used for now)
-    let accounts: Vec<String> = vec![];
-
+    // 3) Try instruction decode
     match Instruction::decode(&accounts, &decoded) {
-        Ok(ix) => JsValue::from_str(&format!("{:?}", ix)),
-        Err(e) => JsValue::from_str(&format!("decode failed: {}", e)),
+        Ok(ix) => to_value(&ix).unwrap_or_else(|e| {
+            let err = ErrorObj {
+                error: format!("serialize failed: {}", e),
+            };
+            to_value(&err).unwrap()
+        }),
+        Err(e) => {
+            let err = ErrorObj {
+                error: format!("Instruction::decode failed: {}", e),
+            };
+            to_value(&err).unwrap()
+        }
     }
 }
 

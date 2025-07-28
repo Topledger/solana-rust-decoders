@@ -4,280 +4,413 @@ use anchor_lang::prelude::*;
 #[allow(dead_code)]
 use borsh::BorshDeserialize;
 pub use ix_data::*;
-use serde::Serialize;
 pub use typedefs::*;
 pub mod typedefs {
+    use crate::pubkey_serializer::pubkey_serde;
+    use crate::pubkey_serializer::pubkey_serde_option;
     use anchor_lang::prelude::*;
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    use serde::Serialize;
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
     pub struct AmmConfig {
         pub bump: u8,
         pub index: u16,
+        #[serde(with = "pubkey_serde")]
         pub owner: Pubkey,
         pub protocol_fee_rate: u32,
         pub trade_fee_rate: u32,
         pub tick_spacing: u16,
         pub fund_fee_rate: u32,
         pub padding_u32: u32,
+        #[serde(with = "pubkey_serde")]
         pub fund_owner: Pubkey,
         pub padding: [u64; 3],
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
     pub struct CollectPersonalFeeEvent {
+        #[serde(with = "pubkey_serde")]
         pub position_nft_mint: Pubkey,
+        #[serde(with = "pubkey_serde")]
         pub recipient_token_account_0: Pubkey,
+        #[serde(with = "pubkey_serde")]
         pub recipient_token_account_1: Pubkey,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_0: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_1: u64,
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
     pub struct CollectProtocolFeeEvent {
+        #[serde(with = "pubkey_serde")]
         pub pool_state: Pubkey,
+        #[serde(with = "pubkey_serde")]
         pub recipient_token_account_0: Pubkey,
+        #[serde(with = "pubkey_serde")]
         pub recipient_token_account_1: Pubkey,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_0: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_1: u64,
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
     pub struct ConfigChangeEvent {
         pub index: u16,
+        #[serde(with = "pubkey_serde")]
         pub owner: Pubkey,
         pub protocol_fee_rate: u32,
         pub trade_fee_rate: u32,
         pub tick_spacing: u16,
         pub fund_fee_rate: u32,
+        #[serde(with = "pubkey_serde")]
         pub fund_owner: Pubkey,
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
     pub struct CreatePersonalPositionEvent {
+        #[serde(with = "pubkey_serde")]
         pub pool_state: Pubkey,
+        #[serde(with = "pubkey_serde")]
         pub minter: Pubkey,
+        #[serde(with = "pubkey_serde")]
         pub nft_owner: Pubkey,
         pub tick_lower_index: i32,
         pub tick_upper_index: i32,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub liquidity: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub deposit_amount_0: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub deposit_amount_1: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub deposit_amount_0_transfer_fee: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub deposit_amount_1_transfer_fee: u64,
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
     pub struct DecreaseLiquidityEvent {
+        #[serde(with = "pubkey_serde")]
         pub position_nft_mint: Pubkey,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub liquidity: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub decrease_amount_0: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub decrease_amount_1: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub fee_amount_0: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub fee_amount_1: u64,
         pub reward_amounts: [u64; 3],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub transfer_fee_0: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub transfer_fee_1: u64,
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
     pub struct IncreaseLiquidityEvent {
+        #[serde(with = "pubkey_serde")]
         pub position_nft_mint: Pubkey,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub liquidity: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_0: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_1: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_0_transfer_fee: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_1_transfer_fee: u64,
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
     pub struct InitializeRewardParam {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub open_time: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub end_time: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub emissions_per_second_x64: u128,
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
     pub struct LiquidityCalculateEvent {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub pool_liquidity: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub pool_sqrt_price_x64: u128,
         pub pool_tick: i32,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub calc_amount_0: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub calc_amount_1: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub trade_fee_owed_0: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub trade_fee_owed_1: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub transfer_fee_0: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub transfer_fee_1: u64,
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
     pub struct LiquidityChangeEvent {
+        #[serde(with = "pubkey_serde")]
         pub pool_state: Pubkey,
         pub tick: i32,
         pub tick_lower: i32,
         pub tick_upper: i32,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub liquidity_before: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub liquidity_after: u128,
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
     pub struct Observation {
         pub block_timestamp: u32,
         pub tick_cumulative: i64,
         pub padding: [u64; 4],
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug)]
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug)]
     pub struct ObservationState {
         pub initialized: bool,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub recent_epoch: u64,
         pub observation_index: u16,
+        #[serde(with = "pubkey_serde")]
         pub pool_id: Pubkey,
+        #[serde(skip_serializing)]
         pub observations: [Observation; 100],
         pub padding: [u64; 4],
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug)]
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug)]
     pub struct OperationState {
         pub bump: u8,
         pub operation_owners: [Pubkey; 10],
+        #[serde(skip_serializing)]
         pub whitelist_mints: [Pubkey; 100],
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
     pub struct PersonalPositionState {
         pub bump: [u8; 1],
+        #[serde(with = "pubkey_serde")]
         pub nft_mint: Pubkey,
+        #[serde(with = "pubkey_serde")]
         pub pool_id: Pubkey,
         pub tick_lower_index: i32,
         pub tick_upper_index: i32,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub liquidity: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub fee_growth_inside_0_last_x64: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub fee_growth_inside_1_last_x64: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub token_fees_owed_0: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub token_fees_owed_1: u64,
         pub reward_infos: [PositionRewardInfo; 3],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub recent_epoch: u64,
         pub padding: [u64; 7],
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
     pub struct PoolCreatedEvent {
+        #[serde(with = "pubkey_serde")]
         pub token_mint_0: Pubkey,
+        #[serde(with = "pubkey_serde")]
         pub token_mint_1: Pubkey,
         pub tick_spacing: u16,
+        #[serde(with = "pubkey_serde")]
         pub pool_state: Pubkey,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub sqrt_price_x64: u128,
         pub tick: i32,
+        #[serde(with = "pubkey_serde")]
         pub token_vault_0: Pubkey,
+        #[serde(with = "pubkey_serde")]
         pub token_vault_1: Pubkey,
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
     pub struct PoolState {
         pub bump: [u8; 1],
+        #[serde(with = "pubkey_serde")]
         pub amm_config: Pubkey,
+        #[serde(with = "pubkey_serde")]
         pub owner: Pubkey,
+        #[serde(with = "pubkey_serde")]
         pub token_mint_0: Pubkey,
+        #[serde(with = "pubkey_serde")]
         pub token_mint_1: Pubkey,
+        #[serde(with = "pubkey_serde")]
         pub token_vault_0: Pubkey,
+        #[serde(with = "pubkey_serde")]
         pub token_vault_1: Pubkey,
+        #[serde(with = "pubkey_serde")]
         pub observation_key: Pubkey,
         pub mint_decimals_0: u8,
         pub mint_decimals_1: u8,
         pub tick_spacing: u16,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub liquidity: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub sqrt_price_x64: u128,
         pub tick_current: i32,
         pub padding3: u16,
         pub padding4: u16,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub fee_growth_global_0_x64: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub fee_growth_global_1_x64: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub protocol_fees_token_0: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub protocol_fees_token_1: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub swap_in_amount_token_0: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub swap_out_amount_token_1: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub swap_in_amount_token_1: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub swap_out_amount_token_0: u128,
         pub status: u8,
         pub padding: [u8; 7],
         pub reward_infos: [RewardInfo; 3],
         pub tick_array_bitmap: [u64; 16],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub total_fees_token_0: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub total_fees_claimed_token_0: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub total_fees_token_1: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub total_fees_claimed_token_1: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub fund_fees_token_0: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub fund_fees_token_1: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub open_time: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub recent_epoch: u64,
         pub padding1: [u64; 24],
         pub padding2: [u64; 32],
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
     pub struct PositionRewardInfo {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub growth_inside_last_x64: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub reward_amount_owed: u64,
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
     pub struct ProtocolPositionState {
         pub bump: u8,
+        #[serde(with = "pubkey_serde")]
         pub pool_id: Pubkey,
         pub tick_lower_index: i32,
         pub tick_upper_index: i32,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub liquidity: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub fee_growth_inside_0_last_x64: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub fee_growth_inside_1_last_x64: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub token_fees_owed_0: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub token_fees_owed_1: u64,
         pub reward_growth_inside: [u128; 3],
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub recent_epoch: u64,
         pub padding: [u64; 7],
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
     pub struct RewardInfo {
         pub reward_state: u8,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub open_time: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub end_time: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub last_update_time: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub emissions_per_second_x64: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub reward_total_emissioned: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub reward_claimed: u64,
+        #[serde(with = "pubkey_serde")]
         pub token_mint: Pubkey,
+        #[serde(with = "pubkey_serde")]
         pub token_vault: Pubkey,
+        #[serde(with = "pubkey_serde")]
         pub authority: Pubkey,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub reward_growth_global_x64: u128,
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
     pub struct SupportMintAssociated {
         pub bump: u8,
+        #[serde(with = "pubkey_serde")]
         pub mint: Pubkey,
         pub padding: [u64; 8],
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
     pub struct SwapEvent {
+        #[serde(with = "pubkey_serde")]
         pub pool_state: Pubkey,
+        #[serde(with = "pubkey_serde")]
         pub sender: Pubkey,
+        #[serde(with = "pubkey_serde")]
         pub token_account_0: Pubkey,
+        #[serde(with = "pubkey_serde")]
         pub token_account_1: Pubkey,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_0: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub transfer_fee_0: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_1: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub transfer_fee_1: u64,
         pub zero_for_one: bool,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub sqrt_price_x64: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub liquidity: u128,
         pub tick: i32,
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
     pub struct TickArrayBitmapExtension {
+        #[serde(with = "pubkey_serde")]
         pub pool_id: Pubkey,
         pub positive_tick_array_bitmap: [[u64; 8]; 14],
         pub negative_tick_array_bitmap: [[u64; 8]; 14],
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug)]
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug)]
     pub struct TickArrayState {
+        #[serde(with = "pubkey_serde")]
         pub pool_id: Pubkey,
         pub start_tick_index: i32,
+        #[serde(skip_serializing)]
         pub ticks: [TickState; 60],
         pub initialized_tick_count: u8,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub recent_epoch: u64,
+        #[serde(skip_serializing)]
         pub padding: [u8; 107],
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
     pub struct TickState {
         pub tick: i32,
         pub liquidity_net: i128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub liquidity_gross: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub fee_growth_outside_0_x64: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub fee_growth_outside_1_x64: u128,
         pub reward_growths_outside_x64: [u128; 3],
         pub padding: [u32; 13],
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
     pub struct UpdateRewardInfosEvent {
         pub reward_growth_global_x64: [u128; 3],
     }
@@ -617,23 +750,29 @@ pub mod accounts_data {
 }
 pub mod ix_data {
     use super::*;
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    use crate::pubkey_serializer::pubkey_serde;
+    use crate::pubkey_serializer::pubkey_serde_option;
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct ClosePositionArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct CollectFundFeeArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_0_requested: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_1_requested: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct CollectProtocolFeeArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_0_requested: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_1_requested: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct CollectRemainingRewardsArguments {
         pub reward_index: u8,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct CreateAmmConfigArguments {
         pub index: u16,
         pub tick_spacing: u16,
@@ -641,126 +780,162 @@ pub mod ix_data {
         pub protocol_fee_rate: u32,
         pub fund_fee_rate: u32,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct CreateOperationAccountArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct CreatePoolArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub sqrt_price_x64: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub open_time: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct CreateSupportMintAssociatedArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct DecreaseLiquidityArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub liquidity: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_0_min: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_1_min: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct DecreaseLiquidityV2Arguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub liquidity: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_0_min: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_1_min: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct IncreaseLiquidityArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub liquidity: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_0_max: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_1_max: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct IncreaseLiquidityV2Arguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub liquidity: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_0_max: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_1_max: u64,
         pub base_flag: bool,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct InitializeRewardArguments {
         pub param: InitializeRewardParam,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct OpenPositionArguments {
         pub tick_lower_index: i32,
         pub tick_upper_index: i32,
         pub tick_array_lower_start_index: i32,
         pub tick_array_upper_start_index: i32,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub liquidity: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_0_max: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_1_max: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct OpenPositionV2Arguments {
         pub tick_lower_index: i32,
         pub tick_upper_index: i32,
         pub tick_array_lower_start_index: i32,
         pub tick_array_upper_start_index: i32,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub liquidity: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_0_max: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_1_max: u64,
         pub with_metadata: bool,
         pub base_flag: bool,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct OpenPositionWithToken22NftArguments {
         pub tick_lower_index: i32,
         pub tick_upper_index: i32,
         pub tick_array_lower_start_index: i32,
         pub tick_array_upper_start_index: i32,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub liquidity: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_0_max: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_1_max: u64,
         pub with_metadata: bool,
         pub base_flag: bool,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct SetRewardParamsArguments {
         pub reward_index: u8,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub emissions_per_second_x64: u128,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub open_time: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub end_time: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct SwapArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub other_amount_threshold: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub sqrt_price_limit_x64: u128,
         pub is_base_input: bool,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct SwapRouterBaseInArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_in: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_out_minimum: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct SwapV2Arguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub other_amount_threshold: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub sqrt_price_limit_x64: u128,
         pub is_base_input: bool,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct TransferRewardOwnerArguments {
+        #[serde(with = "pubkey_serde")]
         pub new_owner: Pubkey,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct UpdateAmmConfigArguments {
         pub param: u8,
         pub value: u32,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct UpdateOperationAccountArguments {
         pub param: u8,
         pub keys: Vec<Pubkey>,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct UpdatePoolStatusArguments {
         pub status: u8,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct UpdateRewardInfosArguments {}
 }
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
+#[serde(tag = "instruction_type")]
 pub enum Instruction {
     ClosePosition {
         accounts: ClosePositionAccounts,
@@ -1582,18 +1757,6 @@ impl Instruction {
                 return Ok(Instruction::UpdateRewardInfos { accounts, args });
             }
             _ => anyhow::bail!("Unknown discriminator: {:?}", disc),
-        }
-    }
-}
-pub mod events {
-    use serde::Serialize;
-    #[derive(Debug, Serialize)]
-    #[serde(tag = "event_type")]
-    pub enum Event {}
-    pub const EVENT_LOG_DISCRIMINATOR: [u8; 8] = [228, 69, 165, 46, 81, 203, 154, 29];
-    impl Event {
-        pub fn decode(_data: &[u8]) -> anyhow::Result<Self> {
-            anyhow::bail!("Event decoding not implemented for CLMM")
         }
     }
 }
