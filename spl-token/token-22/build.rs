@@ -14,7 +14,8 @@ struct CodemaIdl {
 #[derive(Debug, Deserialize)]
 struct CodemaProgram {
     instructions: Vec<CodemaInstruction>,
-    // Skip definedTypes for now to avoid parsing complexity
+    #[serde(rename = "definedTypes")]
+    defined_types: Vec<CodemaDefinedType>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -46,6 +47,7 @@ struct CodemaArgument {
 #[derive(Debug, Deserialize)]
 struct CodemaDefaultValue {
     number: Option<u64>,
+    data: Option<String>, // Added for hex data
 }
 
 #[derive(Debug, Deserialize)]
@@ -57,6 +59,13 @@ struct CodemaType {
     size: Option<serde_json::Value>,
     #[serde(rename = "type")]
     inner_type: Option<Box<CodemaType>>,
+    name: Option<String>, // Added for defined type names
+}
+
+#[derive(Debug, Deserialize)]
+struct CodemaDefinedType {
+    name: String,
+    // We'll keep this simple for now and only handle what we need
 }
 
 fn map_codama_type(codama_type: &CodemaType) -> TokenStream {
@@ -109,9 +118,26 @@ fn map_codama_type(codama_type: &CodemaType) -> TokenStream {
                 quote! { Option<u8> }
             }
         }
+        "zeroableOptionTypeNode" => {
+            if let Some(ref item) = codama_type.item {
+                let inner_type = map_codama_type(item);
+                quote! { Option<#inner_type> }
+            } else {
+                quote! { Option<u8> }
+            }
+        }
         "definedTypeLinkNode" => {
-            // For now, we'll just use u8 as placeholder for defined types like accountState
-            quote! { u8 }
+            // Use the actual defined type name
+            if let Some(ref name) = codama_type.name {
+                let type_name = format_ident!("{}", name.to_upper_camel_case());
+                quote! { #type_name }
+            } else {
+                quote! { u8 } // fallback
+            }
+        }
+        "sizePrefixTypeNode" => {
+            // Handle size-prefixed strings (u32 length + string data)
+            quote! { String }
         }
         _ => {
             eprintln!("Unknown Codama type: {}", codama_type.kind);
@@ -120,15 +146,30 @@ fn map_codama_type(codama_type: &CodemaType) -> TokenStream {
     }
 }
 
-fn extract_discriminator(instruction: &CodemaInstruction) -> u8 {
+fn extract_discriminator(instruction: &CodemaInstruction) -> Vec<u8> {
     // Find the discriminator argument
-    instruction
+    if let Some(disc_arg) = instruction
         .arguments
         .iter()
         .find(|arg| arg.name == "discriminator")
-        .and_then(|arg| arg.default_value.as_ref())
-        .and_then(|val| val.number)
-        .unwrap_or(0) as u8
+    {
+        if let Some(default_value) = &disc_arg.default_value {
+            // Handle single-byte discriminator (number)
+            if let Some(number) = default_value.number {
+                return vec![number as u8];
+            }
+            
+            // Handle multi-byte discriminator (hex data)
+            if let Some(data) = &default_value.data {
+                if let Ok(bytes) = hex::decode(data) {
+                    return bytes;
+                }
+            }
+        }
+    }
+    
+    // Default to [0] if no discriminator found
+    vec![0]
 }
 
 fn main() -> Result<()> {
@@ -140,7 +181,79 @@ fn main() -> Result<()> {
 
     let mut args_structs = Vec::new();
     let mut accounts_structs = Vec::new();
+    let mut defined_types = Vec::new();
     let mut arms = Vec::new();
+
+    // Process defined types first (enums, structs, etc.)
+    for defined_type in &idl.program.defined_types {
+        if defined_type.name == "tokenMetadataField" {
+            // Generate the TokenMetadataField enum
+            let enum_name = format_ident!("TokenMetadataField");
+            let variants = quote! {
+                #[derive(Debug, Serialize)]
+                pub enum #enum_name {
+                    Name,
+                    Symbol, 
+                    Uri,
+                    Key(String),
+                }
+                
+                impl ::borsh::BorshDeserialize for #enum_name {
+                    fn deserialize(buf: &mut &[u8]) -> ::borsh::maybestd::io::Result<Self> {
+                        let field_discriminator: u8 = ::borsh::BorshDeserialize::deserialize(buf)?;
+                        match field_discriminator {
+                            0 => Ok(#enum_name::Name),
+                            1 => Ok(#enum_name::Symbol),
+                            2 => Ok(#enum_name::Uri),
+                            3 => {
+                                // Read the key string for Key variant
+                                let key_len: u32 = ::borsh::BorshDeserialize::deserialize(buf)?;
+                                let mut key_bytes = vec![0u8; key_len as usize];
+                                use std::io::Read;
+                                buf.read_exact(&mut key_bytes).map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))?;
+                                let key_string = String::from_utf8(key_bytes)
+                                    .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))?;
+                                Ok(#enum_name::Key(key_string))
+                            }
+                            _ => Err(std::io::Error::new(std::io::ErrorKind::InvalidData, format!("Unknown TokenMetadataField discriminator: {}", field_discriminator))),
+                        }
+                    }
+                    
+                    fn deserialize_reader<R: std::io::Read>(reader: &mut R) -> ::borsh::maybestd::io::Result<Self> {
+                        let field_discriminator: u8 = ::borsh::BorshDeserialize::deserialize_reader(reader)?;
+                        match field_discriminator {
+                            0 => Ok(#enum_name::Name),
+                            1 => Ok(#enum_name::Symbol),
+                            2 => Ok(#enum_name::Uri),
+                            3 => {
+                                // Read the key string for Key variant
+                                let key_len: u32 = ::borsh::BorshDeserialize::deserialize_reader(reader)?;
+                                let mut key_bytes = vec![0u8; key_len as usize];
+                                reader.read_exact(&mut key_bytes)?;
+                                let key_string = String::from_utf8(key_bytes)
+                                    .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))?;
+                                Ok(#enum_name::Key(key_string))
+                            }
+                            _ => Err(std::io::Error::new(std::io::ErrorKind::InvalidData, format!("Unknown TokenMetadataField discriminator: {}", field_discriminator))),
+                        }
+                    }
+                }
+            };
+            defined_types.push(variants);
+        }
+    }
+    
+    // Add placeholder types for missing defined types
+    defined_types.push(quote! {
+        #[derive(Debug, Serialize, ::borsh::BorshDeserialize)]
+        pub struct AuthorityType(pub u8);
+        
+        #[derive(Debug, Serialize, ::borsh::BorshDeserialize)]
+        pub struct DecryptableBalance(pub Vec<u8>);
+        
+        #[derive(Debug, Serialize, ::borsh::BorshDeserialize)]
+        pub struct AccountState(pub u8);
+    });
 
     println!("Processing {} instructions", idl.program.instructions.len());
 
@@ -154,7 +267,7 @@ fn main() -> Result<()> {
         // Extract discriminator
         let discriminator = extract_discriminator(instruction);
         println!(
-            "Processing instruction: {} (discriminator: {})",
+            "Processing instruction: {} (discriminator: {:?})",
             instruction.name, discriminator
         );
 
@@ -173,6 +286,24 @@ fn main() -> Result<()> {
                         quote! {
                             #[serde(with = "pubkey_serde")]
                             pub #field_name: [u8; 32usize],
+                        }
+                    }
+                    "zeroableOptionTypeNode" => {
+                        if let Some(ref item) = arg.arg_type.item {
+                            if item.kind == "publicKeyTypeNode" {
+                                quote! {
+                                    #[serde(with = "pubkey_serde_option")]
+                                    pub #field_name: Option<[u8; 32usize]>,
+                                }
+                            } else {
+                                quote! {
+                                    pub #field_name: #field_type,
+                                }
+                            }
+                        } else {
+                            quote! {
+                                pub #field_name: #field_type,
+                            }
                         }
                     }
                     "numberTypeNode"
@@ -233,9 +364,51 @@ fn main() -> Result<()> {
             let field_name = format_ident!("{}", arg.name.to_snake_case());
             let field_type = map_codama_type(&arg.arg_type);
 
-            let parse_snippet = quote! {
-                let #field_name: #field_type = <#field_type as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                    .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(#field_name), e))?;
+            let parse_snippet = match arg.arg_type.kind.as_str() {
+                "sizePrefixTypeNode" => {
+                    quote! {
+                        let string_len: u32 = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
+                            .map_err(|e| format!("Failed to deserialize string length for {}: {}", stringify!(#field_name), e))?;
+                        let mut string_bytes = vec![0u8; string_len as usize];
+                        rdr.read_exact(&mut string_bytes)
+                            .map_err(|e| format!("Failed to read string bytes for {}: {}", stringify!(#field_name), e))?;
+                        let #field_name: String = String::from_utf8(string_bytes)
+                            .map_err(|e| format!("Failed to parse UTF-8 string for {}: {}", stringify!(#field_name), e))?;
+                    }
+                }
+                "zeroableOptionTypeNode" => {
+                    if let Some(ref item) = arg.arg_type.item {
+                        if item.kind == "publicKeyTypeNode" {
+                            quote! {
+                                let mut pubkey_bytes = [0u8; 32];
+                                rdr.read_exact(&mut pubkey_bytes)
+                                    .map_err(|e| format!("Failed to read pubkey bytes for {}: {}", stringify!(#field_name), e))?;
+                                let #field_name: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                                    None
+                                } else {
+                                    Some(pubkey_bytes)
+                                };
+                            }
+                        } else {
+                            // Generic zeroable option handling
+                            quote! {
+                                let #field_name: #field_type = <#field_type as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
+                                    .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(#field_name), e))?;
+                            }
+                        }
+                    } else {
+                        quote! {
+                            let #field_name: #field_type = <#field_type as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
+                                .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(#field_name), e))?;
+                        }
+                    }
+                }
+                _ => {
+                    quote! {
+                        let #field_name: #field_type = <#field_type as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
+                            .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(#field_name), e))?;
+                    }
+                }
             };
 
             parse_args.push(parse_snippet);
@@ -280,8 +453,16 @@ fn main() -> Result<()> {
         }
 
         // Generate match arm
+        let discriminator_pattern = if discriminator.len() == 1 {
+            let disc_byte = discriminator[0];
+            quote! { [#disc_byte] }
+        } else {
+            let disc_bytes = &discriminator;
+            quote! { [#(#disc_bytes),*] }
+        };
+        
         arms.push(quote! {
-            [#discriminator] => {
+            #discriminator_pattern => {
                 let mut rdr: &[u8] = rest;
                 #(#parse_args)*
                 let args = #args_ty { #(#arg_idents),* };
@@ -321,8 +502,17 @@ fn main() -> Result<()> {
                     return Err("Empty instruction data".to_string());
                 }
 
-                let (discriminator, rest) = data.split_at(1);
+                // Try 8-byte discriminators first (for multi-byte discriminators)
+                if data.len() >= 8 {
+                    let (discriminator, rest) = data.split_at(8);
+                    match discriminator {
+                        #(#arms)*
+                        _ => {} // Fall through to try 1-byte discriminator
+                    }
+                }
 
+                // Try 1-byte discriminators (for single-byte discriminators) 
+                let (discriminator, rest) = data.split_at(1);
                 match discriminator {
                     #(#arms)*
                     _ => Err(format!("Unknown instruction discriminator: {:?}", discriminator)),
@@ -334,6 +524,7 @@ fn main() -> Result<()> {
     // Generate the complete output
     let out = quote! {
         use anyhow::Result;
+        use std::io::Read;
 
         mod pubkey_serde {
             use bs58;
@@ -348,8 +539,27 @@ fn main() -> Result<()> {
             }
         }
 
+        mod pubkey_serde_option {
+            use bs58;
+            use serde::{Serializer};
+
+            pub fn serialize<S>(bytes: &Option<[u8; 32]>, serializer: S) -> Result<S::Ok, S::Error>
+            where
+                S: Serializer,
+            {
+                match bytes {
+                    Some(bytes) => {
+                        let s = bs58::encode(bytes).into_string();
+                        serializer.serialize_some(&s)
+                    }
+                    None => serializer.serialize_none(),
+                }
+            }
+        }
+
         #(#args_structs)*
         #(#accounts_structs)*
+        #(#defined_types)*
         #instruction_enum
         #decode_impl
     };
