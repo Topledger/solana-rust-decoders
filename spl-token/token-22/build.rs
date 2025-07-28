@@ -326,6 +326,17 @@ fn main() -> Result<()> {
                         quote! {}
                     }
                 }
+                "optionTypeNode" => {
+                    if let Some(ref item) = arg.r#type.item {
+                        if item.kind == "publicKeyTypeNode" {
+                            quote! { #[serde(with = "pubkey_serde_option")] }
+                        } else {
+                            quote! {}
+                        }
+                    } else {
+                        quote! {}
+                    }
+                }
                 "zeroableOptionTypeNode" => {
                     if let Some(ref item) = arg.r#type.item {
                         if item.kind == "publicKeyTypeNode" {

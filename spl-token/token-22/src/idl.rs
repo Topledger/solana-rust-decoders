@@ -40,6 +40,7 @@ pub struct InitializeMintArguments {
     pub decimals: u8,
     #[serde(with = "pubkey_serde")]
     pub mint_authority: [u8; 32usize],
+    #[serde(with = "pubkey_serde_option")]
     pub freeze_authority: Option<[u8; 32usize]>,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
@@ -63,6 +64,7 @@ pub struct RevokeArguments {}
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct SetAuthorityArguments {
     pub authority_type: AuthorityType,
+    #[serde(with = "pubkey_serde_option")]
     pub new_authority: Option<[u8; 32usize]>,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
@@ -126,6 +128,7 @@ pub struct InitializeMint2Arguments {
     pub decimals: u8,
     #[serde(with = "pubkey_serde")]
     pub mint_authority: [u8; 32usize],
+    #[serde(with = "pubkey_serde_option")]
     pub freeze_authority: Option<[u8; 32usize]>,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
@@ -143,11 +146,14 @@ pub struct UiAmountToAmountArguments {
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct InitializeMintCloseAuthorityArguments {
+    #[serde(with = "pubkey_serde_option")]
     pub close_authority: Option<[u8; 32usize]>,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct InitializeTransferFeeConfigArguments {
+    #[serde(with = "pubkey_serde_option")]
     pub transfer_fee_config_authority: Option<[u8; 32usize]>,
+    #[serde(with = "pubkey_serde_option")]
     pub withdraw_withheld_authority: Option<[u8; 32usize]>,
     pub transfer_fee_basis_points: u16,
     #[serde(serialize_with = "crate::serialize_to_string")]
