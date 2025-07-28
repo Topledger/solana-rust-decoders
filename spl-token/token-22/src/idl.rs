@@ -144,6 +144,7 @@ pub struct InitializeTransferFeeConfigArguments {
     pub transfer_fee_basis_points: u16,
     #[serde(serialize_with = "crate::serialize_to_string")]
     pub maximum_fee: u64,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct TransferCheckedWithFeeArguments {
@@ -152,121 +153,128 @@ pub struct TransferCheckedWithFeeArguments {
     pub decimals: u8,
     #[serde(serialize_with = "crate::serialize_to_string")]
     pub fee: u64,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
-pub struct WithdrawWithheldTokensFromMintArguments {}
+pub struct WithdrawWithheldTokensFromMintArguments {
+    pub extension_type: String,
+}
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct WithdrawWithheldTokensFromAccountsArguments {
     pub num_token_accounts: u8,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
-pub struct HarvestWithheldTokensToMintArguments {}
+pub struct HarvestWithheldTokensToMintArguments {
+    pub extension_type: String,
+}
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct SetTransferFeeArguments {
     pub transfer_fee_basis_points: u16,
     #[serde(serialize_with = "crate::serialize_to_string")]
     pub maximum_fee: u64,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct InitializeConfidentialTransferMintArguments {
-    pub confidential_transfer_discriminator: u8,
     #[serde(with = "pubkey_serde_option")]
     pub authority: Option<[u8; 32usize]>,
     pub auto_approve_new_accounts: bool,
     #[serde(with = "pubkey_serde_option")]
     pub auditor_elgamal_pubkey: Option<[u8; 32usize]>,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct UpdateConfidentialTransferMintArguments {
-    pub confidential_transfer_discriminator: u8,
     pub auto_approve_new_accounts: bool,
     #[serde(with = "pubkey_serde_option")]
     pub auditor_elgamal_pubkey: Option<[u8; 32usize]>,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct ConfigureConfidentialTransferAccountArguments {
-    pub confidential_transfer_discriminator: u8,
     pub decryptable_zero_balance: DecryptableBalance,
     #[serde(serialize_with = "crate::serialize_to_string")]
     pub maximum_pending_balance_credit_counter: u64,
     pub proof_instruction_offset: i8,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct ApproveConfidentialTransferAccountArguments {
-    pub confidential_transfer_discriminator: u8,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct EmptyConfidentialTransferAccountArguments {
-    pub confidential_transfer_discriminator: u8,
     pub proof_instruction_offset: i8,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct ConfidentialDepositArguments {
-    pub confidential_transfer_discriminator: u8,
     #[serde(serialize_with = "crate::serialize_to_string")]
     pub amount: u64,
     pub decimals: u8,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct ConfidentialWithdrawArguments {
-    pub confidential_transfer_discriminator: u8,
     #[serde(serialize_with = "crate::serialize_to_string")]
     pub amount: u64,
     pub decimals: u8,
     pub new_decryptable_available_balance: DecryptableBalance,
     pub equality_proof_instruction_offset: i8,
     pub range_proof_instruction_offset: i8,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct ConfidentialTransferArguments {
-    pub confidential_transfer_discriminator: u8,
     pub new_source_decryptable_available_balance: DecryptableBalance,
     pub equality_proof_instruction_offset: i8,
     pub ciphertext_validity_proof_instruction_offset: i8,
     pub range_proof_instruction_offset: i8,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct ApplyConfidentialPendingBalanceArguments {
-    pub confidential_transfer_discriminator: u8,
     #[serde(serialize_with = "crate::serialize_to_string")]
     pub expected_pending_balance_credit_counter: u64,
     pub new_decryptable_available_balance: DecryptableBalance,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct EnableConfidentialCreditsArguments {
-    pub confidential_transfer_discriminator: u8,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct DisableConfidentialCreditsArguments {
-    pub confidential_transfer_discriminator: u8,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct EnableNonConfidentialCreditsArguments {
-    pub confidential_transfer_discriminator: u8,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct DisableNonConfidentialCreditsArguments {
-    pub confidential_transfer_discriminator: u8,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct ConfidentialTransferWithFeeArguments {
-    pub confidential_transfer_discriminator: u8,
     pub new_source_decryptable_available_balance: DecryptableBalance,
     pub equality_proof_instruction_offset: i8,
     pub transfer_amount_ciphertext_validity_proof_instruction_offset: i8,
     pub fee_sigma_proof_instruction_offset: i8,
     pub fee_ciphertext_validity_proof_instruction_offset: i8,
     pub range_proof_instruction_offset: i8,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct InitializeDefaultAccountStateArguments {
-    pub default_account_state_discriminator: u8,
     pub state: AccountState,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct UpdateDefaultAccountStateArguments {
-    pub default_account_state_discriminator: u8,
     pub state: AccountState,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct ReallocateArguments {
@@ -274,11 +282,11 @@ pub struct ReallocateArguments {
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct EnableMemoTransfersArguments {
-    pub memo_transfers_discriminator: u8,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct DisableMemoTransfersArguments {
-    pub memo_transfers_discriminator: u8,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct CreateNativeMintArguments {}
@@ -286,23 +294,23 @@ pub struct CreateNativeMintArguments {}
 pub struct InitializeNonTransferableMintArguments {}
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct InitializeInterestBearingMintArguments {
-    pub interest_bearing_mint_discriminator: u8,
     #[serde(with = "pubkey_serde_option")]
     pub rate_authority: Option<[u8; 32usize]>,
     pub rate: i16,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct UpdateRateInterestBearingMintArguments {
-    pub interest_bearing_mint_discriminator: u8,
     pub rate: i16,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct EnableCpiGuardArguments {
-    pub cpi_guard_discriminator: u8,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct DisableCpiGuardArguments {
-    pub cpi_guard_discriminator: u8,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct InitializePermanentDelegateArguments {
@@ -315,141 +323,148 @@ pub struct InitializeTransferHookArguments {
     pub authority: Option<[u8; 32usize]>,
     #[serde(with = "pubkey_serde_option")]
     pub program_id: Option<[u8; 32usize]>,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct UpdateTransferHookArguments {
     #[serde(with = "pubkey_serde_option")]
     pub program_id: Option<[u8; 32usize]>,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct InitializeConfidentialTransferFeeArguments {
-    pub confidential_transfer_fee_discriminator: u8,
     #[serde(with = "pubkey_serde_option")]
     pub authority: Option<[u8; 32usize]>,
     #[serde(with = "pubkey_serde_option")]
     pub withdraw_withheld_authority_el_gamal_pubkey: Option<[u8; 32usize]>,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct WithdrawWithheldTokensFromMintForConfidentialTransferFeeArguments {
-    pub confidential_transfer_fee_discriminator: u8,
     pub proof_instruction_offset: i8,
     pub new_decryptable_available_balance: DecryptableBalance,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct WithdrawWithheldTokensFromAccountsForConfidentialTransferFeeArguments {
-    pub confidential_transfer_fee_discriminator: u8,
     pub num_token_accounts: u8,
     pub proof_instruction_offset: i8,
     pub new_decryptable_available_balance: DecryptableBalance,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct HarvestWithheldTokensToMintForConfidentialTransferFeeArguments {
-    pub confidential_transfer_fee_discriminator: u8,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct EnableHarvestToMintArguments {
-    pub confidential_transfer_fee_discriminator: u8,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct DisableHarvestToMintArguments {
-    pub confidential_transfer_fee_discriminator: u8,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct WithdrawExcessLamportsArguments {}
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct InitializeMetadataPointerArguments {
-    pub metadata_pointer_discriminator: u8,
     #[serde(with = "pubkey_serde_option")]
     pub authority: Option<[u8; 32usize]>,
     #[serde(with = "pubkey_serde_option")]
     pub metadata_address: Option<[u8; 32usize]>,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct UpdateMetadataPointerArguments {
-    pub metadata_pointer_discriminator: u8,
     #[serde(with = "pubkey_serde_option")]
     pub metadata_address: Option<[u8; 32usize]>,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct InitializeGroupPointerArguments {
-    pub group_pointer_discriminator: u8,
     #[serde(with = "pubkey_serde_option")]
     pub authority: Option<[u8; 32usize]>,
     #[serde(with = "pubkey_serde_option")]
     pub group_address: Option<[u8; 32usize]>,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct UpdateGroupPointerArguments {
-    pub group_pointer_discriminator: u8,
     #[serde(with = "pubkey_serde_option")]
     pub group_address: Option<[u8; 32usize]>,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct InitializeGroupMemberPointerArguments {
-    pub group_member_pointer_discriminator: u8,
     #[serde(with = "pubkey_serde_option")]
     pub authority: Option<[u8; 32usize]>,
     #[serde(with = "pubkey_serde_option")]
     pub member_address: Option<[u8; 32usize]>,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct UpdateGroupMemberPointerArguments {
-    pub group_member_pointer_discriminator: u8,
     #[serde(with = "pubkey_serde_option")]
     pub member_address: Option<[u8; 32usize]>,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct InitializeScaledUiAmountMintArguments {
-    pub scaled_ui_amount_mint_discriminator: u8,
     #[serde(with = "pubkey_serde_option")]
     pub authority: Option<[u8; 32usize]>,
     pub multiplier: u8,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct UpdateMultiplierScaledUiMintArguments {
-    pub scaled_ui_amount_mint_discriminator: u8,
     pub multiplier: u8,
     pub effective_timestamp: i64,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct InitializePausableConfigArguments {
-    pub pausable_discriminator: u8,
     #[serde(with = "pubkey_serde_option")]
     pub authority: Option<[u8; 32usize]>,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct PauseArguments {
-    pub pausable_discriminator: u8,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct ResumeArguments {
-    pub pausable_discriminator: u8,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct InitializeTokenMetadataArguments {
     pub name: String,
     pub symbol: String,
     pub uri: String,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct UpdateTokenMetadataFieldArguments {
     pub field: TokenMetadataField,
     pub value: String,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct RemoveTokenMetadataKeyArguments {
     pub idempotent: bool,
     pub key: String,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct UpdateTokenMetadataUpdateAuthorityArguments {
     #[serde(with = "pubkey_serde_option")]
     pub new_update_authority: Option<[u8; 32usize]>,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct EmitTokenMetadataArguments {
     pub start: Option<u64>,
     pub end: Option<u64>,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct InitializeTokenGroupArguments {
@@ -457,267 +472,273 @@ pub struct InitializeTokenGroupArguments {
     pub update_authority: Option<[u8; 32usize]>,
     #[serde(serialize_with = "crate::serialize_to_string")]
     pub max_size: u64,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct UpdateTokenGroupMaxSizeArguments {
     #[serde(serialize_with = "crate::serialize_to_string")]
     pub max_size: u64,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct UpdateTokenGroupUpdateAuthorityArguments {
     #[serde(with = "pubkey_serde_option")]
     pub new_update_authority: Option<[u8; 32usize]>,
+    pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
-pub struct InitializeTokenGroupMemberArguments {}
+pub struct InitializeTokenGroupMemberArguments {
+    pub extension_type: String,
+}
 #[derive(Debug, Serialize)]
 pub struct InitializeMintAccounts {
+    pub remaining: Vec<String>,
     pub mint: String,
     pub rent: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct InitializeAccountAccounts {
+    pub remaining: Vec<String>,
     pub account: String,
     pub mint: String,
     pub owner: String,
     pub rent: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct InitializeMultisigAccounts {
+    pub remaining: Vec<String>,
     pub multisig: String,
     pub rent: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct TransferAccounts {
+    pub remaining: Vec<String>,
     pub source: String,
     pub destination: String,
     pub authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct ApproveAccounts {
+    pub remaining: Vec<String>,
     pub source: String,
     pub delegate: String,
     pub owner: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct RevokeAccounts {
+    pub remaining: Vec<String>,
     pub source: String,
     pub owner: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct SetAuthorityAccounts {
+    pub remaining: Vec<String>,
     pub owned: String,
     pub owner: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct MintToAccounts {
+    pub remaining: Vec<String>,
     pub mint: String,
     pub token: String,
     pub mint_authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct BurnAccounts {
+    pub remaining: Vec<String>,
     pub account: String,
     pub mint: String,
     pub authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct CloseAccountAccounts {
+    pub remaining: Vec<String>,
     pub account: String,
     pub destination: String,
     pub owner: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct FreezeAccountAccounts {
+    pub remaining: Vec<String>,
     pub account: String,
     pub mint: String,
     pub owner: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct ThawAccountAccounts {
+    pub remaining: Vec<String>,
     pub account: String,
     pub mint: String,
     pub owner: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct TransferCheckedAccounts {
+    pub remaining: Vec<String>,
     pub source: String,
     pub mint: String,
     pub destination: String,
     pub authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct ApproveCheckedAccounts {
+    pub remaining: Vec<String>,
     pub source: String,
     pub mint: String,
     pub delegate: String,
     pub owner: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct MintToCheckedAccounts {
+    pub remaining: Vec<String>,
     pub mint: String,
     pub token: String,
     pub mint_authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct BurnCheckedAccounts {
+    pub remaining: Vec<String>,
     pub account: String,
     pub mint: String,
     pub authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct InitializeAccount2Accounts {
+    pub remaining: Vec<String>,
     pub account: String,
     pub mint: String,
     pub rent: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct SyncNativeAccounts {
-    pub account: String,
     pub remaining: Vec<String>,
+    pub account: String,
 }
 #[derive(Debug, Serialize)]
 pub struct InitializeAccount3Accounts {
+    pub remaining: Vec<String>,
     pub account: String,
     pub mint: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct InitializeMultisig2Accounts {
-    pub multisig: String,
     pub remaining: Vec<String>,
+    pub multisig: String,
 }
 #[derive(Debug, Serialize)]
 pub struct InitializeMint2Accounts {
-    pub mint: String,
     pub remaining: Vec<String>,
+    pub mint: String,
 }
 #[derive(Debug, Serialize)]
 pub struct GetAccountDataSizeAccounts {
-    pub mint: String,
     pub remaining: Vec<String>,
+    pub mint: String,
 }
 #[derive(Debug, Serialize)]
 pub struct InitializeImmutableOwnerAccounts {
-    pub account: String,
     pub remaining: Vec<String>,
+    pub account: String,
 }
 #[derive(Debug, Serialize)]
 pub struct AmountToUiAmountAccounts {
-    pub mint: String,
     pub remaining: Vec<String>,
+    pub mint: String,
 }
 #[derive(Debug, Serialize)]
 pub struct UiAmountToAmountAccounts {
-    pub mint: String,
     pub remaining: Vec<String>,
+    pub mint: String,
 }
 #[derive(Debug, Serialize)]
 pub struct InitializeMintCloseAuthorityAccounts {
-    pub mint: String,
     pub remaining: Vec<String>,
+    pub mint: String,
 }
 #[derive(Debug, Serialize)]
 pub struct InitializeTransferFeeConfigAccounts {
-    pub mint: String,
     pub remaining: Vec<String>,
+    pub mint: String,
 }
 #[derive(Debug, Serialize)]
 pub struct TransferCheckedWithFeeAccounts {
+    pub remaining: Vec<String>,
     pub source: String,
     pub mint: String,
     pub destination: String,
     pub authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct WithdrawWithheldTokensFromMintAccounts {
+    pub remaining: Vec<String>,
     pub mint: String,
     pub fee_receiver: String,
     pub withdraw_withheld_authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct WithdrawWithheldTokensFromAccountsAccounts {
+    pub remaining: Vec<String>,
     pub mint: String,
     pub fee_receiver: String,
     pub withdraw_withheld_authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct HarvestWithheldTokensToMintAccounts {
-    pub mint: String,
     pub remaining: Vec<String>,
+    pub mint: String,
 }
 #[derive(Debug, Serialize)]
 pub struct SetTransferFeeAccounts {
+    pub remaining: Vec<String>,
     pub mint: String,
     pub transfer_fee_config_authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct InitializeConfidentialTransferMintAccounts {
-    pub mint: String,
     pub remaining: Vec<String>,
+    pub mint: String,
 }
 #[derive(Debug, Serialize)]
 pub struct UpdateConfidentialTransferMintAccounts {
+    pub remaining: Vec<String>,
     pub mint: String,
     pub authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct ConfigureConfidentialTransferAccountAccounts {
+    pub remaining: Vec<String>,
     pub token: String,
     pub mint: String,
     pub instructions_sysvar_or_context_state: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub record: Option<String>,
     pub authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct ApproveConfidentialTransferAccountAccounts {
+    pub remaining: Vec<String>,
     pub token: String,
     pub mint: String,
     pub authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct EmptyConfidentialTransferAccountAccounts {
+    pub remaining: Vec<String>,
     pub token: String,
     pub instructions_sysvar_or_context_state: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub record: Option<String>,
     pub authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct ConfidentialDepositAccounts {
+    pub remaining: Vec<String>,
     pub token: String,
     pub mint: String,
     pub authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct ConfidentialWithdrawAccounts {
+    pub remaining: Vec<String>,
     pub token: String,
     pub mint: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -727,10 +748,10 @@ pub struct ConfidentialWithdrawAccounts {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub range_record: Option<String>,
     pub authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct ConfidentialTransferAccounts {
+    pub remaining: Vec<String>,
     pub source_token: String,
     pub mint: String,
     pub destination_token: String,
@@ -743,40 +764,40 @@ pub struct ConfidentialTransferAccounts {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub range_record: Option<String>,
     pub authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct ApplyConfidentialPendingBalanceAccounts {
+    pub remaining: Vec<String>,
     pub token: String,
     pub authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct EnableConfidentialCreditsAccounts {
+    pub remaining: Vec<String>,
     pub token: String,
     pub authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct DisableConfidentialCreditsAccounts {
+    pub remaining: Vec<String>,
     pub token: String,
     pub authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct EnableNonConfidentialCreditsAccounts {
+    pub remaining: Vec<String>,
     pub token: String,
     pub authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct DisableNonConfidentialCreditsAccounts {
+    pub remaining: Vec<String>,
     pub token: String,
     pub authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct ConfidentialTransferWithFeeAccounts {
+    pub remaining: Vec<String>,
     pub source_token: String,
     pub mint: String,
     pub destination_token: String,
@@ -793,258 +814,257 @@ pub struct ConfidentialTransferWithFeeAccounts {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub range_record: Option<String>,
     pub authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct InitializeDefaultAccountStateAccounts {
-    pub mint: String,
     pub remaining: Vec<String>,
+    pub mint: String,
 }
 #[derive(Debug, Serialize)]
 pub struct UpdateDefaultAccountStateAccounts {
+    pub remaining: Vec<String>,
     pub mint: String,
     pub freeze_authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct ReallocateAccounts {
+    pub remaining: Vec<String>,
     pub token: String,
     pub payer: String,
     pub system_program: String,
     pub owner: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct EnableMemoTransfersAccounts {
+    pub remaining: Vec<String>,
     pub token: String,
     pub owner: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct DisableMemoTransfersAccounts {
+    pub remaining: Vec<String>,
     pub token: String,
     pub owner: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct CreateNativeMintAccounts {
+    pub remaining: Vec<String>,
     pub payer: String,
     pub native_mint: String,
     pub system_program: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct InitializeNonTransferableMintAccounts {
-    pub mint: String,
     pub remaining: Vec<String>,
+    pub mint: String,
 }
 #[derive(Debug, Serialize)]
 pub struct InitializeInterestBearingMintAccounts {
-    pub mint: String,
     pub remaining: Vec<String>,
+    pub mint: String,
 }
 #[derive(Debug, Serialize)]
 pub struct UpdateRateInterestBearingMintAccounts {
+    pub remaining: Vec<String>,
     pub mint: String,
     pub rate_authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct EnableCpiGuardAccounts {
+    pub remaining: Vec<String>,
     pub token: String,
     pub owner: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct DisableCpiGuardAccounts {
+    pub remaining: Vec<String>,
     pub token: String,
     pub owner: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct InitializePermanentDelegateAccounts {
-    pub mint: String,
     pub remaining: Vec<String>,
+    pub mint: String,
 }
 #[derive(Debug, Serialize)]
 pub struct InitializeTransferHookAccounts {
-    pub mint: String,
     pub remaining: Vec<String>,
+    pub mint: String,
 }
 #[derive(Debug, Serialize)]
 pub struct UpdateTransferHookAccounts {
+    pub remaining: Vec<String>,
     pub mint: String,
     pub authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct InitializeConfidentialTransferFeeAccounts {
-    pub mint: String,
     pub remaining: Vec<String>,
+    pub mint: String,
 }
 #[derive(Debug, Serialize)]
 pub struct WithdrawWithheldTokensFromMintForConfidentialTransferFeeAccounts {
+    pub remaining: Vec<String>,
     pub mint: String,
     pub destination: String,
     pub instructions_sysvar_or_context_state: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub record: Option<String>,
     pub authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct WithdrawWithheldTokensFromAccountsForConfidentialTransferFeeAccounts {
+    pub remaining: Vec<String>,
     pub mint: String,
     pub destination: String,
     pub instructions_sysvar_or_context_state: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub record: Option<String>,
     pub authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct HarvestWithheldTokensToMintForConfidentialTransferFeeAccounts {
-    pub mint: String,
     pub remaining: Vec<String>,
+    pub mint: String,
 }
 #[derive(Debug, Serialize)]
 pub struct EnableHarvestToMintAccounts {
+    pub remaining: Vec<String>,
     pub mint: String,
     pub authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct DisableHarvestToMintAccounts {
+    pub remaining: Vec<String>,
     pub mint: String,
     pub authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct WithdrawExcessLamportsAccounts {
+    pub remaining: Vec<String>,
     pub source_account: String,
     pub destination_account: String,
     pub authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct InitializeMetadataPointerAccounts {
-    pub mint: String,
     pub remaining: Vec<String>,
+    pub mint: String,
 }
 #[derive(Debug, Serialize)]
 pub struct UpdateMetadataPointerAccounts {
+    pub remaining: Vec<String>,
     pub mint: String,
     pub metadata_pointer_authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct InitializeGroupPointerAccounts {
-    pub mint: String,
     pub remaining: Vec<String>,
+    pub mint: String,
 }
 #[derive(Debug, Serialize)]
 pub struct UpdateGroupPointerAccounts {
+    pub remaining: Vec<String>,
     pub mint: String,
     pub group_pointer_authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct InitializeGroupMemberPointerAccounts {
-    pub mint: String,
     pub remaining: Vec<String>,
+    pub mint: String,
 }
 #[derive(Debug, Serialize)]
 pub struct UpdateGroupMemberPointerAccounts {
+    pub remaining: Vec<String>,
     pub mint: String,
     pub group_member_pointer_authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct InitializeScaledUiAmountMintAccounts {
-    pub mint: String,
     pub remaining: Vec<String>,
+    pub mint: String,
 }
 #[derive(Debug, Serialize)]
 pub struct UpdateMultiplierScaledUiMintAccounts {
+    pub remaining: Vec<String>,
     pub mint: String,
     pub authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct InitializePausableConfigAccounts {
-    pub mint: String,
     pub remaining: Vec<String>,
+    pub mint: String,
 }
 #[derive(Debug, Serialize)]
 pub struct PauseAccounts {
+    pub remaining: Vec<String>,
     pub mint: String,
     pub authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct ResumeAccounts {
+    pub remaining: Vec<String>,
     pub mint: String,
     pub authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct InitializeTokenMetadataAccounts {
+    pub remaining: Vec<String>,
     pub metadata: String,
     pub update_authority: String,
     pub mint: String,
     pub mint_authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct UpdateTokenMetadataFieldAccounts {
+    pub remaining: Vec<String>,
     pub metadata: String,
     pub update_authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct RemoveTokenMetadataKeyAccounts {
+    pub remaining: Vec<String>,
     pub metadata: String,
     pub update_authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct UpdateTokenMetadataUpdateAuthorityAccounts {
+    pub remaining: Vec<String>,
     pub metadata: String,
     pub update_authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct EmitTokenMetadataAccounts {
-    pub metadata: String,
     pub remaining: Vec<String>,
+    pub metadata: String,
 }
 #[derive(Debug, Serialize)]
 pub struct InitializeTokenGroupAccounts {
+    pub remaining: Vec<String>,
     pub group: String,
     pub mint: String,
     pub mint_authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct UpdateTokenGroupMaxSizeAccounts {
+    pub remaining: Vec<String>,
     pub group: String,
     pub update_authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct UpdateTokenGroupUpdateAuthorityAccounts {
+    pub remaining: Vec<String>,
     pub group: String,
     pub update_authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub struct InitializeTokenGroupMemberAccounts {
+    pub remaining: Vec<String>,
     pub member: String,
     pub member_mint: String,
     pub member_mint_authority: String,
     pub group: String,
     pub group_update_authority: String,
-    pub remaining: Vec<String>,
 }
 #[derive(Debug, Serialize)]
 pub enum TokenMetadataField {
@@ -1216,90 +1236,112 @@ pub enum Instruction {
         accounts: InitializeMintCloseAuthorityAccounts,
         args: InitializeMintCloseAuthorityArguments,
     },
+    #[serde(rename = "TransferFee")]
     InitializeTransferFeeConfig {
         accounts: InitializeTransferFeeConfigAccounts,
         args: InitializeTransferFeeConfigArguments,
     },
+    #[serde(rename = "TransferFee")]
     TransferCheckedWithFee {
         accounts: TransferCheckedWithFeeAccounts,
         args: TransferCheckedWithFeeArguments,
     },
+    #[serde(rename = "TransferFee")]
     WithdrawWithheldTokensFromMint {
         accounts: WithdrawWithheldTokensFromMintAccounts,
         args: WithdrawWithheldTokensFromMintArguments,
     },
+    #[serde(rename = "TransferFee")]
     WithdrawWithheldTokensFromAccounts {
         accounts: WithdrawWithheldTokensFromAccountsAccounts,
         args: WithdrawWithheldTokensFromAccountsArguments,
     },
+    #[serde(rename = "TransferFee")]
     HarvestWithheldTokensToMint {
         accounts: HarvestWithheldTokensToMintAccounts,
         args: HarvestWithheldTokensToMintArguments,
     },
+    #[serde(rename = "TransferFee")]
     SetTransferFee {
         accounts: SetTransferFeeAccounts,
         args: SetTransferFeeArguments,
     },
+    #[serde(rename = "ConfidentialTransfer")]
     InitializeConfidentialTransferMint {
         accounts: InitializeConfidentialTransferMintAccounts,
         args: InitializeConfidentialTransferMintArguments,
     },
+    #[serde(rename = "ConfidentialTransfer")]
     UpdateConfidentialTransferMint {
         accounts: UpdateConfidentialTransferMintAccounts,
         args: UpdateConfidentialTransferMintArguments,
     },
+    #[serde(rename = "ConfidentialTransfer")]
     ConfigureConfidentialTransferAccount {
         accounts: ConfigureConfidentialTransferAccountAccounts,
         args: ConfigureConfidentialTransferAccountArguments,
     },
+    #[serde(rename = "ConfidentialTransfer")]
     ApproveConfidentialTransferAccount {
         accounts: ApproveConfidentialTransferAccountAccounts,
         args: ApproveConfidentialTransferAccountArguments,
     },
+    #[serde(rename = "ConfidentialTransfer")]
     EmptyConfidentialTransferAccount {
         accounts: EmptyConfidentialTransferAccountAccounts,
         args: EmptyConfidentialTransferAccountArguments,
     },
+    #[serde(rename = "ConfidentialTransfer")]
     ConfidentialDeposit {
         accounts: ConfidentialDepositAccounts,
         args: ConfidentialDepositArguments,
     },
+    #[serde(rename = "ConfidentialTransfer")]
     ConfidentialWithdraw {
         accounts: ConfidentialWithdrawAccounts,
         args: ConfidentialWithdrawArguments,
     },
+    #[serde(rename = "ConfidentialTransfer")]
     ConfidentialTransfer {
         accounts: ConfidentialTransferAccounts,
         args: ConfidentialTransferArguments,
     },
+    #[serde(rename = "ConfidentialTransfer")]
     ApplyConfidentialPendingBalance {
         accounts: ApplyConfidentialPendingBalanceAccounts,
         args: ApplyConfidentialPendingBalanceArguments,
     },
+    #[serde(rename = "ConfidentialTransfer")]
     EnableConfidentialCredits {
         accounts: EnableConfidentialCreditsAccounts,
         args: EnableConfidentialCreditsArguments,
     },
+    #[serde(rename = "ConfidentialTransfer")]
     DisableConfidentialCredits {
         accounts: DisableConfidentialCreditsAccounts,
         args: DisableConfidentialCreditsArguments,
     },
+    #[serde(rename = "ConfidentialTransfer")]
     EnableNonConfidentialCredits {
         accounts: EnableNonConfidentialCreditsAccounts,
         args: EnableNonConfidentialCreditsArguments,
     },
+    #[serde(rename = "ConfidentialTransfer")]
     DisableNonConfidentialCredits {
         accounts: DisableNonConfidentialCreditsAccounts,
         args: DisableNonConfidentialCreditsArguments,
     },
+    #[serde(rename = "ConfidentialTransfer")]
     ConfidentialTransferWithFee {
         accounts: ConfidentialTransferWithFeeAccounts,
         args: ConfidentialTransferWithFeeArguments,
     },
+    #[serde(rename = "DefaultAccountState")]
     InitializeDefaultAccountState {
         accounts: InitializeDefaultAccountStateAccounts,
         args: InitializeDefaultAccountStateArguments,
     },
+    #[serde(rename = "DefaultAccountState")]
     UpdateDefaultAccountState {
         accounts: UpdateDefaultAccountStateAccounts,
         args: UpdateDefaultAccountStateArguments,
@@ -1308,10 +1350,12 @@ pub enum Instruction {
         accounts: ReallocateAccounts,
         args: ReallocateArguments,
     },
+    #[serde(rename = "MemoTransfers")]
     EnableMemoTransfers {
         accounts: EnableMemoTransfersAccounts,
         args: EnableMemoTransfersArguments,
     },
+    #[serde(rename = "MemoTransfers")]
     DisableMemoTransfers {
         accounts: DisableMemoTransfersAccounts,
         args: DisableMemoTransfersArguments,
@@ -1324,18 +1368,22 @@ pub enum Instruction {
         accounts: InitializeNonTransferableMintAccounts,
         args: InitializeNonTransferableMintArguments,
     },
+    #[serde(rename = "InterestBearingMint")]
     InitializeInterestBearingMint {
         accounts: InitializeInterestBearingMintAccounts,
         args: InitializeInterestBearingMintArguments,
     },
+    #[serde(rename = "InterestBearingMint")]
     UpdateRateInterestBearingMint {
         accounts: UpdateRateInterestBearingMintAccounts,
         args: UpdateRateInterestBearingMintArguments,
     },
+    #[serde(rename = "CpiGuard")]
     EnableCpiGuard {
         accounts: EnableCpiGuardAccounts,
         args: EnableCpiGuardArguments,
     },
+    #[serde(rename = "CpiGuard")]
     DisableCpiGuard {
         accounts: DisableCpiGuardAccounts,
         args: DisableCpiGuardArguments,
@@ -1344,34 +1392,42 @@ pub enum Instruction {
         accounts: InitializePermanentDelegateAccounts,
         args: InitializePermanentDelegateArguments,
     },
+    #[serde(rename = "TransferHook")]
     InitializeTransferHook {
         accounts: InitializeTransferHookAccounts,
         args: InitializeTransferHookArguments,
     },
+    #[serde(rename = "TransferHook")]
     UpdateTransferHook {
         accounts: UpdateTransferHookAccounts,
         args: UpdateTransferHookArguments,
     },
+    #[serde(rename = "ConfidentialTransferFee")]
     InitializeConfidentialTransferFee {
         accounts: InitializeConfidentialTransferFeeAccounts,
         args: InitializeConfidentialTransferFeeArguments,
     },
+    #[serde(rename = "ConfidentialTransferFee")]
     WithdrawWithheldTokensFromMintForConfidentialTransferFee {
         accounts: WithdrawWithheldTokensFromMintForConfidentialTransferFeeAccounts,
         args: WithdrawWithheldTokensFromMintForConfidentialTransferFeeArguments,
     },
+    #[serde(rename = "ConfidentialTransferFee")]
     WithdrawWithheldTokensFromAccountsForConfidentialTransferFee {
         accounts: WithdrawWithheldTokensFromAccountsForConfidentialTransferFeeAccounts,
         args: WithdrawWithheldTokensFromAccountsForConfidentialTransferFeeArguments,
     },
+    #[serde(rename = "ConfidentialTransferFee")]
     HarvestWithheldTokensToMintForConfidentialTransferFee {
         accounts: HarvestWithheldTokensToMintForConfidentialTransferFeeAccounts,
         args: HarvestWithheldTokensToMintForConfidentialTransferFeeArguments,
     },
+    #[serde(rename = "ConfidentialTransferFee")]
     EnableHarvestToMint {
         accounts: EnableHarvestToMintAccounts,
         args: EnableHarvestToMintArguments,
     },
+    #[serde(rename = "ConfidentialTransferFee")]
     DisableHarvestToMint {
         accounts: DisableHarvestToMintAccounts,
         args: DisableHarvestToMintArguments,
@@ -1380,46 +1436,57 @@ pub enum Instruction {
         accounts: WithdrawExcessLamportsAccounts,
         args: WithdrawExcessLamportsArguments,
     },
+    #[serde(rename = "MetadataPointer")]
     InitializeMetadataPointer {
         accounts: InitializeMetadataPointerAccounts,
         args: InitializeMetadataPointerArguments,
     },
+    #[serde(rename = "MetadataPointer")]
     UpdateMetadataPointer {
         accounts: UpdateMetadataPointerAccounts,
         args: UpdateMetadataPointerArguments,
     },
+    #[serde(rename = "GroupPointer")]
     InitializeGroupPointer {
         accounts: InitializeGroupPointerAccounts,
         args: InitializeGroupPointerArguments,
     },
+    #[serde(rename = "GroupPointer")]
     UpdateGroupPointer {
         accounts: UpdateGroupPointerAccounts,
         args: UpdateGroupPointerArguments,
     },
+    #[serde(rename = "GroupMemberPointer")]
     InitializeGroupMemberPointer {
         accounts: InitializeGroupMemberPointerAccounts,
         args: InitializeGroupMemberPointerArguments,
     },
+    #[serde(rename = "GroupMemberPointer")]
     UpdateGroupMemberPointer {
         accounts: UpdateGroupMemberPointerAccounts,
         args: UpdateGroupMemberPointerArguments,
     },
+    #[serde(rename = "ScaledUiAmountMint")]
     InitializeScaledUiAmountMint {
         accounts: InitializeScaledUiAmountMintAccounts,
         args: InitializeScaledUiAmountMintArguments,
     },
+    #[serde(rename = "ScaledUiAmountMint")]
     UpdateMultiplierScaledUiMint {
         accounts: UpdateMultiplierScaledUiMintAccounts,
         args: UpdateMultiplierScaledUiMintArguments,
     },
+    #[serde(rename = "Pausable")]
     InitializePausableConfig {
         accounts: InitializePausableConfigAccounts,
         args: InitializePausableConfigArguments,
     },
+    #[serde(rename = "Pausable")]
     Pause {
         accounts: PauseAccounts,
         args: PauseArguments,
     },
+    #[serde(rename = "Pausable")]
     Resume {
         accounts: ResumeAccounts,
         args: ResumeArguments,
@@ -1498,34 +1565,40 @@ impl Instruction {
                         mint_authority,
                         freeze_authority,
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let mint = keys.next().unwrap().clone();
-                    let rent = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let rent = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "rent")
+                    })?;
                     let accounts = InitializeMintAccounts {
-                        remaining,
-                        mint,
-                        rent,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        rent: rent.clone(),
                     };
                     return Ok(Instruction::InitializeMint { accounts, args });
                 }
                 [1u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = InitializeAccountArguments {};
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(4usize);
-                    let account = keys.next().unwrap().clone();
-                    let mint = keys.next().unwrap().clone();
-                    let owner = keys.next().unwrap().clone();
-                    let rent = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let account = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "account")
+                    })?;
+                    let mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "mint")
+                    })?;
+                    let owner = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "owner")
+                    })?;
+                    let rent = account_keys.get(3usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 3usize, "rent")
+                    })?;
                     let accounts = InitializeAccountAccounts {
-                        remaining,
-                        account,
-                        mint,
-                        owner,
-                        rent,
+                        remaining: vec![],
+                        account: account.clone(),
+                        mint: mint.clone(),
+                        owner: owner.clone(),
+                        rent: rent.clone(),
                     };
                     return Ok(Instruction::InitializeAccount { accounts, args });
                 }
@@ -1534,15 +1607,16 @@ impl Instruction {
                     let m: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                         .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(m), e))?;
                     let args = InitializeMultisigArguments { m };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let multisig = keys.next().unwrap().clone();
-                    let rent = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let multisig = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "multisig")
+                    })?;
+                    let rent = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "rent")
+                    })?;
                     let accounts = InitializeMultisigAccounts {
-                        remaining,
-                        multisig,
-                        rent,
+                        remaining: vec![],
+                        multisig: multisig.clone(),
+                        rent: rent.clone(),
                     };
                     return Ok(Instruction::InitializeMultisig { accounts, args });
                 }
@@ -1553,17 +1627,20 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(amount), e)
                         })?;
                     let args = TransferArguments { amount };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let source = keys.next().unwrap().clone();
-                    let destination = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let source = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "source")
+                    })?;
+                    let destination = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "destination")
+                    })?;
+                    let authority = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "authority")
+                    })?;
                     let accounts = TransferAccounts {
-                        remaining,
-                        source,
-                        destination,
-                        authority,
+                        remaining: vec![],
+                        source: source.clone(),
+                        destination: destination.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::Transfer { accounts, args });
                 }
@@ -1574,32 +1651,36 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(amount), e)
                         })?;
                     let args = ApproveArguments { amount };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let source = keys.next().unwrap().clone();
-                    let delegate = keys.next().unwrap().clone();
-                    let owner = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let source = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "source")
+                    })?;
+                    let delegate = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "delegate")
+                    })?;
+                    let owner = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "owner")
+                    })?;
                     let accounts = ApproveAccounts {
-                        remaining,
-                        source,
-                        delegate,
-                        owner,
+                        remaining: vec![],
+                        source: source.clone(),
+                        delegate: delegate.clone(),
+                        owner: owner.clone(),
                     };
                     return Ok(Instruction::Approve { accounts, args });
                 }
                 [5u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = RevokeArguments {};
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let source = keys.next().unwrap().clone();
-                    let owner = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let source = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "source")
+                    })?;
+                    let owner = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "owner")
+                    })?;
                     let accounts = RevokeAccounts {
-                        remaining,
-                        source,
-                        owner,
+                        remaining: vec![],
+                        source: source.clone(),
+                        owner: owner.clone(),
                     };
                     return Ok(Instruction::Revoke { accounts, args });
                 }
@@ -1627,15 +1708,16 @@ impl Instruction {
                         authority_type,
                         new_authority,
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let owned = keys.next().unwrap().clone();
-                    let owner = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let owned = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "owned")
+                    })?;
+                    let owner = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "owner")
+                    })?;
                     let accounts = SetAuthorityAccounts {
-                        remaining,
-                        owned,
-                        owner,
+                        remaining: vec![],
+                        owned: owned.clone(),
+                        owner: owner.clone(),
                     };
                     return Ok(Instruction::SetAuthority { accounts, args });
                 }
@@ -1646,17 +1728,20 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(amount), e)
                         })?;
                     let args = MintToArguments { amount };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let mint = keys.next().unwrap().clone();
-                    let token = keys.next().unwrap().clone();
-                    let mint_authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let token = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "token")
+                    })?;
+                    let mint_authority = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "mintAuthority")
+                    })?;
                     let accounts = MintToAccounts {
-                        remaining,
-                        mint,
-                        token,
-                        mint_authority,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        token: token.clone(),
+                        mint_authority: mint_authority.clone(),
                     };
                     return Ok(Instruction::MintTo { accounts, args });
                 }
@@ -1667,68 +1752,80 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(amount), e)
                         })?;
                     let args = BurnArguments { amount };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let account = keys.next().unwrap().clone();
-                    let mint = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let account = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "account")
+                    })?;
+                    let mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "mint")
+                    })?;
+                    let authority = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "authority")
+                    })?;
                     let accounts = BurnAccounts {
-                        remaining,
-                        account,
-                        mint,
-                        authority,
+                        remaining: vec![],
+                        account: account.clone(),
+                        mint: mint.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::Burn { accounts, args });
                 }
                 [9u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = CloseAccountArguments {};
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let account = keys.next().unwrap().clone();
-                    let destination = keys.next().unwrap().clone();
-                    let owner = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let account = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "account")
+                    })?;
+                    let destination = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "destination")
+                    })?;
+                    let owner = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "owner")
+                    })?;
                     let accounts = CloseAccountAccounts {
-                        remaining,
-                        account,
-                        destination,
-                        owner,
+                        remaining: vec![],
+                        account: account.clone(),
+                        destination: destination.clone(),
+                        owner: owner.clone(),
                     };
                     return Ok(Instruction::CloseAccount { accounts, args });
                 }
                 [10u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = FreezeAccountArguments {};
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let account = keys.next().unwrap().clone();
-                    let mint = keys.next().unwrap().clone();
-                    let owner = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let account = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "account")
+                    })?;
+                    let mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "mint")
+                    })?;
+                    let owner = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "owner")
+                    })?;
                     let accounts = FreezeAccountAccounts {
-                        remaining,
-                        account,
-                        mint,
-                        owner,
+                        remaining: vec![],
+                        account: account.clone(),
+                        mint: mint.clone(),
+                        owner: owner.clone(),
                     };
                     return Ok(Instruction::FreezeAccount { accounts, args });
                 }
                 [11u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = ThawAccountArguments {};
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let account = keys.next().unwrap().clone();
-                    let mint = keys.next().unwrap().clone();
-                    let owner = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let account = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "account")
+                    })?;
+                    let mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "mint")
+                    })?;
+                    let owner = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "owner")
+                    })?;
                     let accounts = ThawAccountAccounts {
-                        remaining,
-                        account,
-                        mint,
-                        owner,
+                        remaining: vec![],
+                        account: account.clone(),
+                        mint: mint.clone(),
+                        owner: owner.clone(),
                     };
                     return Ok(Instruction::ThawAccount { accounts, args });
                 }
@@ -1743,19 +1840,24 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(decimals), e)
                         })?;
                     let args = TransferCheckedArguments { amount, decimals };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(4usize);
-                    let source = keys.next().unwrap().clone();
-                    let mint = keys.next().unwrap().clone();
-                    let destination = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let source = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "source")
+                    })?;
+                    let mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "mint")
+                    })?;
+                    let destination = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "destination")
+                    })?;
+                    let authority = account_keys.get(3usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 3usize, "authority")
+                    })?;
                     let accounts = TransferCheckedAccounts {
-                        remaining,
-                        source,
-                        mint,
-                        destination,
-                        authority,
+                        remaining: vec![],
+                        source: source.clone(),
+                        mint: mint.clone(),
+                        destination: destination.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::TransferChecked { accounts, args });
                 }
@@ -1770,19 +1872,24 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(decimals), e)
                         })?;
                     let args = ApproveCheckedArguments { amount, decimals };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(4usize);
-                    let source = keys.next().unwrap().clone();
-                    let mint = keys.next().unwrap().clone();
-                    let delegate = keys.next().unwrap().clone();
-                    let owner = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let source = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "source")
+                    })?;
+                    let mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "mint")
+                    })?;
+                    let delegate = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "delegate")
+                    })?;
+                    let owner = account_keys.get(3usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 3usize, "owner")
+                    })?;
                     let accounts = ApproveCheckedAccounts {
-                        remaining,
-                        source,
-                        mint,
-                        delegate,
-                        owner,
+                        remaining: vec![],
+                        source: source.clone(),
+                        mint: mint.clone(),
+                        delegate: delegate.clone(),
+                        owner: owner.clone(),
                     };
                     return Ok(Instruction::ApproveChecked { accounts, args });
                 }
@@ -1797,17 +1904,20 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(decimals), e)
                         })?;
                     let args = MintToCheckedArguments { amount, decimals };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let mint = keys.next().unwrap().clone();
-                    let token = keys.next().unwrap().clone();
-                    let mint_authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let token = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "token")
+                    })?;
+                    let mint_authority = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "mintAuthority")
+                    })?;
                     let accounts = MintToCheckedAccounts {
-                        remaining,
-                        mint,
-                        token,
-                        mint_authority,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        token: token.clone(),
+                        mint_authority: mint_authority.clone(),
                     };
                     return Ok(Instruction::MintToChecked { accounts, args });
                 }
@@ -1822,17 +1932,20 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(decimals), e)
                         })?;
                     let args = BurnCheckedArguments { amount, decimals };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let account = keys.next().unwrap().clone();
-                    let mint = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let account = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "account")
+                    })?;
+                    let mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "mint")
+                    })?;
+                    let authority = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "authority")
+                    })?;
                     let accounts = BurnCheckedAccounts {
-                        remaining,
-                        account,
-                        mint,
-                        authority,
+                        remaining: vec![],
+                        account: account.clone(),
+                        mint: mint.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::BurnChecked { accounts, args });
                 }
@@ -1844,28 +1957,33 @@ impl Instruction {
                                 format!("Failed to deserialize {}: {}", stringify!(owner), e)
                             })?;
                     let args = InitializeAccount2Arguments { owner };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let account = keys.next().unwrap().clone();
-                    let mint = keys.next().unwrap().clone();
-                    let rent = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let account = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "account")
+                    })?;
+                    let mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "mint")
+                    })?;
+                    let rent = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "rent")
+                    })?;
                     let accounts = InitializeAccount2Accounts {
-                        remaining,
-                        account,
-                        mint,
-                        rent,
+                        remaining: vec![],
+                        account: account.clone(),
+                        mint: mint.clone(),
+                        rent: rent.clone(),
                     };
                     return Ok(Instruction::InitializeAccount2 { accounts, args });
                 }
                 [17u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = SyncNativeArguments {};
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let account = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = SyncNativeAccounts { remaining, account };
+                    let account = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "account")
+                    })?;
+                    let accounts = SyncNativeAccounts {
+                        remaining: vec![],
+                        account: account.clone(),
+                    };
                     return Ok(Instruction::SyncNative { accounts, args });
                 }
                 [18u8] => {
@@ -1876,15 +1994,16 @@ impl Instruction {
                                 format!("Failed to deserialize {}: {}", stringify!(owner), e)
                             })?;
                     let args = InitializeAccount3Arguments { owner };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let account = keys.next().unwrap().clone();
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let account = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "account")
+                    })?;
+                    let mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "mint")
+                    })?;
                     let accounts = InitializeAccount3Accounts {
-                        remaining,
-                        account,
-                        mint,
+                        remaining: vec![],
+                        account: account.clone(),
+                        mint: mint.clone(),
                     };
                     return Ok(Instruction::InitializeAccount3 { accounts, args });
                 }
@@ -1893,13 +2012,12 @@ impl Instruction {
                     let m: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                         .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(m), e))?;
                     let args = InitializeMultisig2Arguments { m };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let multisig = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let multisig = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "multisig")
+                    })?;
                     let accounts = InitializeMultisig2Accounts {
-                        remaining,
-                        multisig,
+                        remaining: vec![],
+                        multisig: multisig.clone(),
                     };
                     return Ok(Instruction::InitializeMultisig2 { accounts, args });
                 }
@@ -1932,31 +2050,37 @@ impl Instruction {
                         mint_authority,
                         freeze_authority,
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = InitializeMint2Accounts { remaining, mint };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = InitializeMint2Accounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::InitializeMint2 { accounts, args });
                 }
                 [21u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = GetAccountDataSizeArguments {};
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = GetAccountDataSizeAccounts { remaining, mint };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = GetAccountDataSizeAccounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::GetAccountDataSize { accounts, args });
                 }
                 [22u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = InitializeImmutableOwnerArguments {};
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let account = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = InitializeImmutableOwnerAccounts { remaining, account };
+                    let account = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "account")
+                    })?;
+                    let accounts = InitializeImmutableOwnerAccounts {
+                        remaining: vec![],
+                        account: account.clone(),
+                    };
                     return Ok(Instruction::InitializeImmutableOwner { accounts, args });
                 }
                 [23u8] => {
@@ -1966,11 +2090,13 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(amount), e)
                         })?;
                     let args = AmountToUiAmountArguments { amount };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = AmountToUiAmountAccounts { remaining, mint };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = AmountToUiAmountAccounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::AmountToUiAmount { accounts, args });
                 }
                 [24u8] => {
@@ -1980,11 +2106,13 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(ui_amount), e)
                         })?;
                     let args = UiAmountToAmountArguments { ui_amount };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = UiAmountToAmountAccounts { remaining, mint };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = UiAmountToAmountAccounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::UiAmountToAmount { accounts, args });
                 }
                 [25u8] => {
@@ -1999,11 +2127,13 @@ impl Instruction {
                                 )
                             })?;
                     let args = InitializeMintCloseAuthorityArguments { close_authority };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = InitializeMintCloseAuthorityAccounts { remaining, mint };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = InitializeMintCloseAuthorityAccounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::InitializeMintCloseAuthority { accounts, args });
                 }
                 [26u8, 0u8] => {
@@ -2043,12 +2173,15 @@ impl Instruction {
                         withdraw_withheld_authority,
                         transfer_fee_basis_points,
                         maximum_fee,
+                        extension_type: "initializeTransferFeeConfig".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = InitializeTransferFeeConfigAccounts { remaining, mint };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = InitializeTransferFeeConfigAccounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::InitializeTransferFeeConfig { accounts, args });
                 }
                 [26u8, 1u8] => {
@@ -2067,37 +2200,52 @@ impl Instruction {
                         amount,
                         decimals,
                         fee,
+                        extension_type: "transferCheckedWithFee".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(4usize);
-                    let source = keys.next().unwrap().clone();
-                    let mint = keys.next().unwrap().clone();
-                    let destination = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let source = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "source")
+                    })?;
+                    let mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "mint")
+                    })?;
+                    let destination = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "destination")
+                    })?;
+                    let authority = account_keys.get(3usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 3usize, "authority")
+                    })?;
                     let accounts = TransferCheckedWithFeeAccounts {
-                        remaining,
-                        source,
-                        mint,
-                        destination,
-                        authority,
+                        remaining: vec![],
+                        source: source.clone(),
+                        mint: mint.clone(),
+                        destination: destination.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::TransferCheckedWithFee { accounts, args });
                 }
                 [26u8, 2u8] => {
                     let mut rdr: &[u8] = rest;
-                    let args = WithdrawWithheldTokensFromMintArguments {};
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let mint = keys.next().unwrap().clone();
-                    let fee_receiver = keys.next().unwrap().clone();
-                    let withdraw_withheld_authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let args = WithdrawWithheldTokensFromMintArguments {
+                        extension_type: "withdrawWithheldTokensFromMint".to_string(),
+                    };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let fee_receiver = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "feeReceiver")
+                    })?;
+                    let withdraw_withheld_authority =
+                        account_keys.get(2usize).ok_or_else(|| {
+                            format!(
+                                "Missing account at index {}: {}",
+                                2usize, "withdrawWithheldAuthority"
+                            )
+                        })?;
                     let accounts = WithdrawWithheldTokensFromMintAccounts {
-                        remaining,
-                        mint,
-                        fee_receiver,
-                        withdraw_withheld_authority,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        fee_receiver: fee_receiver.clone(),
+                        withdraw_withheld_authority: withdraw_withheld_authority.clone(),
                     };
                     return Ok(Instruction::WithdrawWithheldTokensFromMint { accounts, args });
                 }
@@ -2111,29 +2259,43 @@ impl Instruction {
                                 e
                             )
                         })?;
-                    let args = WithdrawWithheldTokensFromAccountsArguments { num_token_accounts };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let mint = keys.next().unwrap().clone();
-                    let fee_receiver = keys.next().unwrap().clone();
-                    let withdraw_withheld_authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let args = WithdrawWithheldTokensFromAccountsArguments {
+                        num_token_accounts,
+                        extension_type: "withdrawWithheldTokensFromAccounts".to_string(),
+                    };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let fee_receiver = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "feeReceiver")
+                    })?;
+                    let withdraw_withheld_authority =
+                        account_keys.get(2usize).ok_or_else(|| {
+                            format!(
+                                "Missing account at index {}: {}",
+                                2usize, "withdrawWithheldAuthority"
+                            )
+                        })?;
                     let accounts = WithdrawWithheldTokensFromAccountsAccounts {
-                        remaining,
-                        mint,
-                        fee_receiver,
-                        withdraw_withheld_authority,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        fee_receiver: fee_receiver.clone(),
+                        withdraw_withheld_authority: withdraw_withheld_authority.clone(),
                     };
                     return Ok(Instruction::WithdrawWithheldTokensFromAccounts { accounts, args });
                 }
                 [26u8, 4u8] => {
                     let mut rdr: &[u8] = rest;
-                    let args = HarvestWithheldTokensToMintArguments {};
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = HarvestWithheldTokensToMintAccounts { remaining, mint };
+                    let args = HarvestWithheldTokensToMintArguments {
+                        extension_type: "harvestWithheldTokensToMint".to_string(),
+                    };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = HarvestWithheldTokensToMintAccounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::HarvestWithheldTokensToMint { accounts, args });
                 }
                 [26u8, 5u8] => {
@@ -2153,41 +2315,39 @@ impl Instruction {
                     let args = SetTransferFeeArguments {
                         transfer_fee_basis_points,
                         maximum_fee,
+                        extension_type: "setTransferFee".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let mint = keys.next().unwrap().clone();
-                    let transfer_fee_config_authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let transfer_fee_config_authority =
+                        account_keys.get(1usize).ok_or_else(|| {
+                            format!(
+                                "Missing account at index {}: {}",
+                                1usize, "transferFeeConfigAuthority"
+                            )
+                        })?;
                     let accounts = SetTransferFeeAccounts {
-                        remaining,
-                        mint,
-                        transfer_fee_config_authority,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        transfer_fee_config_authority: transfer_fee_config_authority.clone(),
                     };
                     return Ok(Instruction::SetTransferFee { accounts, args });
                 }
                 [27u8, 0u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_discriminator),
-                                e
-                            )
-                        })?;
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(authority),
                             e
                         )
                     })?;
-                    let authority: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let authority = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
                     let auto_approve_new_accounts: bool =
                         <bool as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(
@@ -2199,43 +2359,36 @@ impl Instruction {
                                 )
                             },
                         )?;
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(auditor_elgamal_pubkey),
                             e
                         )
                     })?;
-                    let auditor_elgamal_pubkey: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32]
-                    {
+                    let auditor_elgamal_pubkey = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
                     let args = InitializeConfidentialTransferMintArguments {
-                        confidential_transfer_discriminator,
                         authority,
                         auto_approve_new_accounts,
                         auditor_elgamal_pubkey,
+                        extension_type: "initializeConfidentialTransferMint".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = InitializeConfidentialTransferMintAccounts { remaining, mint };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = InitializeConfidentialTransferMintAccounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::InitializeConfidentialTransferMint { accounts, args });
                 }
                 [27u8, 1u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_discriminator),
-                                e
-                            )
-                        })?;
                     let auto_approve_new_accounts: bool =
                         <bool as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(
                             |e| {
@@ -2246,47 +2399,39 @@ impl Instruction {
                                 )
                             },
                         )?;
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(auditor_elgamal_pubkey),
                             e
                         )
                     })?;
-                    let auditor_elgamal_pubkey: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32]
-                    {
+                    let auditor_elgamal_pubkey = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
                     let args = UpdateConfidentialTransferMintArguments {
-                        confidential_transfer_discriminator,
                         auto_approve_new_accounts,
                         auditor_elgamal_pubkey,
+                        extension_type: "updateConfidentialTransferMint".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let mint = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "authority")
+                    })?;
                     let accounts = UpdateConfidentialTransferMintAccounts {
-                        remaining,
-                        mint,
-                        authority,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::UpdateConfidentialTransferMint { accounts, args });
                 }
                 [27u8, 2u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_discriminator),
-                                e
-                            )
-                        })?;
                     let decryptable_zero_balance: DecryptableBalance =
                         <DecryptableBalance as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                             .map_err(|e| {
@@ -2313,31 +2458,38 @@ impl Instruction {
                             )
                         })?;
                     let args = ConfigureConfidentialTransferAccountArguments {
-                        confidential_transfer_discriminator,
                         decryptable_zero_balance,
                         maximum_pending_balance_credit_counter,
                         proof_instruction_offset,
+                        extension_type: "configureConfidentialTransferAccount".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(4usize);
-                    let token = keys.next().unwrap().clone();
-                    let mint = keys.next().unwrap().clone();
-                    let instructions_sysvar_or_context_state = keys.next().unwrap().clone();
-                    let record = if opt_budget > 0 {
-                        opt_budget -= 1;
-                        Some(keys.next().unwrap().clone())
-                    } else {
-                        None
-                    };
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let token = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "token")
+                    })?;
+                    let mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "mint")
+                    })?;
+                    let instructions_sysvar_or_context_state =
+                        account_keys.get(2usize).ok_or_else(|| {
+                            format!(
+                                "Missing account at index {}: {}",
+                                2usize, "instructionsSysvarOrContextState"
+                            )
+                        })?;
+                    let record = account_keys.get(3usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 3usize, "record")
+                    })?;
+                    let authority = account_keys.get(4usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 4usize, "authority")
+                    })?;
                     let accounts = ConfigureConfidentialTransferAccountAccounts {
-                        remaining,
-                        token,
-                        mint,
-                        instructions_sysvar_or_context_state,
-                        record,
-                        authority,
+                        remaining: vec![],
+                        token: token.clone(),
+                        mint: mint.clone(),
+                        instructions_sysvar_or_context_state: instructions_sysvar_or_context_state
+                            .clone(),
+                        record: Some(record.clone()),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::ConfigureConfidentialTransferAccount {
                         accounts,
@@ -2346,41 +2498,28 @@ impl Instruction {
                 }
                 [27u8, 3u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_discriminator),
-                                e
-                            )
-                        })?;
                     let args = ApproveConfidentialTransferAccountArguments {
-                        confidential_transfer_discriminator,
+                        extension_type: "approveConfidentialTransferAccount".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let token = keys.next().unwrap().clone();
-                    let mint = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let token = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "token")
+                    })?;
+                    let mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "mint")
+                    })?;
+                    let authority = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "authority")
+                    })?;
                     let accounts = ApproveConfidentialTransferAccountAccounts {
-                        remaining,
-                        token,
-                        mint,
-                        authority,
+                        remaining: vec![],
+                        token: token.clone(),
+                        mint: mint.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::ApproveConfidentialTransferAccount { accounts, args });
                 }
                 [27u8, 4u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_discriminator),
-                                e
-                            )
-                        })?;
                     let proof_instruction_offset: i8 =
                         <i8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
                             format!(
@@ -2390,40 +2529,37 @@ impl Instruction {
                             )
                         })?;
                     let args = EmptyConfidentialTransferAccountArguments {
-                        confidential_transfer_discriminator,
                         proof_instruction_offset,
+                        extension_type: "emptyConfidentialTransferAccount".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let token = keys.next().unwrap().clone();
-                    let instructions_sysvar_or_context_state = keys.next().unwrap().clone();
-                    let record = if opt_budget > 0 {
-                        opt_budget -= 1;
-                        Some(keys.next().unwrap().clone())
-                    } else {
-                        None
-                    };
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let token = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "token")
+                    })?;
+                    let instructions_sysvar_or_context_state =
+                        account_keys.get(1usize).ok_or_else(|| {
+                            format!(
+                                "Missing account at index {}: {}",
+                                1usize, "instructionsSysvarOrContextState"
+                            )
+                        })?;
+                    let record = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "record")
+                    })?;
+                    let authority = account_keys.get(3usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 3usize, "authority")
+                    })?;
                     let accounts = EmptyConfidentialTransferAccountAccounts {
-                        remaining,
-                        token,
-                        instructions_sysvar_or_context_state,
-                        record,
-                        authority,
+                        remaining: vec![],
+                        token: token.clone(),
+                        instructions_sysvar_or_context_state: instructions_sysvar_or_context_state
+                            .clone(),
+                        record: Some(record.clone()),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::EmptyConfidentialTransferAccount { accounts, args });
                 }
                 [27u8, 5u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_discriminator),
-                                e
-                            )
-                        })?;
                     let amount: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                         .map_err(|e| {
                             format!("Failed to deserialize {}: {}", stringify!(amount), e)
@@ -2433,34 +2569,29 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(decimals), e)
                         })?;
                     let args = ConfidentialDepositArguments {
-                        confidential_transfer_discriminator,
                         amount,
                         decimals,
+                        extension_type: "confidentialDeposit".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let token = keys.next().unwrap().clone();
-                    let mint = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let token = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "token")
+                    })?;
+                    let mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "mint")
+                    })?;
+                    let authority = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "authority")
+                    })?;
                     let accounts = ConfidentialDepositAccounts {
-                        remaining,
-                        token,
-                        mint,
-                        authority,
+                        remaining: vec![],
+                        token: token.clone(),
+                        mint: mint.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::ConfidentialDeposit { accounts, args });
                 }
                 [27u8, 6u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_discriminator),
-                                e
-                            )
-                        })?;
                     let amount: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                         .map_err(|e| {
                             format!("Failed to deserialize {}: {}", stringify!(amount), e)
@@ -2495,58 +2626,47 @@ impl Instruction {
                             )
                         })?;
                     let args = ConfidentialWithdrawArguments {
-                        confidential_transfer_discriminator,
                         amount,
                         decimals,
                         new_decryptable_available_balance,
                         equality_proof_instruction_offset,
                         range_proof_instruction_offset,
+                        extension_type: "confidentialWithdraw".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let token = keys.next().unwrap().clone();
-                    let mint = keys.next().unwrap().clone();
-                    let instructions_sysvar = if opt_budget > 0 {
-                        opt_budget -= 1;
-                        Some(keys.next().unwrap().clone())
-                    } else {
-                        None
-                    };
-                    let equality_record = if opt_budget > 0 {
-                        opt_budget -= 1;
-                        Some(keys.next().unwrap().clone())
-                    } else {
-                        None
-                    };
-                    let range_record = if opt_budget > 0 {
-                        opt_budget -= 1;
-                        Some(keys.next().unwrap().clone())
-                    } else {
-                        None
-                    };
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let token = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "token")
+                    })?;
+                    let mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "mint")
+                    })?;
+                    let instructions_sysvar = account_keys.get(2usize).ok_or_else(|| {
+                        format!(
+                            "Missing account at index {}: {}",
+                            2usize, "instructionsSysvar"
+                        )
+                    })?;
+                    let equality_record = account_keys.get(3usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 3usize, "equalityRecord")
+                    })?;
+                    let range_record = account_keys.get(4usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 4usize, "rangeRecord")
+                    })?;
+                    let authority = account_keys.get(5usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 5usize, "authority")
+                    })?;
                     let accounts = ConfidentialWithdrawAccounts {
-                        remaining,
-                        token,
-                        mint,
-                        instructions_sysvar,
-                        equality_record,
-                        range_record,
-                        authority,
+                        remaining: vec![],
+                        token: token.clone(),
+                        mint: mint.clone(),
+                        instructions_sysvar: Some(instructions_sysvar.clone()),
+                        equality_record: Some(equality_record.clone()),
+                        range_record: Some(range_record.clone()),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::ConfidentialWithdraw { accounts, args });
                 }
                 [27u8, 7u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_discriminator),
-                                e
-                            )
-                        })?;
                     let new_source_decryptable_available_balance: DecryptableBalance =
                         <DecryptableBalance as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                             .map_err(|e| {
@@ -2581,66 +2701,60 @@ impl Instruction {
                             )
                         })?;
                     let args = ConfidentialTransferArguments {
-                        confidential_transfer_discriminator,
                         new_source_decryptable_available_balance,
                         equality_proof_instruction_offset,
                         ciphertext_validity_proof_instruction_offset,
                         range_proof_instruction_offset,
+                        extension_type: "confidentialTransfer".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(4usize);
-                    let source_token = keys.next().unwrap().clone();
-                    let mint = keys.next().unwrap().clone();
-                    let destination_token = keys.next().unwrap().clone();
-                    let instructions_sysvar = if opt_budget > 0 {
-                        opt_budget -= 1;
-                        Some(keys.next().unwrap().clone())
-                    } else {
-                        None
-                    };
-                    let equality_record = if opt_budget > 0 {
-                        opt_budget -= 1;
-                        Some(keys.next().unwrap().clone())
-                    } else {
-                        None
-                    };
-                    let ciphertext_validity_record = if opt_budget > 0 {
-                        opt_budget -= 1;
-                        Some(keys.next().unwrap().clone())
-                    } else {
-                        None
-                    };
-                    let range_record = if opt_budget > 0 {
-                        opt_budget -= 1;
-                        Some(keys.next().unwrap().clone())
-                    } else {
-                        None
-                    };
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let source_token = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "sourceToken")
+                    })?;
+                    let mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "mint")
+                    })?;
+                    let destination_token = account_keys.get(2usize).ok_or_else(|| {
+                        format!(
+                            "Missing account at index {}: {}",
+                            2usize, "destinationToken"
+                        )
+                    })?;
+                    let instructions_sysvar = account_keys.get(3usize).ok_or_else(|| {
+                        format!(
+                            "Missing account at index {}: {}",
+                            3usize, "instructionsSysvar"
+                        )
+                    })?;
+                    let equality_record = account_keys.get(4usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 4usize, "equalityRecord")
+                    })?;
+                    let ciphertext_validity_record = account_keys.get(5usize).ok_or_else(|| {
+                        format!(
+                            "Missing account at index {}: {}",
+                            5usize, "ciphertextValidityRecord"
+                        )
+                    })?;
+                    let range_record = account_keys.get(6usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 6usize, "rangeRecord")
+                    })?;
+                    let authority = account_keys.get(7usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 7usize, "authority")
+                    })?;
                     let accounts = ConfidentialTransferAccounts {
-                        remaining,
-                        source_token,
-                        mint,
-                        destination_token,
-                        instructions_sysvar,
-                        equality_record,
-                        ciphertext_validity_record,
-                        range_record,
-                        authority,
+                        remaining: vec![],
+                        source_token: source_token.clone(),
+                        mint: mint.clone(),
+                        destination_token: destination_token.clone(),
+                        instructions_sysvar: Some(instructions_sysvar.clone()),
+                        equality_record: Some(equality_record.clone()),
+                        ciphertext_validity_record: Some(ciphertext_validity_record.clone()),
+                        range_record: Some(range_record.clone()),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::ConfidentialTransfer { accounts, args });
                 }
                 [27u8, 8u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_discriminator),
-                                e
-                            )
-                        })?;
                     let expected_pending_balance_credit_counter: u64 =
                         <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
                             format!(
@@ -2659,132 +2773,97 @@ impl Instruction {
                                 )
                             })?;
                     let args = ApplyConfidentialPendingBalanceArguments {
-                        confidential_transfer_discriminator,
                         expected_pending_balance_credit_counter,
                         new_decryptable_available_balance,
+                        extension_type: "applyConfidentialPendingBalance".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let token = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let token = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "token")
+                    })?;
+                    let authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "authority")
+                    })?;
                     let accounts = ApplyConfidentialPendingBalanceAccounts {
-                        remaining,
-                        token,
-                        authority,
+                        remaining: vec![],
+                        token: token.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::ApplyConfidentialPendingBalance { accounts, args });
                 }
                 [27u8, 9u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_discriminator),
-                                e
-                            )
-                        })?;
                     let args = EnableConfidentialCreditsArguments {
-                        confidential_transfer_discriminator,
+                        extension_type: "enableConfidentialCredits".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let token = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let token = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "token")
+                    })?;
+                    let authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "authority")
+                    })?;
                     let accounts = EnableConfidentialCreditsAccounts {
-                        remaining,
-                        token,
-                        authority,
+                        remaining: vec![],
+                        token: token.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::EnableConfidentialCredits { accounts, args });
                 }
                 [27u8, 10u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_discriminator),
-                                e
-                            )
-                        })?;
                     let args = DisableConfidentialCreditsArguments {
-                        confidential_transfer_discriminator,
+                        extension_type: "disableConfidentialCredits".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let token = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let token = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "token")
+                    })?;
+                    let authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "authority")
+                    })?;
                     let accounts = DisableConfidentialCreditsAccounts {
-                        remaining,
-                        token,
-                        authority,
+                        remaining: vec![],
+                        token: token.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::DisableConfidentialCredits { accounts, args });
                 }
                 [27u8, 11u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_discriminator),
-                                e
-                            )
-                        })?;
                     let args = EnableNonConfidentialCreditsArguments {
-                        confidential_transfer_discriminator,
+                        extension_type: "enableNonConfidentialCredits".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let token = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let token = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "token")
+                    })?;
+                    let authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "authority")
+                    })?;
                     let accounts = EnableNonConfidentialCreditsAccounts {
-                        remaining,
-                        token,
-                        authority,
+                        remaining: vec![],
+                        token: token.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::EnableNonConfidentialCredits { accounts, args });
                 }
                 [27u8, 12u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_discriminator),
-                                e
-                            )
-                        })?;
                     let args = DisableNonConfidentialCreditsArguments {
-                        confidential_transfer_discriminator,
+                        extension_type: "disableNonConfidentialCredits".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let token = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let token = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "token")
+                    })?;
+                    let authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "authority")
+                    })?;
                     let accounts = DisableNonConfidentialCreditsAccounts {
-                        remaining,
-                        token,
-                        authority,
+                        remaining: vec![],
+                        token: token.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::DisableNonConfidentialCredits { accounts, args });
                 }
                 [27u8, 13u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_discriminator),
-                                e
-                            )
-                        })?;
                     let new_source_decryptable_available_balance: DecryptableBalance =
                         <DecryptableBalance as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                             .map_err(|e| {
@@ -2837,126 +2916,118 @@ impl Instruction {
                             )
                         })?;
                     let args = ConfidentialTransferWithFeeArguments {
-                        confidential_transfer_discriminator,
                         new_source_decryptable_available_balance,
                         equality_proof_instruction_offset,
                         transfer_amount_ciphertext_validity_proof_instruction_offset,
                         fee_sigma_proof_instruction_offset,
                         fee_ciphertext_validity_proof_instruction_offset,
                         range_proof_instruction_offset,
+                        extension_type: "confidentialTransferWithFee".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(4usize);
-                    let source_token = keys.next().unwrap().clone();
-                    let mint = keys.next().unwrap().clone();
-                    let destination_token = keys.next().unwrap().clone();
-                    let instructions_sysvar = if opt_budget > 0 {
-                        opt_budget -= 1;
-                        Some(keys.next().unwrap().clone())
-                    } else {
-                        None
-                    };
-                    let equality_record = if opt_budget > 0 {
-                        opt_budget -= 1;
-                        Some(keys.next().unwrap().clone())
-                    } else {
-                        None
-                    };
-                    let transfer_amount_ciphertext_validity_record = if opt_budget > 0 {
-                        opt_budget -= 1;
-                        Some(keys.next().unwrap().clone())
-                    } else {
-                        None
-                    };
-                    let fee_sigma_record = if opt_budget > 0 {
-                        opt_budget -= 1;
-                        Some(keys.next().unwrap().clone())
-                    } else {
-                        None
-                    };
-                    let fee_ciphertext_validity_record = if opt_budget > 0 {
-                        opt_budget -= 1;
-                        Some(keys.next().unwrap().clone())
-                    } else {
-                        None
-                    };
-                    let range_record = if opt_budget > 0 {
-                        opt_budget -= 1;
-                        Some(keys.next().unwrap().clone())
-                    } else {
-                        None
-                    };
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let source_token = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "sourceToken")
+                    })?;
+                    let mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "mint")
+                    })?;
+                    let destination_token = account_keys.get(2usize).ok_or_else(|| {
+                        format!(
+                            "Missing account at index {}: {}",
+                            2usize, "destinationToken"
+                        )
+                    })?;
+                    let instructions_sysvar = account_keys.get(3usize).ok_or_else(|| {
+                        format!(
+                            "Missing account at index {}: {}",
+                            3usize, "instructionsSysvar"
+                        )
+                    })?;
+                    let equality_record = account_keys.get(4usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 4usize, "equalityRecord")
+                    })?;
+                    let transfer_amount_ciphertext_validity_record =
+                        account_keys.get(5usize).ok_or_else(|| {
+                            format!(
+                                "Missing account at index {}: {}",
+                                5usize, "transferAmountCiphertextValidityRecord"
+                            )
+                        })?;
+                    let fee_sigma_record = account_keys.get(6usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 6usize, "feeSigmaRecord")
+                    })?;
+                    let fee_ciphertext_validity_record =
+                        account_keys.get(7usize).ok_or_else(|| {
+                            format!(
+                                "Missing account at index {}: {}",
+                                7usize, "feeCiphertextValidityRecord"
+                            )
+                        })?;
+                    let range_record = account_keys.get(8usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 8usize, "rangeRecord")
+                    })?;
+                    let authority = account_keys.get(9usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 9usize, "authority")
+                    })?;
                     let accounts = ConfidentialTransferWithFeeAccounts {
-                        remaining,
-                        source_token,
-                        mint,
-                        destination_token,
-                        instructions_sysvar,
-                        equality_record,
-                        transfer_amount_ciphertext_validity_record,
-                        fee_sigma_record,
-                        fee_ciphertext_validity_record,
-                        range_record,
-                        authority,
+                        remaining: vec![],
+                        source_token: source_token.clone(),
+                        mint: mint.clone(),
+                        destination_token: destination_token.clone(),
+                        instructions_sysvar: Some(instructions_sysvar.clone()),
+                        equality_record: Some(equality_record.clone()),
+                        transfer_amount_ciphertext_validity_record: Some(
+                            transfer_amount_ciphertext_validity_record.clone(),
+                        ),
+                        fee_sigma_record: Some(fee_sigma_record.clone()),
+                        fee_ciphertext_validity_record: Some(
+                            fee_ciphertext_validity_record.clone(),
+                        ),
+                        range_record: Some(range_record.clone()),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::ConfidentialTransferWithFee { accounts, args });
                 }
                 [28u8, 0u8] => {
                     let mut rdr: &[u8] = rest;
-                    let default_account_state_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(default_account_state_discriminator),
-                                e
-                            )
-                        })?;
                     let state: AccountState =
                         <AccountState as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                             .map_err(|e| {
                                 format!("Failed to deserialize {}: {}", stringify!(state), e)
                             })?;
                     let args = InitializeDefaultAccountStateArguments {
-                        default_account_state_discriminator,
                         state,
+                        extension_type: "initializeDefaultAccountState".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = InitializeDefaultAccountStateAccounts { remaining, mint };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = InitializeDefaultAccountStateAccounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::InitializeDefaultAccountState { accounts, args });
                 }
                 [28u8, 1u8] => {
                     let mut rdr: &[u8] = rest;
-                    let default_account_state_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(default_account_state_discriminator),
-                                e
-                            )
-                        })?;
                     let state: AccountState =
                         <AccountState as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                             .map_err(|e| {
                                 format!("Failed to deserialize {}: {}", stringify!(state), e)
                             })?;
                     let args = UpdateDefaultAccountStateArguments {
-                        default_account_state_discriminator,
                         state,
+                        extension_type: "updateDefaultAccountState".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let mint = keys.next().unwrap().clone();
-                    let freeze_authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let freeze_authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "freezeAuthority")
+                    })?;
                     let accounts = UpdateDefaultAccountStateAccounts {
-                        remaining,
-                        mint,
-                        freeze_authority,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        freeze_authority: freeze_authority.clone(),
                     };
                     return Ok(Instruction::UpdateDefaultAccountState { accounts, args });
                 }
@@ -2973,215 +3044,184 @@ impl Instruction {
                     let args = ReallocateArguments {
                         new_extension_types,
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(4usize);
-                    let token = keys.next().unwrap().clone();
-                    let payer = keys.next().unwrap().clone();
-                    let system_program = keys.next().unwrap().clone();
-                    let owner = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let token = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "token")
+                    })?;
+                    let payer = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "payer")
+                    })?;
+                    let system_program = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "systemProgram")
+                    })?;
+                    let owner = account_keys.get(3usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 3usize, "owner")
+                    })?;
                     let accounts = ReallocateAccounts {
-                        remaining,
-                        token,
-                        payer,
-                        system_program,
-                        owner,
+                        remaining: vec![],
+                        token: token.clone(),
+                        payer: payer.clone(),
+                        system_program: system_program.clone(),
+                        owner: owner.clone(),
                     };
                     return Ok(Instruction::Reallocate { accounts, args });
                 }
                 [30u8, 0u8] => {
                     let mut rdr: &[u8] = rest;
-                    let memo_transfers_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(memo_transfers_discriminator),
-                                e
-                            )
-                        })?;
                     let args = EnableMemoTransfersArguments {
-                        memo_transfers_discriminator,
+                        extension_type: "enableMemoTransfers".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let token = keys.next().unwrap().clone();
-                    let owner = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let token = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "token")
+                    })?;
+                    let owner = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "owner")
+                    })?;
                     let accounts = EnableMemoTransfersAccounts {
-                        remaining,
-                        token,
-                        owner,
+                        remaining: vec![],
+                        token: token.clone(),
+                        owner: owner.clone(),
                     };
                     return Ok(Instruction::EnableMemoTransfers { accounts, args });
                 }
                 [30u8, 1u8] => {
                     let mut rdr: &[u8] = rest;
-                    let memo_transfers_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(memo_transfers_discriminator),
-                                e
-                            )
-                        })?;
                     let args = DisableMemoTransfersArguments {
-                        memo_transfers_discriminator,
+                        extension_type: "disableMemoTransfers".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let token = keys.next().unwrap().clone();
-                    let owner = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let token = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "token")
+                    })?;
+                    let owner = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "owner")
+                    })?;
                     let accounts = DisableMemoTransfersAccounts {
-                        remaining,
-                        token,
-                        owner,
+                        remaining: vec![],
+                        token: token.clone(),
+                        owner: owner.clone(),
                     };
                     return Ok(Instruction::DisableMemoTransfers { accounts, args });
                 }
                 [31u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = CreateNativeMintArguments {};
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let payer = keys.next().unwrap().clone();
-                    let native_mint = keys.next().unwrap().clone();
-                    let system_program = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let payer = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "payer")
+                    })?;
+                    let native_mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "nativeMint")
+                    })?;
+                    let system_program = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "systemProgram")
+                    })?;
                     let accounts = CreateNativeMintAccounts {
-                        remaining,
-                        payer,
-                        native_mint,
-                        system_program,
+                        remaining: vec![],
+                        payer: payer.clone(),
+                        native_mint: native_mint.clone(),
+                        system_program: system_program.clone(),
                     };
                     return Ok(Instruction::CreateNativeMint { accounts, args });
                 }
                 [32u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = InitializeNonTransferableMintArguments {};
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = InitializeNonTransferableMintAccounts { remaining, mint };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = InitializeNonTransferableMintAccounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::InitializeNonTransferableMint { accounts, args });
                 }
                 [33u8, 0u8] => {
                     let mut rdr: &[u8] = rest;
-                    let interest_bearing_mint_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(interest_bearing_mint_discriminator),
-                                e
-                            )
-                        })?;
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(rate_authority),
                             e
                         )
                     })?;
-                    let rate_authority: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let rate_authority = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
                     let rate: i16 = <i16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                         .map_err(|e| {
                             format!("Failed to deserialize {}: {}", stringify!(rate), e)
                         })?;
                     let args = InitializeInterestBearingMintArguments {
-                        interest_bearing_mint_discriminator,
                         rate_authority,
                         rate,
+                        extension_type: "initializeInterestBearingMint".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = InitializeInterestBearingMintAccounts { remaining, mint };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = InitializeInterestBearingMintAccounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::InitializeInterestBearingMint { accounts, args });
                 }
                 [33u8, 1u8] => {
                     let mut rdr: &[u8] = rest;
-                    let interest_bearing_mint_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(interest_bearing_mint_discriminator),
-                                e
-                            )
-                        })?;
                     let rate: i16 = <i16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                         .map_err(|e| {
                             format!("Failed to deserialize {}: {}", stringify!(rate), e)
                         })?;
                     let args = UpdateRateInterestBearingMintArguments {
-                        interest_bearing_mint_discriminator,
                         rate,
+                        extension_type: "updateRateInterestBearingMint".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let mint = keys.next().unwrap().clone();
-                    let rate_authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let rate_authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "rateAuthority")
+                    })?;
                     let accounts = UpdateRateInterestBearingMintAccounts {
-                        remaining,
-                        mint,
-                        rate_authority,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        rate_authority: rate_authority.clone(),
                     };
                     return Ok(Instruction::UpdateRateInterestBearingMint { accounts, args });
                 }
                 [34u8, 0u8] => {
                     let mut rdr: &[u8] = rest;
-                    let cpi_guard_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(cpi_guard_discriminator),
-                                e
-                            )
-                        })?;
                     let args = EnableCpiGuardArguments {
-                        cpi_guard_discriminator,
+                        extension_type: "enableCpiGuard".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let token = keys.next().unwrap().clone();
-                    let owner = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let token = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "token")
+                    })?;
+                    let owner = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "owner")
+                    })?;
                     let accounts = EnableCpiGuardAccounts {
-                        remaining,
-                        token,
-                        owner,
+                        remaining: vec![],
+                        token: token.clone(),
+                        owner: owner.clone(),
                     };
                     return Ok(Instruction::EnableCpiGuard { accounts, args });
                 }
                 [34u8, 1u8] => {
                     let mut rdr: &[u8] = rest;
-                    let cpi_guard_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(cpi_guard_discriminator),
-                                e
-                            )
-                        })?;
                     let args = DisableCpiGuardArguments {
-                        cpi_guard_discriminator,
+                        extension_type: "disableCpiGuard".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let token = keys.next().unwrap().clone();
-                    let owner = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let token = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "token")
+                    })?;
+                    let owner = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "owner")
+                    })?;
                     let accounts = DisableCpiGuardAccounts {
-                        remaining,
-                        token,
-                        owner,
+                        remaining: vec![],
+                        token: token.clone(),
+                        owner: owner.clone(),
                     };
                     return Ok(Instruction::DisableCpiGuard { accounts, args });
                 }
@@ -3193,139 +3233,133 @@ impl Instruction {
                                 format!("Failed to deserialize {}: {}", stringify!(delegate), e)
                             })?;
                     let args = InitializePermanentDelegateArguments { delegate };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = InitializePermanentDelegateAccounts { remaining, mint };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = InitializePermanentDelegateAccounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::InitializePermanentDelegate { accounts, args });
                 }
                 [36u8, 0u8] => {
                     let mut rdr: &[u8] = rest;
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(authority),
                             e
                         )
                     })?;
-                    let authority: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let authority = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(program_id),
                             e
                         )
                     })?;
-                    let program_id: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let program_id = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
                     let args = InitializeTransferHookArguments {
                         authority,
                         program_id,
+                        extension_type: "initializeTransferHook".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = InitializeTransferHookAccounts { remaining, mint };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = InitializeTransferHookAccounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::InitializeTransferHook { accounts, args });
                 }
                 [36u8, 1u8] => {
                     let mut rdr: &[u8] = rest;
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(program_id),
                             e
                         )
                     })?;
-                    let program_id: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let program_id = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
-                    let args = UpdateTransferHookArguments { program_id };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let mint = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let args = UpdateTransferHookArguments {
+                        program_id,
+                        extension_type: "updateTransferHook".to_string(),
+                    };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "authority")
+                    })?;
                     let accounts = UpdateTransferHookAccounts {
-                        remaining,
-                        mint,
-                        authority,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::UpdateTransferHook { accounts, args });
                 }
                 [37u8, 0u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_fee_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_fee_discriminator),
-                                e
-                            )
-                        })?;
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(authority),
                             e
                         )
                     })?;
-                    let authority: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let authority = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(withdraw_withheld_authority_el_gamal_pubkey),
                             e
                         )
                     })?;
-                    let withdraw_withheld_authority_el_gamal_pubkey: Option<[u8; 32usize]> =
-                        if pubkey_bytes == [0u8; 32] {
-                            None
-                        } else {
-                            Some(pubkey_bytes)
-                        };
+                    let withdraw_withheld_authority_el_gamal_pubkey = if bytes == [0u8; 32] {
+                        None
+                    } else {
+                        Some(bytes)
+                    };
                     let args = InitializeConfidentialTransferFeeArguments {
-                        confidential_transfer_fee_discriminator,
                         authority,
                         withdraw_withheld_authority_el_gamal_pubkey,
+                        extension_type: "initializeConfidentialTransferFee".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = InitializeConfidentialTransferFeeAccounts { remaining, mint };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = InitializeConfidentialTransferFeeAccounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::InitializeConfidentialTransferFee { accounts, args });
                 }
                 [37u8, 1u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_fee_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_fee_discriminator),
-                                e
-                            )
-                        })?;
                     let proof_instruction_offset: i8 =
                         <i8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
                             format!(
@@ -3344,31 +3378,39 @@ impl Instruction {
                                 )
                             })?;
                     let args = WithdrawWithheldTokensFromMintForConfidentialTransferFeeArguments {
-                        confidential_transfer_fee_discriminator,
                         proof_instruction_offset,
                         new_decryptable_available_balance,
+                        extension_type: "withdrawWithheldTokensFromMintForConfidentialTransferFee"
+                            .to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(4usize);
-                    let mint = keys.next().unwrap().clone();
-                    let destination = keys.next().unwrap().clone();
-                    let instructions_sysvar_or_context_state = keys.next().unwrap().clone();
-                    let record = if opt_budget > 0 {
-                        opt_budget -= 1;
-                        Some(keys.next().unwrap().clone())
-                    } else {
-                        None
-                    };
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let destination = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "destination")
+                    })?;
+                    let instructions_sysvar_or_context_state =
+                        account_keys.get(2usize).ok_or_else(|| {
+                            format!(
+                                "Missing account at index {}: {}",
+                                2usize, "instructionsSysvarOrContextState"
+                            )
+                        })?;
+                    let record = account_keys.get(3usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 3usize, "record")
+                    })?;
+                    let authority = account_keys.get(4usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 4usize, "authority")
+                    })?;
                     let accounts =
                         WithdrawWithheldTokensFromMintForConfidentialTransferFeeAccounts {
-                            remaining,
-                            mint,
-                            destination,
-                            instructions_sysvar_or_context_state,
-                            record,
-                            authority,
+                            remaining: vec![],
+                            mint: mint.clone(),
+                            destination: destination.clone(),
+                            instructions_sysvar_or_context_state:
+                                instructions_sysvar_or_context_state.clone(),
+                            record: Some(record.clone()),
+                            authority: authority.clone(),
                         };
                     return Ok(
                         Instruction::WithdrawWithheldTokensFromMintForConfidentialTransferFee {
@@ -3379,14 +3421,6 @@ impl Instruction {
                 }
                 [37u8, 2u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_fee_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_fee_discriminator),
-                                e
-                            )
-                        })?;
                     let num_token_accounts: u8 =
                         <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
                             format!(
@@ -3414,32 +3448,41 @@ impl Instruction {
                             })?;
                     let args =
                         WithdrawWithheldTokensFromAccountsForConfidentialTransferFeeArguments {
-                            confidential_transfer_fee_discriminator,
                             num_token_accounts,
                             proof_instruction_offset,
                             new_decryptable_available_balance,
+                            extension_type:
+                                "withdrawWithheldTokensFromAccountsForConfidentialTransferFee"
+                                    .to_string(),
                         };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(4usize);
-                    let mint = keys.next().unwrap().clone();
-                    let destination = keys.next().unwrap().clone();
-                    let instructions_sysvar_or_context_state = keys.next().unwrap().clone();
-                    let record = if opt_budget > 0 {
-                        opt_budget -= 1;
-                        Some(keys.next().unwrap().clone())
-                    } else {
-                        None
-                    };
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let destination = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "destination")
+                    })?;
+                    let instructions_sysvar_or_context_state =
+                        account_keys.get(2usize).ok_or_else(|| {
+                            format!(
+                                "Missing account at index {}: {}",
+                                2usize, "instructionsSysvarOrContextState"
+                            )
+                        })?;
+                    let record = account_keys.get(3usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 3usize, "record")
+                    })?;
+                    let authority = account_keys.get(4usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 4usize, "authority")
+                    })?;
                     let accounts =
                         WithdrawWithheldTokensFromAccountsForConfidentialTransferFeeAccounts {
-                            remaining,
-                            mint,
-                            destination,
-                            instructions_sysvar_or_context_state,
-                            record,
-                            authority,
+                            remaining: vec![],
+                            mint: mint.clone(),
+                            destination: destination.clone(),
+                            instructions_sysvar_or_context_state:
+                                instructions_sysvar_or_context_state.clone(),
+                            record: Some(record.clone()),
+                            authority: authority.clone(),
                         };
                     return Ok(
                         Instruction::WithdrawWithheldTokensFromAccountsForConfidentialTransferFee {
@@ -3450,24 +3493,16 @@ impl Instruction {
                 }
                 [37u8, 3u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_fee_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_fee_discriminator),
-                                e
-                            )
-                        })?;
                     let args = HarvestWithheldTokensToMintForConfidentialTransferFeeArguments {
-                        confidential_transfer_fee_discriminator,
+                        extension_type: "harvestWithheldTokensToMintForConfidentialTransferFee"
+                            .to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
                     let accounts = HarvestWithheldTokensToMintForConfidentialTransferFeeAccounts {
-                        remaining,
-                        mint,
+                        remaining: vec![],
+                        mint: mint.clone(),
                     };
                     return Ok(
                         Instruction::HarvestWithheldTokensToMintForConfidentialTransferFee {
@@ -3478,381 +3513,330 @@ impl Instruction {
                 }
                 [37u8, 4u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_fee_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_fee_discriminator),
-                                e
-                            )
-                        })?;
                     let args = EnableHarvestToMintArguments {
-                        confidential_transfer_fee_discriminator,
+                        extension_type: "enableHarvestToMint".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let mint = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "authority")
+                    })?;
                     let accounts = EnableHarvestToMintAccounts {
-                        remaining,
-                        mint,
-                        authority,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::EnableHarvestToMint { accounts, args });
                 }
                 [37u8, 5u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_fee_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_fee_discriminator),
-                                e
-                            )
-                        })?;
                     let args = DisableHarvestToMintArguments {
-                        confidential_transfer_fee_discriminator,
+                        extension_type: "disableHarvestToMint".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let mint = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "authority")
+                    })?;
                     let accounts = DisableHarvestToMintAccounts {
-                        remaining,
-                        mint,
-                        authority,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::DisableHarvestToMint { accounts, args });
                 }
                 [38u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = WithdrawExcessLamportsArguments {};
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let source_account = keys.next().unwrap().clone();
-                    let destination_account = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let source_account = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "sourceAccount")
+                    })?;
+                    let destination_account = account_keys.get(1usize).ok_or_else(|| {
+                        format!(
+                            "Missing account at index {}: {}",
+                            1usize, "destinationAccount"
+                        )
+                    })?;
+                    let authority = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "authority")
+                    })?;
                     let accounts = WithdrawExcessLamportsAccounts {
-                        remaining,
-                        source_account,
-                        destination_account,
-                        authority,
+                        remaining: vec![],
+                        source_account: source_account.clone(),
+                        destination_account: destination_account.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::WithdrawExcessLamports { accounts, args });
                 }
                 [39u8, 0u8] => {
                     let mut rdr: &[u8] = rest;
-                    let metadata_pointer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(metadata_pointer_discriminator),
-                                e
-                            )
-                        })?;
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(authority),
                             e
                         )
                     })?;
-                    let authority: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let authority = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(metadata_address),
                             e
                         )
                     })?;
-                    let metadata_address: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let metadata_address = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
                     let args = InitializeMetadataPointerArguments {
-                        metadata_pointer_discriminator,
                         authority,
                         metadata_address,
+                        extension_type: "initializeMetadataPointer".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = InitializeMetadataPointerAccounts { remaining, mint };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = InitializeMetadataPointerAccounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::InitializeMetadataPointer { accounts, args });
                 }
                 [39u8, 1u8] => {
                     let mut rdr: &[u8] = rest;
-                    let metadata_pointer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(metadata_pointer_discriminator),
-                                e
-                            )
-                        })?;
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(metadata_address),
                             e
                         )
                     })?;
-                    let metadata_address: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let metadata_address = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
                     let args = UpdateMetadataPointerArguments {
-                        metadata_pointer_discriminator,
                         metadata_address,
+                        extension_type: "updateMetadataPointer".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let mint = keys.next().unwrap().clone();
-                    let metadata_pointer_authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let metadata_pointer_authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!(
+                            "Missing account at index {}: {}",
+                            1usize, "metadataPointerAuthority"
+                        )
+                    })?;
                     let accounts = UpdateMetadataPointerAccounts {
-                        remaining,
-                        mint,
-                        metadata_pointer_authority,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        metadata_pointer_authority: metadata_pointer_authority.clone(),
                     };
                     return Ok(Instruction::UpdateMetadataPointer { accounts, args });
                 }
                 [40u8, 0u8] => {
                     let mut rdr: &[u8] = rest;
-                    let group_pointer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(group_pointer_discriminator),
-                                e
-                            )
-                        })?;
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(authority),
                             e
                         )
                     })?;
-                    let authority: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let authority = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(group_address),
                             e
                         )
                     })?;
-                    let group_address: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let group_address = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
                     let args = InitializeGroupPointerArguments {
-                        group_pointer_discriminator,
                         authority,
                         group_address,
+                        extension_type: "initializeGroupPointer".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = InitializeGroupPointerAccounts { remaining, mint };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = InitializeGroupPointerAccounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::InitializeGroupPointer { accounts, args });
                 }
                 [40u8, 1u8] => {
                     let mut rdr: &[u8] = rest;
-                    let group_pointer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(group_pointer_discriminator),
-                                e
-                            )
-                        })?;
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(group_address),
                             e
                         )
                     })?;
-                    let group_address: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let group_address = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
                     let args = UpdateGroupPointerArguments {
-                        group_pointer_discriminator,
                         group_address,
+                        extension_type: "updateGroupPointer".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let mint = keys.next().unwrap().clone();
-                    let group_pointer_authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let group_pointer_authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!(
+                            "Missing account at index {}: {}",
+                            1usize, "groupPointerAuthority"
+                        )
+                    })?;
                     let accounts = UpdateGroupPointerAccounts {
-                        remaining,
-                        mint,
-                        group_pointer_authority,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        group_pointer_authority: group_pointer_authority.clone(),
                     };
                     return Ok(Instruction::UpdateGroupPointer { accounts, args });
                 }
                 [41u8, 0u8] => {
                     let mut rdr: &[u8] = rest;
-                    let group_member_pointer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(group_member_pointer_discriminator),
-                                e
-                            )
-                        })?;
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(authority),
                             e
                         )
                     })?;
-                    let authority: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let authority = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(member_address),
                             e
                         )
                     })?;
-                    let member_address: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let member_address = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
                     let args = InitializeGroupMemberPointerArguments {
-                        group_member_pointer_discriminator,
                         authority,
                         member_address,
+                        extension_type: "initializeGroupMemberPointer".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = InitializeGroupMemberPointerAccounts { remaining, mint };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = InitializeGroupMemberPointerAccounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::InitializeGroupMemberPointer { accounts, args });
                 }
                 [41u8, 1u8] => {
                     let mut rdr: &[u8] = rest;
-                    let group_member_pointer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(group_member_pointer_discriminator),
-                                e
-                            )
-                        })?;
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(member_address),
                             e
                         )
                     })?;
-                    let member_address: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let member_address = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
                     let args = UpdateGroupMemberPointerArguments {
-                        group_member_pointer_discriminator,
                         member_address,
+                        extension_type: "updateGroupMemberPointer".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let mint = keys.next().unwrap().clone();
-                    let group_member_pointer_authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let group_member_pointer_authority =
+                        account_keys.get(1usize).ok_or_else(|| {
+                            format!(
+                                "Missing account at index {}: {}",
+                                1usize, "groupMemberPointerAuthority"
+                            )
+                        })?;
                     let accounts = UpdateGroupMemberPointerAccounts {
-                        remaining,
-                        mint,
-                        group_member_pointer_authority,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        group_member_pointer_authority: group_member_pointer_authority.clone(),
                     };
                     return Ok(Instruction::UpdateGroupMemberPointer { accounts, args });
                 }
                 [43u8, 0u8] => {
                     let mut rdr: &[u8] = rest;
-                    let scaled_ui_amount_mint_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(scaled_ui_amount_mint_discriminator),
-                                e
-                            )
-                        })?;
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(authority),
                             e
                         )
                     })?;
-                    let authority: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let authority = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
                     let multiplier: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                         .map_err(|e| {
                         format!("Failed to deserialize {}: {}", stringify!(multiplier), e)
                     })?;
                     let args = InitializeScaledUiAmountMintArguments {
-                        scaled_ui_amount_mint_discriminator,
                         authority,
                         multiplier,
+                        extension_type: "initializeScaledUiAmountMint".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = InitializeScaledUiAmountMintAccounts { remaining, mint };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = InitializeScaledUiAmountMintAccounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::InitializeScaledUiAmountMint { accounts, args });
                 }
                 [43u8, 1u8] => {
                     let mut rdr: &[u8] = rest;
-                    let scaled_ui_amount_mint_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(scaled_ui_amount_mint_discriminator),
-                                e
-                            )
-                        })?;
                     let multiplier: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                         .map_err(|e| {
                         format!("Failed to deserialize {}: {}", stringify!(multiplier), e)
@@ -3866,187 +3850,159 @@ impl Instruction {
                             )
                         })?;
                     let args = UpdateMultiplierScaledUiMintArguments {
-                        scaled_ui_amount_mint_discriminator,
                         multiplier,
                         effective_timestamp,
+                        extension_type: "updateMultiplierScaledUiMint".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let mint = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "authority")
+                    })?;
                     let accounts = UpdateMultiplierScaledUiMintAccounts {
-                        remaining,
-                        mint,
-                        authority,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::UpdateMultiplierScaledUiMint { accounts, args });
                 }
                 [44u8, 0u8] => {
                     let mut rdr: &[u8] = rest;
-                    let pausable_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(pausable_discriminator),
-                                e
-                            )
-                        })?;
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(authority),
                             e
                         )
                     })?;
-                    let authority: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let authority = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
                     let args = InitializePausableConfigArguments {
-                        pausable_discriminator,
                         authority,
+                        extension_type: "initializePausableConfig".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = InitializePausableConfigAccounts { remaining, mint };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = InitializePausableConfigAccounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::InitializePausableConfig { accounts, args });
                 }
                 [44u8, 1u8] => {
                     let mut rdr: &[u8] = rest;
-                    let pausable_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(pausable_discriminator),
-                                e
-                            )
-                        })?;
                     let args = PauseArguments {
-                        pausable_discriminator,
+                        extension_type: "pause".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let mint = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "authority")
+                    })?;
                     let accounts = PauseAccounts {
-                        remaining,
-                        mint,
-                        authority,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::Pause { accounts, args });
                 }
                 [44u8, 2u8] => {
                     let mut rdr: &[u8] = rest;
-                    let pausable_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(pausable_discriminator),
-                                e
-                            )
-                        })?;
                     let args = ResumeArguments {
-                        pausable_discriminator,
+                        extension_type: "resume".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let mint = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "authority")
+                    })?;
                     let accounts = ResumeAccounts {
-                        remaining,
-                        mint,
-                        authority,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::Resume { accounts, args });
                 }
                 [210u8, 225u8, 30u8, 162u8, 88u8, 184u8, 77u8, 141u8] => {
                     let mut rdr: &[u8] = rest;
-                    let string_len: u32 = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                        .map_err(|e| {
-                            format!(
-                                "Failed to deserialize string length for {}: {}",
-                                stringify!(name),
-                                e
-                            )
+                    let len =
+                        <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
+                            format!("Failed to deserialize {}: {}", stringify!(name), e)
                         })?;
-                    let mut string_bytes = vec![0u8; string_len as usize];
-                    rdr.read_exact(&mut string_bytes).map_err(|e| {
+                    let mut bytes = vec![0u8; len as usize];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
-                            "Failed to read string bytes for {}: {}",
+                            "Failed to read {} bytes for {}: {}",
+                            len,
                             stringify!(name),
                             e
                         )
                     })?;
-                    let name: String = String::from_utf8(string_bytes).map_err(|e| {
-                        format!(
-                            "Failed to parse UTF-8 string for {}: {}",
-                            stringify!(name),
-                            e
-                        )
+                    let name = String::from_utf8(bytes).map_err(|e| {
+                        format!("Failed to convert {} to string: {}", stringify!(name), e)
                     })?;
-                    let string_len: u32 = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                        .map_err(|e| {
-                            format!(
-                                "Failed to deserialize string length for {}: {}",
-                                stringify!(symbol),
-                                e
-                            )
+                    let len =
+                        <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
+                            format!("Failed to deserialize {}: {}", stringify!(symbol), e)
                         })?;
-                    let mut string_bytes = vec![0u8; string_len as usize];
-                    rdr.read_exact(&mut string_bytes).map_err(|e| {
+                    let mut bytes = vec![0u8; len as usize];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
-                            "Failed to read string bytes for {}: {}",
+                            "Failed to read {} bytes for {}: {}",
+                            len,
                             stringify!(symbol),
                             e
                         )
                     })?;
-                    let symbol: String = String::from_utf8(string_bytes).map_err(|e| {
-                        format!(
-                            "Failed to parse UTF-8 string for {}: {}",
-                            stringify!(symbol),
-                            e
-                        )
+                    let symbol = String::from_utf8(bytes).map_err(|e| {
+                        format!("Failed to convert {} to string: {}", stringify!(symbol), e)
                     })?;
-                    let string_len: u32 = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                        .map_err(|e| {
-                            format!(
-                                "Failed to deserialize string length for {}: {}",
-                                stringify!(uri),
-                                e
-                            )
-                        })?;
-                    let mut string_bytes = vec![0u8; string_len as usize];
-                    rdr.read_exact(&mut string_bytes).map_err(|e| {
-                        format!("Failed to read string bytes for {}: {}", stringify!(uri), e)
-                    })?;
-                    let uri: String = String::from_utf8(string_bytes).map_err(|e| {
+                    let len = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
+                        .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(uri), e))?;
+                    let mut bytes = vec![0u8; len as usize];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
-                            "Failed to parse UTF-8 string for {}: {}",
+                            "Failed to read {} bytes for {}: {}",
+                            len,
                             stringify!(uri),
                             e
                         )
                     })?;
-                    let args = InitializeTokenMetadataArguments { name, symbol, uri };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(4usize);
-                    let metadata = keys.next().unwrap().clone();
-                    let update_authority = keys.next().unwrap().clone();
-                    let mint = keys.next().unwrap().clone();
-                    let mint_authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let uri = String::from_utf8(bytes).map_err(|e| {
+                        format!("Failed to convert {} to string: {}", stringify!(uri), e)
+                    })?;
+                    let args = InitializeTokenMetadataArguments {
+                        name,
+                        symbol,
+                        uri,
+                        extension_type: "initializeTokenMetadata".to_string(),
+                    };
+                    let metadata = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "metadata")
+                    })?;
+                    let update_authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "updateAuthority")
+                    })?;
+                    let mint = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "mint")
+                    })?;
+                    let mint_authority = account_keys.get(3usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 3usize, "mintAuthority")
+                    })?;
                     let accounts = InitializeTokenMetadataAccounts {
-                        remaining,
-                        metadata,
-                        update_authority,
-                        mint,
-                        mint_authority,
+                        remaining: vec![],
+                        metadata: metadata.clone(),
+                        update_authority: update_authority.clone(),
+                        mint: mint.clone(),
+                        mint_authority: mint_authority.clone(),
                     };
                     return Ok(Instruction::InitializeTokenMetadata { accounts, args });
                 }
@@ -4057,39 +4013,37 @@ impl Instruction {
                             .map_err(|e| {
                                 format!("Failed to deserialize {}: {}", stringify!(field), e)
                             })?;
-                    let string_len: u32 = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                        .map_err(|e| {
-                            format!(
-                                "Failed to deserialize string length for {}: {}",
-                                stringify!(value),
-                                e
-                            )
+                    let len =
+                        <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
+                            format!("Failed to deserialize {}: {}", stringify!(value), e)
                         })?;
-                    let mut string_bytes = vec![0u8; string_len as usize];
-                    rdr.read_exact(&mut string_bytes).map_err(|e| {
+                    let mut bytes = vec![0u8; len as usize];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
-                            "Failed to read string bytes for {}: {}",
+                            "Failed to read {} bytes for {}: {}",
+                            len,
                             stringify!(value),
                             e
                         )
                     })?;
-                    let value: String = String::from_utf8(string_bytes).map_err(|e| {
-                        format!(
-                            "Failed to parse UTF-8 string for {}: {}",
-                            stringify!(value),
-                            e
-                        )
+                    let value = String::from_utf8(bytes).map_err(|e| {
+                        format!("Failed to convert {} to string: {}", stringify!(value), e)
                     })?;
-                    let args = UpdateTokenMetadataFieldArguments { field, value };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let metadata = keys.next().unwrap().clone();
-                    let update_authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let args = UpdateTokenMetadataFieldArguments {
+                        field,
+                        value,
+                        extension_type: "updateTokenMetadataField".to_string(),
+                    };
+                    let metadata = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "metadata")
+                    })?;
+                    let update_authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "updateAuthority")
+                    })?;
                     let accounts = UpdateTokenMetadataFieldAccounts {
-                        remaining,
-                        metadata,
-                        update_authority,
+                        remaining: vec![],
+                        metadata: metadata.clone(),
+                        update_authority: update_authority.clone(),
                     };
                     return Ok(Instruction::UpdateTokenMetadataField { accounts, args });
                 }
@@ -4099,65 +4053,67 @@ impl Instruction {
                         <bool as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(
                             |e| format!("Failed to deserialize {}: {}", stringify!(idempotent), e),
                         )?;
-                    let string_len: u32 = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                        .map_err(|e| {
-                            format!(
-                                "Failed to deserialize string length for {}: {}",
-                                stringify!(key),
-                                e
-                            )
-                        })?;
-                    let mut string_bytes = vec![0u8; string_len as usize];
-                    rdr.read_exact(&mut string_bytes).map_err(|e| {
-                        format!("Failed to read string bytes for {}: {}", stringify!(key), e)
-                    })?;
-                    let key: String = String::from_utf8(string_bytes).map_err(|e| {
+                    let len = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
+                        .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(key), e))?;
+                    let mut bytes = vec![0u8; len as usize];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
-                            "Failed to parse UTF-8 string for {}: {}",
+                            "Failed to read {} bytes for {}: {}",
+                            len,
                             stringify!(key),
                             e
                         )
                     })?;
-                    let args = RemoveTokenMetadataKeyArguments { idempotent, key };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let metadata = keys.next().unwrap().clone();
-                    let update_authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let key = String::from_utf8(bytes).map_err(|e| {
+                        format!("Failed to convert {} to string: {}", stringify!(key), e)
+                    })?;
+                    let args = RemoveTokenMetadataKeyArguments {
+                        idempotent,
+                        key,
+                        extension_type: "removeTokenMetadataKey".to_string(),
+                    };
+                    let metadata = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "metadata")
+                    })?;
+                    let update_authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "updateAuthority")
+                    })?;
                     let accounts = RemoveTokenMetadataKeyAccounts {
-                        remaining,
-                        metadata,
-                        update_authority,
+                        remaining: vec![],
+                        metadata: metadata.clone(),
+                        update_authority: update_authority.clone(),
                     };
                     return Ok(Instruction::RemoveTokenMetadataKey { accounts, args });
                 }
                 [215u8, 228u8, 166u8, 228u8, 84u8, 100u8, 86u8, 123u8] => {
                     let mut rdr: &[u8] = rest;
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(new_update_authority),
                             e
                         )
                     })?;
-                    let new_update_authority: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let new_update_authority = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
                     let args = UpdateTokenMetadataUpdateAuthorityArguments {
                         new_update_authority,
+                        extension_type: "updateTokenMetadataUpdateAuthority".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let metadata = keys.next().unwrap().clone();
-                    let update_authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let metadata = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "metadata")
+                    })?;
+                    let update_authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "updateAuthority")
+                    })?;
                     let accounts = UpdateTokenMetadataUpdateAuthorityAccounts {
-                        remaining,
-                        metadata,
-                        update_authority,
+                        remaining: vec![],
+                        metadata: metadata.clone(),
+                        update_authority: update_authority.clone(),
                     };
                     return Ok(Instruction::UpdateTokenMetadataUpdateAuthority { accounts, args });
                 }
@@ -4171,31 +4127,34 @@ impl Instruction {
                         &mut rdr,
                     )
                     .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(end), e))?;
-                    let args = EmitTokenMetadataArguments { start, end };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let metadata = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let args = EmitTokenMetadataArguments {
+                        start,
+                        end,
+                        extension_type: "emitTokenMetadata".to_string(),
+                    };
+                    let metadata = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "metadata")
+                    })?;
                     let accounts = EmitTokenMetadataAccounts {
-                        remaining,
-                        metadata,
+                        remaining: vec![],
+                        metadata: metadata.clone(),
                     };
                     return Ok(Instruction::EmitTokenMetadata { accounts, args });
                 }
                 [121u8, 113u8, 108u8, 39u8, 54u8, 51u8, 0u8, 4u8] => {
                     let mut rdr: &[u8] = rest;
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(update_authority),
                             e
                         )
                     })?;
-                    let update_authority: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let update_authority = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
                     let max_size: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                         .map_err(|e| {
@@ -4204,18 +4163,22 @@ impl Instruction {
                     let args = InitializeTokenGroupArguments {
                         update_authority,
                         max_size,
+                        extension_type: "initializeTokenGroup".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let group = keys.next().unwrap().clone();
-                    let mint = keys.next().unwrap().clone();
-                    let mint_authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let group = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "group")
+                    })?;
+                    let mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "mint")
+                    })?;
+                    let mint_authority = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "mintAuthority")
+                    })?;
                     let accounts = InitializeTokenGroupAccounts {
-                        remaining,
-                        group,
-                        mint,
-                        mint_authority,
+                        remaining: vec![],
+                        group: group.clone(),
+                        mint: mint.clone(),
+                        mint_authority: mint_authority.clone(),
                     };
                     return Ok(Instruction::InitializeTokenGroup { accounts, args });
                 }
@@ -4225,67 +4188,88 @@ impl Instruction {
                         .map_err(|e| {
                         format!("Failed to deserialize {}: {}", stringify!(max_size), e)
                     })?;
-                    let args = UpdateTokenGroupMaxSizeArguments { max_size };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let group = keys.next().unwrap().clone();
-                    let update_authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let args = UpdateTokenGroupMaxSizeArguments {
+                        max_size,
+                        extension_type: "updateTokenGroupMaxSize".to_string(),
+                    };
+                    let group = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "group")
+                    })?;
+                    let update_authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "updateAuthority")
+                    })?;
                     let accounts = UpdateTokenGroupMaxSizeAccounts {
-                        remaining,
-                        group,
-                        update_authority,
+                        remaining: vec![],
+                        group: group.clone(),
+                        update_authority: update_authority.clone(),
                     };
                     return Ok(Instruction::UpdateTokenGroupMaxSize { accounts, args });
                 }
                 [161u8, 105u8, 88u8, 1u8, 237u8, 221u8, 216u8, 203u8] => {
                     let mut rdr: &[u8] = rest;
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(new_update_authority),
                             e
                         )
                     })?;
-                    let new_update_authority: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let new_update_authority = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
                     let args = UpdateTokenGroupUpdateAuthorityArguments {
                         new_update_authority,
+                        extension_type: "updateTokenGroupUpdateAuthority".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let group = keys.next().unwrap().clone();
-                    let update_authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let group = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "group")
+                    })?;
+                    let update_authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "updateAuthority")
+                    })?;
                     let accounts = UpdateTokenGroupUpdateAuthorityAccounts {
-                        remaining,
-                        group,
-                        update_authority,
+                        remaining: vec![],
+                        group: group.clone(),
+                        update_authority: update_authority.clone(),
                     };
                     return Ok(Instruction::UpdateTokenGroupUpdateAuthority { accounts, args });
                 }
                 [152u8, 32u8, 222u8, 176u8, 223u8, 237u8, 116u8, 134u8] => {
                     let mut rdr: &[u8] = rest;
-                    let args = InitializeTokenGroupMemberArguments {};
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(5usize);
-                    let member = keys.next().unwrap().clone();
-                    let member_mint = keys.next().unwrap().clone();
-                    let member_mint_authority = keys.next().unwrap().clone();
-                    let group = keys.next().unwrap().clone();
-                    let group_update_authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let args = InitializeTokenGroupMemberArguments {
+                        extension_type: "initializeTokenGroupMember".to_string(),
+                    };
+                    let member = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "member")
+                    })?;
+                    let member_mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "memberMint")
+                    })?;
+                    let member_mint_authority = account_keys.get(2usize).ok_or_else(|| {
+                        format!(
+                            "Missing account at index {}: {}",
+                            2usize, "memberMintAuthority"
+                        )
+                    })?;
+                    let group = account_keys.get(3usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 3usize, "group")
+                    })?;
+                    let group_update_authority = account_keys.get(4usize).ok_or_else(|| {
+                        format!(
+                            "Missing account at index {}: {}",
+                            4usize, "groupUpdateAuthority"
+                        )
+                    })?;
                     let accounts = InitializeTokenGroupMemberAccounts {
-                        remaining,
-                        member,
-                        member_mint,
-                        member_mint_authority,
-                        group,
-                        group_update_authority,
+                        remaining: vec![],
+                        member: member.clone(),
+                        member_mint: member_mint.clone(),
+                        member_mint_authority: member_mint_authority.clone(),
+                        group: group.clone(),
+                        group_update_authority: group_update_authority.clone(),
                     };
                     return Ok(Instruction::InitializeTokenGroupMember { accounts, args });
                 }
@@ -4324,34 +4308,40 @@ impl Instruction {
                         mint_authority,
                         freeze_authority,
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let mint = keys.next().unwrap().clone();
-                    let rent = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let rent = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "rent")
+                    })?;
                     let accounts = InitializeMintAccounts {
-                        remaining,
-                        mint,
-                        rent,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        rent: rent.clone(),
                     };
                     return Ok(Instruction::InitializeMint { accounts, args });
                 }
                 [1u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = InitializeAccountArguments {};
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(4usize);
-                    let account = keys.next().unwrap().clone();
-                    let mint = keys.next().unwrap().clone();
-                    let owner = keys.next().unwrap().clone();
-                    let rent = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let account = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "account")
+                    })?;
+                    let mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "mint")
+                    })?;
+                    let owner = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "owner")
+                    })?;
+                    let rent = account_keys.get(3usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 3usize, "rent")
+                    })?;
                     let accounts = InitializeAccountAccounts {
-                        remaining,
-                        account,
-                        mint,
-                        owner,
-                        rent,
+                        remaining: vec![],
+                        account: account.clone(),
+                        mint: mint.clone(),
+                        owner: owner.clone(),
+                        rent: rent.clone(),
                     };
                     return Ok(Instruction::InitializeAccount { accounts, args });
                 }
@@ -4360,15 +4350,16 @@ impl Instruction {
                     let m: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                         .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(m), e))?;
                     let args = InitializeMultisigArguments { m };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let multisig = keys.next().unwrap().clone();
-                    let rent = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let multisig = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "multisig")
+                    })?;
+                    let rent = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "rent")
+                    })?;
                     let accounts = InitializeMultisigAccounts {
-                        remaining,
-                        multisig,
-                        rent,
+                        remaining: vec![],
+                        multisig: multisig.clone(),
+                        rent: rent.clone(),
                     };
                     return Ok(Instruction::InitializeMultisig { accounts, args });
                 }
@@ -4379,17 +4370,20 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(amount), e)
                         })?;
                     let args = TransferArguments { amount };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let source = keys.next().unwrap().clone();
-                    let destination = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let source = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "source")
+                    })?;
+                    let destination = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "destination")
+                    })?;
+                    let authority = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "authority")
+                    })?;
                     let accounts = TransferAccounts {
-                        remaining,
-                        source,
-                        destination,
-                        authority,
+                        remaining: vec![],
+                        source: source.clone(),
+                        destination: destination.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::Transfer { accounts, args });
                 }
@@ -4400,32 +4394,36 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(amount), e)
                         })?;
                     let args = ApproveArguments { amount };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let source = keys.next().unwrap().clone();
-                    let delegate = keys.next().unwrap().clone();
-                    let owner = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let source = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "source")
+                    })?;
+                    let delegate = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "delegate")
+                    })?;
+                    let owner = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "owner")
+                    })?;
                     let accounts = ApproveAccounts {
-                        remaining,
-                        source,
-                        delegate,
-                        owner,
+                        remaining: vec![],
+                        source: source.clone(),
+                        delegate: delegate.clone(),
+                        owner: owner.clone(),
                     };
                     return Ok(Instruction::Approve { accounts, args });
                 }
                 [5u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = RevokeArguments {};
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let source = keys.next().unwrap().clone();
-                    let owner = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let source = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "source")
+                    })?;
+                    let owner = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "owner")
+                    })?;
                     let accounts = RevokeAccounts {
-                        remaining,
-                        source,
-                        owner,
+                        remaining: vec![],
+                        source: source.clone(),
+                        owner: owner.clone(),
                     };
                     return Ok(Instruction::Revoke { accounts, args });
                 }
@@ -4453,15 +4451,16 @@ impl Instruction {
                         authority_type,
                         new_authority,
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let owned = keys.next().unwrap().clone();
-                    let owner = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let owned = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "owned")
+                    })?;
+                    let owner = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "owner")
+                    })?;
                     let accounts = SetAuthorityAccounts {
-                        remaining,
-                        owned,
-                        owner,
+                        remaining: vec![],
+                        owned: owned.clone(),
+                        owner: owner.clone(),
                     };
                     return Ok(Instruction::SetAuthority { accounts, args });
                 }
@@ -4472,17 +4471,20 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(amount), e)
                         })?;
                     let args = MintToArguments { amount };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let mint = keys.next().unwrap().clone();
-                    let token = keys.next().unwrap().clone();
-                    let mint_authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let token = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "token")
+                    })?;
+                    let mint_authority = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "mintAuthority")
+                    })?;
                     let accounts = MintToAccounts {
-                        remaining,
-                        mint,
-                        token,
-                        mint_authority,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        token: token.clone(),
+                        mint_authority: mint_authority.clone(),
                     };
                     return Ok(Instruction::MintTo { accounts, args });
                 }
@@ -4493,68 +4495,80 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(amount), e)
                         })?;
                     let args = BurnArguments { amount };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let account = keys.next().unwrap().clone();
-                    let mint = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let account = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "account")
+                    })?;
+                    let mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "mint")
+                    })?;
+                    let authority = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "authority")
+                    })?;
                     let accounts = BurnAccounts {
-                        remaining,
-                        account,
-                        mint,
-                        authority,
+                        remaining: vec![],
+                        account: account.clone(),
+                        mint: mint.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::Burn { accounts, args });
                 }
                 [9u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = CloseAccountArguments {};
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let account = keys.next().unwrap().clone();
-                    let destination = keys.next().unwrap().clone();
-                    let owner = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let account = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "account")
+                    })?;
+                    let destination = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "destination")
+                    })?;
+                    let owner = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "owner")
+                    })?;
                     let accounts = CloseAccountAccounts {
-                        remaining,
-                        account,
-                        destination,
-                        owner,
+                        remaining: vec![],
+                        account: account.clone(),
+                        destination: destination.clone(),
+                        owner: owner.clone(),
                     };
                     return Ok(Instruction::CloseAccount { accounts, args });
                 }
                 [10u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = FreezeAccountArguments {};
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let account = keys.next().unwrap().clone();
-                    let mint = keys.next().unwrap().clone();
-                    let owner = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let account = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "account")
+                    })?;
+                    let mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "mint")
+                    })?;
+                    let owner = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "owner")
+                    })?;
                     let accounts = FreezeAccountAccounts {
-                        remaining,
-                        account,
-                        mint,
-                        owner,
+                        remaining: vec![],
+                        account: account.clone(),
+                        mint: mint.clone(),
+                        owner: owner.clone(),
                     };
                     return Ok(Instruction::FreezeAccount { accounts, args });
                 }
                 [11u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = ThawAccountArguments {};
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let account = keys.next().unwrap().clone();
-                    let mint = keys.next().unwrap().clone();
-                    let owner = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let account = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "account")
+                    })?;
+                    let mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "mint")
+                    })?;
+                    let owner = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "owner")
+                    })?;
                     let accounts = ThawAccountAccounts {
-                        remaining,
-                        account,
-                        mint,
-                        owner,
+                        remaining: vec![],
+                        account: account.clone(),
+                        mint: mint.clone(),
+                        owner: owner.clone(),
                     };
                     return Ok(Instruction::ThawAccount { accounts, args });
                 }
@@ -4569,19 +4583,24 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(decimals), e)
                         })?;
                     let args = TransferCheckedArguments { amount, decimals };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(4usize);
-                    let source = keys.next().unwrap().clone();
-                    let mint = keys.next().unwrap().clone();
-                    let destination = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let source = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "source")
+                    })?;
+                    let mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "mint")
+                    })?;
+                    let destination = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "destination")
+                    })?;
+                    let authority = account_keys.get(3usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 3usize, "authority")
+                    })?;
                     let accounts = TransferCheckedAccounts {
-                        remaining,
-                        source,
-                        mint,
-                        destination,
-                        authority,
+                        remaining: vec![],
+                        source: source.clone(),
+                        mint: mint.clone(),
+                        destination: destination.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::TransferChecked { accounts, args });
                 }
@@ -4596,19 +4615,24 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(decimals), e)
                         })?;
                     let args = ApproveCheckedArguments { amount, decimals };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(4usize);
-                    let source = keys.next().unwrap().clone();
-                    let mint = keys.next().unwrap().clone();
-                    let delegate = keys.next().unwrap().clone();
-                    let owner = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let source = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "source")
+                    })?;
+                    let mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "mint")
+                    })?;
+                    let delegate = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "delegate")
+                    })?;
+                    let owner = account_keys.get(3usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 3usize, "owner")
+                    })?;
                     let accounts = ApproveCheckedAccounts {
-                        remaining,
-                        source,
-                        mint,
-                        delegate,
-                        owner,
+                        remaining: vec![],
+                        source: source.clone(),
+                        mint: mint.clone(),
+                        delegate: delegate.clone(),
+                        owner: owner.clone(),
                     };
                     return Ok(Instruction::ApproveChecked { accounts, args });
                 }
@@ -4623,17 +4647,20 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(decimals), e)
                         })?;
                     let args = MintToCheckedArguments { amount, decimals };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let mint = keys.next().unwrap().clone();
-                    let token = keys.next().unwrap().clone();
-                    let mint_authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let token = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "token")
+                    })?;
+                    let mint_authority = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "mintAuthority")
+                    })?;
                     let accounts = MintToCheckedAccounts {
-                        remaining,
-                        mint,
-                        token,
-                        mint_authority,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        token: token.clone(),
+                        mint_authority: mint_authority.clone(),
                     };
                     return Ok(Instruction::MintToChecked { accounts, args });
                 }
@@ -4648,17 +4675,20 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(decimals), e)
                         })?;
                     let args = BurnCheckedArguments { amount, decimals };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let account = keys.next().unwrap().clone();
-                    let mint = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let account = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "account")
+                    })?;
+                    let mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "mint")
+                    })?;
+                    let authority = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "authority")
+                    })?;
                     let accounts = BurnCheckedAccounts {
-                        remaining,
-                        account,
-                        mint,
-                        authority,
+                        remaining: vec![],
+                        account: account.clone(),
+                        mint: mint.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::BurnChecked { accounts, args });
                 }
@@ -4670,28 +4700,33 @@ impl Instruction {
                                 format!("Failed to deserialize {}: {}", stringify!(owner), e)
                             })?;
                     let args = InitializeAccount2Arguments { owner };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let account = keys.next().unwrap().clone();
-                    let mint = keys.next().unwrap().clone();
-                    let rent = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let account = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "account")
+                    })?;
+                    let mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "mint")
+                    })?;
+                    let rent = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "rent")
+                    })?;
                     let accounts = InitializeAccount2Accounts {
-                        remaining,
-                        account,
-                        mint,
-                        rent,
+                        remaining: vec![],
+                        account: account.clone(),
+                        mint: mint.clone(),
+                        rent: rent.clone(),
                     };
                     return Ok(Instruction::InitializeAccount2 { accounts, args });
                 }
                 [17u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = SyncNativeArguments {};
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let account = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = SyncNativeAccounts { remaining, account };
+                    let account = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "account")
+                    })?;
+                    let accounts = SyncNativeAccounts {
+                        remaining: vec![],
+                        account: account.clone(),
+                    };
                     return Ok(Instruction::SyncNative { accounts, args });
                 }
                 [18u8] => {
@@ -4702,15 +4737,16 @@ impl Instruction {
                                 format!("Failed to deserialize {}: {}", stringify!(owner), e)
                             })?;
                     let args = InitializeAccount3Arguments { owner };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let account = keys.next().unwrap().clone();
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let account = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "account")
+                    })?;
+                    let mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "mint")
+                    })?;
                     let accounts = InitializeAccount3Accounts {
-                        remaining,
-                        account,
-                        mint,
+                        remaining: vec![],
+                        account: account.clone(),
+                        mint: mint.clone(),
                     };
                     return Ok(Instruction::InitializeAccount3 { accounts, args });
                 }
@@ -4719,13 +4755,12 @@ impl Instruction {
                     let m: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                         .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(m), e))?;
                     let args = InitializeMultisig2Arguments { m };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let multisig = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let multisig = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "multisig")
+                    })?;
                     let accounts = InitializeMultisig2Accounts {
-                        remaining,
-                        multisig,
+                        remaining: vec![],
+                        multisig: multisig.clone(),
                     };
                     return Ok(Instruction::InitializeMultisig2 { accounts, args });
                 }
@@ -4758,31 +4793,37 @@ impl Instruction {
                         mint_authority,
                         freeze_authority,
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = InitializeMint2Accounts { remaining, mint };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = InitializeMint2Accounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::InitializeMint2 { accounts, args });
                 }
                 [21u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = GetAccountDataSizeArguments {};
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = GetAccountDataSizeAccounts { remaining, mint };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = GetAccountDataSizeAccounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::GetAccountDataSize { accounts, args });
                 }
                 [22u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = InitializeImmutableOwnerArguments {};
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let account = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = InitializeImmutableOwnerAccounts { remaining, account };
+                    let account = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "account")
+                    })?;
+                    let accounts = InitializeImmutableOwnerAccounts {
+                        remaining: vec![],
+                        account: account.clone(),
+                    };
                     return Ok(Instruction::InitializeImmutableOwner { accounts, args });
                 }
                 [23u8] => {
@@ -4792,11 +4833,13 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(amount), e)
                         })?;
                     let args = AmountToUiAmountArguments { amount };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = AmountToUiAmountAccounts { remaining, mint };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = AmountToUiAmountAccounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::AmountToUiAmount { accounts, args });
                 }
                 [24u8] => {
@@ -4806,11 +4849,13 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(ui_amount), e)
                         })?;
                     let args = UiAmountToAmountArguments { ui_amount };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = UiAmountToAmountAccounts { remaining, mint };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = UiAmountToAmountAccounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::UiAmountToAmount { accounts, args });
                 }
                 [25u8] => {
@@ -4825,11 +4870,13 @@ impl Instruction {
                                 )
                             })?;
                     let args = InitializeMintCloseAuthorityArguments { close_authority };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = InitializeMintCloseAuthorityAccounts { remaining, mint };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = InitializeMintCloseAuthorityAccounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::InitializeMintCloseAuthority { accounts, args });
                 }
                 [26u8, 0u8] => {
@@ -4869,12 +4916,15 @@ impl Instruction {
                         withdraw_withheld_authority,
                         transfer_fee_basis_points,
                         maximum_fee,
+                        extension_type: "initializeTransferFeeConfig".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = InitializeTransferFeeConfigAccounts { remaining, mint };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = InitializeTransferFeeConfigAccounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::InitializeTransferFeeConfig { accounts, args });
                 }
                 [26u8, 1u8] => {
@@ -4893,37 +4943,52 @@ impl Instruction {
                         amount,
                         decimals,
                         fee,
+                        extension_type: "transferCheckedWithFee".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(4usize);
-                    let source = keys.next().unwrap().clone();
-                    let mint = keys.next().unwrap().clone();
-                    let destination = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let source = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "source")
+                    })?;
+                    let mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "mint")
+                    })?;
+                    let destination = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "destination")
+                    })?;
+                    let authority = account_keys.get(3usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 3usize, "authority")
+                    })?;
                     let accounts = TransferCheckedWithFeeAccounts {
-                        remaining,
-                        source,
-                        mint,
-                        destination,
-                        authority,
+                        remaining: vec![],
+                        source: source.clone(),
+                        mint: mint.clone(),
+                        destination: destination.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::TransferCheckedWithFee { accounts, args });
                 }
                 [26u8, 2u8] => {
                     let mut rdr: &[u8] = rest;
-                    let args = WithdrawWithheldTokensFromMintArguments {};
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let mint = keys.next().unwrap().clone();
-                    let fee_receiver = keys.next().unwrap().clone();
-                    let withdraw_withheld_authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let args = WithdrawWithheldTokensFromMintArguments {
+                        extension_type: "withdrawWithheldTokensFromMint".to_string(),
+                    };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let fee_receiver = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "feeReceiver")
+                    })?;
+                    let withdraw_withheld_authority =
+                        account_keys.get(2usize).ok_or_else(|| {
+                            format!(
+                                "Missing account at index {}: {}",
+                                2usize, "withdrawWithheldAuthority"
+                            )
+                        })?;
                     let accounts = WithdrawWithheldTokensFromMintAccounts {
-                        remaining,
-                        mint,
-                        fee_receiver,
-                        withdraw_withheld_authority,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        fee_receiver: fee_receiver.clone(),
+                        withdraw_withheld_authority: withdraw_withheld_authority.clone(),
                     };
                     return Ok(Instruction::WithdrawWithheldTokensFromMint { accounts, args });
                 }
@@ -4937,29 +5002,43 @@ impl Instruction {
                                 e
                             )
                         })?;
-                    let args = WithdrawWithheldTokensFromAccountsArguments { num_token_accounts };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let mint = keys.next().unwrap().clone();
-                    let fee_receiver = keys.next().unwrap().clone();
-                    let withdraw_withheld_authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let args = WithdrawWithheldTokensFromAccountsArguments {
+                        num_token_accounts,
+                        extension_type: "withdrawWithheldTokensFromAccounts".to_string(),
+                    };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let fee_receiver = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "feeReceiver")
+                    })?;
+                    let withdraw_withheld_authority =
+                        account_keys.get(2usize).ok_or_else(|| {
+                            format!(
+                                "Missing account at index {}: {}",
+                                2usize, "withdrawWithheldAuthority"
+                            )
+                        })?;
                     let accounts = WithdrawWithheldTokensFromAccountsAccounts {
-                        remaining,
-                        mint,
-                        fee_receiver,
-                        withdraw_withheld_authority,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        fee_receiver: fee_receiver.clone(),
+                        withdraw_withheld_authority: withdraw_withheld_authority.clone(),
                     };
                     return Ok(Instruction::WithdrawWithheldTokensFromAccounts { accounts, args });
                 }
                 [26u8, 4u8] => {
                     let mut rdr: &[u8] = rest;
-                    let args = HarvestWithheldTokensToMintArguments {};
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = HarvestWithheldTokensToMintAccounts { remaining, mint };
+                    let args = HarvestWithheldTokensToMintArguments {
+                        extension_type: "harvestWithheldTokensToMint".to_string(),
+                    };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = HarvestWithheldTokensToMintAccounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::HarvestWithheldTokensToMint { accounts, args });
                 }
                 [26u8, 5u8] => {
@@ -4979,41 +5058,39 @@ impl Instruction {
                     let args = SetTransferFeeArguments {
                         transfer_fee_basis_points,
                         maximum_fee,
+                        extension_type: "setTransferFee".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let mint = keys.next().unwrap().clone();
-                    let transfer_fee_config_authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let transfer_fee_config_authority =
+                        account_keys.get(1usize).ok_or_else(|| {
+                            format!(
+                                "Missing account at index {}: {}",
+                                1usize, "transferFeeConfigAuthority"
+                            )
+                        })?;
                     let accounts = SetTransferFeeAccounts {
-                        remaining,
-                        mint,
-                        transfer_fee_config_authority,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        transfer_fee_config_authority: transfer_fee_config_authority.clone(),
                     };
                     return Ok(Instruction::SetTransferFee { accounts, args });
                 }
                 [27u8, 0u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_discriminator),
-                                e
-                            )
-                        })?;
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(authority),
                             e
                         )
                     })?;
-                    let authority: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let authority = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
                     let auto_approve_new_accounts: bool =
                         <bool as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(
@@ -5025,43 +5102,36 @@ impl Instruction {
                                 )
                             },
                         )?;
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(auditor_elgamal_pubkey),
                             e
                         )
                     })?;
-                    let auditor_elgamal_pubkey: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32]
-                    {
+                    let auditor_elgamal_pubkey = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
                     let args = InitializeConfidentialTransferMintArguments {
-                        confidential_transfer_discriminator,
                         authority,
                         auto_approve_new_accounts,
                         auditor_elgamal_pubkey,
+                        extension_type: "initializeConfidentialTransferMint".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = InitializeConfidentialTransferMintAccounts { remaining, mint };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = InitializeConfidentialTransferMintAccounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::InitializeConfidentialTransferMint { accounts, args });
                 }
                 [27u8, 1u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_discriminator),
-                                e
-                            )
-                        })?;
                     let auto_approve_new_accounts: bool =
                         <bool as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(
                             |e| {
@@ -5072,47 +5142,39 @@ impl Instruction {
                                 )
                             },
                         )?;
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(auditor_elgamal_pubkey),
                             e
                         )
                     })?;
-                    let auditor_elgamal_pubkey: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32]
-                    {
+                    let auditor_elgamal_pubkey = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
                     let args = UpdateConfidentialTransferMintArguments {
-                        confidential_transfer_discriminator,
                         auto_approve_new_accounts,
                         auditor_elgamal_pubkey,
+                        extension_type: "updateConfidentialTransferMint".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let mint = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "authority")
+                    })?;
                     let accounts = UpdateConfidentialTransferMintAccounts {
-                        remaining,
-                        mint,
-                        authority,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::UpdateConfidentialTransferMint { accounts, args });
                 }
                 [27u8, 2u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_discriminator),
-                                e
-                            )
-                        })?;
                     let decryptable_zero_balance: DecryptableBalance =
                         <DecryptableBalance as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                             .map_err(|e| {
@@ -5139,31 +5201,38 @@ impl Instruction {
                             )
                         })?;
                     let args = ConfigureConfidentialTransferAccountArguments {
-                        confidential_transfer_discriminator,
                         decryptable_zero_balance,
                         maximum_pending_balance_credit_counter,
                         proof_instruction_offset,
+                        extension_type: "configureConfidentialTransferAccount".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(4usize);
-                    let token = keys.next().unwrap().clone();
-                    let mint = keys.next().unwrap().clone();
-                    let instructions_sysvar_or_context_state = keys.next().unwrap().clone();
-                    let record = if opt_budget > 0 {
-                        opt_budget -= 1;
-                        Some(keys.next().unwrap().clone())
-                    } else {
-                        None
-                    };
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let token = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "token")
+                    })?;
+                    let mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "mint")
+                    })?;
+                    let instructions_sysvar_or_context_state =
+                        account_keys.get(2usize).ok_or_else(|| {
+                            format!(
+                                "Missing account at index {}: {}",
+                                2usize, "instructionsSysvarOrContextState"
+                            )
+                        })?;
+                    let record = account_keys.get(3usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 3usize, "record")
+                    })?;
+                    let authority = account_keys.get(4usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 4usize, "authority")
+                    })?;
                     let accounts = ConfigureConfidentialTransferAccountAccounts {
-                        remaining,
-                        token,
-                        mint,
-                        instructions_sysvar_or_context_state,
-                        record,
-                        authority,
+                        remaining: vec![],
+                        token: token.clone(),
+                        mint: mint.clone(),
+                        instructions_sysvar_or_context_state: instructions_sysvar_or_context_state
+                            .clone(),
+                        record: Some(record.clone()),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::ConfigureConfidentialTransferAccount {
                         accounts,
@@ -5172,41 +5241,28 @@ impl Instruction {
                 }
                 [27u8, 3u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_discriminator),
-                                e
-                            )
-                        })?;
                     let args = ApproveConfidentialTransferAccountArguments {
-                        confidential_transfer_discriminator,
+                        extension_type: "approveConfidentialTransferAccount".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let token = keys.next().unwrap().clone();
-                    let mint = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let token = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "token")
+                    })?;
+                    let mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "mint")
+                    })?;
+                    let authority = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "authority")
+                    })?;
                     let accounts = ApproveConfidentialTransferAccountAccounts {
-                        remaining,
-                        token,
-                        mint,
-                        authority,
+                        remaining: vec![],
+                        token: token.clone(),
+                        mint: mint.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::ApproveConfidentialTransferAccount { accounts, args });
                 }
                 [27u8, 4u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_discriminator),
-                                e
-                            )
-                        })?;
                     let proof_instruction_offset: i8 =
                         <i8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
                             format!(
@@ -5216,40 +5272,37 @@ impl Instruction {
                             )
                         })?;
                     let args = EmptyConfidentialTransferAccountArguments {
-                        confidential_transfer_discriminator,
                         proof_instruction_offset,
+                        extension_type: "emptyConfidentialTransferAccount".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let token = keys.next().unwrap().clone();
-                    let instructions_sysvar_or_context_state = keys.next().unwrap().clone();
-                    let record = if opt_budget > 0 {
-                        opt_budget -= 1;
-                        Some(keys.next().unwrap().clone())
-                    } else {
-                        None
-                    };
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let token = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "token")
+                    })?;
+                    let instructions_sysvar_or_context_state =
+                        account_keys.get(1usize).ok_or_else(|| {
+                            format!(
+                                "Missing account at index {}: {}",
+                                1usize, "instructionsSysvarOrContextState"
+                            )
+                        })?;
+                    let record = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "record")
+                    })?;
+                    let authority = account_keys.get(3usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 3usize, "authority")
+                    })?;
                     let accounts = EmptyConfidentialTransferAccountAccounts {
-                        remaining,
-                        token,
-                        instructions_sysvar_or_context_state,
-                        record,
-                        authority,
+                        remaining: vec![],
+                        token: token.clone(),
+                        instructions_sysvar_or_context_state: instructions_sysvar_or_context_state
+                            .clone(),
+                        record: Some(record.clone()),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::EmptyConfidentialTransferAccount { accounts, args });
                 }
                 [27u8, 5u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_discriminator),
-                                e
-                            )
-                        })?;
                     let amount: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                         .map_err(|e| {
                             format!("Failed to deserialize {}: {}", stringify!(amount), e)
@@ -5259,34 +5312,29 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(decimals), e)
                         })?;
                     let args = ConfidentialDepositArguments {
-                        confidential_transfer_discriminator,
                         amount,
                         decimals,
+                        extension_type: "confidentialDeposit".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let token = keys.next().unwrap().clone();
-                    let mint = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let token = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "token")
+                    })?;
+                    let mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "mint")
+                    })?;
+                    let authority = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "authority")
+                    })?;
                     let accounts = ConfidentialDepositAccounts {
-                        remaining,
-                        token,
-                        mint,
-                        authority,
+                        remaining: vec![],
+                        token: token.clone(),
+                        mint: mint.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::ConfidentialDeposit { accounts, args });
                 }
                 [27u8, 6u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_discriminator),
-                                e
-                            )
-                        })?;
                     let amount: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                         .map_err(|e| {
                             format!("Failed to deserialize {}: {}", stringify!(amount), e)
@@ -5321,58 +5369,47 @@ impl Instruction {
                             )
                         })?;
                     let args = ConfidentialWithdrawArguments {
-                        confidential_transfer_discriminator,
                         amount,
                         decimals,
                         new_decryptable_available_balance,
                         equality_proof_instruction_offset,
                         range_proof_instruction_offset,
+                        extension_type: "confidentialWithdraw".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let token = keys.next().unwrap().clone();
-                    let mint = keys.next().unwrap().clone();
-                    let instructions_sysvar = if opt_budget > 0 {
-                        opt_budget -= 1;
-                        Some(keys.next().unwrap().clone())
-                    } else {
-                        None
-                    };
-                    let equality_record = if opt_budget > 0 {
-                        opt_budget -= 1;
-                        Some(keys.next().unwrap().clone())
-                    } else {
-                        None
-                    };
-                    let range_record = if opt_budget > 0 {
-                        opt_budget -= 1;
-                        Some(keys.next().unwrap().clone())
-                    } else {
-                        None
-                    };
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let token = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "token")
+                    })?;
+                    let mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "mint")
+                    })?;
+                    let instructions_sysvar = account_keys.get(2usize).ok_or_else(|| {
+                        format!(
+                            "Missing account at index {}: {}",
+                            2usize, "instructionsSysvar"
+                        )
+                    })?;
+                    let equality_record = account_keys.get(3usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 3usize, "equalityRecord")
+                    })?;
+                    let range_record = account_keys.get(4usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 4usize, "rangeRecord")
+                    })?;
+                    let authority = account_keys.get(5usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 5usize, "authority")
+                    })?;
                     let accounts = ConfidentialWithdrawAccounts {
-                        remaining,
-                        token,
-                        mint,
-                        instructions_sysvar,
-                        equality_record,
-                        range_record,
-                        authority,
+                        remaining: vec![],
+                        token: token.clone(),
+                        mint: mint.clone(),
+                        instructions_sysvar: Some(instructions_sysvar.clone()),
+                        equality_record: Some(equality_record.clone()),
+                        range_record: Some(range_record.clone()),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::ConfidentialWithdraw { accounts, args });
                 }
                 [27u8, 7u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_discriminator),
-                                e
-                            )
-                        })?;
                     let new_source_decryptable_available_balance: DecryptableBalance =
                         <DecryptableBalance as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                             .map_err(|e| {
@@ -5407,66 +5444,60 @@ impl Instruction {
                             )
                         })?;
                     let args = ConfidentialTransferArguments {
-                        confidential_transfer_discriminator,
                         new_source_decryptable_available_balance,
                         equality_proof_instruction_offset,
                         ciphertext_validity_proof_instruction_offset,
                         range_proof_instruction_offset,
+                        extension_type: "confidentialTransfer".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(4usize);
-                    let source_token = keys.next().unwrap().clone();
-                    let mint = keys.next().unwrap().clone();
-                    let destination_token = keys.next().unwrap().clone();
-                    let instructions_sysvar = if opt_budget > 0 {
-                        opt_budget -= 1;
-                        Some(keys.next().unwrap().clone())
-                    } else {
-                        None
-                    };
-                    let equality_record = if opt_budget > 0 {
-                        opt_budget -= 1;
-                        Some(keys.next().unwrap().clone())
-                    } else {
-                        None
-                    };
-                    let ciphertext_validity_record = if opt_budget > 0 {
-                        opt_budget -= 1;
-                        Some(keys.next().unwrap().clone())
-                    } else {
-                        None
-                    };
-                    let range_record = if opt_budget > 0 {
-                        opt_budget -= 1;
-                        Some(keys.next().unwrap().clone())
-                    } else {
-                        None
-                    };
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let source_token = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "sourceToken")
+                    })?;
+                    let mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "mint")
+                    })?;
+                    let destination_token = account_keys.get(2usize).ok_or_else(|| {
+                        format!(
+                            "Missing account at index {}: {}",
+                            2usize, "destinationToken"
+                        )
+                    })?;
+                    let instructions_sysvar = account_keys.get(3usize).ok_or_else(|| {
+                        format!(
+                            "Missing account at index {}: {}",
+                            3usize, "instructionsSysvar"
+                        )
+                    })?;
+                    let equality_record = account_keys.get(4usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 4usize, "equalityRecord")
+                    })?;
+                    let ciphertext_validity_record = account_keys.get(5usize).ok_or_else(|| {
+                        format!(
+                            "Missing account at index {}: {}",
+                            5usize, "ciphertextValidityRecord"
+                        )
+                    })?;
+                    let range_record = account_keys.get(6usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 6usize, "rangeRecord")
+                    })?;
+                    let authority = account_keys.get(7usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 7usize, "authority")
+                    })?;
                     let accounts = ConfidentialTransferAccounts {
-                        remaining,
-                        source_token,
-                        mint,
-                        destination_token,
-                        instructions_sysvar,
-                        equality_record,
-                        ciphertext_validity_record,
-                        range_record,
-                        authority,
+                        remaining: vec![],
+                        source_token: source_token.clone(),
+                        mint: mint.clone(),
+                        destination_token: destination_token.clone(),
+                        instructions_sysvar: Some(instructions_sysvar.clone()),
+                        equality_record: Some(equality_record.clone()),
+                        ciphertext_validity_record: Some(ciphertext_validity_record.clone()),
+                        range_record: Some(range_record.clone()),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::ConfidentialTransfer { accounts, args });
                 }
                 [27u8, 8u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_discriminator),
-                                e
-                            )
-                        })?;
                     let expected_pending_balance_credit_counter: u64 =
                         <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
                             format!(
@@ -5485,132 +5516,97 @@ impl Instruction {
                                 )
                             })?;
                     let args = ApplyConfidentialPendingBalanceArguments {
-                        confidential_transfer_discriminator,
                         expected_pending_balance_credit_counter,
                         new_decryptable_available_balance,
+                        extension_type: "applyConfidentialPendingBalance".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let token = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let token = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "token")
+                    })?;
+                    let authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "authority")
+                    })?;
                     let accounts = ApplyConfidentialPendingBalanceAccounts {
-                        remaining,
-                        token,
-                        authority,
+                        remaining: vec![],
+                        token: token.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::ApplyConfidentialPendingBalance { accounts, args });
                 }
                 [27u8, 9u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_discriminator),
-                                e
-                            )
-                        })?;
                     let args = EnableConfidentialCreditsArguments {
-                        confidential_transfer_discriminator,
+                        extension_type: "enableConfidentialCredits".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let token = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let token = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "token")
+                    })?;
+                    let authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "authority")
+                    })?;
                     let accounts = EnableConfidentialCreditsAccounts {
-                        remaining,
-                        token,
-                        authority,
+                        remaining: vec![],
+                        token: token.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::EnableConfidentialCredits { accounts, args });
                 }
                 [27u8, 10u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_discriminator),
-                                e
-                            )
-                        })?;
                     let args = DisableConfidentialCreditsArguments {
-                        confidential_transfer_discriminator,
+                        extension_type: "disableConfidentialCredits".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let token = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let token = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "token")
+                    })?;
+                    let authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "authority")
+                    })?;
                     let accounts = DisableConfidentialCreditsAccounts {
-                        remaining,
-                        token,
-                        authority,
+                        remaining: vec![],
+                        token: token.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::DisableConfidentialCredits { accounts, args });
                 }
                 [27u8, 11u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_discriminator),
-                                e
-                            )
-                        })?;
                     let args = EnableNonConfidentialCreditsArguments {
-                        confidential_transfer_discriminator,
+                        extension_type: "enableNonConfidentialCredits".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let token = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let token = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "token")
+                    })?;
+                    let authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "authority")
+                    })?;
                     let accounts = EnableNonConfidentialCreditsAccounts {
-                        remaining,
-                        token,
-                        authority,
+                        remaining: vec![],
+                        token: token.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::EnableNonConfidentialCredits { accounts, args });
                 }
                 [27u8, 12u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_discriminator),
-                                e
-                            )
-                        })?;
                     let args = DisableNonConfidentialCreditsArguments {
-                        confidential_transfer_discriminator,
+                        extension_type: "disableNonConfidentialCredits".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let token = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let token = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "token")
+                    })?;
+                    let authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "authority")
+                    })?;
                     let accounts = DisableNonConfidentialCreditsAccounts {
-                        remaining,
-                        token,
-                        authority,
+                        remaining: vec![],
+                        token: token.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::DisableNonConfidentialCredits { accounts, args });
                 }
                 [27u8, 13u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_discriminator),
-                                e
-                            )
-                        })?;
                     let new_source_decryptable_available_balance: DecryptableBalance =
                         <DecryptableBalance as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                             .map_err(|e| {
@@ -5663,126 +5659,118 @@ impl Instruction {
                             )
                         })?;
                     let args = ConfidentialTransferWithFeeArguments {
-                        confidential_transfer_discriminator,
                         new_source_decryptable_available_balance,
                         equality_proof_instruction_offset,
                         transfer_amount_ciphertext_validity_proof_instruction_offset,
                         fee_sigma_proof_instruction_offset,
                         fee_ciphertext_validity_proof_instruction_offset,
                         range_proof_instruction_offset,
+                        extension_type: "confidentialTransferWithFee".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(4usize);
-                    let source_token = keys.next().unwrap().clone();
-                    let mint = keys.next().unwrap().clone();
-                    let destination_token = keys.next().unwrap().clone();
-                    let instructions_sysvar = if opt_budget > 0 {
-                        opt_budget -= 1;
-                        Some(keys.next().unwrap().clone())
-                    } else {
-                        None
-                    };
-                    let equality_record = if opt_budget > 0 {
-                        opt_budget -= 1;
-                        Some(keys.next().unwrap().clone())
-                    } else {
-                        None
-                    };
-                    let transfer_amount_ciphertext_validity_record = if opt_budget > 0 {
-                        opt_budget -= 1;
-                        Some(keys.next().unwrap().clone())
-                    } else {
-                        None
-                    };
-                    let fee_sigma_record = if opt_budget > 0 {
-                        opt_budget -= 1;
-                        Some(keys.next().unwrap().clone())
-                    } else {
-                        None
-                    };
-                    let fee_ciphertext_validity_record = if opt_budget > 0 {
-                        opt_budget -= 1;
-                        Some(keys.next().unwrap().clone())
-                    } else {
-                        None
-                    };
-                    let range_record = if opt_budget > 0 {
-                        opt_budget -= 1;
-                        Some(keys.next().unwrap().clone())
-                    } else {
-                        None
-                    };
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let source_token = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "sourceToken")
+                    })?;
+                    let mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "mint")
+                    })?;
+                    let destination_token = account_keys.get(2usize).ok_or_else(|| {
+                        format!(
+                            "Missing account at index {}: {}",
+                            2usize, "destinationToken"
+                        )
+                    })?;
+                    let instructions_sysvar = account_keys.get(3usize).ok_or_else(|| {
+                        format!(
+                            "Missing account at index {}: {}",
+                            3usize, "instructionsSysvar"
+                        )
+                    })?;
+                    let equality_record = account_keys.get(4usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 4usize, "equalityRecord")
+                    })?;
+                    let transfer_amount_ciphertext_validity_record =
+                        account_keys.get(5usize).ok_or_else(|| {
+                            format!(
+                                "Missing account at index {}: {}",
+                                5usize, "transferAmountCiphertextValidityRecord"
+                            )
+                        })?;
+                    let fee_sigma_record = account_keys.get(6usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 6usize, "feeSigmaRecord")
+                    })?;
+                    let fee_ciphertext_validity_record =
+                        account_keys.get(7usize).ok_or_else(|| {
+                            format!(
+                                "Missing account at index {}: {}",
+                                7usize, "feeCiphertextValidityRecord"
+                            )
+                        })?;
+                    let range_record = account_keys.get(8usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 8usize, "rangeRecord")
+                    })?;
+                    let authority = account_keys.get(9usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 9usize, "authority")
+                    })?;
                     let accounts = ConfidentialTransferWithFeeAccounts {
-                        remaining,
-                        source_token,
-                        mint,
-                        destination_token,
-                        instructions_sysvar,
-                        equality_record,
-                        transfer_amount_ciphertext_validity_record,
-                        fee_sigma_record,
-                        fee_ciphertext_validity_record,
-                        range_record,
-                        authority,
+                        remaining: vec![],
+                        source_token: source_token.clone(),
+                        mint: mint.clone(),
+                        destination_token: destination_token.clone(),
+                        instructions_sysvar: Some(instructions_sysvar.clone()),
+                        equality_record: Some(equality_record.clone()),
+                        transfer_amount_ciphertext_validity_record: Some(
+                            transfer_amount_ciphertext_validity_record.clone(),
+                        ),
+                        fee_sigma_record: Some(fee_sigma_record.clone()),
+                        fee_ciphertext_validity_record: Some(
+                            fee_ciphertext_validity_record.clone(),
+                        ),
+                        range_record: Some(range_record.clone()),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::ConfidentialTransferWithFee { accounts, args });
                 }
                 [28u8, 0u8] => {
                     let mut rdr: &[u8] = rest;
-                    let default_account_state_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(default_account_state_discriminator),
-                                e
-                            )
-                        })?;
                     let state: AccountState =
                         <AccountState as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                             .map_err(|e| {
                                 format!("Failed to deserialize {}: {}", stringify!(state), e)
                             })?;
                     let args = InitializeDefaultAccountStateArguments {
-                        default_account_state_discriminator,
                         state,
+                        extension_type: "initializeDefaultAccountState".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = InitializeDefaultAccountStateAccounts { remaining, mint };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = InitializeDefaultAccountStateAccounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::InitializeDefaultAccountState { accounts, args });
                 }
                 [28u8, 1u8] => {
                     let mut rdr: &[u8] = rest;
-                    let default_account_state_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(default_account_state_discriminator),
-                                e
-                            )
-                        })?;
                     let state: AccountState =
                         <AccountState as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                             .map_err(|e| {
                                 format!("Failed to deserialize {}: {}", stringify!(state), e)
                             })?;
                     let args = UpdateDefaultAccountStateArguments {
-                        default_account_state_discriminator,
                         state,
+                        extension_type: "updateDefaultAccountState".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let mint = keys.next().unwrap().clone();
-                    let freeze_authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let freeze_authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "freezeAuthority")
+                    })?;
                     let accounts = UpdateDefaultAccountStateAccounts {
-                        remaining,
-                        mint,
-                        freeze_authority,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        freeze_authority: freeze_authority.clone(),
                     };
                     return Ok(Instruction::UpdateDefaultAccountState { accounts, args });
                 }
@@ -5799,215 +5787,184 @@ impl Instruction {
                     let args = ReallocateArguments {
                         new_extension_types,
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(4usize);
-                    let token = keys.next().unwrap().clone();
-                    let payer = keys.next().unwrap().clone();
-                    let system_program = keys.next().unwrap().clone();
-                    let owner = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let token = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "token")
+                    })?;
+                    let payer = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "payer")
+                    })?;
+                    let system_program = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "systemProgram")
+                    })?;
+                    let owner = account_keys.get(3usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 3usize, "owner")
+                    })?;
                     let accounts = ReallocateAccounts {
-                        remaining,
-                        token,
-                        payer,
-                        system_program,
-                        owner,
+                        remaining: vec![],
+                        token: token.clone(),
+                        payer: payer.clone(),
+                        system_program: system_program.clone(),
+                        owner: owner.clone(),
                     };
                     return Ok(Instruction::Reallocate { accounts, args });
                 }
                 [30u8, 0u8] => {
                     let mut rdr: &[u8] = rest;
-                    let memo_transfers_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(memo_transfers_discriminator),
-                                e
-                            )
-                        })?;
                     let args = EnableMemoTransfersArguments {
-                        memo_transfers_discriminator,
+                        extension_type: "enableMemoTransfers".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let token = keys.next().unwrap().clone();
-                    let owner = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let token = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "token")
+                    })?;
+                    let owner = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "owner")
+                    })?;
                     let accounts = EnableMemoTransfersAccounts {
-                        remaining,
-                        token,
-                        owner,
+                        remaining: vec![],
+                        token: token.clone(),
+                        owner: owner.clone(),
                     };
                     return Ok(Instruction::EnableMemoTransfers { accounts, args });
                 }
                 [30u8, 1u8] => {
                     let mut rdr: &[u8] = rest;
-                    let memo_transfers_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(memo_transfers_discriminator),
-                                e
-                            )
-                        })?;
                     let args = DisableMemoTransfersArguments {
-                        memo_transfers_discriminator,
+                        extension_type: "disableMemoTransfers".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let token = keys.next().unwrap().clone();
-                    let owner = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let token = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "token")
+                    })?;
+                    let owner = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "owner")
+                    })?;
                     let accounts = DisableMemoTransfersAccounts {
-                        remaining,
-                        token,
-                        owner,
+                        remaining: vec![],
+                        token: token.clone(),
+                        owner: owner.clone(),
                     };
                     return Ok(Instruction::DisableMemoTransfers { accounts, args });
                 }
                 [31u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = CreateNativeMintArguments {};
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let payer = keys.next().unwrap().clone();
-                    let native_mint = keys.next().unwrap().clone();
-                    let system_program = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let payer = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "payer")
+                    })?;
+                    let native_mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "nativeMint")
+                    })?;
+                    let system_program = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "systemProgram")
+                    })?;
                     let accounts = CreateNativeMintAccounts {
-                        remaining,
-                        payer,
-                        native_mint,
-                        system_program,
+                        remaining: vec![],
+                        payer: payer.clone(),
+                        native_mint: native_mint.clone(),
+                        system_program: system_program.clone(),
                     };
                     return Ok(Instruction::CreateNativeMint { accounts, args });
                 }
                 [32u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = InitializeNonTransferableMintArguments {};
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = InitializeNonTransferableMintAccounts { remaining, mint };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = InitializeNonTransferableMintAccounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::InitializeNonTransferableMint { accounts, args });
                 }
                 [33u8, 0u8] => {
                     let mut rdr: &[u8] = rest;
-                    let interest_bearing_mint_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(interest_bearing_mint_discriminator),
-                                e
-                            )
-                        })?;
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(rate_authority),
                             e
                         )
                     })?;
-                    let rate_authority: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let rate_authority = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
                     let rate: i16 = <i16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                         .map_err(|e| {
                             format!("Failed to deserialize {}: {}", stringify!(rate), e)
                         })?;
                     let args = InitializeInterestBearingMintArguments {
-                        interest_bearing_mint_discriminator,
                         rate_authority,
                         rate,
+                        extension_type: "initializeInterestBearingMint".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = InitializeInterestBearingMintAccounts { remaining, mint };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = InitializeInterestBearingMintAccounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::InitializeInterestBearingMint { accounts, args });
                 }
                 [33u8, 1u8] => {
                     let mut rdr: &[u8] = rest;
-                    let interest_bearing_mint_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(interest_bearing_mint_discriminator),
-                                e
-                            )
-                        })?;
                     let rate: i16 = <i16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                         .map_err(|e| {
                             format!("Failed to deserialize {}: {}", stringify!(rate), e)
                         })?;
                     let args = UpdateRateInterestBearingMintArguments {
-                        interest_bearing_mint_discriminator,
                         rate,
+                        extension_type: "updateRateInterestBearingMint".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let mint = keys.next().unwrap().clone();
-                    let rate_authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let rate_authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "rateAuthority")
+                    })?;
                     let accounts = UpdateRateInterestBearingMintAccounts {
-                        remaining,
-                        mint,
-                        rate_authority,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        rate_authority: rate_authority.clone(),
                     };
                     return Ok(Instruction::UpdateRateInterestBearingMint { accounts, args });
                 }
                 [34u8, 0u8] => {
                     let mut rdr: &[u8] = rest;
-                    let cpi_guard_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(cpi_guard_discriminator),
-                                e
-                            )
-                        })?;
                     let args = EnableCpiGuardArguments {
-                        cpi_guard_discriminator,
+                        extension_type: "enableCpiGuard".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let token = keys.next().unwrap().clone();
-                    let owner = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let token = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "token")
+                    })?;
+                    let owner = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "owner")
+                    })?;
                     let accounts = EnableCpiGuardAccounts {
-                        remaining,
-                        token,
-                        owner,
+                        remaining: vec![],
+                        token: token.clone(),
+                        owner: owner.clone(),
                     };
                     return Ok(Instruction::EnableCpiGuard { accounts, args });
                 }
                 [34u8, 1u8] => {
                     let mut rdr: &[u8] = rest;
-                    let cpi_guard_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(cpi_guard_discriminator),
-                                e
-                            )
-                        })?;
                     let args = DisableCpiGuardArguments {
-                        cpi_guard_discriminator,
+                        extension_type: "disableCpiGuard".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let token = keys.next().unwrap().clone();
-                    let owner = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let token = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "token")
+                    })?;
+                    let owner = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "owner")
+                    })?;
                     let accounts = DisableCpiGuardAccounts {
-                        remaining,
-                        token,
-                        owner,
+                        remaining: vec![],
+                        token: token.clone(),
+                        owner: owner.clone(),
                     };
                     return Ok(Instruction::DisableCpiGuard { accounts, args });
                 }
@@ -6019,139 +5976,133 @@ impl Instruction {
                                 format!("Failed to deserialize {}: {}", stringify!(delegate), e)
                             })?;
                     let args = InitializePermanentDelegateArguments { delegate };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = InitializePermanentDelegateAccounts { remaining, mint };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = InitializePermanentDelegateAccounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::InitializePermanentDelegate { accounts, args });
                 }
                 [36u8, 0u8] => {
                     let mut rdr: &[u8] = rest;
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(authority),
                             e
                         )
                     })?;
-                    let authority: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let authority = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(program_id),
                             e
                         )
                     })?;
-                    let program_id: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let program_id = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
                     let args = InitializeTransferHookArguments {
                         authority,
                         program_id,
+                        extension_type: "initializeTransferHook".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = InitializeTransferHookAccounts { remaining, mint };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = InitializeTransferHookAccounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::InitializeTransferHook { accounts, args });
                 }
                 [36u8, 1u8] => {
                     let mut rdr: &[u8] = rest;
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(program_id),
                             e
                         )
                     })?;
-                    let program_id: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let program_id = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
-                    let args = UpdateTransferHookArguments { program_id };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let mint = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let args = UpdateTransferHookArguments {
+                        program_id,
+                        extension_type: "updateTransferHook".to_string(),
+                    };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "authority")
+                    })?;
                     let accounts = UpdateTransferHookAccounts {
-                        remaining,
-                        mint,
-                        authority,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::UpdateTransferHook { accounts, args });
                 }
                 [37u8, 0u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_fee_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_fee_discriminator),
-                                e
-                            )
-                        })?;
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(authority),
                             e
                         )
                     })?;
-                    let authority: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let authority = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(withdraw_withheld_authority_el_gamal_pubkey),
                             e
                         )
                     })?;
-                    let withdraw_withheld_authority_el_gamal_pubkey: Option<[u8; 32usize]> =
-                        if pubkey_bytes == [0u8; 32] {
-                            None
-                        } else {
-                            Some(pubkey_bytes)
-                        };
+                    let withdraw_withheld_authority_el_gamal_pubkey = if bytes == [0u8; 32] {
+                        None
+                    } else {
+                        Some(bytes)
+                    };
                     let args = InitializeConfidentialTransferFeeArguments {
-                        confidential_transfer_fee_discriminator,
                         authority,
                         withdraw_withheld_authority_el_gamal_pubkey,
+                        extension_type: "initializeConfidentialTransferFee".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = InitializeConfidentialTransferFeeAccounts { remaining, mint };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = InitializeConfidentialTransferFeeAccounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::InitializeConfidentialTransferFee { accounts, args });
                 }
                 [37u8, 1u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_fee_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_fee_discriminator),
-                                e
-                            )
-                        })?;
                     let proof_instruction_offset: i8 =
                         <i8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
                             format!(
@@ -6170,31 +6121,39 @@ impl Instruction {
                                 )
                             })?;
                     let args = WithdrawWithheldTokensFromMintForConfidentialTransferFeeArguments {
-                        confidential_transfer_fee_discriminator,
                         proof_instruction_offset,
                         new_decryptable_available_balance,
+                        extension_type: "withdrawWithheldTokensFromMintForConfidentialTransferFee"
+                            .to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(4usize);
-                    let mint = keys.next().unwrap().clone();
-                    let destination = keys.next().unwrap().clone();
-                    let instructions_sysvar_or_context_state = keys.next().unwrap().clone();
-                    let record = if opt_budget > 0 {
-                        opt_budget -= 1;
-                        Some(keys.next().unwrap().clone())
-                    } else {
-                        None
-                    };
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let destination = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "destination")
+                    })?;
+                    let instructions_sysvar_or_context_state =
+                        account_keys.get(2usize).ok_or_else(|| {
+                            format!(
+                                "Missing account at index {}: {}",
+                                2usize, "instructionsSysvarOrContextState"
+                            )
+                        })?;
+                    let record = account_keys.get(3usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 3usize, "record")
+                    })?;
+                    let authority = account_keys.get(4usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 4usize, "authority")
+                    })?;
                     let accounts =
                         WithdrawWithheldTokensFromMintForConfidentialTransferFeeAccounts {
-                            remaining,
-                            mint,
-                            destination,
-                            instructions_sysvar_or_context_state,
-                            record,
-                            authority,
+                            remaining: vec![],
+                            mint: mint.clone(),
+                            destination: destination.clone(),
+                            instructions_sysvar_or_context_state:
+                                instructions_sysvar_or_context_state.clone(),
+                            record: Some(record.clone()),
+                            authority: authority.clone(),
                         };
                     return Ok(
                         Instruction::WithdrawWithheldTokensFromMintForConfidentialTransferFee {
@@ -6205,14 +6164,6 @@ impl Instruction {
                 }
                 [37u8, 2u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_fee_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_fee_discriminator),
-                                e
-                            )
-                        })?;
                     let num_token_accounts: u8 =
                         <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
                             format!(
@@ -6240,32 +6191,41 @@ impl Instruction {
                             })?;
                     let args =
                         WithdrawWithheldTokensFromAccountsForConfidentialTransferFeeArguments {
-                            confidential_transfer_fee_discriminator,
                             num_token_accounts,
                             proof_instruction_offset,
                             new_decryptable_available_balance,
+                            extension_type:
+                                "withdrawWithheldTokensFromAccountsForConfidentialTransferFee"
+                                    .to_string(),
                         };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(4usize);
-                    let mint = keys.next().unwrap().clone();
-                    let destination = keys.next().unwrap().clone();
-                    let instructions_sysvar_or_context_state = keys.next().unwrap().clone();
-                    let record = if opt_budget > 0 {
-                        opt_budget -= 1;
-                        Some(keys.next().unwrap().clone())
-                    } else {
-                        None
-                    };
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let destination = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "destination")
+                    })?;
+                    let instructions_sysvar_or_context_state =
+                        account_keys.get(2usize).ok_or_else(|| {
+                            format!(
+                                "Missing account at index {}: {}",
+                                2usize, "instructionsSysvarOrContextState"
+                            )
+                        })?;
+                    let record = account_keys.get(3usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 3usize, "record")
+                    })?;
+                    let authority = account_keys.get(4usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 4usize, "authority")
+                    })?;
                     let accounts =
                         WithdrawWithheldTokensFromAccountsForConfidentialTransferFeeAccounts {
-                            remaining,
-                            mint,
-                            destination,
-                            instructions_sysvar_or_context_state,
-                            record,
-                            authority,
+                            remaining: vec![],
+                            mint: mint.clone(),
+                            destination: destination.clone(),
+                            instructions_sysvar_or_context_state:
+                                instructions_sysvar_or_context_state.clone(),
+                            record: Some(record.clone()),
+                            authority: authority.clone(),
                         };
                     return Ok(
                         Instruction::WithdrawWithheldTokensFromAccountsForConfidentialTransferFee {
@@ -6276,24 +6236,16 @@ impl Instruction {
                 }
                 [37u8, 3u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_fee_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_fee_discriminator),
-                                e
-                            )
-                        })?;
                     let args = HarvestWithheldTokensToMintForConfidentialTransferFeeArguments {
-                        confidential_transfer_fee_discriminator,
+                        extension_type: "harvestWithheldTokensToMintForConfidentialTransferFee"
+                            .to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
                     let accounts = HarvestWithheldTokensToMintForConfidentialTransferFeeAccounts {
-                        remaining,
-                        mint,
+                        remaining: vec![],
+                        mint: mint.clone(),
                     };
                     return Ok(
                         Instruction::HarvestWithheldTokensToMintForConfidentialTransferFee {
@@ -6304,381 +6256,330 @@ impl Instruction {
                 }
                 [37u8, 4u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_fee_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_fee_discriminator),
-                                e
-                            )
-                        })?;
                     let args = EnableHarvestToMintArguments {
-                        confidential_transfer_fee_discriminator,
+                        extension_type: "enableHarvestToMint".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let mint = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "authority")
+                    })?;
                     let accounts = EnableHarvestToMintAccounts {
-                        remaining,
-                        mint,
-                        authority,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::EnableHarvestToMint { accounts, args });
                 }
                 [37u8, 5u8] => {
                     let mut rdr: &[u8] = rest;
-                    let confidential_transfer_fee_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(confidential_transfer_fee_discriminator),
-                                e
-                            )
-                        })?;
                     let args = DisableHarvestToMintArguments {
-                        confidential_transfer_fee_discriminator,
+                        extension_type: "disableHarvestToMint".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let mint = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "authority")
+                    })?;
                     let accounts = DisableHarvestToMintAccounts {
-                        remaining,
-                        mint,
-                        authority,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::DisableHarvestToMint { accounts, args });
                 }
                 [38u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = WithdrawExcessLamportsArguments {};
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let source_account = keys.next().unwrap().clone();
-                    let destination_account = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let source_account = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "sourceAccount")
+                    })?;
+                    let destination_account = account_keys.get(1usize).ok_or_else(|| {
+                        format!(
+                            "Missing account at index {}: {}",
+                            1usize, "destinationAccount"
+                        )
+                    })?;
+                    let authority = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "authority")
+                    })?;
                     let accounts = WithdrawExcessLamportsAccounts {
-                        remaining,
-                        source_account,
-                        destination_account,
-                        authority,
+                        remaining: vec![],
+                        source_account: source_account.clone(),
+                        destination_account: destination_account.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::WithdrawExcessLamports { accounts, args });
                 }
                 [39u8, 0u8] => {
                     let mut rdr: &[u8] = rest;
-                    let metadata_pointer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(metadata_pointer_discriminator),
-                                e
-                            )
-                        })?;
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(authority),
                             e
                         )
                     })?;
-                    let authority: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let authority = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(metadata_address),
                             e
                         )
                     })?;
-                    let metadata_address: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let metadata_address = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
                     let args = InitializeMetadataPointerArguments {
-                        metadata_pointer_discriminator,
                         authority,
                         metadata_address,
+                        extension_type: "initializeMetadataPointer".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = InitializeMetadataPointerAccounts { remaining, mint };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = InitializeMetadataPointerAccounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::InitializeMetadataPointer { accounts, args });
                 }
                 [39u8, 1u8] => {
                     let mut rdr: &[u8] = rest;
-                    let metadata_pointer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(metadata_pointer_discriminator),
-                                e
-                            )
-                        })?;
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(metadata_address),
                             e
                         )
                     })?;
-                    let metadata_address: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let metadata_address = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
                     let args = UpdateMetadataPointerArguments {
-                        metadata_pointer_discriminator,
                         metadata_address,
+                        extension_type: "updateMetadataPointer".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let mint = keys.next().unwrap().clone();
-                    let metadata_pointer_authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let metadata_pointer_authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!(
+                            "Missing account at index {}: {}",
+                            1usize, "metadataPointerAuthority"
+                        )
+                    })?;
                     let accounts = UpdateMetadataPointerAccounts {
-                        remaining,
-                        mint,
-                        metadata_pointer_authority,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        metadata_pointer_authority: metadata_pointer_authority.clone(),
                     };
                     return Ok(Instruction::UpdateMetadataPointer { accounts, args });
                 }
                 [40u8, 0u8] => {
                     let mut rdr: &[u8] = rest;
-                    let group_pointer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(group_pointer_discriminator),
-                                e
-                            )
-                        })?;
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(authority),
                             e
                         )
                     })?;
-                    let authority: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let authority = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(group_address),
                             e
                         )
                     })?;
-                    let group_address: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let group_address = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
                     let args = InitializeGroupPointerArguments {
-                        group_pointer_discriminator,
                         authority,
                         group_address,
+                        extension_type: "initializeGroupPointer".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = InitializeGroupPointerAccounts { remaining, mint };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = InitializeGroupPointerAccounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::InitializeGroupPointer { accounts, args });
                 }
                 [40u8, 1u8] => {
                     let mut rdr: &[u8] = rest;
-                    let group_pointer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(group_pointer_discriminator),
-                                e
-                            )
-                        })?;
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(group_address),
                             e
                         )
                     })?;
-                    let group_address: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let group_address = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
                     let args = UpdateGroupPointerArguments {
-                        group_pointer_discriminator,
                         group_address,
+                        extension_type: "updateGroupPointer".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let mint = keys.next().unwrap().clone();
-                    let group_pointer_authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let group_pointer_authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!(
+                            "Missing account at index {}: {}",
+                            1usize, "groupPointerAuthority"
+                        )
+                    })?;
                     let accounts = UpdateGroupPointerAccounts {
-                        remaining,
-                        mint,
-                        group_pointer_authority,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        group_pointer_authority: group_pointer_authority.clone(),
                     };
                     return Ok(Instruction::UpdateGroupPointer { accounts, args });
                 }
                 [41u8, 0u8] => {
                     let mut rdr: &[u8] = rest;
-                    let group_member_pointer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(group_member_pointer_discriminator),
-                                e
-                            )
-                        })?;
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(authority),
                             e
                         )
                     })?;
-                    let authority: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let authority = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(member_address),
                             e
                         )
                     })?;
-                    let member_address: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let member_address = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
                     let args = InitializeGroupMemberPointerArguments {
-                        group_member_pointer_discriminator,
                         authority,
                         member_address,
+                        extension_type: "initializeGroupMemberPointer".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = InitializeGroupMemberPointerAccounts { remaining, mint };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = InitializeGroupMemberPointerAccounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::InitializeGroupMemberPointer { accounts, args });
                 }
                 [41u8, 1u8] => {
                     let mut rdr: &[u8] = rest;
-                    let group_member_pointer_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(group_member_pointer_discriminator),
-                                e
-                            )
-                        })?;
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(member_address),
                             e
                         )
                     })?;
-                    let member_address: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let member_address = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
                     let args = UpdateGroupMemberPointerArguments {
-                        group_member_pointer_discriminator,
                         member_address,
+                        extension_type: "updateGroupMemberPointer".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let mint = keys.next().unwrap().clone();
-                    let group_member_pointer_authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let group_member_pointer_authority =
+                        account_keys.get(1usize).ok_or_else(|| {
+                            format!(
+                                "Missing account at index {}: {}",
+                                1usize, "groupMemberPointerAuthority"
+                            )
+                        })?;
                     let accounts = UpdateGroupMemberPointerAccounts {
-                        remaining,
-                        mint,
-                        group_member_pointer_authority,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        group_member_pointer_authority: group_member_pointer_authority.clone(),
                     };
                     return Ok(Instruction::UpdateGroupMemberPointer { accounts, args });
                 }
                 [43u8, 0u8] => {
                     let mut rdr: &[u8] = rest;
-                    let scaled_ui_amount_mint_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(scaled_ui_amount_mint_discriminator),
-                                e
-                            )
-                        })?;
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(authority),
                             e
                         )
                     })?;
-                    let authority: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let authority = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
                     let multiplier: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                         .map_err(|e| {
                         format!("Failed to deserialize {}: {}", stringify!(multiplier), e)
                     })?;
                     let args = InitializeScaledUiAmountMintArguments {
-                        scaled_ui_amount_mint_discriminator,
                         authority,
                         multiplier,
+                        extension_type: "initializeScaledUiAmountMint".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = InitializeScaledUiAmountMintAccounts { remaining, mint };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = InitializeScaledUiAmountMintAccounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::InitializeScaledUiAmountMint { accounts, args });
                 }
                 [43u8, 1u8] => {
                     let mut rdr: &[u8] = rest;
-                    let scaled_ui_amount_mint_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(scaled_ui_amount_mint_discriminator),
-                                e
-                            )
-                        })?;
                     let multiplier: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                         .map_err(|e| {
                         format!("Failed to deserialize {}: {}", stringify!(multiplier), e)
@@ -6692,187 +6593,159 @@ impl Instruction {
                             )
                         })?;
                     let args = UpdateMultiplierScaledUiMintArguments {
-                        scaled_ui_amount_mint_discriminator,
                         multiplier,
                         effective_timestamp,
+                        extension_type: "updateMultiplierScaledUiMint".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let mint = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "authority")
+                    })?;
                     let accounts = UpdateMultiplierScaledUiMintAccounts {
-                        remaining,
-                        mint,
-                        authority,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::UpdateMultiplierScaledUiMint { accounts, args });
                 }
                 [44u8, 0u8] => {
                     let mut rdr: &[u8] = rest;
-                    let pausable_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(pausable_discriminator),
-                                e
-                            )
-                        })?;
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(authority),
                             e
                         )
                     })?;
-                    let authority: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let authority = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
                     let args = InitializePausableConfigArguments {
-                        pausable_discriminator,
                         authority,
+                        extension_type: "initializePausableConfig".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let mint = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
-                    let accounts = InitializePausableConfigAccounts { remaining, mint };
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let accounts = InitializePausableConfigAccounts {
+                        remaining: vec![],
+                        mint: mint.clone(),
+                    };
                     return Ok(Instruction::InitializePausableConfig { accounts, args });
                 }
                 [44u8, 1u8] => {
                     let mut rdr: &[u8] = rest;
-                    let pausable_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(pausable_discriminator),
-                                e
-                            )
-                        })?;
                     let args = PauseArguments {
-                        pausable_discriminator,
+                        extension_type: "pause".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let mint = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "authority")
+                    })?;
                     let accounts = PauseAccounts {
-                        remaining,
-                        mint,
-                        authority,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::Pause { accounts, args });
                 }
                 [44u8, 2u8] => {
                     let mut rdr: &[u8] = rest;
-                    let pausable_discriminator: u8 =
-                        <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(pausable_discriminator),
-                                e
-                            )
-                        })?;
                     let args = ResumeArguments {
-                        pausable_discriminator,
+                        extension_type: "resume".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let mint = keys.next().unwrap().clone();
-                    let authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let mint = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "mint")
+                    })?;
+                    let authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "authority")
+                    })?;
                     let accounts = ResumeAccounts {
-                        remaining,
-                        mint,
-                        authority,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        authority: authority.clone(),
                     };
                     return Ok(Instruction::Resume { accounts, args });
                 }
                 [210u8, 225u8, 30u8, 162u8, 88u8, 184u8, 77u8, 141u8] => {
                     let mut rdr: &[u8] = rest;
-                    let string_len: u32 = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                        .map_err(|e| {
-                            format!(
-                                "Failed to deserialize string length for {}: {}",
-                                stringify!(name),
-                                e
-                            )
+                    let len =
+                        <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
+                            format!("Failed to deserialize {}: {}", stringify!(name), e)
                         })?;
-                    let mut string_bytes = vec![0u8; string_len as usize];
-                    rdr.read_exact(&mut string_bytes).map_err(|e| {
+                    let mut bytes = vec![0u8; len as usize];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
-                            "Failed to read string bytes for {}: {}",
+                            "Failed to read {} bytes for {}: {}",
+                            len,
                             stringify!(name),
                             e
                         )
                     })?;
-                    let name: String = String::from_utf8(string_bytes).map_err(|e| {
-                        format!(
-                            "Failed to parse UTF-8 string for {}: {}",
-                            stringify!(name),
-                            e
-                        )
+                    let name = String::from_utf8(bytes).map_err(|e| {
+                        format!("Failed to convert {} to string: {}", stringify!(name), e)
                     })?;
-                    let string_len: u32 = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                        .map_err(|e| {
-                            format!(
-                                "Failed to deserialize string length for {}: {}",
-                                stringify!(symbol),
-                                e
-                            )
+                    let len =
+                        <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
+                            format!("Failed to deserialize {}: {}", stringify!(symbol), e)
                         })?;
-                    let mut string_bytes = vec![0u8; string_len as usize];
-                    rdr.read_exact(&mut string_bytes).map_err(|e| {
+                    let mut bytes = vec![0u8; len as usize];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
-                            "Failed to read string bytes for {}: {}",
+                            "Failed to read {} bytes for {}: {}",
+                            len,
                             stringify!(symbol),
                             e
                         )
                     })?;
-                    let symbol: String = String::from_utf8(string_bytes).map_err(|e| {
-                        format!(
-                            "Failed to parse UTF-8 string for {}: {}",
-                            stringify!(symbol),
-                            e
-                        )
+                    let symbol = String::from_utf8(bytes).map_err(|e| {
+                        format!("Failed to convert {} to string: {}", stringify!(symbol), e)
                     })?;
-                    let string_len: u32 = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                        .map_err(|e| {
-                            format!(
-                                "Failed to deserialize string length for {}: {}",
-                                stringify!(uri),
-                                e
-                            )
-                        })?;
-                    let mut string_bytes = vec![0u8; string_len as usize];
-                    rdr.read_exact(&mut string_bytes).map_err(|e| {
-                        format!("Failed to read string bytes for {}: {}", stringify!(uri), e)
-                    })?;
-                    let uri: String = String::from_utf8(string_bytes).map_err(|e| {
+                    let len = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
+                        .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(uri), e))?;
+                    let mut bytes = vec![0u8; len as usize];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
-                            "Failed to parse UTF-8 string for {}: {}",
+                            "Failed to read {} bytes for {}: {}",
+                            len,
                             stringify!(uri),
                             e
                         )
                     })?;
-                    let args = InitializeTokenMetadataArguments { name, symbol, uri };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(4usize);
-                    let metadata = keys.next().unwrap().clone();
-                    let update_authority = keys.next().unwrap().clone();
-                    let mint = keys.next().unwrap().clone();
-                    let mint_authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let uri = String::from_utf8(bytes).map_err(|e| {
+                        format!("Failed to convert {} to string: {}", stringify!(uri), e)
+                    })?;
+                    let args = InitializeTokenMetadataArguments {
+                        name,
+                        symbol,
+                        uri,
+                        extension_type: "initializeTokenMetadata".to_string(),
+                    };
+                    let metadata = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "metadata")
+                    })?;
+                    let update_authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "updateAuthority")
+                    })?;
+                    let mint = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "mint")
+                    })?;
+                    let mint_authority = account_keys.get(3usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 3usize, "mintAuthority")
+                    })?;
                     let accounts = InitializeTokenMetadataAccounts {
-                        remaining,
-                        metadata,
-                        update_authority,
-                        mint,
-                        mint_authority,
+                        remaining: vec![],
+                        metadata: metadata.clone(),
+                        update_authority: update_authority.clone(),
+                        mint: mint.clone(),
+                        mint_authority: mint_authority.clone(),
                     };
                     return Ok(Instruction::InitializeTokenMetadata { accounts, args });
                 }
@@ -6883,39 +6756,37 @@ impl Instruction {
                             .map_err(|e| {
                                 format!("Failed to deserialize {}: {}", stringify!(field), e)
                             })?;
-                    let string_len: u32 = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                        .map_err(|e| {
-                            format!(
-                                "Failed to deserialize string length for {}: {}",
-                                stringify!(value),
-                                e
-                            )
+                    let len =
+                        <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
+                            format!("Failed to deserialize {}: {}", stringify!(value), e)
                         })?;
-                    let mut string_bytes = vec![0u8; string_len as usize];
-                    rdr.read_exact(&mut string_bytes).map_err(|e| {
+                    let mut bytes = vec![0u8; len as usize];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
-                            "Failed to read string bytes for {}: {}",
+                            "Failed to read {} bytes for {}: {}",
+                            len,
                             stringify!(value),
                             e
                         )
                     })?;
-                    let value: String = String::from_utf8(string_bytes).map_err(|e| {
-                        format!(
-                            "Failed to parse UTF-8 string for {}: {}",
-                            stringify!(value),
-                            e
-                        )
+                    let value = String::from_utf8(bytes).map_err(|e| {
+                        format!("Failed to convert {} to string: {}", stringify!(value), e)
                     })?;
-                    let args = UpdateTokenMetadataFieldArguments { field, value };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let metadata = keys.next().unwrap().clone();
-                    let update_authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let args = UpdateTokenMetadataFieldArguments {
+                        field,
+                        value,
+                        extension_type: "updateTokenMetadataField".to_string(),
+                    };
+                    let metadata = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "metadata")
+                    })?;
+                    let update_authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "updateAuthority")
+                    })?;
                     let accounts = UpdateTokenMetadataFieldAccounts {
-                        remaining,
-                        metadata,
-                        update_authority,
+                        remaining: vec![],
+                        metadata: metadata.clone(),
+                        update_authority: update_authority.clone(),
                     };
                     return Ok(Instruction::UpdateTokenMetadataField { accounts, args });
                 }
@@ -6925,65 +6796,67 @@ impl Instruction {
                         <bool as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(
                             |e| format!("Failed to deserialize {}: {}", stringify!(idempotent), e),
                         )?;
-                    let string_len: u32 = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                        .map_err(|e| {
-                            format!(
-                                "Failed to deserialize string length for {}: {}",
-                                stringify!(key),
-                                e
-                            )
-                        })?;
-                    let mut string_bytes = vec![0u8; string_len as usize];
-                    rdr.read_exact(&mut string_bytes).map_err(|e| {
-                        format!("Failed to read string bytes for {}: {}", stringify!(key), e)
-                    })?;
-                    let key: String = String::from_utf8(string_bytes).map_err(|e| {
+                    let len = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
+                        .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(key), e))?;
+                    let mut bytes = vec![0u8; len as usize];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
-                            "Failed to parse UTF-8 string for {}: {}",
+                            "Failed to read {} bytes for {}: {}",
+                            len,
                             stringify!(key),
                             e
                         )
                     })?;
-                    let args = RemoveTokenMetadataKeyArguments { idempotent, key };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let metadata = keys.next().unwrap().clone();
-                    let update_authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let key = String::from_utf8(bytes).map_err(|e| {
+                        format!("Failed to convert {} to string: {}", stringify!(key), e)
+                    })?;
+                    let args = RemoveTokenMetadataKeyArguments {
+                        idempotent,
+                        key,
+                        extension_type: "removeTokenMetadataKey".to_string(),
+                    };
+                    let metadata = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "metadata")
+                    })?;
+                    let update_authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "updateAuthority")
+                    })?;
                     let accounts = RemoveTokenMetadataKeyAccounts {
-                        remaining,
-                        metadata,
-                        update_authority,
+                        remaining: vec![],
+                        metadata: metadata.clone(),
+                        update_authority: update_authority.clone(),
                     };
                     return Ok(Instruction::RemoveTokenMetadataKey { accounts, args });
                 }
                 [215u8, 228u8, 166u8, 228u8, 84u8, 100u8, 86u8, 123u8] => {
                     let mut rdr: &[u8] = rest;
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(new_update_authority),
                             e
                         )
                     })?;
-                    let new_update_authority: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let new_update_authority = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
                     let args = UpdateTokenMetadataUpdateAuthorityArguments {
                         new_update_authority,
+                        extension_type: "updateTokenMetadataUpdateAuthority".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let metadata = keys.next().unwrap().clone();
-                    let update_authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let metadata = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "metadata")
+                    })?;
+                    let update_authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "updateAuthority")
+                    })?;
                     let accounts = UpdateTokenMetadataUpdateAuthorityAccounts {
-                        remaining,
-                        metadata,
-                        update_authority,
+                        remaining: vec![],
+                        metadata: metadata.clone(),
+                        update_authority: update_authority.clone(),
                     };
                     return Ok(Instruction::UpdateTokenMetadataUpdateAuthority { accounts, args });
                 }
@@ -6997,31 +6870,34 @@ impl Instruction {
                         &mut rdr,
                     )
                     .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(end), e))?;
-                    let args = EmitTokenMetadataArguments { start, end };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                    let metadata = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let args = EmitTokenMetadataArguments {
+                        start,
+                        end,
+                        extension_type: "emitTokenMetadata".to_string(),
+                    };
+                    let metadata = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "metadata")
+                    })?;
                     let accounts = EmitTokenMetadataAccounts {
-                        remaining,
-                        metadata,
+                        remaining: vec![],
+                        metadata: metadata.clone(),
                     };
                     return Ok(Instruction::EmitTokenMetadata { accounts, args });
                 }
                 [121u8, 113u8, 108u8, 39u8, 54u8, 51u8, 0u8, 4u8] => {
                     let mut rdr: &[u8] = rest;
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(update_authority),
                             e
                         )
                     })?;
-                    let update_authority: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let update_authority = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
                     let max_size: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                         .map_err(|e| {
@@ -7030,18 +6906,22 @@ impl Instruction {
                     let args = InitializeTokenGroupArguments {
                         update_authority,
                         max_size,
+                        extension_type: "initializeTokenGroup".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                    let group = keys.next().unwrap().clone();
-                    let mint = keys.next().unwrap().clone();
-                    let mint_authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let group = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "group")
+                    })?;
+                    let mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "mint")
+                    })?;
+                    let mint_authority = account_keys.get(2usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 2usize, "mintAuthority")
+                    })?;
                     let accounts = InitializeTokenGroupAccounts {
-                        remaining,
-                        group,
-                        mint,
-                        mint_authority,
+                        remaining: vec![],
+                        group: group.clone(),
+                        mint: mint.clone(),
+                        mint_authority: mint_authority.clone(),
                     };
                     return Ok(Instruction::InitializeTokenGroup { accounts, args });
                 }
@@ -7051,67 +6931,88 @@ impl Instruction {
                         .map_err(|e| {
                         format!("Failed to deserialize {}: {}", stringify!(max_size), e)
                     })?;
-                    let args = UpdateTokenGroupMaxSizeArguments { max_size };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let group = keys.next().unwrap().clone();
-                    let update_authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let args = UpdateTokenGroupMaxSizeArguments {
+                        max_size,
+                        extension_type: "updateTokenGroupMaxSize".to_string(),
+                    };
+                    let group = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "group")
+                    })?;
+                    let update_authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "updateAuthority")
+                    })?;
                     let accounts = UpdateTokenGroupMaxSizeAccounts {
-                        remaining,
-                        group,
-                        update_authority,
+                        remaining: vec![],
+                        group: group.clone(),
+                        update_authority: update_authority.clone(),
                     };
                     return Ok(Instruction::UpdateTokenGroupMaxSize { accounts, args });
                 }
                 [161u8, 105u8, 88u8, 1u8, 237u8, 221u8, 216u8, 203u8] => {
                     let mut rdr: &[u8] = rest;
-                    let mut pubkey_bytes = [0u8; 32];
-                    rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                    let mut bytes = [0u8; 32];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
                         format!(
                             "Failed to read pubkey bytes for {}: {}",
                             stringify!(new_update_authority),
                             e
                         )
                     })?;
-                    let new_update_authority: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                    let new_update_authority = if bytes == [0u8; 32] {
                         None
                     } else {
-                        Some(pubkey_bytes)
+                        Some(bytes)
                     };
                     let args = UpdateTokenGroupUpdateAuthorityArguments {
                         new_update_authority,
+                        extension_type: "updateTokenGroupUpdateAuthority".to_string(),
                     };
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                    let group = keys.next().unwrap().clone();
-                    let update_authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let group = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "group")
+                    })?;
+                    let update_authority = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "updateAuthority")
+                    })?;
                     let accounts = UpdateTokenGroupUpdateAuthorityAccounts {
-                        remaining,
-                        group,
-                        update_authority,
+                        remaining: vec![],
+                        group: group.clone(),
+                        update_authority: update_authority.clone(),
                     };
                     return Ok(Instruction::UpdateTokenGroupUpdateAuthority { accounts, args });
                 }
                 [152u8, 32u8, 222u8, 176u8, 223u8, 237u8, 116u8, 134u8] => {
                     let mut rdr: &[u8] = rest;
-                    let args = InitializeTokenGroupMemberArguments {};
-                    let mut keys = account_keys.iter();
-                    let mut opt_budget = account_keys.len().saturating_sub(5usize);
-                    let member = keys.next().unwrap().clone();
-                    let member_mint = keys.next().unwrap().clone();
-                    let member_mint_authority = keys.next().unwrap().clone();
-                    let group = keys.next().unwrap().clone();
-                    let group_update_authority = keys.next().unwrap().clone();
-                    let remaining = keys.cloned().collect();
+                    let args = InitializeTokenGroupMemberArguments {
+                        extension_type: "initializeTokenGroupMember".to_string(),
+                    };
+                    let member = account_keys.get(0usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 0usize, "member")
+                    })?;
+                    let member_mint = account_keys.get(1usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 1usize, "memberMint")
+                    })?;
+                    let member_mint_authority = account_keys.get(2usize).ok_or_else(|| {
+                        format!(
+                            "Missing account at index {}: {}",
+                            2usize, "memberMintAuthority"
+                        )
+                    })?;
+                    let group = account_keys.get(3usize).ok_or_else(|| {
+                        format!("Missing account at index {}: {}", 3usize, "group")
+                    })?;
+                    let group_update_authority = account_keys.get(4usize).ok_or_else(|| {
+                        format!(
+                            "Missing account at index {}: {}",
+                            4usize, "groupUpdateAuthority"
+                        )
+                    })?;
                     let accounts = InitializeTokenGroupMemberAccounts {
-                        remaining,
-                        member,
-                        member_mint,
-                        member_mint_authority,
-                        group,
-                        group_update_authority,
+                        remaining: vec![],
+                        member: member.clone(),
+                        member_mint: member_mint.clone(),
+                        member_mint_authority: member_mint_authority.clone(),
+                        group: group.clone(),
+                        group_update_authority: group_update_authority.clone(),
                     };
                     return Ok(Instruction::InitializeTokenGroupMember { accounts, args });
                 }
@@ -7150,34 +7051,40 @@ impl Instruction {
                     mint_authority,
                     freeze_authority,
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                let mint = keys.next().unwrap().clone();
-                let rent = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let rent = account_keys
+                    .get(1usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "rent"))?;
                 let accounts = InitializeMintAccounts {
-                    remaining,
-                    mint,
-                    rent,
+                    remaining: vec![],
+                    mint: mint.clone(),
+                    rent: rent.clone(),
                 };
                 return Ok(Instruction::InitializeMint { accounts, args });
             }
             [1u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = InitializeAccountArguments {};
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(4usize);
-                let account = keys.next().unwrap().clone();
-                let mint = keys.next().unwrap().clone();
-                let owner = keys.next().unwrap().clone();
-                let rent = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let account = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "account"))?;
+                let mint = account_keys
+                    .get(1usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "mint"))?;
+                let owner = account_keys
+                    .get(2usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 2usize, "owner"))?;
+                let rent = account_keys
+                    .get(3usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 3usize, "rent"))?;
                 let accounts = InitializeAccountAccounts {
-                    remaining,
-                    account,
-                    mint,
-                    owner,
-                    rent,
+                    remaining: vec![],
+                    account: account.clone(),
+                    mint: mint.clone(),
+                    owner: owner.clone(),
+                    rent: rent.clone(),
                 };
                 return Ok(Instruction::InitializeAccount { accounts, args });
             }
@@ -7186,15 +7093,16 @@ impl Instruction {
                 let m: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                     .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(m), e))?;
                 let args = InitializeMultisigArguments { m };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                let multisig = keys.next().unwrap().clone();
-                let rent = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let multisig = account_keys.get(0usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 0usize, "multisig")
+                })?;
+                let rent = account_keys
+                    .get(1usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "rent"))?;
                 let accounts = InitializeMultisigAccounts {
-                    remaining,
-                    multisig,
-                    rent,
+                    remaining: vec![],
+                    multisig: multisig.clone(),
+                    rent: rent.clone(),
                 };
                 return Ok(Instruction::InitializeMultisig { accounts, args });
             }
@@ -7203,17 +7111,20 @@ impl Instruction {
                 let amount: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                     .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(amount), e))?;
                 let args = TransferArguments { amount };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                let source = keys.next().unwrap().clone();
-                let destination = keys.next().unwrap().clone();
-                let authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let source = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "source"))?;
+                let destination = account_keys.get(1usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 1usize, "destination")
+                })?;
+                let authority = account_keys.get(2usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 2usize, "authority")
+                })?;
                 let accounts = TransferAccounts {
-                    remaining,
-                    source,
-                    destination,
-                    authority,
+                    remaining: vec![],
+                    source: source.clone(),
+                    destination: destination.clone(),
+                    authority: authority.clone(),
                 };
                 return Ok(Instruction::Transfer { accounts, args });
             }
@@ -7222,32 +7133,36 @@ impl Instruction {
                 let amount: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                     .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(amount), e))?;
                 let args = ApproveArguments { amount };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                let source = keys.next().unwrap().clone();
-                let delegate = keys.next().unwrap().clone();
-                let owner = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let source = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "source"))?;
+                let delegate = account_keys.get(1usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 1usize, "delegate")
+                })?;
+                let owner = account_keys
+                    .get(2usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 2usize, "owner"))?;
                 let accounts = ApproveAccounts {
-                    remaining,
-                    source,
-                    delegate,
-                    owner,
+                    remaining: vec![],
+                    source: source.clone(),
+                    delegate: delegate.clone(),
+                    owner: owner.clone(),
                 };
                 return Ok(Instruction::Approve { accounts, args });
             }
             [5u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = RevokeArguments {};
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                let source = keys.next().unwrap().clone();
-                let owner = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let source = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "source"))?;
+                let owner = account_keys
+                    .get(1usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "owner"))?;
                 let accounts = RevokeAccounts {
-                    remaining,
-                    source,
-                    owner,
+                    remaining: vec![],
+                    source: source.clone(),
+                    owner: owner.clone(),
                 };
                 return Ok(Instruction::Revoke { accounts, args });
             }
@@ -7272,15 +7187,16 @@ impl Instruction {
                     authority_type,
                     new_authority,
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                let owned = keys.next().unwrap().clone();
-                let owner = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let owned = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "owned"))?;
+                let owner = account_keys
+                    .get(1usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "owner"))?;
                 let accounts = SetAuthorityAccounts {
-                    remaining,
-                    owned,
-                    owner,
+                    remaining: vec![],
+                    owned: owned.clone(),
+                    owner: owner.clone(),
                 };
                 return Ok(Instruction::SetAuthority { accounts, args });
             }
@@ -7289,17 +7205,20 @@ impl Instruction {
                 let amount: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                     .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(amount), e))?;
                 let args = MintToArguments { amount };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                let mint = keys.next().unwrap().clone();
-                let token = keys.next().unwrap().clone();
-                let mint_authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let token = account_keys
+                    .get(1usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "token"))?;
+                let mint_authority = account_keys.get(2usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 2usize, "mintAuthority")
+                })?;
                 let accounts = MintToAccounts {
-                    remaining,
-                    mint,
-                    token,
-                    mint_authority,
+                    remaining: vec![],
+                    mint: mint.clone(),
+                    token: token.clone(),
+                    mint_authority: mint_authority.clone(),
                 };
                 return Ok(Instruction::MintTo { accounts, args });
             }
@@ -7308,68 +7227,80 @@ impl Instruction {
                 let amount: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                     .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(amount), e))?;
                 let args = BurnArguments { amount };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                let account = keys.next().unwrap().clone();
-                let mint = keys.next().unwrap().clone();
-                let authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let account = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "account"))?;
+                let mint = account_keys
+                    .get(1usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "mint"))?;
+                let authority = account_keys.get(2usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 2usize, "authority")
+                })?;
                 let accounts = BurnAccounts {
-                    remaining,
-                    account,
-                    mint,
-                    authority,
+                    remaining: vec![],
+                    account: account.clone(),
+                    mint: mint.clone(),
+                    authority: authority.clone(),
                 };
                 return Ok(Instruction::Burn { accounts, args });
             }
             [9u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = CloseAccountArguments {};
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                let account = keys.next().unwrap().clone();
-                let destination = keys.next().unwrap().clone();
-                let owner = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let account = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "account"))?;
+                let destination = account_keys.get(1usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 1usize, "destination")
+                })?;
+                let owner = account_keys
+                    .get(2usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 2usize, "owner"))?;
                 let accounts = CloseAccountAccounts {
-                    remaining,
-                    account,
-                    destination,
-                    owner,
+                    remaining: vec![],
+                    account: account.clone(),
+                    destination: destination.clone(),
+                    owner: owner.clone(),
                 };
                 return Ok(Instruction::CloseAccount { accounts, args });
             }
             [10u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = FreezeAccountArguments {};
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                let account = keys.next().unwrap().clone();
-                let mint = keys.next().unwrap().clone();
-                let owner = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let account = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "account"))?;
+                let mint = account_keys
+                    .get(1usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "mint"))?;
+                let owner = account_keys
+                    .get(2usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 2usize, "owner"))?;
                 let accounts = FreezeAccountAccounts {
-                    remaining,
-                    account,
-                    mint,
-                    owner,
+                    remaining: vec![],
+                    account: account.clone(),
+                    mint: mint.clone(),
+                    owner: owner.clone(),
                 };
                 return Ok(Instruction::FreezeAccount { accounts, args });
             }
             [11u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = ThawAccountArguments {};
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                let account = keys.next().unwrap().clone();
-                let mint = keys.next().unwrap().clone();
-                let owner = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let account = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "account"))?;
+                let mint = account_keys
+                    .get(1usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "mint"))?;
+                let owner = account_keys
+                    .get(2usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 2usize, "owner"))?;
                 let accounts = ThawAccountAccounts {
-                    remaining,
-                    account,
-                    mint,
-                    owner,
+                    remaining: vec![],
+                    account: account.clone(),
+                    mint: mint.clone(),
+                    owner: owner.clone(),
                 };
                 return Ok(Instruction::ThawAccount { accounts, args });
             }
@@ -7382,19 +7313,24 @@ impl Instruction {
                         format!("Failed to deserialize {}: {}", stringify!(decimals), e)
                     })?;
                 let args = TransferCheckedArguments { amount, decimals };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(4usize);
-                let source = keys.next().unwrap().clone();
-                let mint = keys.next().unwrap().clone();
-                let destination = keys.next().unwrap().clone();
-                let authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let source = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "source"))?;
+                let mint = account_keys
+                    .get(1usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "mint"))?;
+                let destination = account_keys.get(2usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 2usize, "destination")
+                })?;
+                let authority = account_keys.get(3usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 3usize, "authority")
+                })?;
                 let accounts = TransferCheckedAccounts {
-                    remaining,
-                    source,
-                    mint,
-                    destination,
-                    authority,
+                    remaining: vec![],
+                    source: source.clone(),
+                    mint: mint.clone(),
+                    destination: destination.clone(),
+                    authority: authority.clone(),
                 };
                 return Ok(Instruction::TransferChecked { accounts, args });
             }
@@ -7407,19 +7343,24 @@ impl Instruction {
                         format!("Failed to deserialize {}: {}", stringify!(decimals), e)
                     })?;
                 let args = ApproveCheckedArguments { amount, decimals };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(4usize);
-                let source = keys.next().unwrap().clone();
-                let mint = keys.next().unwrap().clone();
-                let delegate = keys.next().unwrap().clone();
-                let owner = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let source = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "source"))?;
+                let mint = account_keys
+                    .get(1usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "mint"))?;
+                let delegate = account_keys.get(2usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 2usize, "delegate")
+                })?;
+                let owner = account_keys
+                    .get(3usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 3usize, "owner"))?;
                 let accounts = ApproveCheckedAccounts {
-                    remaining,
-                    source,
-                    mint,
-                    delegate,
-                    owner,
+                    remaining: vec![],
+                    source: source.clone(),
+                    mint: mint.clone(),
+                    delegate: delegate.clone(),
+                    owner: owner.clone(),
                 };
                 return Ok(Instruction::ApproveChecked { accounts, args });
             }
@@ -7432,17 +7373,20 @@ impl Instruction {
                         format!("Failed to deserialize {}: {}", stringify!(decimals), e)
                     })?;
                 let args = MintToCheckedArguments { amount, decimals };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                let mint = keys.next().unwrap().clone();
-                let token = keys.next().unwrap().clone();
-                let mint_authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let token = account_keys
+                    .get(1usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "token"))?;
+                let mint_authority = account_keys.get(2usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 2usize, "mintAuthority")
+                })?;
                 let accounts = MintToCheckedAccounts {
-                    remaining,
-                    mint,
-                    token,
-                    mint_authority,
+                    remaining: vec![],
+                    mint: mint.clone(),
+                    token: token.clone(),
+                    mint_authority: mint_authority.clone(),
                 };
                 return Ok(Instruction::MintToChecked { accounts, args });
             }
@@ -7455,17 +7399,20 @@ impl Instruction {
                         format!("Failed to deserialize {}: {}", stringify!(decimals), e)
                     })?;
                 let args = BurnCheckedArguments { amount, decimals };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                let account = keys.next().unwrap().clone();
-                let mint = keys.next().unwrap().clone();
-                let authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let account = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "account"))?;
+                let mint = account_keys
+                    .get(1usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "mint"))?;
+                let authority = account_keys.get(2usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 2usize, "authority")
+                })?;
                 let accounts = BurnCheckedAccounts {
-                    remaining,
-                    account,
-                    mint,
-                    authority,
+                    remaining: vec![],
+                    account: account.clone(),
+                    mint: mint.clone(),
+                    authority: authority.clone(),
                 };
                 return Ok(Instruction::BurnChecked { accounts, args });
             }
@@ -7476,28 +7423,33 @@ impl Instruction {
                         |e| format!("Failed to deserialize {}: {}", stringify!(owner), e),
                     )?;
                 let args = InitializeAccount2Arguments { owner };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                let account = keys.next().unwrap().clone();
-                let mint = keys.next().unwrap().clone();
-                let rent = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let account = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "account"))?;
+                let mint = account_keys
+                    .get(1usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "mint"))?;
+                let rent = account_keys
+                    .get(2usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 2usize, "rent"))?;
                 let accounts = InitializeAccount2Accounts {
-                    remaining,
-                    account,
-                    mint,
-                    rent,
+                    remaining: vec![],
+                    account: account.clone(),
+                    mint: mint.clone(),
+                    rent: rent.clone(),
                 };
                 return Ok(Instruction::InitializeAccount2 { accounts, args });
             }
             [17u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = SyncNativeArguments {};
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                let account = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
-                let accounts = SyncNativeAccounts { remaining, account };
+                let account = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "account"))?;
+                let accounts = SyncNativeAccounts {
+                    remaining: vec![],
+                    account: account.clone(),
+                };
                 return Ok(Instruction::SyncNative { accounts, args });
             }
             [18u8] => {
@@ -7507,15 +7459,16 @@ impl Instruction {
                         |e| format!("Failed to deserialize {}: {}", stringify!(owner), e),
                     )?;
                 let args = InitializeAccount3Arguments { owner };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                let account = keys.next().unwrap().clone();
-                let mint = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let account = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "account"))?;
+                let mint = account_keys
+                    .get(1usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "mint"))?;
                 let accounts = InitializeAccount3Accounts {
-                    remaining,
-                    account,
-                    mint,
+                    remaining: vec![],
+                    account: account.clone(),
+                    mint: mint.clone(),
                 };
                 return Ok(Instruction::InitializeAccount3 { accounts, args });
             }
@@ -7524,13 +7477,12 @@ impl Instruction {
                 let m: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                     .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(m), e))?;
                 let args = InitializeMultisig2Arguments { m };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                let multisig = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let multisig = account_keys.get(0usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 0usize, "multisig")
+                })?;
                 let accounts = InitializeMultisig2Accounts {
-                    remaining,
-                    multisig,
+                    remaining: vec![],
+                    multisig: multisig.clone(),
                 };
                 return Ok(Instruction::InitializeMultisig2 { accounts, args });
             }
@@ -7564,31 +7516,37 @@ impl Instruction {
                     mint_authority,
                     freeze_authority,
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                let mint = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
-                let accounts = InitializeMint2Accounts { remaining, mint };
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let accounts = InitializeMint2Accounts {
+                    remaining: vec![],
+                    mint: mint.clone(),
+                };
                 return Ok(Instruction::InitializeMint2 { accounts, args });
             }
             [21u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = GetAccountDataSizeArguments {};
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                let mint = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
-                let accounts = GetAccountDataSizeAccounts { remaining, mint };
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let accounts = GetAccountDataSizeAccounts {
+                    remaining: vec![],
+                    mint: mint.clone(),
+                };
                 return Ok(Instruction::GetAccountDataSize { accounts, args });
             }
             [22u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = InitializeImmutableOwnerArguments {};
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                let account = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
-                let accounts = InitializeImmutableOwnerAccounts { remaining, account };
+                let account = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "account"))?;
+                let accounts = InitializeImmutableOwnerAccounts {
+                    remaining: vec![],
+                    account: account.clone(),
+                };
                 return Ok(Instruction::InitializeImmutableOwner { accounts, args });
             }
             [23u8] => {
@@ -7596,11 +7554,13 @@ impl Instruction {
                 let amount: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                     .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(amount), e))?;
                 let args = AmountToUiAmountArguments { amount };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                let mint = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
-                let accounts = AmountToUiAmountAccounts { remaining, mint };
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let accounts = AmountToUiAmountAccounts {
+                    remaining: vec![],
+                    mint: mint.clone(),
+                };
                 return Ok(Instruction::AmountToUiAmount { accounts, args });
             }
             [24u8] => {
@@ -7610,11 +7570,13 @@ impl Instruction {
                         format!("Failed to deserialize {}: {}", stringify!(ui_amount), e)
                     })?;
                 let args = UiAmountToAmountArguments { ui_amount };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                let mint = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
-                let accounts = UiAmountToAmountAccounts { remaining, mint };
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let accounts = UiAmountToAmountAccounts {
+                    remaining: vec![],
+                    mint: mint.clone(),
+                };
                 return Ok(Instruction::UiAmountToAmount { accounts, args });
             }
             [25u8] => {
@@ -7629,11 +7591,13 @@ impl Instruction {
                             )
                         })?;
                 let args = InitializeMintCloseAuthorityArguments { close_authority };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                let mint = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
-                let accounts = InitializeMintCloseAuthorityAccounts { remaining, mint };
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let accounts = InitializeMintCloseAuthorityAccounts {
+                    remaining: vec![],
+                    mint: mint.clone(),
+                };
                 return Ok(Instruction::InitializeMintCloseAuthority { accounts, args });
             }
             [26u8, 0u8] => {
@@ -7673,12 +7637,15 @@ impl Instruction {
                     withdraw_withheld_authority,
                     transfer_fee_basis_points,
                     maximum_fee,
+                    extension_type: "initializeTransferFeeConfig".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                let mint = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
-                let accounts = InitializeTransferFeeConfigAccounts { remaining, mint };
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let accounts = InitializeTransferFeeConfigAccounts {
+                    remaining: vec![],
+                    mint: mint.clone(),
+                };
                 return Ok(Instruction::InitializeTransferFeeConfig { accounts, args });
             }
             [26u8, 1u8] => {
@@ -7695,37 +7662,51 @@ impl Instruction {
                     amount,
                     decimals,
                     fee,
+                    extension_type: "transferCheckedWithFee".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(4usize);
-                let source = keys.next().unwrap().clone();
-                let mint = keys.next().unwrap().clone();
-                let destination = keys.next().unwrap().clone();
-                let authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let source = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "source"))?;
+                let mint = account_keys
+                    .get(1usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "mint"))?;
+                let destination = account_keys.get(2usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 2usize, "destination")
+                })?;
+                let authority = account_keys.get(3usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 3usize, "authority")
+                })?;
                 let accounts = TransferCheckedWithFeeAccounts {
-                    remaining,
-                    source,
-                    mint,
-                    destination,
-                    authority,
+                    remaining: vec![],
+                    source: source.clone(),
+                    mint: mint.clone(),
+                    destination: destination.clone(),
+                    authority: authority.clone(),
                 };
                 return Ok(Instruction::TransferCheckedWithFee { accounts, args });
             }
             [26u8, 2u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = WithdrawWithheldTokensFromMintArguments {};
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                let mint = keys.next().unwrap().clone();
-                let fee_receiver = keys.next().unwrap().clone();
-                let withdraw_withheld_authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let args = WithdrawWithheldTokensFromMintArguments {
+                    extension_type: "withdrawWithheldTokensFromMint".to_string(),
+                };
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let fee_receiver = account_keys.get(1usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 1usize, "feeReceiver")
+                })?;
+                let withdraw_withheld_authority = account_keys.get(2usize).ok_or_else(|| {
+                    format!(
+                        "Missing account at index {}: {}",
+                        2usize, "withdrawWithheldAuthority"
+                    )
+                })?;
                 let accounts = WithdrawWithheldTokensFromMintAccounts {
-                    remaining,
-                    mint,
-                    fee_receiver,
-                    withdraw_withheld_authority,
+                    remaining: vec![],
+                    mint: mint.clone(),
+                    fee_receiver: fee_receiver.clone(),
+                    withdraw_withheld_authority: withdraw_withheld_authority.clone(),
                 };
                 return Ok(Instruction::WithdrawWithheldTokensFromMint { accounts, args });
             }
@@ -7739,29 +7720,42 @@ impl Instruction {
                             e
                         )
                     })?;
-                let args = WithdrawWithheldTokensFromAccountsArguments { num_token_accounts };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                let mint = keys.next().unwrap().clone();
-                let fee_receiver = keys.next().unwrap().clone();
-                let withdraw_withheld_authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let args = WithdrawWithheldTokensFromAccountsArguments {
+                    num_token_accounts,
+                    extension_type: "withdrawWithheldTokensFromAccounts".to_string(),
+                };
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let fee_receiver = account_keys.get(1usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 1usize, "feeReceiver")
+                })?;
+                let withdraw_withheld_authority = account_keys.get(2usize).ok_or_else(|| {
+                    format!(
+                        "Missing account at index {}: {}",
+                        2usize, "withdrawWithheldAuthority"
+                    )
+                })?;
                 let accounts = WithdrawWithheldTokensFromAccountsAccounts {
-                    remaining,
-                    mint,
-                    fee_receiver,
-                    withdraw_withheld_authority,
+                    remaining: vec![],
+                    mint: mint.clone(),
+                    fee_receiver: fee_receiver.clone(),
+                    withdraw_withheld_authority: withdraw_withheld_authority.clone(),
                 };
                 return Ok(Instruction::WithdrawWithheldTokensFromAccounts { accounts, args });
             }
             [26u8, 4u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = HarvestWithheldTokensToMintArguments {};
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                let mint = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
-                let accounts = HarvestWithheldTokensToMintAccounts { remaining, mint };
+                let args = HarvestWithheldTokensToMintArguments {
+                    extension_type: "harvestWithheldTokensToMint".to_string(),
+                };
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let accounts = HarvestWithheldTokensToMintAccounts {
+                    remaining: vec![],
+                    mint: mint.clone(),
+                };
                 return Ok(Instruction::HarvestWithheldTokensToMint { accounts, args });
             }
             [26u8, 5u8] => {
@@ -7781,41 +7775,38 @@ impl Instruction {
                 let args = SetTransferFeeArguments {
                     transfer_fee_basis_points,
                     maximum_fee,
+                    extension_type: "setTransferFee".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                let mint = keys.next().unwrap().clone();
-                let transfer_fee_config_authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let transfer_fee_config_authority = account_keys.get(1usize).ok_or_else(|| {
+                    format!(
+                        "Missing account at index {}: {}",
+                        1usize, "transferFeeConfigAuthority"
+                    )
+                })?;
                 let accounts = SetTransferFeeAccounts {
-                    remaining,
-                    mint,
-                    transfer_fee_config_authority,
+                    remaining: vec![],
+                    mint: mint.clone(),
+                    transfer_fee_config_authority: transfer_fee_config_authority.clone(),
                 };
                 return Ok(Instruction::SetTransferFee { accounts, args });
             }
             [27u8, 0u8] => {
                 let mut rdr: &[u8] = rest;
-                let confidential_transfer_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(confidential_transfer_discriminator),
-                            e
-                        )
-                    })?;
-                let mut pubkey_bytes = [0u8; 32];
-                rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                let mut bytes = [0u8; 32];
+                rdr.read_exact(&mut bytes).map_err(|e| {
                     format!(
                         "Failed to read pubkey bytes for {}: {}",
                         stringify!(authority),
                         e
                     )
                 })?;
-                let authority: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                let authority = if bytes == [0u8; 32] {
                     None
                 } else {
-                    Some(pubkey_bytes)
+                    Some(bytes)
                 };
                 let auto_approve_new_accounts: bool =
                     <bool as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
@@ -7825,42 +7816,36 @@ impl Instruction {
                             e
                         )
                     })?;
-                let mut pubkey_bytes = [0u8; 32];
-                rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                let mut bytes = [0u8; 32];
+                rdr.read_exact(&mut bytes).map_err(|e| {
                     format!(
                         "Failed to read pubkey bytes for {}: {}",
                         stringify!(auditor_elgamal_pubkey),
                         e
                     )
                 })?;
-                let auditor_elgamal_pubkey: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                let auditor_elgamal_pubkey = if bytes == [0u8; 32] {
                     None
                 } else {
-                    Some(pubkey_bytes)
+                    Some(bytes)
                 };
                 let args = InitializeConfidentialTransferMintArguments {
-                    confidential_transfer_discriminator,
                     authority,
                     auto_approve_new_accounts,
                     auditor_elgamal_pubkey,
+                    extension_type: "initializeConfidentialTransferMint".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                let mint = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
-                let accounts = InitializeConfidentialTransferMintAccounts { remaining, mint };
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let accounts = InitializeConfidentialTransferMintAccounts {
+                    remaining: vec![],
+                    mint: mint.clone(),
+                };
                 return Ok(Instruction::InitializeConfidentialTransferMint { accounts, args });
             }
             [27u8, 1u8] => {
                 let mut rdr: &[u8] = rest;
-                let confidential_transfer_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(confidential_transfer_discriminator),
-                            e
-                        )
-                    })?;
                 let auto_approve_new_accounts: bool =
                     <bool as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
                         format!(
@@ -7869,46 +7854,39 @@ impl Instruction {
                             e
                         )
                     })?;
-                let mut pubkey_bytes = [0u8; 32];
-                rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                let mut bytes = [0u8; 32];
+                rdr.read_exact(&mut bytes).map_err(|e| {
                     format!(
                         "Failed to read pubkey bytes for {}: {}",
                         stringify!(auditor_elgamal_pubkey),
                         e
                     )
                 })?;
-                let auditor_elgamal_pubkey: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                let auditor_elgamal_pubkey = if bytes == [0u8; 32] {
                     None
                 } else {
-                    Some(pubkey_bytes)
+                    Some(bytes)
                 };
                 let args = UpdateConfidentialTransferMintArguments {
-                    confidential_transfer_discriminator,
                     auto_approve_new_accounts,
                     auditor_elgamal_pubkey,
+                    extension_type: "updateConfidentialTransferMint".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                let mint = keys.next().unwrap().clone();
-                let authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let authority = account_keys.get(1usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 1usize, "authority")
+                })?;
                 let accounts = UpdateConfidentialTransferMintAccounts {
-                    remaining,
-                    mint,
-                    authority,
+                    remaining: vec![],
+                    mint: mint.clone(),
+                    authority: authority.clone(),
                 };
                 return Ok(Instruction::UpdateConfidentialTransferMint { accounts, args });
             }
             [27u8, 2u8] => {
                 let mut rdr: &[u8] = rest;
-                let confidential_transfer_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(confidential_transfer_discriminator),
-                            e
-                        )
-                    })?;
                 let decryptable_zero_balance: DecryptableBalance =
                     <DecryptableBalance as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                         .map_err(|e| {
@@ -7935,71 +7913,65 @@ impl Instruction {
                         )
                     })?;
                 let args = ConfigureConfidentialTransferAccountArguments {
-                    confidential_transfer_discriminator,
                     decryptable_zero_balance,
                     maximum_pending_balance_credit_counter,
                     proof_instruction_offset,
+                    extension_type: "configureConfidentialTransferAccount".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(4usize);
-                let token = keys.next().unwrap().clone();
-                let mint = keys.next().unwrap().clone();
-                let instructions_sysvar_or_context_state = keys.next().unwrap().clone();
-                let record = if opt_budget > 0 {
-                    opt_budget -= 1;
-                    Some(keys.next().unwrap().clone())
-                } else {
-                    None
-                };
-                let authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let token = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "token"))?;
+                let mint = account_keys
+                    .get(1usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "mint"))?;
+                let instructions_sysvar_or_context_state =
+                    account_keys.get(2usize).ok_or_else(|| {
+                        format!(
+                            "Missing account at index {}: {}",
+                            2usize, "instructionsSysvarOrContextState"
+                        )
+                    })?;
+                let record = account_keys
+                    .get(3usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 3usize, "record"))?;
+                let authority = account_keys.get(4usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 4usize, "authority")
+                })?;
                 let accounts = ConfigureConfidentialTransferAccountAccounts {
-                    remaining,
-                    token,
-                    mint,
-                    instructions_sysvar_or_context_state,
-                    record,
-                    authority,
+                    remaining: vec![],
+                    token: token.clone(),
+                    mint: mint.clone(),
+                    instructions_sysvar_or_context_state: instructions_sysvar_or_context_state
+                        .clone(),
+                    record: Some(record.clone()),
+                    authority: authority.clone(),
                 };
                 return Ok(Instruction::ConfigureConfidentialTransferAccount { accounts, args });
             }
             [27u8, 3u8] => {
                 let mut rdr: &[u8] = rest;
-                let confidential_transfer_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(confidential_transfer_discriminator),
-                            e
-                        )
-                    })?;
                 let args = ApproveConfidentialTransferAccountArguments {
-                    confidential_transfer_discriminator,
+                    extension_type: "approveConfidentialTransferAccount".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                let token = keys.next().unwrap().clone();
-                let mint = keys.next().unwrap().clone();
-                let authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let token = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "token"))?;
+                let mint = account_keys
+                    .get(1usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "mint"))?;
+                let authority = account_keys.get(2usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 2usize, "authority")
+                })?;
                 let accounts = ApproveConfidentialTransferAccountAccounts {
-                    remaining,
-                    token,
-                    mint,
-                    authority,
+                    remaining: vec![],
+                    token: token.clone(),
+                    mint: mint.clone(),
+                    authority: authority.clone(),
                 };
                 return Ok(Instruction::ApproveConfidentialTransferAccount { accounts, args });
             }
             [27u8, 4u8] => {
                 let mut rdr: &[u8] = rest;
-                let confidential_transfer_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(confidential_transfer_discriminator),
-                            e
-                        )
-                    })?;
                 let proof_instruction_offset: i8 =
                     <i8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
                         format!(
@@ -8009,40 +7981,37 @@ impl Instruction {
                         )
                     })?;
                 let args = EmptyConfidentialTransferAccountArguments {
-                    confidential_transfer_discriminator,
                     proof_instruction_offset,
+                    extension_type: "emptyConfidentialTransferAccount".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                let token = keys.next().unwrap().clone();
-                let instructions_sysvar_or_context_state = keys.next().unwrap().clone();
-                let record = if opt_budget > 0 {
-                    opt_budget -= 1;
-                    Some(keys.next().unwrap().clone())
-                } else {
-                    None
-                };
-                let authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let token = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "token"))?;
+                let instructions_sysvar_or_context_state =
+                    account_keys.get(1usize).ok_or_else(|| {
+                        format!(
+                            "Missing account at index {}: {}",
+                            1usize, "instructionsSysvarOrContextState"
+                        )
+                    })?;
+                let record = account_keys
+                    .get(2usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 2usize, "record"))?;
+                let authority = account_keys.get(3usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 3usize, "authority")
+                })?;
                 let accounts = EmptyConfidentialTransferAccountAccounts {
-                    remaining,
-                    token,
-                    instructions_sysvar_or_context_state,
-                    record,
-                    authority,
+                    remaining: vec![],
+                    token: token.clone(),
+                    instructions_sysvar_or_context_state: instructions_sysvar_or_context_state
+                        .clone(),
+                    record: Some(record.clone()),
+                    authority: authority.clone(),
                 };
                 return Ok(Instruction::EmptyConfidentialTransferAccount { accounts, args });
             }
             [27u8, 5u8] => {
                 let mut rdr: &[u8] = rest;
-                let confidential_transfer_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(confidential_transfer_discriminator),
-                            e
-                        )
-                    })?;
                 let amount: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                     .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(amount), e))?;
                 let decimals: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
@@ -8050,34 +8019,29 @@ impl Instruction {
                         format!("Failed to deserialize {}: {}", stringify!(decimals), e)
                     })?;
                 let args = ConfidentialDepositArguments {
-                    confidential_transfer_discriminator,
                     amount,
                     decimals,
+                    extension_type: "confidentialDeposit".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                let token = keys.next().unwrap().clone();
-                let mint = keys.next().unwrap().clone();
-                let authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let token = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "token"))?;
+                let mint = account_keys
+                    .get(1usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "mint"))?;
+                let authority = account_keys.get(2usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 2usize, "authority")
+                })?;
                 let accounts = ConfidentialDepositAccounts {
-                    remaining,
-                    token,
-                    mint,
-                    authority,
+                    remaining: vec![],
+                    token: token.clone(),
+                    mint: mint.clone(),
+                    authority: authority.clone(),
                 };
                 return Ok(Instruction::ConfidentialDeposit { accounts, args });
             }
             [27u8, 6u8] => {
                 let mut rdr: &[u8] = rest;
-                let confidential_transfer_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(confidential_transfer_discriminator),
-                            e
-                        )
-                    })?;
                 let amount: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                     .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(amount), e))?;
                 let decimals: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
@@ -8110,58 +8074,47 @@ impl Instruction {
                         )
                     })?;
                 let args = ConfidentialWithdrawArguments {
-                    confidential_transfer_discriminator,
                     amount,
                     decimals,
                     new_decryptable_available_balance,
                     equality_proof_instruction_offset,
                     range_proof_instruction_offset,
+                    extension_type: "confidentialWithdraw".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                let token = keys.next().unwrap().clone();
-                let mint = keys.next().unwrap().clone();
-                let instructions_sysvar = if opt_budget > 0 {
-                    opt_budget -= 1;
-                    Some(keys.next().unwrap().clone())
-                } else {
-                    None
-                };
-                let equality_record = if opt_budget > 0 {
-                    opt_budget -= 1;
-                    Some(keys.next().unwrap().clone())
-                } else {
-                    None
-                };
-                let range_record = if opt_budget > 0 {
-                    opt_budget -= 1;
-                    Some(keys.next().unwrap().clone())
-                } else {
-                    None
-                };
-                let authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let token = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "token"))?;
+                let mint = account_keys
+                    .get(1usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "mint"))?;
+                let instructions_sysvar = account_keys.get(2usize).ok_or_else(|| {
+                    format!(
+                        "Missing account at index {}: {}",
+                        2usize, "instructionsSysvar"
+                    )
+                })?;
+                let equality_record = account_keys.get(3usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 3usize, "equalityRecord")
+                })?;
+                let range_record = account_keys.get(4usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 4usize, "rangeRecord")
+                })?;
+                let authority = account_keys.get(5usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 5usize, "authority")
+                })?;
                 let accounts = ConfidentialWithdrawAccounts {
-                    remaining,
-                    token,
-                    mint,
-                    instructions_sysvar,
-                    equality_record,
-                    range_record,
-                    authority,
+                    remaining: vec![],
+                    token: token.clone(),
+                    mint: mint.clone(),
+                    instructions_sysvar: Some(instructions_sysvar.clone()),
+                    equality_record: Some(equality_record.clone()),
+                    range_record: Some(range_record.clone()),
+                    authority: authority.clone(),
                 };
                 return Ok(Instruction::ConfidentialWithdraw { accounts, args });
             }
             [27u8, 7u8] => {
                 let mut rdr: &[u8] = rest;
-                let confidential_transfer_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(confidential_transfer_discriminator),
-                            e
-                        )
-                    })?;
                 let new_source_decryptable_available_balance: DecryptableBalance =
                     <DecryptableBalance as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                         .map_err(|e| {
@@ -8196,66 +8149,60 @@ impl Instruction {
                         )
                     })?;
                 let args = ConfidentialTransferArguments {
-                    confidential_transfer_discriminator,
                     new_source_decryptable_available_balance,
                     equality_proof_instruction_offset,
                     ciphertext_validity_proof_instruction_offset,
                     range_proof_instruction_offset,
+                    extension_type: "confidentialTransfer".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(4usize);
-                let source_token = keys.next().unwrap().clone();
-                let mint = keys.next().unwrap().clone();
-                let destination_token = keys.next().unwrap().clone();
-                let instructions_sysvar = if opt_budget > 0 {
-                    opt_budget -= 1;
-                    Some(keys.next().unwrap().clone())
-                } else {
-                    None
-                };
-                let equality_record = if opt_budget > 0 {
-                    opt_budget -= 1;
-                    Some(keys.next().unwrap().clone())
-                } else {
-                    None
-                };
-                let ciphertext_validity_record = if opt_budget > 0 {
-                    opt_budget -= 1;
-                    Some(keys.next().unwrap().clone())
-                } else {
-                    None
-                };
-                let range_record = if opt_budget > 0 {
-                    opt_budget -= 1;
-                    Some(keys.next().unwrap().clone())
-                } else {
-                    None
-                };
-                let authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let source_token = account_keys.get(0usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 0usize, "sourceToken")
+                })?;
+                let mint = account_keys
+                    .get(1usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "mint"))?;
+                let destination_token = account_keys.get(2usize).ok_or_else(|| {
+                    format!(
+                        "Missing account at index {}: {}",
+                        2usize, "destinationToken"
+                    )
+                })?;
+                let instructions_sysvar = account_keys.get(3usize).ok_or_else(|| {
+                    format!(
+                        "Missing account at index {}: {}",
+                        3usize, "instructionsSysvar"
+                    )
+                })?;
+                let equality_record = account_keys.get(4usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 4usize, "equalityRecord")
+                })?;
+                let ciphertext_validity_record = account_keys.get(5usize).ok_or_else(|| {
+                    format!(
+                        "Missing account at index {}: {}",
+                        5usize, "ciphertextValidityRecord"
+                    )
+                })?;
+                let range_record = account_keys.get(6usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 6usize, "rangeRecord")
+                })?;
+                let authority = account_keys.get(7usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 7usize, "authority")
+                })?;
                 let accounts = ConfidentialTransferAccounts {
-                    remaining,
-                    source_token,
-                    mint,
-                    destination_token,
-                    instructions_sysvar,
-                    equality_record,
-                    ciphertext_validity_record,
-                    range_record,
-                    authority,
+                    remaining: vec![],
+                    source_token: source_token.clone(),
+                    mint: mint.clone(),
+                    destination_token: destination_token.clone(),
+                    instructions_sysvar: Some(instructions_sysvar.clone()),
+                    equality_record: Some(equality_record.clone()),
+                    ciphertext_validity_record: Some(ciphertext_validity_record.clone()),
+                    range_record: Some(range_record.clone()),
+                    authority: authority.clone(),
                 };
                 return Ok(Instruction::ConfidentialTransfer { accounts, args });
             }
             [27u8, 8u8] => {
                 let mut rdr: &[u8] = rest;
-                let confidential_transfer_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(confidential_transfer_discriminator),
-                            e
-                        )
-                    })?;
                 let expected_pending_balance_credit_counter: u64 =
                     <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
                         format!(
@@ -8274,132 +8221,97 @@ impl Instruction {
                             )
                         })?;
                 let args = ApplyConfidentialPendingBalanceArguments {
-                    confidential_transfer_discriminator,
                     expected_pending_balance_credit_counter,
                     new_decryptable_available_balance,
+                    extension_type: "applyConfidentialPendingBalance".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                let token = keys.next().unwrap().clone();
-                let authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let token = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "token"))?;
+                let authority = account_keys.get(1usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 1usize, "authority")
+                })?;
                 let accounts = ApplyConfidentialPendingBalanceAccounts {
-                    remaining,
-                    token,
-                    authority,
+                    remaining: vec![],
+                    token: token.clone(),
+                    authority: authority.clone(),
                 };
                 return Ok(Instruction::ApplyConfidentialPendingBalance { accounts, args });
             }
             [27u8, 9u8] => {
                 let mut rdr: &[u8] = rest;
-                let confidential_transfer_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(confidential_transfer_discriminator),
-                            e
-                        )
-                    })?;
                 let args = EnableConfidentialCreditsArguments {
-                    confidential_transfer_discriminator,
+                    extension_type: "enableConfidentialCredits".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                let token = keys.next().unwrap().clone();
-                let authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let token = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "token"))?;
+                let authority = account_keys.get(1usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 1usize, "authority")
+                })?;
                 let accounts = EnableConfidentialCreditsAccounts {
-                    remaining,
-                    token,
-                    authority,
+                    remaining: vec![],
+                    token: token.clone(),
+                    authority: authority.clone(),
                 };
                 return Ok(Instruction::EnableConfidentialCredits { accounts, args });
             }
             [27u8, 10u8] => {
                 let mut rdr: &[u8] = rest;
-                let confidential_transfer_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(confidential_transfer_discriminator),
-                            e
-                        )
-                    })?;
                 let args = DisableConfidentialCreditsArguments {
-                    confidential_transfer_discriminator,
+                    extension_type: "disableConfidentialCredits".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                let token = keys.next().unwrap().clone();
-                let authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let token = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "token"))?;
+                let authority = account_keys.get(1usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 1usize, "authority")
+                })?;
                 let accounts = DisableConfidentialCreditsAccounts {
-                    remaining,
-                    token,
-                    authority,
+                    remaining: vec![],
+                    token: token.clone(),
+                    authority: authority.clone(),
                 };
                 return Ok(Instruction::DisableConfidentialCredits { accounts, args });
             }
             [27u8, 11u8] => {
                 let mut rdr: &[u8] = rest;
-                let confidential_transfer_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(confidential_transfer_discriminator),
-                            e
-                        )
-                    })?;
                 let args = EnableNonConfidentialCreditsArguments {
-                    confidential_transfer_discriminator,
+                    extension_type: "enableNonConfidentialCredits".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                let token = keys.next().unwrap().clone();
-                let authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let token = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "token"))?;
+                let authority = account_keys.get(1usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 1usize, "authority")
+                })?;
                 let accounts = EnableNonConfidentialCreditsAccounts {
-                    remaining,
-                    token,
-                    authority,
+                    remaining: vec![],
+                    token: token.clone(),
+                    authority: authority.clone(),
                 };
                 return Ok(Instruction::EnableNonConfidentialCredits { accounts, args });
             }
             [27u8, 12u8] => {
                 let mut rdr: &[u8] = rest;
-                let confidential_transfer_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(confidential_transfer_discriminator),
-                            e
-                        )
-                    })?;
                 let args = DisableNonConfidentialCreditsArguments {
-                    confidential_transfer_discriminator,
+                    extension_type: "disableNonConfidentialCredits".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                let token = keys.next().unwrap().clone();
-                let authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let token = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "token"))?;
+                let authority = account_keys.get(1usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 1usize, "authority")
+                })?;
                 let accounts = DisableNonConfidentialCreditsAccounts {
-                    remaining,
-                    token,
-                    authority,
+                    remaining: vec![],
+                    token: token.clone(),
+                    authority: authority.clone(),
                 };
                 return Ok(Instruction::DisableNonConfidentialCredits { accounts, args });
             }
             [27u8, 13u8] => {
                 let mut rdr: &[u8] = rest;
-                let confidential_transfer_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(confidential_transfer_discriminator),
-                            e
-                        )
-                    })?;
                 let new_source_decryptable_available_balance: DecryptableBalance =
                     <DecryptableBalance as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                         .map_err(|e| {
@@ -8452,124 +8364,113 @@ impl Instruction {
                         )
                     })?;
                 let args = ConfidentialTransferWithFeeArguments {
-                    confidential_transfer_discriminator,
                     new_source_decryptable_available_balance,
                     equality_proof_instruction_offset,
                     transfer_amount_ciphertext_validity_proof_instruction_offset,
                     fee_sigma_proof_instruction_offset,
                     fee_ciphertext_validity_proof_instruction_offset,
                     range_proof_instruction_offset,
+                    extension_type: "confidentialTransferWithFee".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(4usize);
-                let source_token = keys.next().unwrap().clone();
-                let mint = keys.next().unwrap().clone();
-                let destination_token = keys.next().unwrap().clone();
-                let instructions_sysvar = if opt_budget > 0 {
-                    opt_budget -= 1;
-                    Some(keys.next().unwrap().clone())
-                } else {
-                    None
-                };
-                let equality_record = if opt_budget > 0 {
-                    opt_budget -= 1;
-                    Some(keys.next().unwrap().clone())
-                } else {
-                    None
-                };
-                let transfer_amount_ciphertext_validity_record = if opt_budget > 0 {
-                    opt_budget -= 1;
-                    Some(keys.next().unwrap().clone())
-                } else {
-                    None
-                };
-                let fee_sigma_record = if opt_budget > 0 {
-                    opt_budget -= 1;
-                    Some(keys.next().unwrap().clone())
-                } else {
-                    None
-                };
-                let fee_ciphertext_validity_record = if opt_budget > 0 {
-                    opt_budget -= 1;
-                    Some(keys.next().unwrap().clone())
-                } else {
-                    None
-                };
-                let range_record = if opt_budget > 0 {
-                    opt_budget -= 1;
-                    Some(keys.next().unwrap().clone())
-                } else {
-                    None
-                };
-                let authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let source_token = account_keys.get(0usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 0usize, "sourceToken")
+                })?;
+                let mint = account_keys
+                    .get(1usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "mint"))?;
+                let destination_token = account_keys.get(2usize).ok_or_else(|| {
+                    format!(
+                        "Missing account at index {}: {}",
+                        2usize, "destinationToken"
+                    )
+                })?;
+                let instructions_sysvar = account_keys.get(3usize).ok_or_else(|| {
+                    format!(
+                        "Missing account at index {}: {}",
+                        3usize, "instructionsSysvar"
+                    )
+                })?;
+                let equality_record = account_keys.get(4usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 4usize, "equalityRecord")
+                })?;
+                let transfer_amount_ciphertext_validity_record =
+                    account_keys.get(5usize).ok_or_else(|| {
+                        format!(
+                            "Missing account at index {}: {}",
+                            5usize, "transferAmountCiphertextValidityRecord"
+                        )
+                    })?;
+                let fee_sigma_record = account_keys.get(6usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 6usize, "feeSigmaRecord")
+                })?;
+                let fee_ciphertext_validity_record = account_keys.get(7usize).ok_or_else(|| {
+                    format!(
+                        "Missing account at index {}: {}",
+                        7usize, "feeCiphertextValidityRecord"
+                    )
+                })?;
+                let range_record = account_keys.get(8usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 8usize, "rangeRecord")
+                })?;
+                let authority = account_keys.get(9usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 9usize, "authority")
+                })?;
                 let accounts = ConfidentialTransferWithFeeAccounts {
-                    remaining,
-                    source_token,
-                    mint,
-                    destination_token,
-                    instructions_sysvar,
-                    equality_record,
-                    transfer_amount_ciphertext_validity_record,
-                    fee_sigma_record,
-                    fee_ciphertext_validity_record,
-                    range_record,
-                    authority,
+                    remaining: vec![],
+                    source_token: source_token.clone(),
+                    mint: mint.clone(),
+                    destination_token: destination_token.clone(),
+                    instructions_sysvar: Some(instructions_sysvar.clone()),
+                    equality_record: Some(equality_record.clone()),
+                    transfer_amount_ciphertext_validity_record: Some(
+                        transfer_amount_ciphertext_validity_record.clone(),
+                    ),
+                    fee_sigma_record: Some(fee_sigma_record.clone()),
+                    fee_ciphertext_validity_record: Some(fee_ciphertext_validity_record.clone()),
+                    range_record: Some(range_record.clone()),
+                    authority: authority.clone(),
                 };
                 return Ok(Instruction::ConfidentialTransferWithFee { accounts, args });
             }
             [28u8, 0u8] => {
                 let mut rdr: &[u8] = rest;
-                let default_account_state_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(default_account_state_discriminator),
-                            e
-                        )
-                    })?;
                 let state: AccountState = <AccountState as ::borsh::BorshDeserialize>::deserialize(
                     &mut rdr,
                 )
                 .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(state), e))?;
                 let args = InitializeDefaultAccountStateArguments {
-                    default_account_state_discriminator,
                     state,
+                    extension_type: "initializeDefaultAccountState".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                let mint = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
-                let accounts = InitializeDefaultAccountStateAccounts { remaining, mint };
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let accounts = InitializeDefaultAccountStateAccounts {
+                    remaining: vec![],
+                    mint: mint.clone(),
+                };
                 return Ok(Instruction::InitializeDefaultAccountState { accounts, args });
             }
             [28u8, 1u8] => {
                 let mut rdr: &[u8] = rest;
-                let default_account_state_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(default_account_state_discriminator),
-                            e
-                        )
-                    })?;
                 let state: AccountState = <AccountState as ::borsh::BorshDeserialize>::deserialize(
                     &mut rdr,
                 )
                 .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(state), e))?;
                 let args = UpdateDefaultAccountStateArguments {
-                    default_account_state_discriminator,
                     state,
+                    extension_type: "updateDefaultAccountState".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                let mint = keys.next().unwrap().clone();
-                let freeze_authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let freeze_authority = account_keys.get(1usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 1usize, "freezeAuthority")
+                })?;
                 let accounts = UpdateDefaultAccountStateAccounts {
-                    remaining,
-                    mint,
-                    freeze_authority,
+                    remaining: vec![],
+                    mint: mint.clone(),
+                    freeze_authority: freeze_authority.clone(),
                 };
                 return Ok(Instruction::UpdateDefaultAccountState { accounts, args });
             }
@@ -8586,211 +8487,180 @@ impl Instruction {
                 let args = ReallocateArguments {
                     new_extension_types,
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(4usize);
-                let token = keys.next().unwrap().clone();
-                let payer = keys.next().unwrap().clone();
-                let system_program = keys.next().unwrap().clone();
-                let owner = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let token = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "token"))?;
+                let payer = account_keys
+                    .get(1usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "payer"))?;
+                let system_program = account_keys.get(2usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 2usize, "systemProgram")
+                })?;
+                let owner = account_keys
+                    .get(3usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 3usize, "owner"))?;
                 let accounts = ReallocateAccounts {
-                    remaining,
-                    token,
-                    payer,
-                    system_program,
-                    owner,
+                    remaining: vec![],
+                    token: token.clone(),
+                    payer: payer.clone(),
+                    system_program: system_program.clone(),
+                    owner: owner.clone(),
                 };
                 return Ok(Instruction::Reallocate { accounts, args });
             }
             [30u8, 0u8] => {
                 let mut rdr: &[u8] = rest;
-                let memo_transfers_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(memo_transfers_discriminator),
-                            e
-                        )
-                    })?;
                 let args = EnableMemoTransfersArguments {
-                    memo_transfers_discriminator,
+                    extension_type: "enableMemoTransfers".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                let token = keys.next().unwrap().clone();
-                let owner = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let token = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "token"))?;
+                let owner = account_keys
+                    .get(1usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "owner"))?;
                 let accounts = EnableMemoTransfersAccounts {
-                    remaining,
-                    token,
-                    owner,
+                    remaining: vec![],
+                    token: token.clone(),
+                    owner: owner.clone(),
                 };
                 return Ok(Instruction::EnableMemoTransfers { accounts, args });
             }
             [30u8, 1u8] => {
                 let mut rdr: &[u8] = rest;
-                let memo_transfers_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(memo_transfers_discriminator),
-                            e
-                        )
-                    })?;
                 let args = DisableMemoTransfersArguments {
-                    memo_transfers_discriminator,
+                    extension_type: "disableMemoTransfers".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                let token = keys.next().unwrap().clone();
-                let owner = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let token = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "token"))?;
+                let owner = account_keys
+                    .get(1usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "owner"))?;
                 let accounts = DisableMemoTransfersAccounts {
-                    remaining,
-                    token,
-                    owner,
+                    remaining: vec![],
+                    token: token.clone(),
+                    owner: owner.clone(),
                 };
                 return Ok(Instruction::DisableMemoTransfers { accounts, args });
             }
             [31u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = CreateNativeMintArguments {};
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                let payer = keys.next().unwrap().clone();
-                let native_mint = keys.next().unwrap().clone();
-                let system_program = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let payer = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "payer"))?;
+                let native_mint = account_keys.get(1usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 1usize, "nativeMint")
+                })?;
+                let system_program = account_keys.get(2usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 2usize, "systemProgram")
+                })?;
                 let accounts = CreateNativeMintAccounts {
-                    remaining,
-                    payer,
-                    native_mint,
-                    system_program,
+                    remaining: vec![],
+                    payer: payer.clone(),
+                    native_mint: native_mint.clone(),
+                    system_program: system_program.clone(),
                 };
                 return Ok(Instruction::CreateNativeMint { accounts, args });
             }
             [32u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = InitializeNonTransferableMintArguments {};
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                let mint = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
-                let accounts = InitializeNonTransferableMintAccounts { remaining, mint };
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let accounts = InitializeNonTransferableMintAccounts {
+                    remaining: vec![],
+                    mint: mint.clone(),
+                };
                 return Ok(Instruction::InitializeNonTransferableMint { accounts, args });
             }
             [33u8, 0u8] => {
                 let mut rdr: &[u8] = rest;
-                let interest_bearing_mint_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(interest_bearing_mint_discriminator),
-                            e
-                        )
-                    })?;
-                let mut pubkey_bytes = [0u8; 32];
-                rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                let mut bytes = [0u8; 32];
+                rdr.read_exact(&mut bytes).map_err(|e| {
                     format!(
                         "Failed to read pubkey bytes for {}: {}",
                         stringify!(rate_authority),
                         e
                     )
                 })?;
-                let rate_authority: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                let rate_authority = if bytes == [0u8; 32] {
                     None
                 } else {
-                    Some(pubkey_bytes)
+                    Some(bytes)
                 };
                 let rate: i16 = <i16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                     .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(rate), e))?;
                 let args = InitializeInterestBearingMintArguments {
-                    interest_bearing_mint_discriminator,
                     rate_authority,
                     rate,
+                    extension_type: "initializeInterestBearingMint".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                let mint = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
-                let accounts = InitializeInterestBearingMintAccounts { remaining, mint };
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let accounts = InitializeInterestBearingMintAccounts {
+                    remaining: vec![],
+                    mint: mint.clone(),
+                };
                 return Ok(Instruction::InitializeInterestBearingMint { accounts, args });
             }
             [33u8, 1u8] => {
                 let mut rdr: &[u8] = rest;
-                let interest_bearing_mint_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(interest_bearing_mint_discriminator),
-                            e
-                        )
-                    })?;
                 let rate: i16 = <i16 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                     .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(rate), e))?;
                 let args = UpdateRateInterestBearingMintArguments {
-                    interest_bearing_mint_discriminator,
                     rate,
+                    extension_type: "updateRateInterestBearingMint".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                let mint = keys.next().unwrap().clone();
-                let rate_authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let rate_authority = account_keys.get(1usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 1usize, "rateAuthority")
+                })?;
                 let accounts = UpdateRateInterestBearingMintAccounts {
-                    remaining,
-                    mint,
-                    rate_authority,
+                    remaining: vec![],
+                    mint: mint.clone(),
+                    rate_authority: rate_authority.clone(),
                 };
                 return Ok(Instruction::UpdateRateInterestBearingMint { accounts, args });
             }
             [34u8, 0u8] => {
                 let mut rdr: &[u8] = rest;
-                let cpi_guard_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(cpi_guard_discriminator),
-                            e
-                        )
-                    })?;
                 let args = EnableCpiGuardArguments {
-                    cpi_guard_discriminator,
+                    extension_type: "enableCpiGuard".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                let token = keys.next().unwrap().clone();
-                let owner = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let token = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "token"))?;
+                let owner = account_keys
+                    .get(1usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "owner"))?;
                 let accounts = EnableCpiGuardAccounts {
-                    remaining,
-                    token,
-                    owner,
+                    remaining: vec![],
+                    token: token.clone(),
+                    owner: owner.clone(),
                 };
                 return Ok(Instruction::EnableCpiGuard { accounts, args });
             }
             [34u8, 1u8] => {
                 let mut rdr: &[u8] = rest;
-                let cpi_guard_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(cpi_guard_discriminator),
-                            e
-                        )
-                    })?;
                 let args = DisableCpiGuardArguments {
-                    cpi_guard_discriminator,
+                    extension_type: "disableCpiGuard".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                let token = keys.next().unwrap().clone();
-                let owner = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let token = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "token"))?;
+                let owner = account_keys
+                    .get(1usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "owner"))?;
                 let accounts = DisableCpiGuardAccounts {
-                    remaining,
-                    token,
-                    owner,
+                    remaining: vec![],
+                    token: token.clone(),
+                    owner: owner.clone(),
                 };
                 return Ok(Instruction::DisableCpiGuard { accounts, args });
             }
@@ -8801,139 +8671,133 @@ impl Instruction {
                         |e| format!("Failed to deserialize {}: {}", stringify!(delegate), e),
                     )?;
                 let args = InitializePermanentDelegateArguments { delegate };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                let mint = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
-                let accounts = InitializePermanentDelegateAccounts { remaining, mint };
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let accounts = InitializePermanentDelegateAccounts {
+                    remaining: vec![],
+                    mint: mint.clone(),
+                };
                 return Ok(Instruction::InitializePermanentDelegate { accounts, args });
             }
             [36u8, 0u8] => {
                 let mut rdr: &[u8] = rest;
-                let mut pubkey_bytes = [0u8; 32];
-                rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                let mut bytes = [0u8; 32];
+                rdr.read_exact(&mut bytes).map_err(|e| {
                     format!(
                         "Failed to read pubkey bytes for {}: {}",
                         stringify!(authority),
                         e
                     )
                 })?;
-                let authority: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                let authority = if bytes == [0u8; 32] {
                     None
                 } else {
-                    Some(pubkey_bytes)
+                    Some(bytes)
                 };
-                let mut pubkey_bytes = [0u8; 32];
-                rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                let mut bytes = [0u8; 32];
+                rdr.read_exact(&mut bytes).map_err(|e| {
                     format!(
                         "Failed to read pubkey bytes for {}: {}",
                         stringify!(program_id),
                         e
                     )
                 })?;
-                let program_id: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                let program_id = if bytes == [0u8; 32] {
                     None
                 } else {
-                    Some(pubkey_bytes)
+                    Some(bytes)
                 };
                 let args = InitializeTransferHookArguments {
                     authority,
                     program_id,
+                    extension_type: "initializeTransferHook".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                let mint = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
-                let accounts = InitializeTransferHookAccounts { remaining, mint };
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let accounts = InitializeTransferHookAccounts {
+                    remaining: vec![],
+                    mint: mint.clone(),
+                };
                 return Ok(Instruction::InitializeTransferHook { accounts, args });
             }
             [36u8, 1u8] => {
                 let mut rdr: &[u8] = rest;
-                let mut pubkey_bytes = [0u8; 32];
-                rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                let mut bytes = [0u8; 32];
+                rdr.read_exact(&mut bytes).map_err(|e| {
                     format!(
                         "Failed to read pubkey bytes for {}: {}",
                         stringify!(program_id),
                         e
                     )
                 })?;
-                let program_id: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                let program_id = if bytes == [0u8; 32] {
                     None
                 } else {
-                    Some(pubkey_bytes)
+                    Some(bytes)
                 };
-                let args = UpdateTransferHookArguments { program_id };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                let mint = keys.next().unwrap().clone();
-                let authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let args = UpdateTransferHookArguments {
+                    program_id,
+                    extension_type: "updateTransferHook".to_string(),
+                };
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let authority = account_keys.get(1usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 1usize, "authority")
+                })?;
                 let accounts = UpdateTransferHookAccounts {
-                    remaining,
-                    mint,
-                    authority,
+                    remaining: vec![],
+                    mint: mint.clone(),
+                    authority: authority.clone(),
                 };
                 return Ok(Instruction::UpdateTransferHook { accounts, args });
             }
             [37u8, 0u8] => {
                 let mut rdr: &[u8] = rest;
-                let confidential_transfer_fee_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(confidential_transfer_fee_discriminator),
-                            e
-                        )
-                    })?;
-                let mut pubkey_bytes = [0u8; 32];
-                rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                let mut bytes = [0u8; 32];
+                rdr.read_exact(&mut bytes).map_err(|e| {
                     format!(
                         "Failed to read pubkey bytes for {}: {}",
                         stringify!(authority),
                         e
                     )
                 })?;
-                let authority: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                let authority = if bytes == [0u8; 32] {
                     None
                 } else {
-                    Some(pubkey_bytes)
+                    Some(bytes)
                 };
-                let mut pubkey_bytes = [0u8; 32];
-                rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                let mut bytes = [0u8; 32];
+                rdr.read_exact(&mut bytes).map_err(|e| {
                     format!(
                         "Failed to read pubkey bytes for {}: {}",
                         stringify!(withdraw_withheld_authority_el_gamal_pubkey),
                         e
                     )
                 })?;
-                let withdraw_withheld_authority_el_gamal_pubkey: Option<[u8; 32usize]> =
-                    if pubkey_bytes == [0u8; 32] {
-                        None
-                    } else {
-                        Some(pubkey_bytes)
-                    };
+                let withdraw_withheld_authority_el_gamal_pubkey = if bytes == [0u8; 32] {
+                    None
+                } else {
+                    Some(bytes)
+                };
                 let args = InitializeConfidentialTransferFeeArguments {
-                    confidential_transfer_fee_discriminator,
                     authority,
                     withdraw_withheld_authority_el_gamal_pubkey,
+                    extension_type: "initializeConfidentialTransferFee".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                let mint = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
-                let accounts = InitializeConfidentialTransferFeeAccounts { remaining, mint };
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let accounts = InitializeConfidentialTransferFeeAccounts {
+                    remaining: vec![],
+                    mint: mint.clone(),
+                };
                 return Ok(Instruction::InitializeConfidentialTransferFee { accounts, args });
             }
             [37u8, 1u8] => {
                 let mut rdr: &[u8] = rest;
-                let confidential_transfer_fee_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(confidential_transfer_fee_discriminator),
-                            e
-                        )
-                    })?;
                 let proof_instruction_offset: i8 =
                     <i8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
                         format!(
@@ -8952,30 +8816,38 @@ impl Instruction {
                             )
                         })?;
                 let args = WithdrawWithheldTokensFromMintForConfidentialTransferFeeArguments {
-                    confidential_transfer_fee_discriminator,
                     proof_instruction_offset,
                     new_decryptable_available_balance,
+                    extension_type: "withdrawWithheldTokensFromMintForConfidentialTransferFee"
+                        .to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(4usize);
-                let mint = keys.next().unwrap().clone();
-                let destination = keys.next().unwrap().clone();
-                let instructions_sysvar_or_context_state = keys.next().unwrap().clone();
-                let record = if opt_budget > 0 {
-                    opt_budget -= 1;
-                    Some(keys.next().unwrap().clone())
-                } else {
-                    None
-                };
-                let authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let destination = account_keys.get(1usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 1usize, "destination")
+                })?;
+                let instructions_sysvar_or_context_state =
+                    account_keys.get(2usize).ok_or_else(|| {
+                        format!(
+                            "Missing account at index {}: {}",
+                            2usize, "instructionsSysvarOrContextState"
+                        )
+                    })?;
+                let record = account_keys
+                    .get(3usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 3usize, "record"))?;
+                let authority = account_keys.get(4usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 4usize, "authority")
+                })?;
                 let accounts = WithdrawWithheldTokensFromMintForConfidentialTransferFeeAccounts {
-                    remaining,
-                    mint,
-                    destination,
-                    instructions_sysvar_or_context_state,
-                    record,
-                    authority,
+                    remaining: vec![],
+                    mint: mint.clone(),
+                    destination: destination.clone(),
+                    instructions_sysvar_or_context_state: instructions_sysvar_or_context_state
+                        .clone(),
+                    record: Some(record.clone()),
+                    authority: authority.clone(),
                 };
                 return Ok(
                     Instruction::WithdrawWithheldTokensFromMintForConfidentialTransferFee {
@@ -8986,14 +8858,6 @@ impl Instruction {
             }
             [37u8, 2u8] => {
                 let mut rdr: &[u8] = rest;
-                let confidential_transfer_fee_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(confidential_transfer_fee_discriminator),
-                            e
-                        )
-                    })?;
                 let num_token_accounts: u8 =
                     <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
                         format!(
@@ -9020,32 +8884,40 @@ impl Instruction {
                             )
                         })?;
                 let args = WithdrawWithheldTokensFromAccountsForConfidentialTransferFeeArguments {
-                    confidential_transfer_fee_discriminator,
                     num_token_accounts,
                     proof_instruction_offset,
                     new_decryptable_available_balance,
+                    extension_type: "withdrawWithheldTokensFromAccountsForConfidentialTransferFee"
+                        .to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(4usize);
-                let mint = keys.next().unwrap().clone();
-                let destination = keys.next().unwrap().clone();
-                let instructions_sysvar_or_context_state = keys.next().unwrap().clone();
-                let record = if opt_budget > 0 {
-                    opt_budget -= 1;
-                    Some(keys.next().unwrap().clone())
-                } else {
-                    None
-                };
-                let authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let destination = account_keys.get(1usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 1usize, "destination")
+                })?;
+                let instructions_sysvar_or_context_state =
+                    account_keys.get(2usize).ok_or_else(|| {
+                        format!(
+                            "Missing account at index {}: {}",
+                            2usize, "instructionsSysvarOrContextState"
+                        )
+                    })?;
+                let record = account_keys
+                    .get(3usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 3usize, "record"))?;
+                let authority = account_keys.get(4usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 4usize, "authority")
+                })?;
                 let accounts =
                     WithdrawWithheldTokensFromAccountsForConfidentialTransferFeeAccounts {
-                        remaining,
-                        mint,
-                        destination,
-                        instructions_sysvar_or_context_state,
-                        record,
-                        authority,
+                        remaining: vec![],
+                        mint: mint.clone(),
+                        destination: destination.clone(),
+                        instructions_sysvar_or_context_state: instructions_sysvar_or_context_state
+                            .clone(),
+                        record: Some(record.clone()),
+                        authority: authority.clone(),
                     };
                 return Ok(
                     Instruction::WithdrawWithheldTokensFromAccountsForConfidentialTransferFee {
@@ -9056,24 +8928,16 @@ impl Instruction {
             }
             [37u8, 3u8] => {
                 let mut rdr: &[u8] = rest;
-                let confidential_transfer_fee_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(confidential_transfer_fee_discriminator),
-                            e
-                        )
-                    })?;
                 let args = HarvestWithheldTokensToMintForConfidentialTransferFeeArguments {
-                    confidential_transfer_fee_discriminator,
+                    extension_type: "harvestWithheldTokensToMintForConfidentialTransferFee"
+                        .to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                let mint = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
                 let accounts = HarvestWithheldTokensToMintForConfidentialTransferFeeAccounts {
-                    remaining,
-                    mint,
+                    remaining: vec![],
+                    mint: mint.clone(),
                 };
                 return Ok(
                     Instruction::HarvestWithheldTokensToMintForConfidentialTransferFee {
@@ -9084,381 +8948,329 @@ impl Instruction {
             }
             [37u8, 4u8] => {
                 let mut rdr: &[u8] = rest;
-                let confidential_transfer_fee_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(confidential_transfer_fee_discriminator),
-                            e
-                        )
-                    })?;
                 let args = EnableHarvestToMintArguments {
-                    confidential_transfer_fee_discriminator,
+                    extension_type: "enableHarvestToMint".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                let mint = keys.next().unwrap().clone();
-                let authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let authority = account_keys.get(1usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 1usize, "authority")
+                })?;
                 let accounts = EnableHarvestToMintAccounts {
-                    remaining,
-                    mint,
-                    authority,
+                    remaining: vec![],
+                    mint: mint.clone(),
+                    authority: authority.clone(),
                 };
                 return Ok(Instruction::EnableHarvestToMint { accounts, args });
             }
             [37u8, 5u8] => {
                 let mut rdr: &[u8] = rest;
-                let confidential_transfer_fee_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(confidential_transfer_fee_discriminator),
-                            e
-                        )
-                    })?;
                 let args = DisableHarvestToMintArguments {
-                    confidential_transfer_fee_discriminator,
+                    extension_type: "disableHarvestToMint".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                let mint = keys.next().unwrap().clone();
-                let authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let authority = account_keys.get(1usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 1usize, "authority")
+                })?;
                 let accounts = DisableHarvestToMintAccounts {
-                    remaining,
-                    mint,
-                    authority,
+                    remaining: vec![],
+                    mint: mint.clone(),
+                    authority: authority.clone(),
                 };
                 return Ok(Instruction::DisableHarvestToMint { accounts, args });
             }
             [38u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = WithdrawExcessLamportsArguments {};
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                let source_account = keys.next().unwrap().clone();
-                let destination_account = keys.next().unwrap().clone();
-                let authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let source_account = account_keys.get(0usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 0usize, "sourceAccount")
+                })?;
+                let destination_account = account_keys.get(1usize).ok_or_else(|| {
+                    format!(
+                        "Missing account at index {}: {}",
+                        1usize, "destinationAccount"
+                    )
+                })?;
+                let authority = account_keys.get(2usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 2usize, "authority")
+                })?;
                 let accounts = WithdrawExcessLamportsAccounts {
-                    remaining,
-                    source_account,
-                    destination_account,
-                    authority,
+                    remaining: vec![],
+                    source_account: source_account.clone(),
+                    destination_account: destination_account.clone(),
+                    authority: authority.clone(),
                 };
                 return Ok(Instruction::WithdrawExcessLamports { accounts, args });
             }
             [39u8, 0u8] => {
                 let mut rdr: &[u8] = rest;
-                let metadata_pointer_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(metadata_pointer_discriminator),
-                            e
-                        )
-                    })?;
-                let mut pubkey_bytes = [0u8; 32];
-                rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                let mut bytes = [0u8; 32];
+                rdr.read_exact(&mut bytes).map_err(|e| {
                     format!(
                         "Failed to read pubkey bytes for {}: {}",
                         stringify!(authority),
                         e
                     )
                 })?;
-                let authority: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                let authority = if bytes == [0u8; 32] {
                     None
                 } else {
-                    Some(pubkey_bytes)
+                    Some(bytes)
                 };
-                let mut pubkey_bytes = [0u8; 32];
-                rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                let mut bytes = [0u8; 32];
+                rdr.read_exact(&mut bytes).map_err(|e| {
                     format!(
                         "Failed to read pubkey bytes for {}: {}",
                         stringify!(metadata_address),
                         e
                     )
                 })?;
-                let metadata_address: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                let metadata_address = if bytes == [0u8; 32] {
                     None
                 } else {
-                    Some(pubkey_bytes)
+                    Some(bytes)
                 };
                 let args = InitializeMetadataPointerArguments {
-                    metadata_pointer_discriminator,
                     authority,
                     metadata_address,
+                    extension_type: "initializeMetadataPointer".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                let mint = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
-                let accounts = InitializeMetadataPointerAccounts { remaining, mint };
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let accounts = InitializeMetadataPointerAccounts {
+                    remaining: vec![],
+                    mint: mint.clone(),
+                };
                 return Ok(Instruction::InitializeMetadataPointer { accounts, args });
             }
             [39u8, 1u8] => {
                 let mut rdr: &[u8] = rest;
-                let metadata_pointer_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(metadata_pointer_discriminator),
-                            e
-                        )
-                    })?;
-                let mut pubkey_bytes = [0u8; 32];
-                rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                let mut bytes = [0u8; 32];
+                rdr.read_exact(&mut bytes).map_err(|e| {
                     format!(
                         "Failed to read pubkey bytes for {}: {}",
                         stringify!(metadata_address),
                         e
                     )
                 })?;
-                let metadata_address: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                let metadata_address = if bytes == [0u8; 32] {
                     None
                 } else {
-                    Some(pubkey_bytes)
+                    Some(bytes)
                 };
                 let args = UpdateMetadataPointerArguments {
-                    metadata_pointer_discriminator,
                     metadata_address,
+                    extension_type: "updateMetadataPointer".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                let mint = keys.next().unwrap().clone();
-                let metadata_pointer_authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let metadata_pointer_authority = account_keys.get(1usize).ok_or_else(|| {
+                    format!(
+                        "Missing account at index {}: {}",
+                        1usize, "metadataPointerAuthority"
+                    )
+                })?;
                 let accounts = UpdateMetadataPointerAccounts {
-                    remaining,
-                    mint,
-                    metadata_pointer_authority,
+                    remaining: vec![],
+                    mint: mint.clone(),
+                    metadata_pointer_authority: metadata_pointer_authority.clone(),
                 };
                 return Ok(Instruction::UpdateMetadataPointer { accounts, args });
             }
             [40u8, 0u8] => {
                 let mut rdr: &[u8] = rest;
-                let group_pointer_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(group_pointer_discriminator),
-                            e
-                        )
-                    })?;
-                let mut pubkey_bytes = [0u8; 32];
-                rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                let mut bytes = [0u8; 32];
+                rdr.read_exact(&mut bytes).map_err(|e| {
                     format!(
                         "Failed to read pubkey bytes for {}: {}",
                         stringify!(authority),
                         e
                     )
                 })?;
-                let authority: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                let authority = if bytes == [0u8; 32] {
                     None
                 } else {
-                    Some(pubkey_bytes)
+                    Some(bytes)
                 };
-                let mut pubkey_bytes = [0u8; 32];
-                rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                let mut bytes = [0u8; 32];
+                rdr.read_exact(&mut bytes).map_err(|e| {
                     format!(
                         "Failed to read pubkey bytes for {}: {}",
                         stringify!(group_address),
                         e
                     )
                 })?;
-                let group_address: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                let group_address = if bytes == [0u8; 32] {
                     None
                 } else {
-                    Some(pubkey_bytes)
+                    Some(bytes)
                 };
                 let args = InitializeGroupPointerArguments {
-                    group_pointer_discriminator,
                     authority,
                     group_address,
+                    extension_type: "initializeGroupPointer".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                let mint = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
-                let accounts = InitializeGroupPointerAccounts { remaining, mint };
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let accounts = InitializeGroupPointerAccounts {
+                    remaining: vec![],
+                    mint: mint.clone(),
+                };
                 return Ok(Instruction::InitializeGroupPointer { accounts, args });
             }
             [40u8, 1u8] => {
                 let mut rdr: &[u8] = rest;
-                let group_pointer_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(group_pointer_discriminator),
-                            e
-                        )
-                    })?;
-                let mut pubkey_bytes = [0u8; 32];
-                rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                let mut bytes = [0u8; 32];
+                rdr.read_exact(&mut bytes).map_err(|e| {
                     format!(
                         "Failed to read pubkey bytes for {}: {}",
                         stringify!(group_address),
                         e
                     )
                 })?;
-                let group_address: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                let group_address = if bytes == [0u8; 32] {
                     None
                 } else {
-                    Some(pubkey_bytes)
+                    Some(bytes)
                 };
                 let args = UpdateGroupPointerArguments {
-                    group_pointer_discriminator,
                     group_address,
+                    extension_type: "updateGroupPointer".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                let mint = keys.next().unwrap().clone();
-                let group_pointer_authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let group_pointer_authority = account_keys.get(1usize).ok_or_else(|| {
+                    format!(
+                        "Missing account at index {}: {}",
+                        1usize, "groupPointerAuthority"
+                    )
+                })?;
                 let accounts = UpdateGroupPointerAccounts {
-                    remaining,
-                    mint,
-                    group_pointer_authority,
+                    remaining: vec![],
+                    mint: mint.clone(),
+                    group_pointer_authority: group_pointer_authority.clone(),
                 };
                 return Ok(Instruction::UpdateGroupPointer { accounts, args });
             }
             [41u8, 0u8] => {
                 let mut rdr: &[u8] = rest;
-                let group_member_pointer_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(group_member_pointer_discriminator),
-                            e
-                        )
-                    })?;
-                let mut pubkey_bytes = [0u8; 32];
-                rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                let mut bytes = [0u8; 32];
+                rdr.read_exact(&mut bytes).map_err(|e| {
                     format!(
                         "Failed to read pubkey bytes for {}: {}",
                         stringify!(authority),
                         e
                     )
                 })?;
-                let authority: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                let authority = if bytes == [0u8; 32] {
                     None
                 } else {
-                    Some(pubkey_bytes)
+                    Some(bytes)
                 };
-                let mut pubkey_bytes = [0u8; 32];
-                rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                let mut bytes = [0u8; 32];
+                rdr.read_exact(&mut bytes).map_err(|e| {
                     format!(
                         "Failed to read pubkey bytes for {}: {}",
                         stringify!(member_address),
                         e
                     )
                 })?;
-                let member_address: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                let member_address = if bytes == [0u8; 32] {
                     None
                 } else {
-                    Some(pubkey_bytes)
+                    Some(bytes)
                 };
                 let args = InitializeGroupMemberPointerArguments {
-                    group_member_pointer_discriminator,
                     authority,
                     member_address,
+                    extension_type: "initializeGroupMemberPointer".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                let mint = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
-                let accounts = InitializeGroupMemberPointerAccounts { remaining, mint };
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let accounts = InitializeGroupMemberPointerAccounts {
+                    remaining: vec![],
+                    mint: mint.clone(),
+                };
                 return Ok(Instruction::InitializeGroupMemberPointer { accounts, args });
             }
             [41u8, 1u8] => {
                 let mut rdr: &[u8] = rest;
-                let group_member_pointer_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(group_member_pointer_discriminator),
-                            e
-                        )
-                    })?;
-                let mut pubkey_bytes = [0u8; 32];
-                rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                let mut bytes = [0u8; 32];
+                rdr.read_exact(&mut bytes).map_err(|e| {
                     format!(
                         "Failed to read pubkey bytes for {}: {}",
                         stringify!(member_address),
                         e
                     )
                 })?;
-                let member_address: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                let member_address = if bytes == [0u8; 32] {
                     None
                 } else {
-                    Some(pubkey_bytes)
+                    Some(bytes)
                 };
                 let args = UpdateGroupMemberPointerArguments {
-                    group_member_pointer_discriminator,
                     member_address,
+                    extension_type: "updateGroupMemberPointer".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                let mint = keys.next().unwrap().clone();
-                let group_member_pointer_authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let group_member_pointer_authority = account_keys.get(1usize).ok_or_else(|| {
+                    format!(
+                        "Missing account at index {}: {}",
+                        1usize, "groupMemberPointerAuthority"
+                    )
+                })?;
                 let accounts = UpdateGroupMemberPointerAccounts {
-                    remaining,
-                    mint,
-                    group_member_pointer_authority,
+                    remaining: vec![],
+                    mint: mint.clone(),
+                    group_member_pointer_authority: group_member_pointer_authority.clone(),
                 };
                 return Ok(Instruction::UpdateGroupMemberPointer { accounts, args });
             }
             [43u8, 0u8] => {
                 let mut rdr: &[u8] = rest;
-                let scaled_ui_amount_mint_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(scaled_ui_amount_mint_discriminator),
-                            e
-                        )
-                    })?;
-                let mut pubkey_bytes = [0u8; 32];
-                rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                let mut bytes = [0u8; 32];
+                rdr.read_exact(&mut bytes).map_err(|e| {
                     format!(
                         "Failed to read pubkey bytes for {}: {}",
                         stringify!(authority),
                         e
                     )
                 })?;
-                let authority: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                let authority = if bytes == [0u8; 32] {
                     None
                 } else {
-                    Some(pubkey_bytes)
+                    Some(bytes)
                 };
                 let multiplier: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                     .map_err(|e| {
                         format!("Failed to deserialize {}: {}", stringify!(multiplier), e)
                     })?;
                 let args = InitializeScaledUiAmountMintArguments {
-                    scaled_ui_amount_mint_discriminator,
                     authority,
                     multiplier,
+                    extension_type: "initializeScaledUiAmountMint".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                let mint = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
-                let accounts = InitializeScaledUiAmountMintAccounts { remaining, mint };
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let accounts = InitializeScaledUiAmountMintAccounts {
+                    remaining: vec![],
+                    mint: mint.clone(),
+                };
                 return Ok(Instruction::InitializeScaledUiAmountMint { accounts, args });
             }
             [43u8, 1u8] => {
                 let mut rdr: &[u8] = rest;
-                let scaled_ui_amount_mint_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(scaled_ui_amount_mint_discriminator),
-                            e
-                        )
-                    })?;
                 let multiplier: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                     .map_err(|e| {
                         format!("Failed to deserialize {}: {}", stringify!(multiplier), e)
@@ -9472,187 +9284,155 @@ impl Instruction {
                         )
                     })?;
                 let args = UpdateMultiplierScaledUiMintArguments {
-                    scaled_ui_amount_mint_discriminator,
                     multiplier,
                     effective_timestamp,
+                    extension_type: "updateMultiplierScaledUiMint".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                let mint = keys.next().unwrap().clone();
-                let authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let authority = account_keys.get(1usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 1usize, "authority")
+                })?;
                 let accounts = UpdateMultiplierScaledUiMintAccounts {
-                    remaining,
-                    mint,
-                    authority,
+                    remaining: vec![],
+                    mint: mint.clone(),
+                    authority: authority.clone(),
                 };
                 return Ok(Instruction::UpdateMultiplierScaledUiMint { accounts, args });
             }
             [44u8, 0u8] => {
                 let mut rdr: &[u8] = rest;
-                let pausable_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(pausable_discriminator),
-                            e
-                        )
-                    })?;
-                let mut pubkey_bytes = [0u8; 32];
-                rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                let mut bytes = [0u8; 32];
+                rdr.read_exact(&mut bytes).map_err(|e| {
                     format!(
                         "Failed to read pubkey bytes for {}: {}",
                         stringify!(authority),
                         e
                     )
                 })?;
-                let authority: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                let authority = if bytes == [0u8; 32] {
                     None
                 } else {
-                    Some(pubkey_bytes)
+                    Some(bytes)
                 };
                 let args = InitializePausableConfigArguments {
-                    pausable_discriminator,
                     authority,
+                    extension_type: "initializePausableConfig".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                let mint = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
-                let accounts = InitializePausableConfigAccounts { remaining, mint };
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let accounts = InitializePausableConfigAccounts {
+                    remaining: vec![],
+                    mint: mint.clone(),
+                };
                 return Ok(Instruction::InitializePausableConfig { accounts, args });
             }
             [44u8, 1u8] => {
                 let mut rdr: &[u8] = rest;
-                let pausable_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(pausable_discriminator),
-                            e
-                        )
-                    })?;
                 let args = PauseArguments {
-                    pausable_discriminator,
+                    extension_type: "pause".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                let mint = keys.next().unwrap().clone();
-                let authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let authority = account_keys.get(1usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 1usize, "authority")
+                })?;
                 let accounts = PauseAccounts {
-                    remaining,
-                    mint,
-                    authority,
+                    remaining: vec![],
+                    mint: mint.clone(),
+                    authority: authority.clone(),
                 };
                 return Ok(Instruction::Pause { accounts, args });
             }
             [44u8, 2u8] => {
                 let mut rdr: &[u8] = rest;
-                let pausable_discriminator: u8 =
-                    <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                        format!(
-                            "Failed to deserialize {}: {}",
-                            stringify!(pausable_discriminator),
-                            e
-                        )
-                    })?;
                 let args = ResumeArguments {
-                    pausable_discriminator,
+                    extension_type: "resume".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                let mint = keys.next().unwrap().clone();
-                let authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let mint = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let authority = account_keys.get(1usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 1usize, "authority")
+                })?;
                 let accounts = ResumeAccounts {
-                    remaining,
-                    mint,
-                    authority,
+                    remaining: vec![],
+                    mint: mint.clone(),
+                    authority: authority.clone(),
                 };
                 return Ok(Instruction::Resume { accounts, args });
             }
             [210u8, 225u8, 30u8, 162u8, 88u8, 184u8, 77u8, 141u8] => {
                 let mut rdr: &[u8] = rest;
-                let string_len: u32 = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                    .map_err(|e| {
-                        format!(
-                            "Failed to deserialize string length for {}: {}",
-                            stringify!(name),
-                            e
-                        )
-                    })?;
-                let mut string_bytes = vec![0u8; string_len as usize];
-                rdr.read_exact(&mut string_bytes).map_err(|e| {
+                let len = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
+                    .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(name), e))?;
+                let mut bytes = vec![0u8; len as usize];
+                rdr.read_exact(&mut bytes).map_err(|e| {
                     format!(
-                        "Failed to read string bytes for {}: {}",
+                        "Failed to read {} bytes for {}: {}",
+                        len,
                         stringify!(name),
                         e
                     )
                 })?;
-                let name: String = String::from_utf8(string_bytes).map_err(|e| {
-                    format!(
-                        "Failed to parse UTF-8 string for {}: {}",
-                        stringify!(name),
-                        e
-                    )
+                let name = String::from_utf8(bytes).map_err(|e| {
+                    format!("Failed to convert {} to string: {}", stringify!(name), e)
                 })?;
-                let string_len: u32 = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                    .map_err(|e| {
-                        format!(
-                            "Failed to deserialize string length for {}: {}",
-                            stringify!(symbol),
-                            e
-                        )
-                    })?;
-                let mut string_bytes = vec![0u8; string_len as usize];
-                rdr.read_exact(&mut string_bytes).map_err(|e| {
+                let len = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
+                    .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(symbol), e))?;
+                let mut bytes = vec![0u8; len as usize];
+                rdr.read_exact(&mut bytes).map_err(|e| {
                     format!(
-                        "Failed to read string bytes for {}: {}",
+                        "Failed to read {} bytes for {}: {}",
+                        len,
                         stringify!(symbol),
                         e
                     )
                 })?;
-                let symbol: String = String::from_utf8(string_bytes).map_err(|e| {
-                    format!(
-                        "Failed to parse UTF-8 string for {}: {}",
-                        stringify!(symbol),
-                        e
-                    )
+                let symbol = String::from_utf8(bytes).map_err(|e| {
+                    format!("Failed to convert {} to string: {}", stringify!(symbol), e)
                 })?;
-                let string_len: u32 = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                    .map_err(|e| {
-                        format!(
-                            "Failed to deserialize string length for {}: {}",
-                            stringify!(uri),
-                            e
-                        )
-                    })?;
-                let mut string_bytes = vec![0u8; string_len as usize];
-                rdr.read_exact(&mut string_bytes).map_err(|e| {
-                    format!("Failed to read string bytes for {}: {}", stringify!(uri), e)
-                })?;
-                let uri: String = String::from_utf8(string_bytes).map_err(|e| {
+                let len = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
+                    .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(uri), e))?;
+                let mut bytes = vec![0u8; len as usize];
+                rdr.read_exact(&mut bytes).map_err(|e| {
                     format!(
-                        "Failed to parse UTF-8 string for {}: {}",
+                        "Failed to read {} bytes for {}: {}",
+                        len,
                         stringify!(uri),
                         e
                     )
                 })?;
-                let args = InitializeTokenMetadataArguments { name, symbol, uri };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(4usize);
-                let metadata = keys.next().unwrap().clone();
-                let update_authority = keys.next().unwrap().clone();
-                let mint = keys.next().unwrap().clone();
-                let mint_authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let uri = String::from_utf8(bytes).map_err(|e| {
+                    format!("Failed to convert {} to string: {}", stringify!(uri), e)
+                })?;
+                let args = InitializeTokenMetadataArguments {
+                    name,
+                    symbol,
+                    uri,
+                    extension_type: "initializeTokenMetadata".to_string(),
+                };
+                let metadata = account_keys.get(0usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 0usize, "metadata")
+                })?;
+                let update_authority = account_keys.get(1usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 1usize, "updateAuthority")
+                })?;
+                let mint = account_keys
+                    .get(2usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 2usize, "mint"))?;
+                let mint_authority = account_keys.get(3usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 3usize, "mintAuthority")
+                })?;
                 let accounts = InitializeTokenMetadataAccounts {
-                    remaining,
-                    metadata,
-                    update_authority,
-                    mint,
-                    mint_authority,
+                    remaining: vec![],
+                    metadata: metadata.clone(),
+                    update_authority: update_authority.clone(),
+                    mint: mint.clone(),
+                    mint_authority: mint_authority.clone(),
                 };
                 return Ok(Instruction::InitializeTokenMetadata { accounts, args });
             }
@@ -9663,39 +9443,35 @@ impl Instruction {
                         .map_err(|e| {
                             format!("Failed to deserialize {}: {}", stringify!(field), e)
                         })?;
-                let string_len: u32 = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                    .map_err(|e| {
-                        format!(
-                            "Failed to deserialize string length for {}: {}",
-                            stringify!(value),
-                            e
-                        )
-                    })?;
-                let mut string_bytes = vec![0u8; string_len as usize];
-                rdr.read_exact(&mut string_bytes).map_err(|e| {
+                let len = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
+                    .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(value), e))?;
+                let mut bytes = vec![0u8; len as usize];
+                rdr.read_exact(&mut bytes).map_err(|e| {
                     format!(
-                        "Failed to read string bytes for {}: {}",
+                        "Failed to read {} bytes for {}: {}",
+                        len,
                         stringify!(value),
                         e
                     )
                 })?;
-                let value: String = String::from_utf8(string_bytes).map_err(|e| {
-                    format!(
-                        "Failed to parse UTF-8 string for {}: {}",
-                        stringify!(value),
-                        e
-                    )
+                let value = String::from_utf8(bytes).map_err(|e| {
+                    format!("Failed to convert {} to string: {}", stringify!(value), e)
                 })?;
-                let args = UpdateTokenMetadataFieldArguments { field, value };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                let metadata = keys.next().unwrap().clone();
-                let update_authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let args = UpdateTokenMetadataFieldArguments {
+                    field,
+                    value,
+                    extension_type: "updateTokenMetadataField".to_string(),
+                };
+                let metadata = account_keys.get(0usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 0usize, "metadata")
+                })?;
+                let update_authority = account_keys.get(1usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 1usize, "updateAuthority")
+                })?;
                 let accounts = UpdateTokenMetadataFieldAccounts {
-                    remaining,
-                    metadata,
-                    update_authority,
+                    remaining: vec![],
+                    metadata: metadata.clone(),
+                    update_authority: update_authority.clone(),
                 };
                 return Ok(Instruction::UpdateTokenMetadataField { accounts, args });
             }
@@ -9705,65 +9481,67 @@ impl Instruction {
                     .map_err(|e| {
                     format!("Failed to deserialize {}: {}", stringify!(idempotent), e)
                 })?;
-                let string_len: u32 = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                    .map_err(|e| {
-                        format!(
-                            "Failed to deserialize string length for {}: {}",
-                            stringify!(key),
-                            e
-                        )
-                    })?;
-                let mut string_bytes = vec![0u8; string_len as usize];
-                rdr.read_exact(&mut string_bytes).map_err(|e| {
-                    format!("Failed to read string bytes for {}: {}", stringify!(key), e)
-                })?;
-                let key: String = String::from_utf8(string_bytes).map_err(|e| {
+                let len = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
+                    .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(key), e))?;
+                let mut bytes = vec![0u8; len as usize];
+                rdr.read_exact(&mut bytes).map_err(|e| {
                     format!(
-                        "Failed to parse UTF-8 string for {}: {}",
+                        "Failed to read {} bytes for {}: {}",
+                        len,
                         stringify!(key),
                         e
                     )
                 })?;
-                let args = RemoveTokenMetadataKeyArguments { idempotent, key };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                let metadata = keys.next().unwrap().clone();
-                let update_authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let key = String::from_utf8(bytes).map_err(|e| {
+                    format!("Failed to convert {} to string: {}", stringify!(key), e)
+                })?;
+                let args = RemoveTokenMetadataKeyArguments {
+                    idempotent,
+                    key,
+                    extension_type: "removeTokenMetadataKey".to_string(),
+                };
+                let metadata = account_keys.get(0usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 0usize, "metadata")
+                })?;
+                let update_authority = account_keys.get(1usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 1usize, "updateAuthority")
+                })?;
                 let accounts = RemoveTokenMetadataKeyAccounts {
-                    remaining,
-                    metadata,
-                    update_authority,
+                    remaining: vec![],
+                    metadata: metadata.clone(),
+                    update_authority: update_authority.clone(),
                 };
                 return Ok(Instruction::RemoveTokenMetadataKey { accounts, args });
             }
             [215u8, 228u8, 166u8, 228u8, 84u8, 100u8, 86u8, 123u8] => {
                 let mut rdr: &[u8] = rest;
-                let mut pubkey_bytes = [0u8; 32];
-                rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                let mut bytes = [0u8; 32];
+                rdr.read_exact(&mut bytes).map_err(|e| {
                     format!(
                         "Failed to read pubkey bytes for {}: {}",
                         stringify!(new_update_authority),
                         e
                     )
                 })?;
-                let new_update_authority: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                let new_update_authority = if bytes == [0u8; 32] {
                     None
                 } else {
-                    Some(pubkey_bytes)
+                    Some(bytes)
                 };
                 let args = UpdateTokenMetadataUpdateAuthorityArguments {
                     new_update_authority,
+                    extension_type: "updateTokenMetadataUpdateAuthority".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                let metadata = keys.next().unwrap().clone();
-                let update_authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let metadata = account_keys.get(0usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 0usize, "metadata")
+                })?;
+                let update_authority = account_keys.get(1usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 1usize, "updateAuthority")
+                })?;
                 let accounts = UpdateTokenMetadataUpdateAuthorityAccounts {
-                    remaining,
-                    metadata,
-                    update_authority,
+                    remaining: vec![],
+                    metadata: metadata.clone(),
+                    update_authority: update_authority.clone(),
                 };
                 return Ok(Instruction::UpdateTokenMetadataUpdateAuthority { accounts, args });
             }
@@ -9776,31 +9554,34 @@ impl Instruction {
                 let end: Option<u64> =
                     <Option<u64> as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                         .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(end), e))?;
-                let args = EmitTokenMetadataArguments { start, end };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(1usize);
-                let metadata = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let args = EmitTokenMetadataArguments {
+                    start,
+                    end,
+                    extension_type: "emitTokenMetadata".to_string(),
+                };
+                let metadata = account_keys.get(0usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 0usize, "metadata")
+                })?;
                 let accounts = EmitTokenMetadataAccounts {
-                    remaining,
-                    metadata,
+                    remaining: vec![],
+                    metadata: metadata.clone(),
                 };
                 return Ok(Instruction::EmitTokenMetadata { accounts, args });
             }
             [121u8, 113u8, 108u8, 39u8, 54u8, 51u8, 0u8, 4u8] => {
                 let mut rdr: &[u8] = rest;
-                let mut pubkey_bytes = [0u8; 32];
-                rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                let mut bytes = [0u8; 32];
+                rdr.read_exact(&mut bytes).map_err(|e| {
                     format!(
                         "Failed to read pubkey bytes for {}: {}",
                         stringify!(update_authority),
                         e
                     )
                 })?;
-                let update_authority: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                let update_authority = if bytes == [0u8; 32] {
                     None
                 } else {
-                    Some(pubkey_bytes)
+                    Some(bytes)
                 };
                 let max_size: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                     .map_err(|e| {
@@ -9809,18 +9590,22 @@ impl Instruction {
                 let args = InitializeTokenGroupArguments {
                     update_authority,
                     max_size,
+                    extension_type: "initializeTokenGroup".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(3usize);
-                let group = keys.next().unwrap().clone();
-                let mint = keys.next().unwrap().clone();
-                let mint_authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let group = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "group"))?;
+                let mint = account_keys
+                    .get(1usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "mint"))?;
+                let mint_authority = account_keys.get(2usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 2usize, "mintAuthority")
+                })?;
                 let accounts = InitializeTokenGroupAccounts {
-                    remaining,
-                    group,
-                    mint,
-                    mint_authority,
+                    remaining: vec![],
+                    group: group.clone(),
+                    mint: mint.clone(),
+                    mint_authority: mint_authority.clone(),
                 };
                 return Ok(Instruction::InitializeTokenGroup { accounts, args });
             }
@@ -9830,67 +9615,88 @@ impl Instruction {
                     .map_err(|e| {
                         format!("Failed to deserialize {}: {}", stringify!(max_size), e)
                     })?;
-                let args = UpdateTokenGroupMaxSizeArguments { max_size };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                let group = keys.next().unwrap().clone();
-                let update_authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let args = UpdateTokenGroupMaxSizeArguments {
+                    max_size,
+                    extension_type: "updateTokenGroupMaxSize".to_string(),
+                };
+                let group = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "group"))?;
+                let update_authority = account_keys.get(1usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 1usize, "updateAuthority")
+                })?;
                 let accounts = UpdateTokenGroupMaxSizeAccounts {
-                    remaining,
-                    group,
-                    update_authority,
+                    remaining: vec![],
+                    group: group.clone(),
+                    update_authority: update_authority.clone(),
                 };
                 return Ok(Instruction::UpdateTokenGroupMaxSize { accounts, args });
             }
             [161u8, 105u8, 88u8, 1u8, 237u8, 221u8, 216u8, 203u8] => {
                 let mut rdr: &[u8] = rest;
-                let mut pubkey_bytes = [0u8; 32];
-                rdr.read_exact(&mut pubkey_bytes).map_err(|e| {
+                let mut bytes = [0u8; 32];
+                rdr.read_exact(&mut bytes).map_err(|e| {
                     format!(
                         "Failed to read pubkey bytes for {}: {}",
                         stringify!(new_update_authority),
                         e
                     )
                 })?;
-                let new_update_authority: Option<[u8; 32usize]> = if pubkey_bytes == [0u8; 32] {
+                let new_update_authority = if bytes == [0u8; 32] {
                     None
                 } else {
-                    Some(pubkey_bytes)
+                    Some(bytes)
                 };
                 let args = UpdateTokenGroupUpdateAuthorityArguments {
                     new_update_authority,
+                    extension_type: "updateTokenGroupUpdateAuthority".to_string(),
                 };
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(2usize);
-                let group = keys.next().unwrap().clone();
-                let update_authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let group = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "group"))?;
+                let update_authority = account_keys.get(1usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 1usize, "updateAuthority")
+                })?;
                 let accounts = UpdateTokenGroupUpdateAuthorityAccounts {
-                    remaining,
-                    group,
-                    update_authority,
+                    remaining: vec![],
+                    group: group.clone(),
+                    update_authority: update_authority.clone(),
                 };
                 return Ok(Instruction::UpdateTokenGroupUpdateAuthority { accounts, args });
             }
             [152u8, 32u8, 222u8, 176u8, 223u8, 237u8, 116u8, 134u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitializeTokenGroupMemberArguments {};
-                let mut keys = account_keys.iter();
-                let mut opt_budget = account_keys.len().saturating_sub(5usize);
-                let member = keys.next().unwrap().clone();
-                let member_mint = keys.next().unwrap().clone();
-                let member_mint_authority = keys.next().unwrap().clone();
-                let group = keys.next().unwrap().clone();
-                let group_update_authority = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let args = InitializeTokenGroupMemberArguments {
+                    extension_type: "initializeTokenGroupMember".to_string(),
+                };
+                let member = account_keys
+                    .get(0usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "member"))?;
+                let member_mint = account_keys.get(1usize).ok_or_else(|| {
+                    format!("Missing account at index {}: {}", 1usize, "memberMint")
+                })?;
+                let member_mint_authority = account_keys.get(2usize).ok_or_else(|| {
+                    format!(
+                        "Missing account at index {}: {}",
+                        2usize, "memberMintAuthority"
+                    )
+                })?;
+                let group = account_keys
+                    .get(3usize)
+                    .ok_or_else(|| format!("Missing account at index {}: {}", 3usize, "group"))?;
+                let group_update_authority = account_keys.get(4usize).ok_or_else(|| {
+                    format!(
+                        "Missing account at index {}: {}",
+                        4usize, "groupUpdateAuthority"
+                    )
+                })?;
                 let accounts = InitializeTokenGroupMemberAccounts {
-                    remaining,
-                    member,
-                    member_mint,
-                    member_mint_authority,
-                    group,
-                    group_update_authority,
+                    remaining: vec![],
+                    member: member.clone(),
+                    member_mint: member_mint.clone(),
+                    member_mint_authority: member_mint_authority.clone(),
+                    group: group.clone(),
+                    group_update_authority: group_update_authority.clone(),
                 };
                 return Ok(Instruction::InitializeTokenGroupMember { accounts, args });
             }
