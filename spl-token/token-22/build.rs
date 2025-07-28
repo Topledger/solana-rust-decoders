@@ -147,29 +147,33 @@ fn map_codama_type(codama_type: &CodemaType) -> TokenStream {
 }
 
 fn extract_discriminator(instruction: &CodemaInstruction) -> Vec<u8> {
-    // Find the discriminator argument
-    if let Some(disc_arg) = instruction
-        .arguments
-        .iter()
-        .find(|arg| arg.name == "discriminator")
-    {
-        if let Some(default_value) = &disc_arg.default_value {
-            // Handle single-byte discriminator (number)
+    let mut discriminators = Vec::new();
+    
+    for arg in &instruction.arguments {
+        if let Some(ref default_value) = arg.default_value {
             if let Some(number) = default_value.number {
-                return vec![number as u8];
-            }
-            
-            // Handle multi-byte discriminator (hex data)
-            if let Some(data) = &default_value.data {
+                discriminators.push(number as u8);
+            } else if let Some(ref data) = default_value.data {
+                // Handle hex discriminators
                 if let Ok(bytes) = hex::decode(data) {
-                    return bytes;
+                    discriminators.extend(bytes);
+                    return discriminators;
                 }
             }
         }
     }
     
+    // If we found multiple discriminator fields, use them all
+    if discriminators.len() >= 2 {
+        return discriminators;
+    }
+    
     // Default to [0] if no discriminator found
-    vec![0]
+    if discriminators.is_empty() {
+        vec![0]
+    } else {
+        discriminators
+    }
 }
 
 fn main() -> Result<()> {
@@ -272,55 +276,60 @@ fn main() -> Result<()> {
         );
 
         // Generate arguments struct
-        let arg_fields = instruction
-            .arguments
-            .iter()
-            .filter(|arg| arg.name != "discriminator") // Skip discriminator field
-            .map(|arg| {
-                let field_name = format_ident!("{}", arg.name.to_snake_case());
-                let field_type = map_codama_type(&arg.arg_type);
+        let arg_fields = instruction.arguments.iter().filter_map(|arg| {
+            if arg.name == "discriminator" {
+                return None; // Skip discriminator field
+            }
 
-                // Add serde attributes for special types
-                match arg.arg_type.kind.as_str() {
-                    "publicKeyTypeNode" => {
-                        quote! {
-                            #[serde(with = "pubkey_serde")]
-                            pub #field_name: [u8; 32usize],
-                        }
-                    }
-                    "zeroableOptionTypeNode" => {
-                        if let Some(ref item) = arg.arg_type.item {
-                            if item.kind == "publicKeyTypeNode" {
-                                quote! {
-                                    #[serde(with = "pubkey_serde_option")]
-                                    pub #field_name: Option<[u8; 32usize]>,
-                                }
-                            } else {
-                                quote! {
-                                    pub #field_name: #field_type,
-                                }
-                            }
+            // Skip transferFeeDiscriminator if we're using compound discriminators  
+            if arg.name == "transferFeeDiscriminator" && discriminator.len() > 1 {
+                return None; // Skip this field as it's part of the discriminator
+            }
+
+            let field_name = format_ident!("{}", arg.name.to_snake_case());
+            let field_type = map_codama_type(&arg.arg_type);
+
+            // Add serde attributes for special types
+            match arg.arg_type.kind.as_str() {
+                "publicKeyTypeNode" => {
+                    Some(quote! {
+                        #[serde(with = "pubkey_serde")]
+                        pub #field_name: [u8; 32usize],
+                    })
+                }
+                "zeroableOptionTypeNode" => {
+                    if let Some(ref item) = arg.arg_type.item {
+                        if item.kind == "publicKeyTypeNode" {
+                            Some(quote! {
+                                #[serde(with = "pubkey_serde_option")]
+                                pub #field_name: Option<[u8; 32usize]>,
+                            })
                         } else {
-                            quote! {
+                            Some(quote! {
                                 pub #field_name: #field_type,
-                            }
+                            })
                         }
-                    }
-                    "numberTypeNode"
-                        if matches!(arg.arg_type.format.as_deref(), Some("u64") | Some("u128")) =>
-                    {
-                        quote! {
-                            #[serde(serialize_with = "crate::serialize_to_string")]
+                    } else {
+                        Some(quote! {
                             pub #field_name: #field_type,
-                        }
-                    }
-                    _ => {
-                        quote! {
-                            pub #field_name: #field_type,
-                        }
+                        })
                     }
                 }
-            });
+                "numberTypeNode"
+                    if matches!(arg.arg_type.format.as_deref(), Some("u64") | Some("u128")) =>
+                {
+                    Some(quote! {
+                        #[serde(serialize_with = "crate::serialize_to_string")]
+                        pub #field_name: #field_type,
+                    })
+                }
+                _ => {
+                    Some(quote! {
+                        pub #field_name: #field_type,
+                    })
+                }
+            }
+        }).collect::<Vec<_>>();
 
         args_structs.push(quote! {
             #[derive(::borsh::BorshDeserialize, Debug, Serialize)]
@@ -359,6 +368,11 @@ fn main() -> Result<()> {
         for arg in &instruction.arguments {
             if arg.name == "discriminator" {
                 continue; // Skip discriminator in parsing
+            }
+
+            // Skip transferFeeDiscriminator if we're using compound discriminators
+            if arg.name == "transferFeeDiscriminator" && discriminator.len() > 1 {
+                continue; // Skip this field as it's already consumed by the match pattern
             }
 
             let field_name = format_ident!("{}", arg.name.to_snake_case());
@@ -505,6 +519,15 @@ fn main() -> Result<()> {
                 // Try 8-byte discriminators first (for multi-byte discriminators)
                 if data.len() >= 8 {
                     let (discriminator, rest) = data.split_at(8);
+                    match discriminator {
+                        #(#arms)*
+                        _ => {} // Fall through to try shorter discriminators
+                    }
+                }
+
+                // Try 2-byte discriminators (for compound discriminators like transferFee instructions)
+                if data.len() >= 2 {
+                    let (discriminator, rest) = data.split_at(2);
                     match discriminator {
                         #(#arms)*
                         _ => {} // Fall through to try 1-byte discriminator
