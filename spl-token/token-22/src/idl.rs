@@ -27,6 +27,14 @@ mod pubkey_serde_option {
         }
     }
 }
+fn serialize_decryptable_balance<S>(bytes: &[u8; 36], serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: serde::Serializer,
+{
+    use base64::{engine::general_purpose, Engine as _};
+    let encoded = general_purpose::STANDARD.encode(bytes);
+    serializer.serialize_str(&encoded)
+}
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct InitializeMintArguments {
     pub decimals: u8,
@@ -193,7 +201,8 @@ pub struct UpdateConfidentialTransferMintArguments {
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct ConfigureConfidentialTransferAccountArguments {
-    pub decryptable_zero_balance: DecryptableBalance,
+    #[serde(serialize_with = "serialize_decryptable_balance")]
+    pub decryptable_zero_balance: [u8; 36],
     #[serde(serialize_with = "crate::serialize_to_string")]
     pub maximum_pending_balance_credit_counter: u64,
     pub proof_instruction_offset: i8,
@@ -220,14 +229,16 @@ pub struct ConfidentialWithdrawArguments {
     #[serde(serialize_with = "crate::serialize_to_string")]
     pub amount: u64,
     pub decimals: u8,
-    pub new_decryptable_available_balance: DecryptableBalance,
+    #[serde(serialize_with = "serialize_decryptable_balance")]
+    pub new_decryptable_available_balance: [u8; 36],
     pub equality_proof_instruction_offset: i8,
     pub range_proof_instruction_offset: i8,
     pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct ConfidentialTransferArguments {
-    pub new_source_decryptable_available_balance: DecryptableBalance,
+    #[serde(serialize_with = "serialize_decryptable_balance")]
+    pub new_source_decryptable_available_balance: [u8; 36],
     pub equality_proof_instruction_offset: i8,
     pub ciphertext_validity_proof_instruction_offset: i8,
     pub range_proof_instruction_offset: i8,
@@ -237,7 +248,8 @@ pub struct ConfidentialTransferArguments {
 pub struct ApplyConfidentialPendingBalanceArguments {
     #[serde(serialize_with = "crate::serialize_to_string")]
     pub expected_pending_balance_credit_counter: u64,
-    pub new_decryptable_available_balance: DecryptableBalance,
+    #[serde(serialize_with = "serialize_decryptable_balance")]
+    pub new_decryptable_available_balance: [u8; 36],
     pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
@@ -258,7 +270,8 @@ pub struct DisableNonConfidentialCreditsArguments {
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct ConfidentialTransferWithFeeArguments {
-    pub new_source_decryptable_available_balance: DecryptableBalance,
+    #[serde(serialize_with = "serialize_decryptable_balance")]
+    pub new_source_decryptable_available_balance: [u8; 36],
     pub equality_proof_instruction_offset: i8,
     pub transfer_amount_ciphertext_validity_proof_instruction_offset: i8,
     pub fee_sigma_proof_instruction_offset: i8,
@@ -342,14 +355,16 @@ pub struct InitializeConfidentialTransferFeeArguments {
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct WithdrawWithheldTokensFromMintForConfidentialTransferFeeArguments {
     pub proof_instruction_offset: i8,
-    pub new_decryptable_available_balance: DecryptableBalance,
+    #[serde(serialize_with = "serialize_decryptable_balance")]
+    pub new_decryptable_available_balance: [u8; 36],
     pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
 pub struct WithdrawWithheldTokensFromAccountsForConfidentialTransferFeeArguments {
     pub num_token_accounts: u8,
     pub proof_instruction_offset: i8,
-    pub new_decryptable_available_balance: DecryptableBalance,
+    #[serde(serialize_with = "serialize_decryptable_balance")]
+    pub new_decryptable_available_balance: [u8; 36],
     pub extension_type: String,
 }
 #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
@@ -2432,15 +2447,14 @@ impl Instruction {
                 }
                 [27u8, 2u8] => {
                     let mut rdr: &[u8] = rest;
-                    let decryptable_zero_balance: DecryptableBalance =
-                        <DecryptableBalance as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                            .map_err(|e| {
-                                format!(
-                                    "Failed to deserialize {}: {}",
-                                    stringify!(decryptable_zero_balance),
-                                    e
-                                )
-                            })?;
+                    let mut decryptable_zero_balance = [0u8; 36];
+                    rdr.read_exact(&mut decryptable_zero_balance).map_err(|e| {
+                        format!(
+                            "Failed to read 36 bytes for {}: {}",
+                            stringify!(decryptable_zero_balance),
+                            e
+                        )
+                    })?;
                     let maximum_pending_balance_credit_counter: u64 =
                         <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
                             format!(
@@ -2600,15 +2614,15 @@ impl Instruction {
                         .map_err(|e| {
                             format!("Failed to deserialize {}: {}", stringify!(decimals), e)
                         })?;
-                    let new_decryptable_available_balance: DecryptableBalance =
-                        <DecryptableBalance as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                            .map_err(|e| {
-                                format!(
-                                    "Failed to deserialize {}: {}",
-                                    stringify!(new_decryptable_available_balance),
-                                    e
-                                )
-                            })?;
+                    let mut new_decryptable_available_balance = [0u8; 36];
+                    rdr.read_exact(&mut new_decryptable_available_balance)
+                        .map_err(|e| {
+                            format!(
+                                "Failed to read 36 bytes for {}: {}",
+                                stringify!(new_decryptable_available_balance),
+                                e
+                            )
+                        })?;
                     let equality_proof_instruction_offset: i8 =
                         <i8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
                             format!(
@@ -2667,15 +2681,15 @@ impl Instruction {
                 }
                 [27u8, 7u8] => {
                     let mut rdr: &[u8] = rest;
-                    let new_source_decryptable_available_balance: DecryptableBalance =
-                        <DecryptableBalance as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                            .map_err(|e| {
-                                format!(
-                                    "Failed to deserialize {}: {}",
-                                    stringify!(new_source_decryptable_available_balance),
-                                    e
-                                )
-                            })?;
+                    let mut new_source_decryptable_available_balance = [0u8; 36];
+                    rdr.read_exact(&mut new_source_decryptable_available_balance)
+                        .map_err(|e| {
+                            format!(
+                                "Failed to read 36 bytes for {}: {}",
+                                stringify!(new_source_decryptable_available_balance),
+                                e
+                            )
+                        })?;
                     let equality_proof_instruction_offset: i8 =
                         <i8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
                             format!(
@@ -2763,15 +2777,15 @@ impl Instruction {
                                 e
                             )
                         })?;
-                    let new_decryptable_available_balance: DecryptableBalance =
-                        <DecryptableBalance as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                            .map_err(|e| {
-                                format!(
-                                    "Failed to deserialize {}: {}",
-                                    stringify!(new_decryptable_available_balance),
-                                    e
-                                )
-                            })?;
+                    let mut new_decryptable_available_balance = [0u8; 36];
+                    rdr.read_exact(&mut new_decryptable_available_balance)
+                        .map_err(|e| {
+                            format!(
+                                "Failed to read 36 bytes for {}: {}",
+                                stringify!(new_decryptable_available_balance),
+                                e
+                            )
+                        })?;
                     let args = ApplyConfidentialPendingBalanceArguments {
                         expected_pending_balance_credit_counter,
                         new_decryptable_available_balance,
@@ -2864,15 +2878,15 @@ impl Instruction {
                 }
                 [27u8, 13u8] => {
                     let mut rdr: &[u8] = rest;
-                    let new_source_decryptable_available_balance: DecryptableBalance =
-                        <DecryptableBalance as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                            .map_err(|e| {
-                                format!(
-                                    "Failed to deserialize {}: {}",
-                                    stringify!(new_source_decryptable_available_balance),
-                                    e
-                                )
-                            })?;
+                    let mut new_source_decryptable_available_balance = [0u8; 36];
+                    rdr.read_exact(&mut new_source_decryptable_available_balance)
+                        .map_err(|e| {
+                            format!(
+                                "Failed to read 36 bytes for {}: {}",
+                                stringify!(new_source_decryptable_available_balance),
+                                e
+                            )
+                        })?;
                     let equality_proof_instruction_offset: i8 =
                         <i8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
                             format!(
@@ -3368,15 +3382,15 @@ impl Instruction {
                                 e
                             )
                         })?;
-                    let new_decryptable_available_balance: DecryptableBalance =
-                        <DecryptableBalance as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                            .map_err(|e| {
-                                format!(
-                                    "Failed to deserialize {}: {}",
-                                    stringify!(new_decryptable_available_balance),
-                                    e
-                                )
-                            })?;
+                    let mut new_decryptable_available_balance = [0u8; 36];
+                    rdr.read_exact(&mut new_decryptable_available_balance)
+                        .map_err(|e| {
+                            format!(
+                                "Failed to read 36 bytes for {}: {}",
+                                stringify!(new_decryptable_available_balance),
+                                e
+                            )
+                        })?;
                     let args = WithdrawWithheldTokensFromMintForConfidentialTransferFeeArguments {
                         proof_instruction_offset,
                         new_decryptable_available_balance,
@@ -3437,15 +3451,15 @@ impl Instruction {
                                 e
                             )
                         })?;
-                    let new_decryptable_available_balance: DecryptableBalance =
-                        <DecryptableBalance as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                            .map_err(|e| {
-                                format!(
-                                    "Failed to deserialize {}: {}",
-                                    stringify!(new_decryptable_available_balance),
-                                    e
-                                )
-                            })?;
+                    let mut new_decryptable_available_balance = [0u8; 36];
+                    rdr.read_exact(&mut new_decryptable_available_balance)
+                        .map_err(|e| {
+                            format!(
+                                "Failed to read 36 bytes for {}: {}",
+                                stringify!(new_decryptable_available_balance),
+                                e
+                            )
+                        })?;
                     let args =
                         WithdrawWithheldTokensFromAccountsForConfidentialTransferFeeArguments {
                             num_token_accounts,
@@ -3933,49 +3947,69 @@ impl Instruction {
                 }
                 [210u8, 225u8, 30u8, 162u8, 88u8, 184u8, 77u8, 141u8] => {
                     let mut rdr: &[u8] = rest;
-                    let len =
-                        <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!("Failed to deserialize {}: {}", stringify!(name), e)
+                    let len = {
+                        let mut len_bytes = [0u8; 4];
+                        rdr.read_exact(&mut len_bytes).map_err(|e| {
+                            format!("Failed to read length for {}: {}", stringify!(name), e)
                         })?;
-                    let mut bytes = vec![0u8; len as usize];
-                    rdr.read_exact(&mut bytes).map_err(|e| {
-                        format!(
-                            "Failed to read {} bytes for {}: {}",
-                            len,
-                            stringify!(name),
-                            e
-                        )
-                    })?;
+                        u32::from_le_bytes(len_bytes) as usize
+                    };
+                    let bytes = {
+                        let mut bytes = vec![0u8; len];
+                        rdr.read_exact(&mut bytes).map_err(|e| {
+                            format!(
+                                "Failed to read {} bytes for {}: {}",
+                                len,
+                                stringify!(name),
+                                e
+                            )
+                        })?;
+                        bytes
+                    };
                     let name = String::from_utf8(bytes).map_err(|e| {
                         format!("Failed to convert {} to string: {}", stringify!(name), e)
                     })?;
-                    let len =
-                        <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!("Failed to deserialize {}: {}", stringify!(symbol), e)
+                    let len = {
+                        let mut len_bytes = [0u8; 4];
+                        rdr.read_exact(&mut len_bytes).map_err(|e| {
+                            format!("Failed to read length for {}: {}", stringify!(symbol), e)
                         })?;
-                    let mut bytes = vec![0u8; len as usize];
-                    rdr.read_exact(&mut bytes).map_err(|e| {
-                        format!(
-                            "Failed to read {} bytes for {}: {}",
-                            len,
-                            stringify!(symbol),
-                            e
-                        )
-                    })?;
+                        u32::from_le_bytes(len_bytes) as usize
+                    };
+                    let bytes = {
+                        let mut bytes = vec![0u8; len];
+                        rdr.read_exact(&mut bytes).map_err(|e| {
+                            format!(
+                                "Failed to read {} bytes for {}: {}",
+                                len,
+                                stringify!(symbol),
+                                e
+                            )
+                        })?;
+                        bytes
+                    };
                     let symbol = String::from_utf8(bytes).map_err(|e| {
                         format!("Failed to convert {} to string: {}", stringify!(symbol), e)
                     })?;
-                    let len = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                        .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(uri), e))?;
-                    let mut bytes = vec![0u8; len as usize];
-                    rdr.read_exact(&mut bytes).map_err(|e| {
-                        format!(
-                            "Failed to read {} bytes for {}: {}",
-                            len,
-                            stringify!(uri),
-                            e
-                        )
-                    })?;
+                    let len = {
+                        let mut len_bytes = [0u8; 4];
+                        rdr.read_exact(&mut len_bytes).map_err(|e| {
+                            format!("Failed to read length for {}: {}", stringify!(uri), e)
+                        })?;
+                        u32::from_le_bytes(len_bytes) as usize
+                    };
+                    let bytes = {
+                        let mut bytes = vec![0u8; len];
+                        rdr.read_exact(&mut bytes).map_err(|e| {
+                            format!(
+                                "Failed to read {} bytes for {}: {}",
+                                len,
+                                stringify!(uri),
+                                e
+                            )
+                        })?;
+                        bytes
+                    };
                     let uri = String::from_utf8(bytes).map_err(|e| {
                         format!("Failed to convert {} to string: {}", stringify!(uri), e)
                     })?;
@@ -4013,19 +4047,25 @@ impl Instruction {
                             .map_err(|e| {
                                 format!("Failed to deserialize {}: {}", stringify!(field), e)
                             })?;
-                    let len =
-                        <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!("Failed to deserialize {}: {}", stringify!(value), e)
+                    let len = {
+                        let mut len_bytes = [0u8; 4];
+                        rdr.read_exact(&mut len_bytes).map_err(|e| {
+                            format!("Failed to read length for {}: {}", stringify!(value), e)
                         })?;
-                    let mut bytes = vec![0u8; len as usize];
-                    rdr.read_exact(&mut bytes).map_err(|e| {
-                        format!(
-                            "Failed to read {} bytes for {}: {}",
-                            len,
-                            stringify!(value),
-                            e
-                        )
-                    })?;
+                        u32::from_le_bytes(len_bytes) as usize
+                    };
+                    let bytes = {
+                        let mut bytes = vec![0u8; len];
+                        rdr.read_exact(&mut bytes).map_err(|e| {
+                            format!(
+                                "Failed to read {} bytes for {}: {}",
+                                len,
+                                stringify!(value),
+                                e
+                            )
+                        })?;
+                        bytes
+                    };
                     let value = String::from_utf8(bytes).map_err(|e| {
                         format!("Failed to convert {} to string: {}", stringify!(value), e)
                     })?;
@@ -4053,17 +4093,25 @@ impl Instruction {
                         <bool as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(
                             |e| format!("Failed to deserialize {}: {}", stringify!(idempotent), e),
                         )?;
-                    let len = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                        .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(key), e))?;
-                    let mut bytes = vec![0u8; len as usize];
-                    rdr.read_exact(&mut bytes).map_err(|e| {
-                        format!(
-                            "Failed to read {} bytes for {}: {}",
-                            len,
-                            stringify!(key),
-                            e
-                        )
-                    })?;
+                    let len = {
+                        let mut len_bytes = [0u8; 4];
+                        rdr.read_exact(&mut len_bytes).map_err(|e| {
+                            format!("Failed to read length for {}: {}", stringify!(key), e)
+                        })?;
+                        u32::from_le_bytes(len_bytes) as usize
+                    };
+                    let bytes = {
+                        let mut bytes = vec![0u8; len];
+                        rdr.read_exact(&mut bytes).map_err(|e| {
+                            format!(
+                                "Failed to read {} bytes for {}: {}",
+                                len,
+                                stringify!(key),
+                                e
+                            )
+                        })?;
+                        bytes
+                    };
                     let key = String::from_utf8(bytes).map_err(|e| {
                         format!("Failed to convert {} to string: {}", stringify!(key), e)
                     })?;
@@ -5175,15 +5223,14 @@ impl Instruction {
                 }
                 [27u8, 2u8] => {
                     let mut rdr: &[u8] = rest;
-                    let decryptable_zero_balance: DecryptableBalance =
-                        <DecryptableBalance as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                            .map_err(|e| {
-                                format!(
-                                    "Failed to deserialize {}: {}",
-                                    stringify!(decryptable_zero_balance),
-                                    e
-                                )
-                            })?;
+                    let mut decryptable_zero_balance = [0u8; 36];
+                    rdr.read_exact(&mut decryptable_zero_balance).map_err(|e| {
+                        format!(
+                            "Failed to read 36 bytes for {}: {}",
+                            stringify!(decryptable_zero_balance),
+                            e
+                        )
+                    })?;
                     let maximum_pending_balance_credit_counter: u64 =
                         <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
                             format!(
@@ -5343,15 +5390,15 @@ impl Instruction {
                         .map_err(|e| {
                             format!("Failed to deserialize {}: {}", stringify!(decimals), e)
                         })?;
-                    let new_decryptable_available_balance: DecryptableBalance =
-                        <DecryptableBalance as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                            .map_err(|e| {
-                                format!(
-                                    "Failed to deserialize {}: {}",
-                                    stringify!(new_decryptable_available_balance),
-                                    e
-                                )
-                            })?;
+                    let mut new_decryptable_available_balance = [0u8; 36];
+                    rdr.read_exact(&mut new_decryptable_available_balance)
+                        .map_err(|e| {
+                            format!(
+                                "Failed to read 36 bytes for {}: {}",
+                                stringify!(new_decryptable_available_balance),
+                                e
+                            )
+                        })?;
                     let equality_proof_instruction_offset: i8 =
                         <i8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
                             format!(
@@ -5410,15 +5457,15 @@ impl Instruction {
                 }
                 [27u8, 7u8] => {
                     let mut rdr: &[u8] = rest;
-                    let new_source_decryptable_available_balance: DecryptableBalance =
-                        <DecryptableBalance as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                            .map_err(|e| {
-                                format!(
-                                    "Failed to deserialize {}: {}",
-                                    stringify!(new_source_decryptable_available_balance),
-                                    e
-                                )
-                            })?;
+                    let mut new_source_decryptable_available_balance = [0u8; 36];
+                    rdr.read_exact(&mut new_source_decryptable_available_balance)
+                        .map_err(|e| {
+                            format!(
+                                "Failed to read 36 bytes for {}: {}",
+                                stringify!(new_source_decryptable_available_balance),
+                                e
+                            )
+                        })?;
                     let equality_proof_instruction_offset: i8 =
                         <i8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
                             format!(
@@ -5506,15 +5553,15 @@ impl Instruction {
                                 e
                             )
                         })?;
-                    let new_decryptable_available_balance: DecryptableBalance =
-                        <DecryptableBalance as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                            .map_err(|e| {
-                                format!(
-                                    "Failed to deserialize {}: {}",
-                                    stringify!(new_decryptable_available_balance),
-                                    e
-                                )
-                            })?;
+                    let mut new_decryptable_available_balance = [0u8; 36];
+                    rdr.read_exact(&mut new_decryptable_available_balance)
+                        .map_err(|e| {
+                            format!(
+                                "Failed to read 36 bytes for {}: {}",
+                                stringify!(new_decryptable_available_balance),
+                                e
+                            )
+                        })?;
                     let args = ApplyConfidentialPendingBalanceArguments {
                         expected_pending_balance_credit_counter,
                         new_decryptable_available_balance,
@@ -5607,15 +5654,15 @@ impl Instruction {
                 }
                 [27u8, 13u8] => {
                     let mut rdr: &[u8] = rest;
-                    let new_source_decryptable_available_balance: DecryptableBalance =
-                        <DecryptableBalance as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                            .map_err(|e| {
-                                format!(
-                                    "Failed to deserialize {}: {}",
-                                    stringify!(new_source_decryptable_available_balance),
-                                    e
-                                )
-                            })?;
+                    let mut new_source_decryptable_available_balance = [0u8; 36];
+                    rdr.read_exact(&mut new_source_decryptable_available_balance)
+                        .map_err(|e| {
+                            format!(
+                                "Failed to read 36 bytes for {}: {}",
+                                stringify!(new_source_decryptable_available_balance),
+                                e
+                            )
+                        })?;
                     let equality_proof_instruction_offset: i8 =
                         <i8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
                             format!(
@@ -6111,15 +6158,15 @@ impl Instruction {
                                 e
                             )
                         })?;
-                    let new_decryptable_available_balance: DecryptableBalance =
-                        <DecryptableBalance as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                            .map_err(|e| {
-                                format!(
-                                    "Failed to deserialize {}: {}",
-                                    stringify!(new_decryptable_available_balance),
-                                    e
-                                )
-                            })?;
+                    let mut new_decryptable_available_balance = [0u8; 36];
+                    rdr.read_exact(&mut new_decryptable_available_balance)
+                        .map_err(|e| {
+                            format!(
+                                "Failed to read 36 bytes for {}: {}",
+                                stringify!(new_decryptable_available_balance),
+                                e
+                            )
+                        })?;
                     let args = WithdrawWithheldTokensFromMintForConfidentialTransferFeeArguments {
                         proof_instruction_offset,
                         new_decryptable_available_balance,
@@ -6180,15 +6227,15 @@ impl Instruction {
                                 e
                             )
                         })?;
-                    let new_decryptable_available_balance: DecryptableBalance =
-                        <DecryptableBalance as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                            .map_err(|e| {
-                                format!(
-                                    "Failed to deserialize {}: {}",
-                                    stringify!(new_decryptable_available_balance),
-                                    e
-                                )
-                            })?;
+                    let mut new_decryptable_available_balance = [0u8; 36];
+                    rdr.read_exact(&mut new_decryptable_available_balance)
+                        .map_err(|e| {
+                            format!(
+                                "Failed to read 36 bytes for {}: {}",
+                                stringify!(new_decryptable_available_balance),
+                                e
+                            )
+                        })?;
                     let args =
                         WithdrawWithheldTokensFromAccountsForConfidentialTransferFeeArguments {
                             num_token_accounts,
@@ -6676,49 +6723,69 @@ impl Instruction {
                 }
                 [210u8, 225u8, 30u8, 162u8, 88u8, 184u8, 77u8, 141u8] => {
                     let mut rdr: &[u8] = rest;
-                    let len =
-                        <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!("Failed to deserialize {}: {}", stringify!(name), e)
+                    let len = {
+                        let mut len_bytes = [0u8; 4];
+                        rdr.read_exact(&mut len_bytes).map_err(|e| {
+                            format!("Failed to read length for {}: {}", stringify!(name), e)
                         })?;
-                    let mut bytes = vec![0u8; len as usize];
-                    rdr.read_exact(&mut bytes).map_err(|e| {
-                        format!(
-                            "Failed to read {} bytes for {}: {}",
-                            len,
-                            stringify!(name),
-                            e
-                        )
-                    })?;
+                        u32::from_le_bytes(len_bytes) as usize
+                    };
+                    let bytes = {
+                        let mut bytes = vec![0u8; len];
+                        rdr.read_exact(&mut bytes).map_err(|e| {
+                            format!(
+                                "Failed to read {} bytes for {}: {}",
+                                len,
+                                stringify!(name),
+                                e
+                            )
+                        })?;
+                        bytes
+                    };
                     let name = String::from_utf8(bytes).map_err(|e| {
                         format!("Failed to convert {} to string: {}", stringify!(name), e)
                     })?;
-                    let len =
-                        <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!("Failed to deserialize {}: {}", stringify!(symbol), e)
+                    let len = {
+                        let mut len_bytes = [0u8; 4];
+                        rdr.read_exact(&mut len_bytes).map_err(|e| {
+                            format!("Failed to read length for {}: {}", stringify!(symbol), e)
                         })?;
-                    let mut bytes = vec![0u8; len as usize];
-                    rdr.read_exact(&mut bytes).map_err(|e| {
-                        format!(
-                            "Failed to read {} bytes for {}: {}",
-                            len,
-                            stringify!(symbol),
-                            e
-                        )
-                    })?;
+                        u32::from_le_bytes(len_bytes) as usize
+                    };
+                    let bytes = {
+                        let mut bytes = vec![0u8; len];
+                        rdr.read_exact(&mut bytes).map_err(|e| {
+                            format!(
+                                "Failed to read {} bytes for {}: {}",
+                                len,
+                                stringify!(symbol),
+                                e
+                            )
+                        })?;
+                        bytes
+                    };
                     let symbol = String::from_utf8(bytes).map_err(|e| {
                         format!("Failed to convert {} to string: {}", stringify!(symbol), e)
                     })?;
-                    let len = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                        .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(uri), e))?;
-                    let mut bytes = vec![0u8; len as usize];
-                    rdr.read_exact(&mut bytes).map_err(|e| {
-                        format!(
-                            "Failed to read {} bytes for {}: {}",
-                            len,
-                            stringify!(uri),
-                            e
-                        )
-                    })?;
+                    let len = {
+                        let mut len_bytes = [0u8; 4];
+                        rdr.read_exact(&mut len_bytes).map_err(|e| {
+                            format!("Failed to read length for {}: {}", stringify!(uri), e)
+                        })?;
+                        u32::from_le_bytes(len_bytes) as usize
+                    };
+                    let bytes = {
+                        let mut bytes = vec![0u8; len];
+                        rdr.read_exact(&mut bytes).map_err(|e| {
+                            format!(
+                                "Failed to read {} bytes for {}: {}",
+                                len,
+                                stringify!(uri),
+                                e
+                            )
+                        })?;
+                        bytes
+                    };
                     let uri = String::from_utf8(bytes).map_err(|e| {
                         format!("Failed to convert {} to string: {}", stringify!(uri), e)
                     })?;
@@ -6756,19 +6823,25 @@ impl Instruction {
                             .map_err(|e| {
                                 format!("Failed to deserialize {}: {}", stringify!(field), e)
                             })?;
-                    let len =
-                        <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
-                            format!("Failed to deserialize {}: {}", stringify!(value), e)
+                    let len = {
+                        let mut len_bytes = [0u8; 4];
+                        rdr.read_exact(&mut len_bytes).map_err(|e| {
+                            format!("Failed to read length for {}: {}", stringify!(value), e)
                         })?;
-                    let mut bytes = vec![0u8; len as usize];
-                    rdr.read_exact(&mut bytes).map_err(|e| {
-                        format!(
-                            "Failed to read {} bytes for {}: {}",
-                            len,
-                            stringify!(value),
-                            e
-                        )
-                    })?;
+                        u32::from_le_bytes(len_bytes) as usize
+                    };
+                    let bytes = {
+                        let mut bytes = vec![0u8; len];
+                        rdr.read_exact(&mut bytes).map_err(|e| {
+                            format!(
+                                "Failed to read {} bytes for {}: {}",
+                                len,
+                                stringify!(value),
+                                e
+                            )
+                        })?;
+                        bytes
+                    };
                     let value = String::from_utf8(bytes).map_err(|e| {
                         format!("Failed to convert {} to string: {}", stringify!(value), e)
                     })?;
@@ -6796,17 +6869,25 @@ impl Instruction {
                         <bool as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(
                             |e| format!("Failed to deserialize {}: {}", stringify!(idempotent), e),
                         )?;
-                    let len = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                        .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(key), e))?;
-                    let mut bytes = vec![0u8; len as usize];
-                    rdr.read_exact(&mut bytes).map_err(|e| {
-                        format!(
-                            "Failed to read {} bytes for {}: {}",
-                            len,
-                            stringify!(key),
-                            e
-                        )
-                    })?;
+                    let len = {
+                        let mut len_bytes = [0u8; 4];
+                        rdr.read_exact(&mut len_bytes).map_err(|e| {
+                            format!("Failed to read length for {}: {}", stringify!(key), e)
+                        })?;
+                        u32::from_le_bytes(len_bytes) as usize
+                    };
+                    let bytes = {
+                        let mut bytes = vec![0u8; len];
+                        rdr.read_exact(&mut bytes).map_err(|e| {
+                            format!(
+                                "Failed to read {} bytes for {}: {}",
+                                len,
+                                stringify!(key),
+                                e
+                            )
+                        })?;
+                        bytes
+                    };
                     let key = String::from_utf8(bytes).map_err(|e| {
                         format!("Failed to convert {} to string: {}", stringify!(key), e)
                     })?;
@@ -7887,15 +7968,14 @@ impl Instruction {
             }
             [27u8, 2u8] => {
                 let mut rdr: &[u8] = rest;
-                let decryptable_zero_balance: DecryptableBalance =
-                    <DecryptableBalance as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                        .map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(decryptable_zero_balance),
-                                e
-                            )
-                        })?;
+                let mut decryptable_zero_balance = [0u8; 36];
+                rdr.read_exact(&mut decryptable_zero_balance).map_err(|e| {
+                    format!(
+                        "Failed to read 36 bytes for {}: {}",
+                        stringify!(decryptable_zero_balance),
+                        e
+                    )
+                })?;
                 let maximum_pending_balance_credit_counter: u64 =
                     <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
                         format!(
@@ -8048,15 +8128,15 @@ impl Instruction {
                     .map_err(|e| {
                         format!("Failed to deserialize {}: {}", stringify!(decimals), e)
                     })?;
-                let new_decryptable_available_balance: DecryptableBalance =
-                    <DecryptableBalance as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                        .map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(new_decryptable_available_balance),
-                                e
-                            )
-                        })?;
+                let mut new_decryptable_available_balance = [0u8; 36];
+                rdr.read_exact(&mut new_decryptable_available_balance)
+                    .map_err(|e| {
+                        format!(
+                            "Failed to read 36 bytes for {}: {}",
+                            stringify!(new_decryptable_available_balance),
+                            e
+                        )
+                    })?;
                 let equality_proof_instruction_offset: i8 =
                     <i8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
                         format!(
@@ -8115,15 +8195,15 @@ impl Instruction {
             }
             [27u8, 7u8] => {
                 let mut rdr: &[u8] = rest;
-                let new_source_decryptable_available_balance: DecryptableBalance =
-                    <DecryptableBalance as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                        .map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(new_source_decryptable_available_balance),
-                                e
-                            )
-                        })?;
+                let mut new_source_decryptable_available_balance = [0u8; 36];
+                rdr.read_exact(&mut new_source_decryptable_available_balance)
+                    .map_err(|e| {
+                        format!(
+                            "Failed to read 36 bytes for {}: {}",
+                            stringify!(new_source_decryptable_available_balance),
+                            e
+                        )
+                    })?;
                 let equality_proof_instruction_offset: i8 =
                     <i8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
                         format!(
@@ -8211,15 +8291,15 @@ impl Instruction {
                             e
                         )
                     })?;
-                let new_decryptable_available_balance: DecryptableBalance =
-                    <DecryptableBalance as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                        .map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(new_decryptable_available_balance),
-                                e
-                            )
-                        })?;
+                let mut new_decryptable_available_balance = [0u8; 36];
+                rdr.read_exact(&mut new_decryptable_available_balance)
+                    .map_err(|e| {
+                        format!(
+                            "Failed to read 36 bytes for {}: {}",
+                            stringify!(new_decryptable_available_balance),
+                            e
+                        )
+                    })?;
                 let args = ApplyConfidentialPendingBalanceArguments {
                     expected_pending_balance_credit_counter,
                     new_decryptable_available_balance,
@@ -8312,15 +8392,15 @@ impl Instruction {
             }
             [27u8, 13u8] => {
                 let mut rdr: &[u8] = rest;
-                let new_source_decryptable_available_balance: DecryptableBalance =
-                    <DecryptableBalance as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                        .map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(new_source_decryptable_available_balance),
-                                e
-                            )
-                        })?;
+                let mut new_source_decryptable_available_balance = [0u8; 36];
+                rdr.read_exact(&mut new_source_decryptable_available_balance)
+                    .map_err(|e| {
+                        format!(
+                            "Failed to read 36 bytes for {}: {}",
+                            stringify!(new_source_decryptable_available_balance),
+                            e
+                        )
+                    })?;
                 let equality_proof_instruction_offset: i8 =
                     <i8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
                         format!(
@@ -8806,15 +8886,15 @@ impl Instruction {
                             e
                         )
                     })?;
-                let new_decryptable_available_balance: DecryptableBalance =
-                    <DecryptableBalance as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                        .map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(new_decryptable_available_balance),
-                                e
-                            )
-                        })?;
+                let mut new_decryptable_available_balance = [0u8; 36];
+                rdr.read_exact(&mut new_decryptable_available_balance)
+                    .map_err(|e| {
+                        format!(
+                            "Failed to read 36 bytes for {}: {}",
+                            stringify!(new_decryptable_available_balance),
+                            e
+                        )
+                    })?;
                 let args = WithdrawWithheldTokensFromMintForConfidentialTransferFeeArguments {
                     proof_instruction_offset,
                     new_decryptable_available_balance,
@@ -8874,15 +8954,15 @@ impl Instruction {
                             e
                         )
                     })?;
-                let new_decryptable_available_balance: DecryptableBalance =
-                    <DecryptableBalance as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                        .map_err(|e| {
-                            format!(
-                                "Failed to deserialize {}: {}",
-                                stringify!(new_decryptable_available_balance),
-                                e
-                            )
-                        })?;
+                let mut new_decryptable_available_balance = [0u8; 36];
+                rdr.read_exact(&mut new_decryptable_available_balance)
+                    .map_err(|e| {
+                        format!(
+                            "Failed to read 36 bytes for {}: {}",
+                            stringify!(new_decryptable_available_balance),
+                            e
+                        )
+                    })?;
                 let args = WithdrawWithheldTokensFromAccountsForConfidentialTransferFeeArguments {
                     num_token_accounts,
                     proof_instruction_offset,
@@ -9367,45 +9447,69 @@ impl Instruction {
             }
             [210u8, 225u8, 30u8, 162u8, 88u8, 184u8, 77u8, 141u8] => {
                 let mut rdr: &[u8] = rest;
-                let len = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                    .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(name), e))?;
-                let mut bytes = vec![0u8; len as usize];
-                rdr.read_exact(&mut bytes).map_err(|e| {
-                    format!(
-                        "Failed to read {} bytes for {}: {}",
-                        len,
-                        stringify!(name),
-                        e
-                    )
-                })?;
+                let len = {
+                    let mut len_bytes = [0u8; 4];
+                    rdr.read_exact(&mut len_bytes).map_err(|e| {
+                        format!("Failed to read length for {}: {}", stringify!(name), e)
+                    })?;
+                    u32::from_le_bytes(len_bytes) as usize
+                };
+                let bytes = {
+                    let mut bytes = vec![0u8; len];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
+                        format!(
+                            "Failed to read {} bytes for {}: {}",
+                            len,
+                            stringify!(name),
+                            e
+                        )
+                    })?;
+                    bytes
+                };
                 let name = String::from_utf8(bytes).map_err(|e| {
                     format!("Failed to convert {} to string: {}", stringify!(name), e)
                 })?;
-                let len = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                    .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(symbol), e))?;
-                let mut bytes = vec![0u8; len as usize];
-                rdr.read_exact(&mut bytes).map_err(|e| {
-                    format!(
-                        "Failed to read {} bytes for {}: {}",
-                        len,
-                        stringify!(symbol),
-                        e
-                    )
-                })?;
+                let len = {
+                    let mut len_bytes = [0u8; 4];
+                    rdr.read_exact(&mut len_bytes).map_err(|e| {
+                        format!("Failed to read length for {}: {}", stringify!(symbol), e)
+                    })?;
+                    u32::from_le_bytes(len_bytes) as usize
+                };
+                let bytes = {
+                    let mut bytes = vec![0u8; len];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
+                        format!(
+                            "Failed to read {} bytes for {}: {}",
+                            len,
+                            stringify!(symbol),
+                            e
+                        )
+                    })?;
+                    bytes
+                };
                 let symbol = String::from_utf8(bytes).map_err(|e| {
                     format!("Failed to convert {} to string: {}", stringify!(symbol), e)
                 })?;
-                let len = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                    .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(uri), e))?;
-                let mut bytes = vec![0u8; len as usize];
-                rdr.read_exact(&mut bytes).map_err(|e| {
-                    format!(
-                        "Failed to read {} bytes for {}: {}",
-                        len,
-                        stringify!(uri),
-                        e
-                    )
-                })?;
+                let len = {
+                    let mut len_bytes = [0u8; 4];
+                    rdr.read_exact(&mut len_bytes).map_err(|e| {
+                        format!("Failed to read length for {}: {}", stringify!(uri), e)
+                    })?;
+                    u32::from_le_bytes(len_bytes) as usize
+                };
+                let bytes = {
+                    let mut bytes = vec![0u8; len];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
+                        format!(
+                            "Failed to read {} bytes for {}: {}",
+                            len,
+                            stringify!(uri),
+                            e
+                        )
+                    })?;
+                    bytes
+                };
                 let uri = String::from_utf8(bytes).map_err(|e| {
                     format!("Failed to convert {} to string: {}", stringify!(uri), e)
                 })?;
@@ -9443,17 +9547,25 @@ impl Instruction {
                         .map_err(|e| {
                             format!("Failed to deserialize {}: {}", stringify!(field), e)
                         })?;
-                let len = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                    .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(value), e))?;
-                let mut bytes = vec![0u8; len as usize];
-                rdr.read_exact(&mut bytes).map_err(|e| {
-                    format!(
-                        "Failed to read {} bytes for {}: {}",
-                        len,
-                        stringify!(value),
-                        e
-                    )
-                })?;
+                let len = {
+                    let mut len_bytes = [0u8; 4];
+                    rdr.read_exact(&mut len_bytes).map_err(|e| {
+                        format!("Failed to read length for {}: {}", stringify!(value), e)
+                    })?;
+                    u32::from_le_bytes(len_bytes) as usize
+                };
+                let bytes = {
+                    let mut bytes = vec![0u8; len];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
+                        format!(
+                            "Failed to read {} bytes for {}: {}",
+                            len,
+                            stringify!(value),
+                            e
+                        )
+                    })?;
+                    bytes
+                };
                 let value = String::from_utf8(bytes).map_err(|e| {
                     format!("Failed to convert {} to string: {}", stringify!(value), e)
                 })?;
@@ -9481,17 +9593,25 @@ impl Instruction {
                     .map_err(|e| {
                     format!("Failed to deserialize {}: {}", stringify!(idempotent), e)
                 })?;
-                let len = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                    .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(key), e))?;
-                let mut bytes = vec![0u8; len as usize];
-                rdr.read_exact(&mut bytes).map_err(|e| {
-                    format!(
-                        "Failed to read {} bytes for {}: {}",
-                        len,
-                        stringify!(key),
-                        e
-                    )
-                })?;
+                let len = {
+                    let mut len_bytes = [0u8; 4];
+                    rdr.read_exact(&mut len_bytes).map_err(|e| {
+                        format!("Failed to read length for {}: {}", stringify!(key), e)
+                    })?;
+                    u32::from_le_bytes(len_bytes) as usize
+                };
+                let bytes = {
+                    let mut bytes = vec![0u8; len];
+                    rdr.read_exact(&mut bytes).map_err(|e| {
+                        format!(
+                            "Failed to read {} bytes for {}: {}",
+                            len,
+                            stringify!(key),
+                            e
+                        )
+                    })?;
+                    bytes
+                };
                 let key = String::from_utf8(bytes).map_err(|e| {
                     format!("Failed to convert {} to string: {}", stringify!(key), e)
                 })?;

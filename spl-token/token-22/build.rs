@@ -130,8 +130,13 @@ fn map_codama_type(codama_type: &CodemaType) -> TokenStream {
         "definedTypeLinkNode" => {
             // Use the actual defined type name
             if let Some(ref name) = codama_type.name {
-                let type_name = format_ident!("{}", name.to_upper_camel_case());
-                quote! { #type_name }
+                // Special case for decryptableBalance - it's a 36-byte array
+                if name == "decryptableBalance" {
+                    quote! { [u8; 36] }
+                } else {
+                    let type_name = format_ident!("{}", name.to_upper_camel_case());
+                    quote! { #type_name }
+                }
             } else {
                 quote! { u8 } // fallback
             }
@@ -306,32 +311,49 @@ fn main() -> Result<()> {
 
             let field_name = format_ident!("{}", arg.name.to_snake_case());
             let field_type = map_codama_type(&arg.r#type);
-
-            // Add serde attributes for special types
-            let mut attributes = Vec::new();
-            
-            if matches!(arg.r#type.kind.as_str(), "publicKeyTypeNode") {
-                attributes.push(quote! { #[serde(with = "pubkey_serde")] });
-            }
-            
-            if matches!(arg.r#type.kind.as_str(), "numberTypeNode") {
-                if let Some(format) = arg.r#type.format.as_ref() {
-                    if format == "u64" || format == "u128" {
-                        attributes.push(quote! { #[serde(serialize_with = "crate::serialize_to_string")] });
+            let serde_attrs = match arg.r#type.kind.as_str() {
+                "publicKeyTypeNode" => {
+                    quote! { #[serde(with = "pubkey_serde")] }
+                }
+                "numberTypeNode" => {
+                    if let Some(format) = &arg.r#type.format {
+                        if format == "u64" || format == "u128" {
+                            quote! { #[serde(serialize_with = "crate::serialize_to_string")] }
+                        } else {
+                            quote! {}
+                        }
+                    } else {
+                        quote! {}
                     }
                 }
-            }
-
-            if matches!(arg.r#type.kind.as_str(), "zeroableOptionTypeNode") {
-                if let Some(item) = &arg.r#type.item {
-                    if matches!(item.kind.as_str(), "publicKeyTypeNode") {
-                        attributes.push(quote! { #[serde(with = "pubkey_serde_option")] });
+                "zeroableOptionTypeNode" => {
+                    if let Some(ref item) = arg.r#type.item {
+                        if item.kind == "publicKeyTypeNode" {
+                            quote! { #[serde(with = "pubkey_serde_option")] }
+                        } else {
+                            quote! {}
+                        }
+                    } else {
+                        quote! {}
                     }
                 }
-            }
+                "definedTypeLinkNode" => {
+                    // Special handling for decryptableBalance
+                    if let Some(ref name) = arg.r#type.name {
+                        if name == "decryptableBalance" {
+                            quote! { #[serde(serialize_with = "serialize_decryptable_balance")] }
+                        } else {
+                            quote! {}
+                        }
+                    } else {
+                        quote! {}
+                    }
+                }
+                _ => quote! {}
+            };
 
             Some(quote! {
-                #(#attributes)*
+                #serde_attrs
                 pub #field_name: #field_type,
             })
         }).collect::<Vec<_>>();
@@ -393,11 +415,18 @@ fn main() -> Result<()> {
             let parse_snippet = match arg.r#type.kind.as_str() {
                 "sizePrefixTypeNode" => {
                     quote! {
-                        let len = <u32 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
-                            .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(#field_name), e))?;
-                        let mut bytes = vec![0u8; len as usize];
-                        rdr.read_exact(&mut bytes)
-                            .map_err(|e| format!("Failed to read {} bytes for {}: {}", len, stringify!(#field_name), e))?;
+                        let len = {
+                            let mut len_bytes = [0u8; 4];
+                            rdr.read_exact(&mut len_bytes)
+                                .map_err(|e| format!("Failed to read length for {}: {}", stringify!(#field_name), e))?;
+                            u32::from_le_bytes(len_bytes) as usize
+                        };
+                        let bytes = {
+                            let mut bytes = vec![0u8; len];
+                            rdr.read_exact(&mut bytes)
+                                .map_err(|e| format!("Failed to read {} bytes for {}: {}", len, stringify!(#field_name), e))?;
+                            bytes
+                        };
                         let #field_name = String::from_utf8(bytes)
                             .map_err(|e| format!("Failed to convert {} to string: {}", stringify!(#field_name), e))?;
                     }
@@ -414,6 +443,38 @@ fn main() -> Result<()> {
                                 } else {
                                     Some(bytes)
                                 };
+                            }
+                        } else {
+                            quote! {
+                                let #field_name: #field_type =
+                                    <#field_type as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
+                                        format!(
+                                            "Failed to deserialize {}: {}",
+                                            stringify!(#field_name), e
+                                        )
+                                    })?;
+                            }
+                        }
+                    } else {
+                        quote! {
+                            let #field_name: #field_type =
+                                <#field_type as ::borsh::BorshDeserialize>::deserialize(&mut rdr).map_err(|e| {
+                                    format!(
+                                        "Failed to deserialize {}: {}",
+                                        stringify!(#field_name), e
+                                    )
+                                })?;
+                        }
+                    }
+                }
+                "definedTypeLinkNode" => {
+                    // Special handling for decryptableBalance
+                    if let Some(ref name) = arg.r#type.name {
+                        if name == "decryptableBalance" {
+                            quote! {
+                                let mut #field_name = [0u8; 36];
+                                rdr.read_exact(&mut #field_name)
+                                    .map_err(|e| format!("Failed to read 36 bytes for {}: {}", stringify!(#field_name), e))?;
                             }
                         } else {
                             quote! {
@@ -675,6 +736,15 @@ fn main() -> Result<()> {
                     None => serializer.serialize_none(),
                 }
             }
+        }
+
+        fn serialize_decryptable_balance<S>(bytes: &[u8; 36], serializer: S) -> Result<S::Ok, S::Error>
+        where
+            S: serde::Serializer,
+        {
+            use base64::{Engine as _, engine::general_purpose};
+            let encoded = general_purpose::STANDARD.encode(bytes);
+            serializer.serialize_str(&encoded)
         }
 
         #(#args_structs)*

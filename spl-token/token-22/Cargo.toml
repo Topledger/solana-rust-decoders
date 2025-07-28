@@ -11,6 +11,7 @@ name = "spl_token_22"
 bs58                     = "0.5"   # base58 decode
 borsh                    = "0.10"  # Borsh (de)serialization
 anyhow                   = "1.0"   # ergonomic error handling
+base64                   = "0.21"  # base64 encoding for decryptable balances
 serde                    = { version = "1.0", features = ["derive"] }
 serde_json               = "1.0"   # JSON serialization
 serde-wasm-bindgen       = "0.5"   # serde ↔ Wasm bindings
