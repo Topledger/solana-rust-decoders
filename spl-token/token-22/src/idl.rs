@@ -1580,12 +1580,32 @@ impl Instruction {
                         mint_authority,
                         freeze_authority,
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let rent = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "rent")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let rent = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "rent" , "rent" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeMintAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -1596,18 +1616,58 @@ impl Instruction {
                 [1u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = InitializeAccountArguments {};
-                    let account = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "account")
-                    })?;
-                    let mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "mint")
-                    })?;
-                    let owner = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "owner")
-                    })?;
-                    let rent = account_keys.get(3usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 3usize, "rent")
-                    })?;
+                    let account = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "account" , "account" , account_index , provided_count) }) ?
+                    };
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let owner = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                    };
+                    let rent = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            3usize
+                        } else {
+                            3usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "rent" , "rent" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeAccountAccounts {
                         remaining: vec![],
                         account: account.clone(),
@@ -1622,12 +1682,32 @@ impl Instruction {
                     let m: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                         .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(m), e))?;
                     let args = InitializeMultisigArguments { m };
-                    let multisig = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "multisig")
-                    })?;
-                    let rent = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "rent")
-                    })?;
+                    let multisig = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "multisig" , "multisig" , account_index , provided_count) }) ?
+                    };
+                    let rent = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "rent" , "rent" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeMultisigAccounts {
                         remaining: vec![],
                         multisig: multisig.clone(),
@@ -1642,15 +1722,45 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(amount), e)
                         })?;
                     let args = TransferArguments { amount };
-                    let source = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "source")
-                    })?;
-                    let destination = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "destination")
-                    })?;
-                    let authority = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "authority")
-                    })?;
+                    let source = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "source" , "source" , account_index , provided_count) }) ?
+                    };
+                    let destination = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "destination" , "destination" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = TransferAccounts {
                         remaining: vec![],
                         source: source.clone(),
@@ -1666,15 +1776,45 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(amount), e)
                         })?;
                     let args = ApproveArguments { amount };
-                    let source = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "source")
-                    })?;
-                    let delegate = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "delegate")
-                    })?;
-                    let owner = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "owner")
-                    })?;
+                    let source = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "source" , "source" , account_index , provided_count) }) ?
+                    };
+                    let delegate = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "delegate" , "delegate" , account_index , provided_count) }) ?
+                    };
+                    let owner = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                    };
                     let accounts = ApproveAccounts {
                         remaining: vec![],
                         source: source.clone(),
@@ -1686,12 +1826,32 @@ impl Instruction {
                 [5u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = RevokeArguments {};
-                    let source = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "source")
-                    })?;
-                    let owner = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "owner")
-                    })?;
+                    let source = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "source" , "source" , account_index , provided_count) }) ?
+                    };
+                    let owner = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                    };
                     let accounts = RevokeAccounts {
                         remaining: vec![],
                         source: source.clone(),
@@ -1723,12 +1883,32 @@ impl Instruction {
                         authority_type,
                         new_authority,
                     };
-                    let owned = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "owned")
-                    })?;
-                    let owner = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "owner")
-                    })?;
+                    let owned = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owned" , "owned" , account_index , provided_count) }) ?
+                    };
+                    let owner = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                    };
                     let accounts = SetAuthorityAccounts {
                         remaining: vec![],
                         owned: owned.clone(),
@@ -1743,15 +1923,45 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(amount), e)
                         })?;
                     let args = MintToArguments { amount };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let token = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "token")
-                    })?;
-                    let mint_authority = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "mintAuthority")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                    };
+                    let mint_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mintAuthority" , "mintAuthority" , account_index , provided_count) }) ?
+                    };
                     let accounts = MintToAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -1767,15 +1977,45 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(amount), e)
                         })?;
                     let args = BurnArguments { amount };
-                    let account = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "account")
-                    })?;
-                    let mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "mint")
-                    })?;
-                    let authority = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "authority")
-                    })?;
+                    let account = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "account" , "account" , account_index , provided_count) }) ?
+                    };
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = BurnAccounts {
                         remaining: vec![],
                         account: account.clone(),
@@ -1787,15 +2027,45 @@ impl Instruction {
                 [9u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = CloseAccountArguments {};
-                    let account = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "account")
-                    })?;
-                    let destination = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "destination")
-                    })?;
-                    let owner = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "owner")
-                    })?;
+                    let account = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "account" , "account" , account_index , provided_count) }) ?
+                    };
+                    let destination = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "destination" , "destination" , account_index , provided_count) }) ?
+                    };
+                    let owner = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                    };
                     let accounts = CloseAccountAccounts {
                         remaining: vec![],
                         account: account.clone(),
@@ -1807,15 +2077,45 @@ impl Instruction {
                 [10u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = FreezeAccountArguments {};
-                    let account = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "account")
-                    })?;
-                    let mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "mint")
-                    })?;
-                    let owner = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "owner")
-                    })?;
+                    let account = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "account" , "account" , account_index , provided_count) }) ?
+                    };
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let owner = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                    };
                     let accounts = FreezeAccountAccounts {
                         remaining: vec![],
                         account: account.clone(),
@@ -1827,15 +2127,45 @@ impl Instruction {
                 [11u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = ThawAccountArguments {};
-                    let account = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "account")
-                    })?;
-                    let mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "mint")
-                    })?;
-                    let owner = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "owner")
-                    })?;
+                    let account = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "account" , "account" , account_index , provided_count) }) ?
+                    };
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let owner = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                    };
                     let accounts = ThawAccountAccounts {
                         remaining: vec![],
                         account: account.clone(),
@@ -1855,18 +2185,58 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(decimals), e)
                         })?;
                     let args = TransferCheckedArguments { amount, decimals };
-                    let source = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "source")
-                    })?;
-                    let mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "mint")
-                    })?;
-                    let destination = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "destination")
-                    })?;
-                    let authority = account_keys.get(3usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 3usize, "authority")
-                    })?;
+                    let source = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "source" , "source" , account_index , provided_count) }) ?
+                    };
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let destination = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "destination" , "destination" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            3usize
+                        } else {
+                            3usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = TransferCheckedAccounts {
                         remaining: vec![],
                         source: source.clone(),
@@ -1887,18 +2257,58 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(decimals), e)
                         })?;
                     let args = ApproveCheckedArguments { amount, decimals };
-                    let source = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "source")
-                    })?;
-                    let mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "mint")
-                    })?;
-                    let delegate = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "delegate")
-                    })?;
-                    let owner = account_keys.get(3usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 3usize, "owner")
-                    })?;
+                    let source = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "source" , "source" , account_index , provided_count) }) ?
+                    };
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let delegate = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "delegate" , "delegate" , account_index , provided_count) }) ?
+                    };
+                    let owner = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            3usize
+                        } else {
+                            3usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                    };
                     let accounts = ApproveCheckedAccounts {
                         remaining: vec![],
                         source: source.clone(),
@@ -1919,15 +2329,45 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(decimals), e)
                         })?;
                     let args = MintToCheckedArguments { amount, decimals };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let token = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "token")
-                    })?;
-                    let mint_authority = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "mintAuthority")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                    };
+                    let mint_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mintAuthority" , "mintAuthority" , account_index , provided_count) }) ?
+                    };
                     let accounts = MintToCheckedAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -1947,15 +2387,45 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(decimals), e)
                         })?;
                     let args = BurnCheckedArguments { amount, decimals };
-                    let account = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "account")
-                    })?;
-                    let mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "mint")
-                    })?;
-                    let authority = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "authority")
-                    })?;
+                    let account = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "account" , "account" , account_index , provided_count) }) ?
+                    };
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = BurnCheckedAccounts {
                         remaining: vec![],
                         account: account.clone(),
@@ -1972,15 +2442,45 @@ impl Instruction {
                                 format!("Failed to deserialize {}: {}", stringify!(owner), e)
                             })?;
                     let args = InitializeAccount2Arguments { owner };
-                    let account = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "account")
-                    })?;
-                    let mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "mint")
-                    })?;
-                    let rent = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "rent")
-                    })?;
+                    let account = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "account" , "account" , account_index , provided_count) }) ?
+                    };
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let rent = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "rent" , "rent" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeAccount2Accounts {
                         remaining: vec![],
                         account: account.clone(),
@@ -1992,9 +2492,19 @@ impl Instruction {
                 [17u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = SyncNativeArguments {};
-                    let account = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "account")
-                    })?;
+                    let account = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "account" , "account" , account_index , provided_count) }) ?
+                    };
                     let accounts = SyncNativeAccounts {
                         remaining: vec![],
                         account: account.clone(),
@@ -2009,12 +2519,32 @@ impl Instruction {
                                 format!("Failed to deserialize {}: {}", stringify!(owner), e)
                             })?;
                     let args = InitializeAccount3Arguments { owner };
-                    let account = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "account")
-                    })?;
-                    let mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "mint")
-                    })?;
+                    let account = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "account" , "account" , account_index , provided_count) }) ?
+                    };
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeAccount3Accounts {
                         remaining: vec![],
                         account: account.clone(),
@@ -2027,9 +2557,19 @@ impl Instruction {
                     let m: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                         .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(m), e))?;
                     let args = InitializeMultisig2Arguments { m };
-                    let multisig = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "multisig")
-                    })?;
+                    let multisig = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "multisig" , "multisig" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeMultisig2Accounts {
                         remaining: vec![],
                         multisig: multisig.clone(),
@@ -2065,9 +2605,19 @@ impl Instruction {
                         mint_authority,
                         freeze_authority,
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeMint2Accounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -2077,9 +2627,19 @@ impl Instruction {
                 [21u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = GetAccountDataSizeArguments {};
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = GetAccountDataSizeAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -2089,9 +2649,19 @@ impl Instruction {
                 [22u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = InitializeImmutableOwnerArguments {};
-                    let account = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "account")
-                    })?;
+                    let account = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "account" , "account" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeImmutableOwnerAccounts {
                         remaining: vec![],
                         account: account.clone(),
@@ -2105,9 +2675,19 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(amount), e)
                         })?;
                     let args = AmountToUiAmountArguments { amount };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = AmountToUiAmountAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -2121,9 +2701,19 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(ui_amount), e)
                         })?;
                     let args = UiAmountToAmountArguments { ui_amount };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = UiAmountToAmountAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -2142,9 +2732,19 @@ impl Instruction {
                                 )
                             })?;
                     let args = InitializeMintCloseAuthorityArguments { close_authority };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeMintCloseAuthorityAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -2190,9 +2790,19 @@ impl Instruction {
                         maximum_fee,
                         extension_type: "initializeTransferFeeConfig".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeTransferFeeConfigAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -2217,18 +2827,58 @@ impl Instruction {
                         fee,
                         extension_type: "transferCheckedWithFee".to_string(),
                     };
-                    let source = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "source")
-                    })?;
-                    let mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "mint")
-                    })?;
-                    let destination = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "destination")
-                    })?;
-                    let authority = account_keys.get(3usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 3usize, "authority")
-                    })?;
+                    let source = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "source" , "source" , account_index , provided_count) }) ?
+                    };
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let destination = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "destination" , "destination" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            3usize
+                        } else {
+                            3usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = TransferCheckedWithFeeAccounts {
                         remaining: vec![],
                         source: source.clone(),
@@ -2243,19 +2893,45 @@ impl Instruction {
                     let args = WithdrawWithheldTokensFromMintArguments {
                         extension_type: "withdrawWithheldTokensFromMint".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let fee_receiver = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "feeReceiver")
-                    })?;
-                    let withdraw_withheld_authority =
-                        account_keys.get(2usize).ok_or_else(|| {
-                            format!(
-                                "Missing account at index {}: {}",
-                                2usize, "withdrawWithheldAuthority"
-                            )
-                        })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let fee_receiver = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "feeReceiver" , "feeReceiver" , account_index , provided_count) }) ?
+                    };
+                    let withdraw_withheld_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "withdrawWithheldAuthority" , "withdrawWithheldAuthority" , account_index , provided_count) }) ?
+                    };
                     let accounts = WithdrawWithheldTokensFromMintAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -2278,19 +2954,45 @@ impl Instruction {
                         num_token_accounts,
                         extension_type: "withdrawWithheldTokensFromAccounts".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let fee_receiver = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "feeReceiver")
-                    })?;
-                    let withdraw_withheld_authority =
-                        account_keys.get(2usize).ok_or_else(|| {
-                            format!(
-                                "Missing account at index {}: {}",
-                                2usize, "withdrawWithheldAuthority"
-                            )
-                        })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let fee_receiver = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "feeReceiver" , "feeReceiver" , account_index , provided_count) }) ?
+                    };
+                    let withdraw_withheld_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "withdrawWithheldAuthority" , "withdrawWithheldAuthority" , account_index , provided_count) }) ?
+                    };
                     let accounts = WithdrawWithheldTokensFromAccountsAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -2304,9 +3006,19 @@ impl Instruction {
                     let args = HarvestWithheldTokensToMintArguments {
                         extension_type: "harvestWithheldTokensToMint".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = HarvestWithheldTokensToMintAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -2332,16 +3044,32 @@ impl Instruction {
                         maximum_fee,
                         extension_type: "setTransferFee".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let transfer_fee_config_authority =
-                        account_keys.get(1usize).ok_or_else(|| {
-                            format!(
-                                "Missing account at index {}: {}",
-                                1usize, "transferFeeConfigAuthority"
-                            )
-                        })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let transfer_fee_config_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "transferFeeConfigAuthority" , "transferFeeConfigAuthority" , account_index , provided_count) }) ?
+                    };
                     let accounts = SetTransferFeeAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -2393,9 +3121,19 @@ impl Instruction {
                         auditor_elgamal_pubkey,
                         extension_type: "initializeConfidentialTransferMint".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeConfidentialTransferMintAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -2432,12 +3170,32 @@ impl Instruction {
                         auditor_elgamal_pubkey,
                         extension_type: "updateConfidentialTransferMint".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "authority")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = UpdateConfidentialTransferMintAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -2477,32 +3235,74 @@ impl Instruction {
                         proof_instruction_offset,
                         extension_type: "configureConfidentialTransferAccount".to_string(),
                     };
-                    let token = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "token")
-                    })?;
-                    let mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "mint")
-                    })?;
-                    let instructions_sysvar_or_context_state =
-                        account_keys.get(2usize).ok_or_else(|| {
-                            format!(
-                                "Missing account at index {}: {}",
-                                2usize, "instructionsSysvarOrContextState"
-                            )
-                        })?;
-                    let record = account_keys.get(3usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 3usize, "record")
-                    })?;
-                    let authority = account_keys.get(4usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 4usize, "authority")
-                    })?;
+                    let token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 5usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                    };
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 5usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let instructions_sysvar_or_context_state = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 5usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "instructionsSysvarOrContextState" , "instructionsSysvarOrContextState" , account_index , provided_count) }) ?
+                    };
+                    let record = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count > required_count && provided_count > 3usize {
+                            account_keys.get(3usize).map(|key| key.clone())
+                        } else {
+                            None
+                        }
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 5usize {
+                            4usize
+                        } else {
+                            4usize - 1usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = ConfigureConfidentialTransferAccountAccounts {
                         remaining: vec![],
                         token: token.clone(),
                         mint: mint.clone(),
                         instructions_sysvar_or_context_state: instructions_sysvar_or_context_state
                             .clone(),
-                        record: Some(record.clone()),
+                        record: record,
                         authority: authority.clone(),
                     };
                     return Ok(Instruction::ConfigureConfidentialTransferAccount {
@@ -2515,15 +3315,45 @@ impl Instruction {
                     let args = ApproveConfidentialTransferAccountArguments {
                         extension_type: "approveConfidentialTransferAccount".to_string(),
                     };
-                    let token = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "token")
-                    })?;
-                    let mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "mint")
-                    })?;
-                    let authority = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "authority")
-                    })?;
+                    let token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                    };
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = ApproveConfidentialTransferAccountAccounts {
                         remaining: vec![],
                         token: token.clone(),
@@ -2546,28 +3376,60 @@ impl Instruction {
                         proof_instruction_offset,
                         extension_type: "emptyConfidentialTransferAccount".to_string(),
                     };
-                    let token = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "token")
-                    })?;
-                    let instructions_sysvar_or_context_state =
-                        account_keys.get(1usize).ok_or_else(|| {
-                            format!(
-                                "Missing account at index {}: {}",
-                                1usize, "instructionsSysvarOrContextState"
-                            )
-                        })?;
-                    let record = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "record")
-                    })?;
-                    let authority = account_keys.get(3usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 3usize, "authority")
-                    })?;
+                    let token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                    };
+                    let instructions_sysvar_or_context_state = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "instructionsSysvarOrContextState" , "instructionsSysvarOrContextState" , account_index , provided_count) }) ?
+                    };
+                    let record = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count > required_count && provided_count > 2usize {
+                            account_keys.get(2usize).map(|key| key.clone())
+                        } else {
+                            None
+                        }
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            3usize
+                        } else {
+                            3usize - 1usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = EmptyConfidentialTransferAccountAccounts {
                         remaining: vec![],
                         token: token.clone(),
                         instructions_sysvar_or_context_state: instructions_sysvar_or_context_state
                             .clone(),
-                        record: Some(record.clone()),
+                        record: record,
                         authority: authority.clone(),
                     };
                     return Ok(Instruction::EmptyConfidentialTransferAccount { accounts, args });
@@ -2587,15 +3449,45 @@ impl Instruction {
                         decimals,
                         extension_type: "confidentialDeposit".to_string(),
                     };
-                    let token = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "token")
-                    })?;
-                    let mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "mint")
-                    })?;
-                    let authority = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "authority")
-                    })?;
+                    let token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                    };
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = ConfidentialDepositAccounts {
                         remaining: vec![],
                         token: token.clone(),
@@ -2647,34 +3539,79 @@ impl Instruction {
                         range_proof_instruction_offset,
                         extension_type: "confidentialWithdraw".to_string(),
                     };
-                    let token = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "token")
-                    })?;
-                    let mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "mint")
-                    })?;
-                    let instructions_sysvar = account_keys.get(2usize).ok_or_else(|| {
-                        format!(
-                            "Missing account at index {}: {}",
-                            2usize, "instructionsSysvar"
-                        )
-                    })?;
-                    let equality_record = account_keys.get(3usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 3usize, "equalityRecord")
-                    })?;
-                    let range_record = account_keys.get(4usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 4usize, "rangeRecord")
-                    })?;
-                    let authority = account_keys.get(5usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 5usize, "authority")
-                    })?;
+                    let token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 6usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                    };
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 6usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let instructions_sysvar = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count > required_count && provided_count > 2usize {
+                            account_keys.get(2usize).map(|key| key.clone())
+                        } else {
+                            None
+                        }
+                    };
+                    let equality_record = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count > required_count && provided_count > 3usize {
+                            account_keys.get(3usize).map(|key| key.clone())
+                        } else {
+                            None
+                        }
+                    };
+                    let range_record = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count > required_count && provided_count > 4usize {
+                            account_keys.get(4usize).map(|key| key.clone())
+                        } else {
+                            None
+                        }
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 6usize {
+                            5usize
+                        } else {
+                            5usize - 3usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = ConfidentialWithdrawAccounts {
                         remaining: vec![],
                         token: token.clone(),
                         mint: mint.clone(),
-                        instructions_sysvar: Some(instructions_sysvar.clone()),
-                        equality_record: Some(equality_record.clone()),
-                        range_record: Some(range_record.clone()),
+                        instructions_sysvar: instructions_sysvar,
+                        equality_record: equality_record,
+                        range_record: range_record,
                         authority: authority.clone(),
                     };
                     return Ok(Instruction::ConfidentialWithdraw { accounts, args });
@@ -2721,48 +3658,103 @@ impl Instruction {
                         range_proof_instruction_offset,
                         extension_type: "confidentialTransfer".to_string(),
                     };
-                    let source_token = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "sourceToken")
-                    })?;
-                    let mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "mint")
-                    })?;
-                    let destination_token = account_keys.get(2usize).ok_or_else(|| {
-                        format!(
-                            "Missing account at index {}: {}",
-                            2usize, "destinationToken"
-                        )
-                    })?;
-                    let instructions_sysvar = account_keys.get(3usize).ok_or_else(|| {
-                        format!(
-                            "Missing account at index {}: {}",
-                            3usize, "instructionsSysvar"
-                        )
-                    })?;
-                    let equality_record = account_keys.get(4usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 4usize, "equalityRecord")
-                    })?;
-                    let ciphertext_validity_record = account_keys.get(5usize).ok_or_else(|| {
-                        format!(
-                            "Missing account at index {}: {}",
-                            5usize, "ciphertextValidityRecord"
-                        )
-                    })?;
-                    let range_record = account_keys.get(6usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 6usize, "rangeRecord")
-                    })?;
-                    let authority = account_keys.get(7usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 7usize, "authority")
-                    })?;
+                    let source_token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 8usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "sourceToken" , "sourceToken" , account_index , provided_count) }) ?
+                    };
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 8usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let destination_token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 8usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "destinationToken" , "destinationToken" , account_index , provided_count) }) ?
+                    };
+                    let instructions_sysvar = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count > required_count && provided_count > 3usize {
+                            account_keys.get(3usize).map(|key| key.clone())
+                        } else {
+                            None
+                        }
+                    };
+                    let equality_record = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count > required_count && provided_count > 4usize {
+                            account_keys.get(4usize).map(|key| key.clone())
+                        } else {
+                            None
+                        }
+                    };
+                    let ciphertext_validity_record = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count > required_count && provided_count > 5usize {
+                            account_keys.get(5usize).map(|key| key.clone())
+                        } else {
+                            None
+                        }
+                    };
+                    let range_record = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count > required_count && provided_count > 6usize {
+                            account_keys.get(6usize).map(|key| key.clone())
+                        } else {
+                            None
+                        }
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 8usize {
+                            7usize
+                        } else {
+                            7usize - 4usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = ConfidentialTransferAccounts {
                         remaining: vec![],
                         source_token: source_token.clone(),
                         mint: mint.clone(),
                         destination_token: destination_token.clone(),
-                        instructions_sysvar: Some(instructions_sysvar.clone()),
-                        equality_record: Some(equality_record.clone()),
-                        ciphertext_validity_record: Some(ciphertext_validity_record.clone()),
-                        range_record: Some(range_record.clone()),
+                        instructions_sysvar: instructions_sysvar,
+                        equality_record: equality_record,
+                        ciphertext_validity_record: ciphertext_validity_record,
+                        range_record: range_record,
                         authority: authority.clone(),
                     };
                     return Ok(Instruction::ConfidentialTransfer { accounts, args });
@@ -2791,12 +3783,32 @@ impl Instruction {
                         new_decryptable_available_balance,
                         extension_type: "applyConfidentialPendingBalance".to_string(),
                     };
-                    let token = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "token")
-                    })?;
-                    let authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "authority")
-                    })?;
+                    let token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = ApplyConfidentialPendingBalanceAccounts {
                         remaining: vec![],
                         token: token.clone(),
@@ -2809,12 +3821,32 @@ impl Instruction {
                     let args = EnableConfidentialCreditsArguments {
                         extension_type: "enableConfidentialCredits".to_string(),
                     };
-                    let token = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "token")
-                    })?;
-                    let authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "authority")
-                    })?;
+                    let token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = EnableConfidentialCreditsAccounts {
                         remaining: vec![],
                         token: token.clone(),
@@ -2827,12 +3859,32 @@ impl Instruction {
                     let args = DisableConfidentialCreditsArguments {
                         extension_type: "disableConfidentialCredits".to_string(),
                     };
-                    let token = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "token")
-                    })?;
-                    let authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "authority")
-                    })?;
+                    let token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = DisableConfidentialCreditsAccounts {
                         remaining: vec![],
                         token: token.clone(),
@@ -2845,12 +3897,32 @@ impl Instruction {
                     let args = EnableNonConfidentialCreditsArguments {
                         extension_type: "enableNonConfidentialCredits".to_string(),
                     };
-                    let token = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "token")
-                    })?;
-                    let authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "authority")
-                    })?;
+                    let token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = EnableNonConfidentialCreditsAccounts {
                         remaining: vec![],
                         token: token.clone(),
@@ -2863,12 +3935,32 @@ impl Instruction {
                     let args = DisableNonConfidentialCreditsArguments {
                         extension_type: "disableNonConfidentialCredits".to_string(),
                     };
-                    let token = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "token")
-                    })?;
-                    let authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "authority")
-                    })?;
+                    let token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = DisableNonConfidentialCreditsAccounts {
                         remaining: vec![],
                         token: token.clone(),
@@ -2938,65 +4030,124 @@ impl Instruction {
                         range_proof_instruction_offset,
                         extension_type: "confidentialTransferWithFee".to_string(),
                     };
-                    let source_token = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "sourceToken")
-                    })?;
-                    let mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "mint")
-                    })?;
-                    let destination_token = account_keys.get(2usize).ok_or_else(|| {
-                        format!(
-                            "Missing account at index {}: {}",
-                            2usize, "destinationToken"
-                        )
-                    })?;
-                    let instructions_sysvar = account_keys.get(3usize).ok_or_else(|| {
-                        format!(
-                            "Missing account at index {}: {}",
-                            3usize, "instructionsSysvar"
-                        )
-                    })?;
-                    let equality_record = account_keys.get(4usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 4usize, "equalityRecord")
-                    })?;
-                    let transfer_amount_ciphertext_validity_record =
-                        account_keys.get(5usize).ok_or_else(|| {
-                            format!(
-                                "Missing account at index {}: {}",
-                                5usize, "transferAmountCiphertextValidityRecord"
-                            )
-                        })?;
-                    let fee_sigma_record = account_keys.get(6usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 6usize, "feeSigmaRecord")
-                    })?;
-                    let fee_ciphertext_validity_record =
-                        account_keys.get(7usize).ok_or_else(|| {
-                            format!(
-                                "Missing account at index {}: {}",
-                                7usize, "feeCiphertextValidityRecord"
-                            )
-                        })?;
-                    let range_record = account_keys.get(8usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 8usize, "rangeRecord")
-                    })?;
-                    let authority = account_keys.get(9usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 9usize, "authority")
-                    })?;
+                    let source_token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 10usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "sourceToken" , "sourceToken" , account_index , provided_count) }) ?
+                    };
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 10usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let destination_token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 10usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "destinationToken" , "destinationToken" , account_index , provided_count) }) ?
+                    };
+                    let instructions_sysvar = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count > required_count && provided_count > 3usize {
+                            account_keys.get(3usize).map(|key| key.clone())
+                        } else {
+                            None
+                        }
+                    };
+                    let equality_record = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count > required_count && provided_count > 4usize {
+                            account_keys.get(4usize).map(|key| key.clone())
+                        } else {
+                            None
+                        }
+                    };
+                    let transfer_amount_ciphertext_validity_record = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count > required_count && provided_count > 5usize {
+                            account_keys.get(5usize).map(|key| key.clone())
+                        } else {
+                            None
+                        }
+                    };
+                    let fee_sigma_record = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count > required_count && provided_count > 6usize {
+                            account_keys.get(6usize).map(|key| key.clone())
+                        } else {
+                            None
+                        }
+                    };
+                    let fee_ciphertext_validity_record = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count > required_count && provided_count > 7usize {
+                            account_keys.get(7usize).map(|key| key.clone())
+                        } else {
+                            None
+                        }
+                    };
+                    let range_record = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count > required_count && provided_count > 8usize {
+                            account_keys.get(8usize).map(|key| key.clone())
+                        } else {
+                            None
+                        }
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 10usize {
+                            9usize
+                        } else {
+                            9usize - 6usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = ConfidentialTransferWithFeeAccounts {
                         remaining: vec![],
                         source_token: source_token.clone(),
                         mint: mint.clone(),
                         destination_token: destination_token.clone(),
-                        instructions_sysvar: Some(instructions_sysvar.clone()),
-                        equality_record: Some(equality_record.clone()),
-                        transfer_amount_ciphertext_validity_record: Some(
-                            transfer_amount_ciphertext_validity_record.clone(),
-                        ),
-                        fee_sigma_record: Some(fee_sigma_record.clone()),
-                        fee_ciphertext_validity_record: Some(
-                            fee_ciphertext_validity_record.clone(),
-                        ),
-                        range_record: Some(range_record.clone()),
+                        instructions_sysvar: instructions_sysvar,
+                        equality_record: equality_record,
+                        transfer_amount_ciphertext_validity_record:
+                            transfer_amount_ciphertext_validity_record,
+                        fee_sigma_record: fee_sigma_record,
+                        fee_ciphertext_validity_record: fee_ciphertext_validity_record,
+                        range_record: range_record,
                         authority: authority.clone(),
                     };
                     return Ok(Instruction::ConfidentialTransferWithFee { accounts, args });
@@ -3012,9 +4163,19 @@ impl Instruction {
                         state,
                         extension_type: "initializeDefaultAccountState".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeDefaultAccountStateAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -3032,12 +4193,32 @@ impl Instruction {
                         state,
                         extension_type: "updateDefaultAccountState".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let freeze_authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "freezeAuthority")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let freeze_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "freezeAuthority" , "freezeAuthority" , account_index , provided_count) }) ?
+                    };
                     let accounts = UpdateDefaultAccountStateAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -3058,18 +4239,58 @@ impl Instruction {
                     let args = ReallocateArguments {
                         new_extension_types,
                     };
-                    let token = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "token")
-                    })?;
-                    let payer = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "payer")
-                    })?;
-                    let system_program = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "systemProgram")
-                    })?;
-                    let owner = account_keys.get(3usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 3usize, "owner")
-                    })?;
+                    let token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                    };
+                    let payer = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "payer" , "payer" , account_index , provided_count) }) ?
+                    };
+                    let system_program = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "systemProgram" , "systemProgram" , account_index , provided_count) }) ?
+                    };
+                    let owner = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            3usize
+                        } else {
+                            3usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                    };
                     let accounts = ReallocateAccounts {
                         remaining: vec![],
                         token: token.clone(),
@@ -3084,12 +4305,32 @@ impl Instruction {
                     let args = EnableMemoTransfersArguments {
                         extension_type: "enableMemoTransfers".to_string(),
                     };
-                    let token = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "token")
-                    })?;
-                    let owner = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "owner")
-                    })?;
+                    let token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                    };
+                    let owner = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                    };
                     let accounts = EnableMemoTransfersAccounts {
                         remaining: vec![],
                         token: token.clone(),
@@ -3102,12 +4343,32 @@ impl Instruction {
                     let args = DisableMemoTransfersArguments {
                         extension_type: "disableMemoTransfers".to_string(),
                     };
-                    let token = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "token")
-                    })?;
-                    let owner = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "owner")
-                    })?;
+                    let token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                    };
+                    let owner = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                    };
                     let accounts = DisableMemoTransfersAccounts {
                         remaining: vec![],
                         token: token.clone(),
@@ -3118,15 +4379,45 @@ impl Instruction {
                 [31u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = CreateNativeMintArguments {};
-                    let payer = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "payer")
-                    })?;
-                    let native_mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "nativeMint")
-                    })?;
-                    let system_program = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "systemProgram")
-                    })?;
+                    let payer = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "payer" , "payer" , account_index , provided_count) }) ?
+                    };
+                    let native_mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "nativeMint" , "nativeMint" , account_index , provided_count) }) ?
+                    };
+                    let system_program = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "systemProgram" , "systemProgram" , account_index , provided_count) }) ?
+                    };
                     let accounts = CreateNativeMintAccounts {
                         remaining: vec![],
                         payer: payer.clone(),
@@ -3138,9 +4429,19 @@ impl Instruction {
                 [32u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = InitializeNonTransferableMintArguments {};
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeNonTransferableMintAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -3171,9 +4472,19 @@ impl Instruction {
                         rate,
                         extension_type: "initializeInterestBearingMint".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeInterestBearingMintAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -3190,12 +4501,32 @@ impl Instruction {
                         rate,
                         extension_type: "updateRateInterestBearingMint".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let rate_authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "rateAuthority")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let rate_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "rateAuthority" , "rateAuthority" , account_index , provided_count) }) ?
+                    };
                     let accounts = UpdateRateInterestBearingMintAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -3208,12 +4539,32 @@ impl Instruction {
                     let args = EnableCpiGuardArguments {
                         extension_type: "enableCpiGuard".to_string(),
                     };
-                    let token = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "token")
-                    })?;
-                    let owner = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "owner")
-                    })?;
+                    let token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                    };
+                    let owner = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                    };
                     let accounts = EnableCpiGuardAccounts {
                         remaining: vec![],
                         token: token.clone(),
@@ -3226,12 +4577,32 @@ impl Instruction {
                     let args = DisableCpiGuardArguments {
                         extension_type: "disableCpiGuard".to_string(),
                     };
-                    let token = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "token")
-                    })?;
-                    let owner = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "owner")
-                    })?;
+                    let token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                    };
+                    let owner = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                    };
                     let accounts = DisableCpiGuardAccounts {
                         remaining: vec![],
                         token: token.clone(),
@@ -3247,9 +4618,19 @@ impl Instruction {
                                 format!("Failed to deserialize {}: {}", stringify!(delegate), e)
                             })?;
                     let args = InitializePermanentDelegateArguments { delegate };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializePermanentDelegateAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -3289,9 +4670,19 @@ impl Instruction {
                         program_id,
                         extension_type: "initializeTransferHook".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeTransferHookAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -3317,12 +4708,32 @@ impl Instruction {
                         program_id,
                         extension_type: "updateTransferHook".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "authority")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = UpdateTransferHookAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -3363,9 +4774,19 @@ impl Instruction {
                         withdraw_withheld_authority_el_gamal_pubkey,
                         extension_type: "initializeConfidentialTransferFee".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeConfidentialTransferFeeAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -3397,25 +4818,67 @@ impl Instruction {
                         extension_type: "withdrawWithheldTokensFromMintForConfidentialTransferFee"
                             .to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let destination = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "destination")
-                    })?;
-                    let instructions_sysvar_or_context_state =
-                        account_keys.get(2usize).ok_or_else(|| {
-                            format!(
-                                "Missing account at index {}: {}",
-                                2usize, "instructionsSysvarOrContextState"
-                            )
-                        })?;
-                    let record = account_keys.get(3usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 3usize, "record")
-                    })?;
-                    let authority = account_keys.get(4usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 4usize, "authority")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 5usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let destination = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 5usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "destination" , "destination" , account_index , provided_count) }) ?
+                    };
+                    let instructions_sysvar_or_context_state = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 5usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "instructionsSysvarOrContextState" , "instructionsSysvarOrContextState" , account_index , provided_count) }) ?
+                    };
+                    let record = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count > required_count && provided_count > 3usize {
+                            account_keys.get(3usize).map(|key| key.clone())
+                        } else {
+                            None
+                        }
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 5usize {
+                            4usize
+                        } else {
+                            4usize - 1usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts =
                         WithdrawWithheldTokensFromMintForConfidentialTransferFeeAccounts {
                             remaining: vec![],
@@ -3423,7 +4886,7 @@ impl Instruction {
                             destination: destination.clone(),
                             instructions_sysvar_or_context_state:
                                 instructions_sysvar_or_context_state.clone(),
-                            record: Some(record.clone()),
+                            record: record,
                             authority: authority.clone(),
                         };
                     return Ok(
@@ -3469,25 +4932,67 @@ impl Instruction {
                                 "withdrawWithheldTokensFromAccountsForConfidentialTransferFee"
                                     .to_string(),
                         };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let destination = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "destination")
-                    })?;
-                    let instructions_sysvar_or_context_state =
-                        account_keys.get(2usize).ok_or_else(|| {
-                            format!(
-                                "Missing account at index {}: {}",
-                                2usize, "instructionsSysvarOrContextState"
-                            )
-                        })?;
-                    let record = account_keys.get(3usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 3usize, "record")
-                    })?;
-                    let authority = account_keys.get(4usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 4usize, "authority")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 5usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let destination = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 5usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "destination" , "destination" , account_index , provided_count) }) ?
+                    };
+                    let instructions_sysvar_or_context_state = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 5usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "instructionsSysvarOrContextState" , "instructionsSysvarOrContextState" , account_index , provided_count) }) ?
+                    };
+                    let record = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count > required_count && provided_count > 3usize {
+                            account_keys.get(3usize).map(|key| key.clone())
+                        } else {
+                            None
+                        }
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 5usize {
+                            4usize
+                        } else {
+                            4usize - 1usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts =
                         WithdrawWithheldTokensFromAccountsForConfidentialTransferFeeAccounts {
                             remaining: vec![],
@@ -3495,7 +5000,7 @@ impl Instruction {
                             destination: destination.clone(),
                             instructions_sysvar_or_context_state:
                                 instructions_sysvar_or_context_state.clone(),
-                            record: Some(record.clone()),
+                            record: record,
                             authority: authority.clone(),
                         };
                     return Ok(
@@ -3511,9 +5016,19 @@ impl Instruction {
                         extension_type: "harvestWithheldTokensToMintForConfidentialTransferFee"
                             .to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = HarvestWithheldTokensToMintForConfidentialTransferFeeAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -3530,12 +5045,32 @@ impl Instruction {
                     let args = EnableHarvestToMintArguments {
                         extension_type: "enableHarvestToMint".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "authority")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = EnableHarvestToMintAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -3548,12 +5083,32 @@ impl Instruction {
                     let args = DisableHarvestToMintArguments {
                         extension_type: "disableHarvestToMint".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "authority")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = DisableHarvestToMintAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -3564,18 +5119,45 @@ impl Instruction {
                 [38u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = WithdrawExcessLamportsArguments {};
-                    let source_account = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "sourceAccount")
-                    })?;
-                    let destination_account = account_keys.get(1usize).ok_or_else(|| {
-                        format!(
-                            "Missing account at index {}: {}",
-                            1usize, "destinationAccount"
-                        )
-                    })?;
-                    let authority = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "authority")
-                    })?;
+                    let source_account = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "sourceAccount" , "sourceAccount" , account_index , provided_count) }) ?
+                    };
+                    let destination_account = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "destinationAccount" , "destinationAccount" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = WithdrawExcessLamportsAccounts {
                         remaining: vec![],
                         source_account: source_account.clone(),
@@ -3617,9 +5199,19 @@ impl Instruction {
                         metadata_address,
                         extension_type: "initializeMetadataPointer".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeMetadataPointerAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -3645,15 +5237,32 @@ impl Instruction {
                         metadata_address,
                         extension_type: "updateMetadataPointer".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let metadata_pointer_authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!(
-                            "Missing account at index {}: {}",
-                            1usize, "metadataPointerAuthority"
-                        )
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let metadata_pointer_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "metadataPointerAuthority" , "metadataPointerAuthority" , account_index , provided_count) }) ?
+                    };
                     let accounts = UpdateMetadataPointerAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -3694,9 +5303,19 @@ impl Instruction {
                         group_address,
                         extension_type: "initializeGroupPointer".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeGroupPointerAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -3722,15 +5341,32 @@ impl Instruction {
                         group_address,
                         extension_type: "updateGroupPointer".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let group_pointer_authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!(
-                            "Missing account at index {}: {}",
-                            1usize, "groupPointerAuthority"
-                        )
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let group_pointer_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "groupPointerAuthority" , "groupPointerAuthority" , account_index , provided_count) }) ?
+                    };
                     let accounts = UpdateGroupPointerAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -3771,9 +5407,19 @@ impl Instruction {
                         member_address,
                         extension_type: "initializeGroupMemberPointer".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeGroupMemberPointerAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -3799,16 +5445,32 @@ impl Instruction {
                         member_address,
                         extension_type: "updateGroupMemberPointer".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let group_member_pointer_authority =
-                        account_keys.get(1usize).ok_or_else(|| {
-                            format!(
-                                "Missing account at index {}: {}",
-                                1usize, "groupMemberPointerAuthority"
-                            )
-                        })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let group_member_pointer_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "groupMemberPointerAuthority" , "groupMemberPointerAuthority" , account_index , provided_count) }) ?
+                    };
                     let accounts = UpdateGroupMemberPointerAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -3840,9 +5502,19 @@ impl Instruction {
                         multiplier,
                         extension_type: "initializeScaledUiAmountMint".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeScaledUiAmountMintAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -3868,12 +5540,32 @@ impl Instruction {
                         effective_timestamp,
                         extension_type: "updateMultiplierScaledUiMint".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "authority")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = UpdateMultiplierScaledUiMintAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -3900,9 +5592,19 @@ impl Instruction {
                         authority,
                         extension_type: "initializePausableConfig".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializePausableConfigAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -3914,12 +5616,32 @@ impl Instruction {
                     let args = PauseArguments {
                         extension_type: "pause".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "authority")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = PauseAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -3932,12 +5654,32 @@ impl Instruction {
                     let args = ResumeArguments {
                         extension_type: "resume".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "authority")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = ResumeAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -4019,18 +5761,58 @@ impl Instruction {
                         uri,
                         extension_type: "initializeTokenMetadata".to_string(),
                     };
-                    let metadata = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "metadata")
-                    })?;
-                    let update_authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "updateAuthority")
-                    })?;
-                    let mint = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "mint")
-                    })?;
-                    let mint_authority = account_keys.get(3usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 3usize, "mintAuthority")
-                    })?;
+                    let metadata = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "metadata" , "metadata" , account_index , provided_count) }) ?
+                    };
+                    let update_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "updateAuthority" , "updateAuthority" , account_index , provided_count) }) ?
+                    };
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let mint_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            3usize
+                        } else {
+                            3usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mintAuthority" , "mintAuthority" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeTokenMetadataAccounts {
                         remaining: vec![],
                         metadata: metadata.clone(),
@@ -4074,12 +5856,32 @@ impl Instruction {
                         value,
                         extension_type: "updateTokenMetadataField".to_string(),
                     };
-                    let metadata = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "metadata")
-                    })?;
-                    let update_authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "updateAuthority")
-                    })?;
+                    let metadata = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "metadata" , "metadata" , account_index , provided_count) }) ?
+                    };
+                    let update_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "updateAuthority" , "updateAuthority" , account_index , provided_count) }) ?
+                    };
                     let accounts = UpdateTokenMetadataFieldAccounts {
                         remaining: vec![],
                         metadata: metadata.clone(),
@@ -4120,12 +5922,32 @@ impl Instruction {
                         key,
                         extension_type: "removeTokenMetadataKey".to_string(),
                     };
-                    let metadata = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "metadata")
-                    })?;
-                    let update_authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "updateAuthority")
-                    })?;
+                    let metadata = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "metadata" , "metadata" , account_index , provided_count) }) ?
+                    };
+                    let update_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "updateAuthority" , "updateAuthority" , account_index , provided_count) }) ?
+                    };
                     let accounts = RemoveTokenMetadataKeyAccounts {
                         remaining: vec![],
                         metadata: metadata.clone(),
@@ -4152,12 +5974,32 @@ impl Instruction {
                         new_update_authority,
                         extension_type: "updateTokenMetadataUpdateAuthority".to_string(),
                     };
-                    let metadata = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "metadata")
-                    })?;
-                    let update_authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "updateAuthority")
-                    })?;
+                    let metadata = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "metadata" , "metadata" , account_index , provided_count) }) ?
+                    };
+                    let update_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "updateAuthority" , "updateAuthority" , account_index , provided_count) }) ?
+                    };
                     let accounts = UpdateTokenMetadataUpdateAuthorityAccounts {
                         remaining: vec![],
                         metadata: metadata.clone(),
@@ -4180,9 +6022,19 @@ impl Instruction {
                         end,
                         extension_type: "emitTokenMetadata".to_string(),
                     };
-                    let metadata = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "metadata")
-                    })?;
+                    let metadata = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "metadata" , "metadata" , account_index , provided_count) }) ?
+                    };
                     let accounts = EmitTokenMetadataAccounts {
                         remaining: vec![],
                         metadata: metadata.clone(),
@@ -4213,15 +6065,45 @@ impl Instruction {
                         max_size,
                         extension_type: "initializeTokenGroup".to_string(),
                     };
-                    let group = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "group")
-                    })?;
-                    let mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "mint")
-                    })?;
-                    let mint_authority = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "mintAuthority")
-                    })?;
+                    let group = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "group" , "group" , account_index , provided_count) }) ?
+                    };
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let mint_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mintAuthority" , "mintAuthority" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeTokenGroupAccounts {
                         remaining: vec![],
                         group: group.clone(),
@@ -4240,12 +6122,32 @@ impl Instruction {
                         max_size,
                         extension_type: "updateTokenGroupMaxSize".to_string(),
                     };
-                    let group = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "group")
-                    })?;
-                    let update_authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "updateAuthority")
-                    })?;
+                    let group = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "group" , "group" , account_index , provided_count) }) ?
+                    };
+                    let update_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "updateAuthority" , "updateAuthority" , account_index , provided_count) }) ?
+                    };
                     let accounts = UpdateTokenGroupMaxSizeAccounts {
                         remaining: vec![],
                         group: group.clone(),
@@ -4272,12 +6174,32 @@ impl Instruction {
                         new_update_authority,
                         extension_type: "updateTokenGroupUpdateAuthority".to_string(),
                     };
-                    let group = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "group")
-                    })?;
-                    let update_authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "updateAuthority")
-                    })?;
+                    let group = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "group" , "group" , account_index , provided_count) }) ?
+                    };
+                    let update_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "updateAuthority" , "updateAuthority" , account_index , provided_count) }) ?
+                    };
                     let accounts = UpdateTokenGroupUpdateAuthorityAccounts {
                         remaining: vec![],
                         group: group.clone(),
@@ -4290,27 +6212,71 @@ impl Instruction {
                     let args = InitializeTokenGroupMemberArguments {
                         extension_type: "initializeTokenGroupMember".to_string(),
                     };
-                    let member = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "member")
-                    })?;
-                    let member_mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "memberMint")
-                    })?;
-                    let member_mint_authority = account_keys.get(2usize).ok_or_else(|| {
-                        format!(
-                            "Missing account at index {}: {}",
-                            2usize, "memberMintAuthority"
-                        )
-                    })?;
-                    let group = account_keys.get(3usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 3usize, "group")
-                    })?;
-                    let group_update_authority = account_keys.get(4usize).ok_or_else(|| {
-                        format!(
-                            "Missing account at index {}: {}",
-                            4usize, "groupUpdateAuthority"
-                        )
-                    })?;
+                    let member = {
+                        let provided_count = account_keys.len();
+                        let required_count = 5usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 5usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "member" , "member" , account_index , provided_count) }) ?
+                    };
+                    let member_mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 5usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 5usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "memberMint" , "memberMint" , account_index , provided_count) }) ?
+                    };
+                    let member_mint_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 5usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 5usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "memberMintAuthority" , "memberMintAuthority" , account_index , provided_count) }) ?
+                    };
+                    let group = {
+                        let provided_count = account_keys.len();
+                        let required_count = 5usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 5usize {
+                            3usize
+                        } else {
+                            3usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "group" , "group" , account_index , provided_count) }) ?
+                    };
+                    let group_update_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 5usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 5usize {
+                            4usize
+                        } else {
+                            4usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "groupUpdateAuthority" , "groupUpdateAuthority" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeTokenGroupMemberAccounts {
                         remaining: vec![],
                         member: member.clone(),
@@ -4356,12 +6322,32 @@ impl Instruction {
                         mint_authority,
                         freeze_authority,
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let rent = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "rent")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let rent = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "rent" , "rent" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeMintAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -4372,18 +6358,58 @@ impl Instruction {
                 [1u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = InitializeAccountArguments {};
-                    let account = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "account")
-                    })?;
-                    let mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "mint")
-                    })?;
-                    let owner = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "owner")
-                    })?;
-                    let rent = account_keys.get(3usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 3usize, "rent")
-                    })?;
+                    let account = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "account" , "account" , account_index , provided_count) }) ?
+                    };
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let owner = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                    };
+                    let rent = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            3usize
+                        } else {
+                            3usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "rent" , "rent" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeAccountAccounts {
                         remaining: vec![],
                         account: account.clone(),
@@ -4398,12 +6424,32 @@ impl Instruction {
                     let m: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                         .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(m), e))?;
                     let args = InitializeMultisigArguments { m };
-                    let multisig = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "multisig")
-                    })?;
-                    let rent = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "rent")
-                    })?;
+                    let multisig = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "multisig" , "multisig" , account_index , provided_count) }) ?
+                    };
+                    let rent = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "rent" , "rent" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeMultisigAccounts {
                         remaining: vec![],
                         multisig: multisig.clone(),
@@ -4418,15 +6464,45 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(amount), e)
                         })?;
                     let args = TransferArguments { amount };
-                    let source = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "source")
-                    })?;
-                    let destination = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "destination")
-                    })?;
-                    let authority = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "authority")
-                    })?;
+                    let source = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "source" , "source" , account_index , provided_count) }) ?
+                    };
+                    let destination = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "destination" , "destination" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = TransferAccounts {
                         remaining: vec![],
                         source: source.clone(),
@@ -4442,15 +6518,45 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(amount), e)
                         })?;
                     let args = ApproveArguments { amount };
-                    let source = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "source")
-                    })?;
-                    let delegate = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "delegate")
-                    })?;
-                    let owner = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "owner")
-                    })?;
+                    let source = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "source" , "source" , account_index , provided_count) }) ?
+                    };
+                    let delegate = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "delegate" , "delegate" , account_index , provided_count) }) ?
+                    };
+                    let owner = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                    };
                     let accounts = ApproveAccounts {
                         remaining: vec![],
                         source: source.clone(),
@@ -4462,12 +6568,32 @@ impl Instruction {
                 [5u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = RevokeArguments {};
-                    let source = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "source")
-                    })?;
-                    let owner = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "owner")
-                    })?;
+                    let source = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "source" , "source" , account_index , provided_count) }) ?
+                    };
+                    let owner = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                    };
                     let accounts = RevokeAccounts {
                         remaining: vec![],
                         source: source.clone(),
@@ -4499,12 +6625,32 @@ impl Instruction {
                         authority_type,
                         new_authority,
                     };
-                    let owned = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "owned")
-                    })?;
-                    let owner = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "owner")
-                    })?;
+                    let owned = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owned" , "owned" , account_index , provided_count) }) ?
+                    };
+                    let owner = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                    };
                     let accounts = SetAuthorityAccounts {
                         remaining: vec![],
                         owned: owned.clone(),
@@ -4519,15 +6665,45 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(amount), e)
                         })?;
                     let args = MintToArguments { amount };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let token = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "token")
-                    })?;
-                    let mint_authority = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "mintAuthority")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                    };
+                    let mint_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mintAuthority" , "mintAuthority" , account_index , provided_count) }) ?
+                    };
                     let accounts = MintToAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -4543,15 +6719,45 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(amount), e)
                         })?;
                     let args = BurnArguments { amount };
-                    let account = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "account")
-                    })?;
-                    let mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "mint")
-                    })?;
-                    let authority = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "authority")
-                    })?;
+                    let account = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "account" , "account" , account_index , provided_count) }) ?
+                    };
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = BurnAccounts {
                         remaining: vec![],
                         account: account.clone(),
@@ -4563,15 +6769,45 @@ impl Instruction {
                 [9u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = CloseAccountArguments {};
-                    let account = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "account")
-                    })?;
-                    let destination = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "destination")
-                    })?;
-                    let owner = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "owner")
-                    })?;
+                    let account = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "account" , "account" , account_index , provided_count) }) ?
+                    };
+                    let destination = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "destination" , "destination" , account_index , provided_count) }) ?
+                    };
+                    let owner = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                    };
                     let accounts = CloseAccountAccounts {
                         remaining: vec![],
                         account: account.clone(),
@@ -4583,15 +6819,45 @@ impl Instruction {
                 [10u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = FreezeAccountArguments {};
-                    let account = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "account")
-                    })?;
-                    let mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "mint")
-                    })?;
-                    let owner = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "owner")
-                    })?;
+                    let account = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "account" , "account" , account_index , provided_count) }) ?
+                    };
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let owner = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                    };
                     let accounts = FreezeAccountAccounts {
                         remaining: vec![],
                         account: account.clone(),
@@ -4603,15 +6869,45 @@ impl Instruction {
                 [11u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = ThawAccountArguments {};
-                    let account = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "account")
-                    })?;
-                    let mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "mint")
-                    })?;
-                    let owner = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "owner")
-                    })?;
+                    let account = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "account" , "account" , account_index , provided_count) }) ?
+                    };
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let owner = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                    };
                     let accounts = ThawAccountAccounts {
                         remaining: vec![],
                         account: account.clone(),
@@ -4631,18 +6927,58 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(decimals), e)
                         })?;
                     let args = TransferCheckedArguments { amount, decimals };
-                    let source = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "source")
-                    })?;
-                    let mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "mint")
-                    })?;
-                    let destination = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "destination")
-                    })?;
-                    let authority = account_keys.get(3usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 3usize, "authority")
-                    })?;
+                    let source = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "source" , "source" , account_index , provided_count) }) ?
+                    };
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let destination = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "destination" , "destination" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            3usize
+                        } else {
+                            3usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = TransferCheckedAccounts {
                         remaining: vec![],
                         source: source.clone(),
@@ -4663,18 +6999,58 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(decimals), e)
                         })?;
                     let args = ApproveCheckedArguments { amount, decimals };
-                    let source = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "source")
-                    })?;
-                    let mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "mint")
-                    })?;
-                    let delegate = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "delegate")
-                    })?;
-                    let owner = account_keys.get(3usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 3usize, "owner")
-                    })?;
+                    let source = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "source" , "source" , account_index , provided_count) }) ?
+                    };
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let delegate = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "delegate" , "delegate" , account_index , provided_count) }) ?
+                    };
+                    let owner = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            3usize
+                        } else {
+                            3usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                    };
                     let accounts = ApproveCheckedAccounts {
                         remaining: vec![],
                         source: source.clone(),
@@ -4695,15 +7071,45 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(decimals), e)
                         })?;
                     let args = MintToCheckedArguments { amount, decimals };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let token = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "token")
-                    })?;
-                    let mint_authority = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "mintAuthority")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                    };
+                    let mint_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mintAuthority" , "mintAuthority" , account_index , provided_count) }) ?
+                    };
                     let accounts = MintToCheckedAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -4723,15 +7129,45 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(decimals), e)
                         })?;
                     let args = BurnCheckedArguments { amount, decimals };
-                    let account = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "account")
-                    })?;
-                    let mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "mint")
-                    })?;
-                    let authority = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "authority")
-                    })?;
+                    let account = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "account" , "account" , account_index , provided_count) }) ?
+                    };
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = BurnCheckedAccounts {
                         remaining: vec![],
                         account: account.clone(),
@@ -4748,15 +7184,45 @@ impl Instruction {
                                 format!("Failed to deserialize {}: {}", stringify!(owner), e)
                             })?;
                     let args = InitializeAccount2Arguments { owner };
-                    let account = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "account")
-                    })?;
-                    let mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "mint")
-                    })?;
-                    let rent = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "rent")
-                    })?;
+                    let account = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "account" , "account" , account_index , provided_count) }) ?
+                    };
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let rent = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "rent" , "rent" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeAccount2Accounts {
                         remaining: vec![],
                         account: account.clone(),
@@ -4768,9 +7234,19 @@ impl Instruction {
                 [17u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = SyncNativeArguments {};
-                    let account = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "account")
-                    })?;
+                    let account = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "account" , "account" , account_index , provided_count) }) ?
+                    };
                     let accounts = SyncNativeAccounts {
                         remaining: vec![],
                         account: account.clone(),
@@ -4785,12 +7261,32 @@ impl Instruction {
                                 format!("Failed to deserialize {}: {}", stringify!(owner), e)
                             })?;
                     let args = InitializeAccount3Arguments { owner };
-                    let account = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "account")
-                    })?;
-                    let mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "mint")
-                    })?;
+                    let account = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "account" , "account" , account_index , provided_count) }) ?
+                    };
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeAccount3Accounts {
                         remaining: vec![],
                         account: account.clone(),
@@ -4803,9 +7299,19 @@ impl Instruction {
                     let m: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                         .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(m), e))?;
                     let args = InitializeMultisig2Arguments { m };
-                    let multisig = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "multisig")
-                    })?;
+                    let multisig = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "multisig" , "multisig" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeMultisig2Accounts {
                         remaining: vec![],
                         multisig: multisig.clone(),
@@ -4841,9 +7347,19 @@ impl Instruction {
                         mint_authority,
                         freeze_authority,
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeMint2Accounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -4853,9 +7369,19 @@ impl Instruction {
                 [21u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = GetAccountDataSizeArguments {};
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = GetAccountDataSizeAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -4865,9 +7391,19 @@ impl Instruction {
                 [22u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = InitializeImmutableOwnerArguments {};
-                    let account = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "account")
-                    })?;
+                    let account = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "account" , "account" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeImmutableOwnerAccounts {
                         remaining: vec![],
                         account: account.clone(),
@@ -4881,9 +7417,19 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(amount), e)
                         })?;
                     let args = AmountToUiAmountArguments { amount };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = AmountToUiAmountAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -4897,9 +7443,19 @@ impl Instruction {
                             format!("Failed to deserialize {}: {}", stringify!(ui_amount), e)
                         })?;
                     let args = UiAmountToAmountArguments { ui_amount };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = UiAmountToAmountAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -4918,9 +7474,19 @@ impl Instruction {
                                 )
                             })?;
                     let args = InitializeMintCloseAuthorityArguments { close_authority };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeMintCloseAuthorityAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -4966,9 +7532,19 @@ impl Instruction {
                         maximum_fee,
                         extension_type: "initializeTransferFeeConfig".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeTransferFeeConfigAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -4993,18 +7569,58 @@ impl Instruction {
                         fee,
                         extension_type: "transferCheckedWithFee".to_string(),
                     };
-                    let source = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "source")
-                    })?;
-                    let mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "mint")
-                    })?;
-                    let destination = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "destination")
-                    })?;
-                    let authority = account_keys.get(3usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 3usize, "authority")
-                    })?;
+                    let source = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "source" , "source" , account_index , provided_count) }) ?
+                    };
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let destination = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "destination" , "destination" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            3usize
+                        } else {
+                            3usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = TransferCheckedWithFeeAccounts {
                         remaining: vec![],
                         source: source.clone(),
@@ -5019,19 +7635,45 @@ impl Instruction {
                     let args = WithdrawWithheldTokensFromMintArguments {
                         extension_type: "withdrawWithheldTokensFromMint".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let fee_receiver = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "feeReceiver")
-                    })?;
-                    let withdraw_withheld_authority =
-                        account_keys.get(2usize).ok_or_else(|| {
-                            format!(
-                                "Missing account at index {}: {}",
-                                2usize, "withdrawWithheldAuthority"
-                            )
-                        })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let fee_receiver = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "feeReceiver" , "feeReceiver" , account_index , provided_count) }) ?
+                    };
+                    let withdraw_withheld_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "withdrawWithheldAuthority" , "withdrawWithheldAuthority" , account_index , provided_count) }) ?
+                    };
                     let accounts = WithdrawWithheldTokensFromMintAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -5054,19 +7696,45 @@ impl Instruction {
                         num_token_accounts,
                         extension_type: "withdrawWithheldTokensFromAccounts".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let fee_receiver = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "feeReceiver")
-                    })?;
-                    let withdraw_withheld_authority =
-                        account_keys.get(2usize).ok_or_else(|| {
-                            format!(
-                                "Missing account at index {}: {}",
-                                2usize, "withdrawWithheldAuthority"
-                            )
-                        })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let fee_receiver = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "feeReceiver" , "feeReceiver" , account_index , provided_count) }) ?
+                    };
+                    let withdraw_withheld_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "withdrawWithheldAuthority" , "withdrawWithheldAuthority" , account_index , provided_count) }) ?
+                    };
                     let accounts = WithdrawWithheldTokensFromAccountsAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -5080,9 +7748,19 @@ impl Instruction {
                     let args = HarvestWithheldTokensToMintArguments {
                         extension_type: "harvestWithheldTokensToMint".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = HarvestWithheldTokensToMintAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -5108,16 +7786,32 @@ impl Instruction {
                         maximum_fee,
                         extension_type: "setTransferFee".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let transfer_fee_config_authority =
-                        account_keys.get(1usize).ok_or_else(|| {
-                            format!(
-                                "Missing account at index {}: {}",
-                                1usize, "transferFeeConfigAuthority"
-                            )
-                        })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let transfer_fee_config_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "transferFeeConfigAuthority" , "transferFeeConfigAuthority" , account_index , provided_count) }) ?
+                    };
                     let accounts = SetTransferFeeAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -5169,9 +7863,19 @@ impl Instruction {
                         auditor_elgamal_pubkey,
                         extension_type: "initializeConfidentialTransferMint".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeConfidentialTransferMintAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -5208,12 +7912,32 @@ impl Instruction {
                         auditor_elgamal_pubkey,
                         extension_type: "updateConfidentialTransferMint".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "authority")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = UpdateConfidentialTransferMintAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -5253,32 +7977,74 @@ impl Instruction {
                         proof_instruction_offset,
                         extension_type: "configureConfidentialTransferAccount".to_string(),
                     };
-                    let token = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "token")
-                    })?;
-                    let mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "mint")
-                    })?;
-                    let instructions_sysvar_or_context_state =
-                        account_keys.get(2usize).ok_or_else(|| {
-                            format!(
-                                "Missing account at index {}: {}",
-                                2usize, "instructionsSysvarOrContextState"
-                            )
-                        })?;
-                    let record = account_keys.get(3usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 3usize, "record")
-                    })?;
-                    let authority = account_keys.get(4usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 4usize, "authority")
-                    })?;
+                    let token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 5usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                    };
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 5usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let instructions_sysvar_or_context_state = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 5usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "instructionsSysvarOrContextState" , "instructionsSysvarOrContextState" , account_index , provided_count) }) ?
+                    };
+                    let record = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count > required_count && provided_count > 3usize {
+                            account_keys.get(3usize).map(|key| key.clone())
+                        } else {
+                            None
+                        }
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 5usize {
+                            4usize
+                        } else {
+                            4usize - 1usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = ConfigureConfidentialTransferAccountAccounts {
                         remaining: vec![],
                         token: token.clone(),
                         mint: mint.clone(),
                         instructions_sysvar_or_context_state: instructions_sysvar_or_context_state
                             .clone(),
-                        record: Some(record.clone()),
+                        record: record,
                         authority: authority.clone(),
                     };
                     return Ok(Instruction::ConfigureConfidentialTransferAccount {
@@ -5291,15 +8057,45 @@ impl Instruction {
                     let args = ApproveConfidentialTransferAccountArguments {
                         extension_type: "approveConfidentialTransferAccount".to_string(),
                     };
-                    let token = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "token")
-                    })?;
-                    let mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "mint")
-                    })?;
-                    let authority = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "authority")
-                    })?;
+                    let token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                    };
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = ApproveConfidentialTransferAccountAccounts {
                         remaining: vec![],
                         token: token.clone(),
@@ -5322,28 +8118,60 @@ impl Instruction {
                         proof_instruction_offset,
                         extension_type: "emptyConfidentialTransferAccount".to_string(),
                     };
-                    let token = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "token")
-                    })?;
-                    let instructions_sysvar_or_context_state =
-                        account_keys.get(1usize).ok_or_else(|| {
-                            format!(
-                                "Missing account at index {}: {}",
-                                1usize, "instructionsSysvarOrContextState"
-                            )
-                        })?;
-                    let record = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "record")
-                    })?;
-                    let authority = account_keys.get(3usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 3usize, "authority")
-                    })?;
+                    let token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                    };
+                    let instructions_sysvar_or_context_state = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "instructionsSysvarOrContextState" , "instructionsSysvarOrContextState" , account_index , provided_count) }) ?
+                    };
+                    let record = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count > required_count && provided_count > 2usize {
+                            account_keys.get(2usize).map(|key| key.clone())
+                        } else {
+                            None
+                        }
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            3usize
+                        } else {
+                            3usize - 1usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = EmptyConfidentialTransferAccountAccounts {
                         remaining: vec![],
                         token: token.clone(),
                         instructions_sysvar_or_context_state: instructions_sysvar_or_context_state
                             .clone(),
-                        record: Some(record.clone()),
+                        record: record,
                         authority: authority.clone(),
                     };
                     return Ok(Instruction::EmptyConfidentialTransferAccount { accounts, args });
@@ -5363,15 +8191,45 @@ impl Instruction {
                         decimals,
                         extension_type: "confidentialDeposit".to_string(),
                     };
-                    let token = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "token")
-                    })?;
-                    let mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "mint")
-                    })?;
-                    let authority = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "authority")
-                    })?;
+                    let token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                    };
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = ConfidentialDepositAccounts {
                         remaining: vec![],
                         token: token.clone(),
@@ -5423,34 +8281,79 @@ impl Instruction {
                         range_proof_instruction_offset,
                         extension_type: "confidentialWithdraw".to_string(),
                     };
-                    let token = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "token")
-                    })?;
-                    let mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "mint")
-                    })?;
-                    let instructions_sysvar = account_keys.get(2usize).ok_or_else(|| {
-                        format!(
-                            "Missing account at index {}: {}",
-                            2usize, "instructionsSysvar"
-                        )
-                    })?;
-                    let equality_record = account_keys.get(3usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 3usize, "equalityRecord")
-                    })?;
-                    let range_record = account_keys.get(4usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 4usize, "rangeRecord")
-                    })?;
-                    let authority = account_keys.get(5usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 5usize, "authority")
-                    })?;
+                    let token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 6usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                    };
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 6usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let instructions_sysvar = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count > required_count && provided_count > 2usize {
+                            account_keys.get(2usize).map(|key| key.clone())
+                        } else {
+                            None
+                        }
+                    };
+                    let equality_record = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count > required_count && provided_count > 3usize {
+                            account_keys.get(3usize).map(|key| key.clone())
+                        } else {
+                            None
+                        }
+                    };
+                    let range_record = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count > required_count && provided_count > 4usize {
+                            account_keys.get(4usize).map(|key| key.clone())
+                        } else {
+                            None
+                        }
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 6usize {
+                            5usize
+                        } else {
+                            5usize - 3usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = ConfidentialWithdrawAccounts {
                         remaining: vec![],
                         token: token.clone(),
                         mint: mint.clone(),
-                        instructions_sysvar: Some(instructions_sysvar.clone()),
-                        equality_record: Some(equality_record.clone()),
-                        range_record: Some(range_record.clone()),
+                        instructions_sysvar: instructions_sysvar,
+                        equality_record: equality_record,
+                        range_record: range_record,
                         authority: authority.clone(),
                     };
                     return Ok(Instruction::ConfidentialWithdraw { accounts, args });
@@ -5497,48 +8400,103 @@ impl Instruction {
                         range_proof_instruction_offset,
                         extension_type: "confidentialTransfer".to_string(),
                     };
-                    let source_token = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "sourceToken")
-                    })?;
-                    let mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "mint")
-                    })?;
-                    let destination_token = account_keys.get(2usize).ok_or_else(|| {
-                        format!(
-                            "Missing account at index {}: {}",
-                            2usize, "destinationToken"
-                        )
-                    })?;
-                    let instructions_sysvar = account_keys.get(3usize).ok_or_else(|| {
-                        format!(
-                            "Missing account at index {}: {}",
-                            3usize, "instructionsSysvar"
-                        )
-                    })?;
-                    let equality_record = account_keys.get(4usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 4usize, "equalityRecord")
-                    })?;
-                    let ciphertext_validity_record = account_keys.get(5usize).ok_or_else(|| {
-                        format!(
-                            "Missing account at index {}: {}",
-                            5usize, "ciphertextValidityRecord"
-                        )
-                    })?;
-                    let range_record = account_keys.get(6usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 6usize, "rangeRecord")
-                    })?;
-                    let authority = account_keys.get(7usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 7usize, "authority")
-                    })?;
+                    let source_token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 8usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "sourceToken" , "sourceToken" , account_index , provided_count) }) ?
+                    };
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 8usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let destination_token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 8usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "destinationToken" , "destinationToken" , account_index , provided_count) }) ?
+                    };
+                    let instructions_sysvar = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count > required_count && provided_count > 3usize {
+                            account_keys.get(3usize).map(|key| key.clone())
+                        } else {
+                            None
+                        }
+                    };
+                    let equality_record = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count > required_count && provided_count > 4usize {
+                            account_keys.get(4usize).map(|key| key.clone())
+                        } else {
+                            None
+                        }
+                    };
+                    let ciphertext_validity_record = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count > required_count && provided_count > 5usize {
+                            account_keys.get(5usize).map(|key| key.clone())
+                        } else {
+                            None
+                        }
+                    };
+                    let range_record = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count > required_count && provided_count > 6usize {
+                            account_keys.get(6usize).map(|key| key.clone())
+                        } else {
+                            None
+                        }
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 8usize {
+                            7usize
+                        } else {
+                            7usize - 4usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = ConfidentialTransferAccounts {
                         remaining: vec![],
                         source_token: source_token.clone(),
                         mint: mint.clone(),
                         destination_token: destination_token.clone(),
-                        instructions_sysvar: Some(instructions_sysvar.clone()),
-                        equality_record: Some(equality_record.clone()),
-                        ciphertext_validity_record: Some(ciphertext_validity_record.clone()),
-                        range_record: Some(range_record.clone()),
+                        instructions_sysvar: instructions_sysvar,
+                        equality_record: equality_record,
+                        ciphertext_validity_record: ciphertext_validity_record,
+                        range_record: range_record,
                         authority: authority.clone(),
                     };
                     return Ok(Instruction::ConfidentialTransfer { accounts, args });
@@ -5567,12 +8525,32 @@ impl Instruction {
                         new_decryptable_available_balance,
                         extension_type: "applyConfidentialPendingBalance".to_string(),
                     };
-                    let token = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "token")
-                    })?;
-                    let authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "authority")
-                    })?;
+                    let token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = ApplyConfidentialPendingBalanceAccounts {
                         remaining: vec![],
                         token: token.clone(),
@@ -5585,12 +8563,32 @@ impl Instruction {
                     let args = EnableConfidentialCreditsArguments {
                         extension_type: "enableConfidentialCredits".to_string(),
                     };
-                    let token = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "token")
-                    })?;
-                    let authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "authority")
-                    })?;
+                    let token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = EnableConfidentialCreditsAccounts {
                         remaining: vec![],
                         token: token.clone(),
@@ -5603,12 +8601,32 @@ impl Instruction {
                     let args = DisableConfidentialCreditsArguments {
                         extension_type: "disableConfidentialCredits".to_string(),
                     };
-                    let token = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "token")
-                    })?;
-                    let authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "authority")
-                    })?;
+                    let token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = DisableConfidentialCreditsAccounts {
                         remaining: vec![],
                         token: token.clone(),
@@ -5621,12 +8639,32 @@ impl Instruction {
                     let args = EnableNonConfidentialCreditsArguments {
                         extension_type: "enableNonConfidentialCredits".to_string(),
                     };
-                    let token = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "token")
-                    })?;
-                    let authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "authority")
-                    })?;
+                    let token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = EnableNonConfidentialCreditsAccounts {
                         remaining: vec![],
                         token: token.clone(),
@@ -5639,12 +8677,32 @@ impl Instruction {
                     let args = DisableNonConfidentialCreditsArguments {
                         extension_type: "disableNonConfidentialCredits".to_string(),
                     };
-                    let token = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "token")
-                    })?;
-                    let authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "authority")
-                    })?;
+                    let token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = DisableNonConfidentialCreditsAccounts {
                         remaining: vec![],
                         token: token.clone(),
@@ -5714,65 +8772,124 @@ impl Instruction {
                         range_proof_instruction_offset,
                         extension_type: "confidentialTransferWithFee".to_string(),
                     };
-                    let source_token = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "sourceToken")
-                    })?;
-                    let mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "mint")
-                    })?;
-                    let destination_token = account_keys.get(2usize).ok_or_else(|| {
-                        format!(
-                            "Missing account at index {}: {}",
-                            2usize, "destinationToken"
-                        )
-                    })?;
-                    let instructions_sysvar = account_keys.get(3usize).ok_or_else(|| {
-                        format!(
-                            "Missing account at index {}: {}",
-                            3usize, "instructionsSysvar"
-                        )
-                    })?;
-                    let equality_record = account_keys.get(4usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 4usize, "equalityRecord")
-                    })?;
-                    let transfer_amount_ciphertext_validity_record =
-                        account_keys.get(5usize).ok_or_else(|| {
-                            format!(
-                                "Missing account at index {}: {}",
-                                5usize, "transferAmountCiphertextValidityRecord"
-                            )
-                        })?;
-                    let fee_sigma_record = account_keys.get(6usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 6usize, "feeSigmaRecord")
-                    })?;
-                    let fee_ciphertext_validity_record =
-                        account_keys.get(7usize).ok_or_else(|| {
-                            format!(
-                                "Missing account at index {}: {}",
-                                7usize, "feeCiphertextValidityRecord"
-                            )
-                        })?;
-                    let range_record = account_keys.get(8usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 8usize, "rangeRecord")
-                    })?;
-                    let authority = account_keys.get(9usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 9usize, "authority")
-                    })?;
+                    let source_token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 10usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "sourceToken" , "sourceToken" , account_index , provided_count) }) ?
+                    };
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 10usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let destination_token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 10usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "destinationToken" , "destinationToken" , account_index , provided_count) }) ?
+                    };
+                    let instructions_sysvar = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count > required_count && provided_count > 3usize {
+                            account_keys.get(3usize).map(|key| key.clone())
+                        } else {
+                            None
+                        }
+                    };
+                    let equality_record = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count > required_count && provided_count > 4usize {
+                            account_keys.get(4usize).map(|key| key.clone())
+                        } else {
+                            None
+                        }
+                    };
+                    let transfer_amount_ciphertext_validity_record = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count > required_count && provided_count > 5usize {
+                            account_keys.get(5usize).map(|key| key.clone())
+                        } else {
+                            None
+                        }
+                    };
+                    let fee_sigma_record = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count > required_count && provided_count > 6usize {
+                            account_keys.get(6usize).map(|key| key.clone())
+                        } else {
+                            None
+                        }
+                    };
+                    let fee_ciphertext_validity_record = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count > required_count && provided_count > 7usize {
+                            account_keys.get(7usize).map(|key| key.clone())
+                        } else {
+                            None
+                        }
+                    };
+                    let range_record = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count > required_count && provided_count > 8usize {
+                            account_keys.get(8usize).map(|key| key.clone())
+                        } else {
+                            None
+                        }
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 10usize {
+                            9usize
+                        } else {
+                            9usize - 6usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = ConfidentialTransferWithFeeAccounts {
                         remaining: vec![],
                         source_token: source_token.clone(),
                         mint: mint.clone(),
                         destination_token: destination_token.clone(),
-                        instructions_sysvar: Some(instructions_sysvar.clone()),
-                        equality_record: Some(equality_record.clone()),
-                        transfer_amount_ciphertext_validity_record: Some(
-                            transfer_amount_ciphertext_validity_record.clone(),
-                        ),
-                        fee_sigma_record: Some(fee_sigma_record.clone()),
-                        fee_ciphertext_validity_record: Some(
-                            fee_ciphertext_validity_record.clone(),
-                        ),
-                        range_record: Some(range_record.clone()),
+                        instructions_sysvar: instructions_sysvar,
+                        equality_record: equality_record,
+                        transfer_amount_ciphertext_validity_record:
+                            transfer_amount_ciphertext_validity_record,
+                        fee_sigma_record: fee_sigma_record,
+                        fee_ciphertext_validity_record: fee_ciphertext_validity_record,
+                        range_record: range_record,
                         authority: authority.clone(),
                     };
                     return Ok(Instruction::ConfidentialTransferWithFee { accounts, args });
@@ -5788,9 +8905,19 @@ impl Instruction {
                         state,
                         extension_type: "initializeDefaultAccountState".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeDefaultAccountStateAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -5808,12 +8935,32 @@ impl Instruction {
                         state,
                         extension_type: "updateDefaultAccountState".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let freeze_authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "freezeAuthority")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let freeze_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "freezeAuthority" , "freezeAuthority" , account_index , provided_count) }) ?
+                    };
                     let accounts = UpdateDefaultAccountStateAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -5834,18 +8981,58 @@ impl Instruction {
                     let args = ReallocateArguments {
                         new_extension_types,
                     };
-                    let token = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "token")
-                    })?;
-                    let payer = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "payer")
-                    })?;
-                    let system_program = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "systemProgram")
-                    })?;
-                    let owner = account_keys.get(3usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 3usize, "owner")
-                    })?;
+                    let token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                    };
+                    let payer = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "payer" , "payer" , account_index , provided_count) }) ?
+                    };
+                    let system_program = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "systemProgram" , "systemProgram" , account_index , provided_count) }) ?
+                    };
+                    let owner = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            3usize
+                        } else {
+                            3usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                    };
                     let accounts = ReallocateAccounts {
                         remaining: vec![],
                         token: token.clone(),
@@ -5860,12 +9047,32 @@ impl Instruction {
                     let args = EnableMemoTransfersArguments {
                         extension_type: "enableMemoTransfers".to_string(),
                     };
-                    let token = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "token")
-                    })?;
-                    let owner = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "owner")
-                    })?;
+                    let token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                    };
+                    let owner = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                    };
                     let accounts = EnableMemoTransfersAccounts {
                         remaining: vec![],
                         token: token.clone(),
@@ -5878,12 +9085,32 @@ impl Instruction {
                     let args = DisableMemoTransfersArguments {
                         extension_type: "disableMemoTransfers".to_string(),
                     };
-                    let token = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "token")
-                    })?;
-                    let owner = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "owner")
-                    })?;
+                    let token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                    };
+                    let owner = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                    };
                     let accounts = DisableMemoTransfersAccounts {
                         remaining: vec![],
                         token: token.clone(),
@@ -5894,15 +9121,45 @@ impl Instruction {
                 [31u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = CreateNativeMintArguments {};
-                    let payer = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "payer")
-                    })?;
-                    let native_mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "nativeMint")
-                    })?;
-                    let system_program = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "systemProgram")
-                    })?;
+                    let payer = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "payer" , "payer" , account_index , provided_count) }) ?
+                    };
+                    let native_mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "nativeMint" , "nativeMint" , account_index , provided_count) }) ?
+                    };
+                    let system_program = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "systemProgram" , "systemProgram" , account_index , provided_count) }) ?
+                    };
                     let accounts = CreateNativeMintAccounts {
                         remaining: vec![],
                         payer: payer.clone(),
@@ -5914,9 +9171,19 @@ impl Instruction {
                 [32u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = InitializeNonTransferableMintArguments {};
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeNonTransferableMintAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -5947,9 +9214,19 @@ impl Instruction {
                         rate,
                         extension_type: "initializeInterestBearingMint".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeInterestBearingMintAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -5966,12 +9243,32 @@ impl Instruction {
                         rate,
                         extension_type: "updateRateInterestBearingMint".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let rate_authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "rateAuthority")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let rate_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "rateAuthority" , "rateAuthority" , account_index , provided_count) }) ?
+                    };
                     let accounts = UpdateRateInterestBearingMintAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -5984,12 +9281,32 @@ impl Instruction {
                     let args = EnableCpiGuardArguments {
                         extension_type: "enableCpiGuard".to_string(),
                     };
-                    let token = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "token")
-                    })?;
-                    let owner = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "owner")
-                    })?;
+                    let token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                    };
+                    let owner = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                    };
                     let accounts = EnableCpiGuardAccounts {
                         remaining: vec![],
                         token: token.clone(),
@@ -6002,12 +9319,32 @@ impl Instruction {
                     let args = DisableCpiGuardArguments {
                         extension_type: "disableCpiGuard".to_string(),
                     };
-                    let token = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "token")
-                    })?;
-                    let owner = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "owner")
-                    })?;
+                    let token = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                    };
+                    let owner = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                    };
                     let accounts = DisableCpiGuardAccounts {
                         remaining: vec![],
                         token: token.clone(),
@@ -6023,9 +9360,19 @@ impl Instruction {
                                 format!("Failed to deserialize {}: {}", stringify!(delegate), e)
                             })?;
                     let args = InitializePermanentDelegateArguments { delegate };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializePermanentDelegateAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -6065,9 +9412,19 @@ impl Instruction {
                         program_id,
                         extension_type: "initializeTransferHook".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeTransferHookAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -6093,12 +9450,32 @@ impl Instruction {
                         program_id,
                         extension_type: "updateTransferHook".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "authority")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = UpdateTransferHookAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -6139,9 +9516,19 @@ impl Instruction {
                         withdraw_withheld_authority_el_gamal_pubkey,
                         extension_type: "initializeConfidentialTransferFee".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeConfidentialTransferFeeAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -6173,25 +9560,67 @@ impl Instruction {
                         extension_type: "withdrawWithheldTokensFromMintForConfidentialTransferFee"
                             .to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let destination = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "destination")
-                    })?;
-                    let instructions_sysvar_or_context_state =
-                        account_keys.get(2usize).ok_or_else(|| {
-                            format!(
-                                "Missing account at index {}: {}",
-                                2usize, "instructionsSysvarOrContextState"
-                            )
-                        })?;
-                    let record = account_keys.get(3usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 3usize, "record")
-                    })?;
-                    let authority = account_keys.get(4usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 4usize, "authority")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 5usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let destination = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 5usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "destination" , "destination" , account_index , provided_count) }) ?
+                    };
+                    let instructions_sysvar_or_context_state = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 5usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "instructionsSysvarOrContextState" , "instructionsSysvarOrContextState" , account_index , provided_count) }) ?
+                    };
+                    let record = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count > required_count && provided_count > 3usize {
+                            account_keys.get(3usize).map(|key| key.clone())
+                        } else {
+                            None
+                        }
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 5usize {
+                            4usize
+                        } else {
+                            4usize - 1usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts =
                         WithdrawWithheldTokensFromMintForConfidentialTransferFeeAccounts {
                             remaining: vec![],
@@ -6199,7 +9628,7 @@ impl Instruction {
                             destination: destination.clone(),
                             instructions_sysvar_or_context_state:
                                 instructions_sysvar_or_context_state.clone(),
-                            record: Some(record.clone()),
+                            record: record,
                             authority: authority.clone(),
                         };
                     return Ok(
@@ -6245,25 +9674,67 @@ impl Instruction {
                                 "withdrawWithheldTokensFromAccountsForConfidentialTransferFee"
                                     .to_string(),
                         };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let destination = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "destination")
-                    })?;
-                    let instructions_sysvar_or_context_state =
-                        account_keys.get(2usize).ok_or_else(|| {
-                            format!(
-                                "Missing account at index {}: {}",
-                                2usize, "instructionsSysvarOrContextState"
-                            )
-                        })?;
-                    let record = account_keys.get(3usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 3usize, "record")
-                    })?;
-                    let authority = account_keys.get(4usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 4usize, "authority")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 5usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let destination = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 5usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "destination" , "destination" , account_index , provided_count) }) ?
+                    };
+                    let instructions_sysvar_or_context_state = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 5usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "instructionsSysvarOrContextState" , "instructionsSysvarOrContextState" , account_index , provided_count) }) ?
+                    };
+                    let record = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count > required_count && provided_count > 3usize {
+                            account_keys.get(3usize).map(|key| key.clone())
+                        } else {
+                            None
+                        }
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 5usize {
+                            4usize
+                        } else {
+                            4usize - 1usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts =
                         WithdrawWithheldTokensFromAccountsForConfidentialTransferFeeAccounts {
                             remaining: vec![],
@@ -6271,7 +9742,7 @@ impl Instruction {
                             destination: destination.clone(),
                             instructions_sysvar_or_context_state:
                                 instructions_sysvar_or_context_state.clone(),
-                            record: Some(record.clone()),
+                            record: record,
                             authority: authority.clone(),
                         };
                     return Ok(
@@ -6287,9 +9758,19 @@ impl Instruction {
                         extension_type: "harvestWithheldTokensToMintForConfidentialTransferFee"
                             .to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = HarvestWithheldTokensToMintForConfidentialTransferFeeAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -6306,12 +9787,32 @@ impl Instruction {
                     let args = EnableHarvestToMintArguments {
                         extension_type: "enableHarvestToMint".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "authority")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = EnableHarvestToMintAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -6324,12 +9825,32 @@ impl Instruction {
                     let args = DisableHarvestToMintArguments {
                         extension_type: "disableHarvestToMint".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "authority")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = DisableHarvestToMintAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -6340,18 +9861,45 @@ impl Instruction {
                 [38u8] => {
                     let mut rdr: &[u8] = rest;
                     let args = WithdrawExcessLamportsArguments {};
-                    let source_account = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "sourceAccount")
-                    })?;
-                    let destination_account = account_keys.get(1usize).ok_or_else(|| {
-                        format!(
-                            "Missing account at index {}: {}",
-                            1usize, "destinationAccount"
-                        )
-                    })?;
-                    let authority = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "authority")
-                    })?;
+                    let source_account = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "sourceAccount" , "sourceAccount" , account_index , provided_count) }) ?
+                    };
+                    let destination_account = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "destinationAccount" , "destinationAccount" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = WithdrawExcessLamportsAccounts {
                         remaining: vec![],
                         source_account: source_account.clone(),
@@ -6393,9 +9941,19 @@ impl Instruction {
                         metadata_address,
                         extension_type: "initializeMetadataPointer".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeMetadataPointerAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -6421,15 +9979,32 @@ impl Instruction {
                         metadata_address,
                         extension_type: "updateMetadataPointer".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let metadata_pointer_authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!(
-                            "Missing account at index {}: {}",
-                            1usize, "metadataPointerAuthority"
-                        )
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let metadata_pointer_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "metadataPointerAuthority" , "metadataPointerAuthority" , account_index , provided_count) }) ?
+                    };
                     let accounts = UpdateMetadataPointerAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -6470,9 +10045,19 @@ impl Instruction {
                         group_address,
                         extension_type: "initializeGroupPointer".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeGroupPointerAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -6498,15 +10083,32 @@ impl Instruction {
                         group_address,
                         extension_type: "updateGroupPointer".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let group_pointer_authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!(
-                            "Missing account at index {}: {}",
-                            1usize, "groupPointerAuthority"
-                        )
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let group_pointer_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "groupPointerAuthority" , "groupPointerAuthority" , account_index , provided_count) }) ?
+                    };
                     let accounts = UpdateGroupPointerAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -6547,9 +10149,19 @@ impl Instruction {
                         member_address,
                         extension_type: "initializeGroupMemberPointer".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeGroupMemberPointerAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -6575,16 +10187,32 @@ impl Instruction {
                         member_address,
                         extension_type: "updateGroupMemberPointer".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let group_member_pointer_authority =
-                        account_keys.get(1usize).ok_or_else(|| {
-                            format!(
-                                "Missing account at index {}: {}",
-                                1usize, "groupMemberPointerAuthority"
-                            )
-                        })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let group_member_pointer_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "groupMemberPointerAuthority" , "groupMemberPointerAuthority" , account_index , provided_count) }) ?
+                    };
                     let accounts = UpdateGroupMemberPointerAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -6616,9 +10244,19 @@ impl Instruction {
                         multiplier,
                         extension_type: "initializeScaledUiAmountMint".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeScaledUiAmountMintAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -6644,12 +10282,32 @@ impl Instruction {
                         effective_timestamp,
                         extension_type: "updateMultiplierScaledUiMint".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "authority")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = UpdateMultiplierScaledUiMintAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -6676,9 +10334,19 @@ impl Instruction {
                         authority,
                         extension_type: "initializePausableConfig".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializePausableConfigAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -6690,12 +10358,32 @@ impl Instruction {
                     let args = PauseArguments {
                         extension_type: "pause".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "authority")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = PauseAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -6708,12 +10396,32 @@ impl Instruction {
                     let args = ResumeArguments {
                         extension_type: "resume".to_string(),
                     };
-                    let mint = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "mint")
-                    })?;
-                    let authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "authority")
-                    })?;
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                    };
                     let accounts = ResumeAccounts {
                         remaining: vec![],
                         mint: mint.clone(),
@@ -6795,18 +10503,58 @@ impl Instruction {
                         uri,
                         extension_type: "initializeTokenMetadata".to_string(),
                     };
-                    let metadata = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "metadata")
-                    })?;
-                    let update_authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "updateAuthority")
-                    })?;
-                    let mint = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "mint")
-                    })?;
-                    let mint_authority = account_keys.get(3usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 3usize, "mintAuthority")
-                    })?;
+                    let metadata = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "metadata" , "metadata" , account_index , provided_count) }) ?
+                    };
+                    let update_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "updateAuthority" , "updateAuthority" , account_index , provided_count) }) ?
+                    };
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let mint_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 4usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 4usize {
+                            3usize
+                        } else {
+                            3usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mintAuthority" , "mintAuthority" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeTokenMetadataAccounts {
                         remaining: vec![],
                         metadata: metadata.clone(),
@@ -6850,12 +10598,32 @@ impl Instruction {
                         value,
                         extension_type: "updateTokenMetadataField".to_string(),
                     };
-                    let metadata = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "metadata")
-                    })?;
-                    let update_authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "updateAuthority")
-                    })?;
+                    let metadata = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "metadata" , "metadata" , account_index , provided_count) }) ?
+                    };
+                    let update_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "updateAuthority" , "updateAuthority" , account_index , provided_count) }) ?
+                    };
                     let accounts = UpdateTokenMetadataFieldAccounts {
                         remaining: vec![],
                         metadata: metadata.clone(),
@@ -6896,12 +10664,32 @@ impl Instruction {
                         key,
                         extension_type: "removeTokenMetadataKey".to_string(),
                     };
-                    let metadata = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "metadata")
-                    })?;
-                    let update_authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "updateAuthority")
-                    })?;
+                    let metadata = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "metadata" , "metadata" , account_index , provided_count) }) ?
+                    };
+                    let update_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "updateAuthority" , "updateAuthority" , account_index , provided_count) }) ?
+                    };
                     let accounts = RemoveTokenMetadataKeyAccounts {
                         remaining: vec![],
                         metadata: metadata.clone(),
@@ -6928,12 +10716,32 @@ impl Instruction {
                         new_update_authority,
                         extension_type: "updateTokenMetadataUpdateAuthority".to_string(),
                     };
-                    let metadata = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "metadata")
-                    })?;
-                    let update_authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "updateAuthority")
-                    })?;
+                    let metadata = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "metadata" , "metadata" , account_index , provided_count) }) ?
+                    };
+                    let update_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "updateAuthority" , "updateAuthority" , account_index , provided_count) }) ?
+                    };
                     let accounts = UpdateTokenMetadataUpdateAuthorityAccounts {
                         remaining: vec![],
                         metadata: metadata.clone(),
@@ -6956,9 +10764,19 @@ impl Instruction {
                         end,
                         extension_type: "emitTokenMetadata".to_string(),
                     };
-                    let metadata = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "metadata")
-                    })?;
+                    let metadata = {
+                        let provided_count = account_keys.len();
+                        let required_count = 1usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 1usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "metadata" , "metadata" , account_index , provided_count) }) ?
+                    };
                     let accounts = EmitTokenMetadataAccounts {
                         remaining: vec![],
                         metadata: metadata.clone(),
@@ -6989,15 +10807,45 @@ impl Instruction {
                         max_size,
                         extension_type: "initializeTokenGroup".to_string(),
                     };
-                    let group = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "group")
-                    })?;
-                    let mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "mint")
-                    })?;
-                    let mint_authority = account_keys.get(2usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 2usize, "mintAuthority")
-                    })?;
+                    let group = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "group" , "group" , account_index , provided_count) }) ?
+                    };
+                    let mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                    };
+                    let mint_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 3usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 3usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mintAuthority" , "mintAuthority" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeTokenGroupAccounts {
                         remaining: vec![],
                         group: group.clone(),
@@ -7016,12 +10864,32 @@ impl Instruction {
                         max_size,
                         extension_type: "updateTokenGroupMaxSize".to_string(),
                     };
-                    let group = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "group")
-                    })?;
-                    let update_authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "updateAuthority")
-                    })?;
+                    let group = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "group" , "group" , account_index , provided_count) }) ?
+                    };
+                    let update_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "updateAuthority" , "updateAuthority" , account_index , provided_count) }) ?
+                    };
                     let accounts = UpdateTokenGroupMaxSizeAccounts {
                         remaining: vec![],
                         group: group.clone(),
@@ -7048,12 +10916,32 @@ impl Instruction {
                         new_update_authority,
                         extension_type: "updateTokenGroupUpdateAuthority".to_string(),
                     };
-                    let group = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "group")
-                    })?;
-                    let update_authority = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "updateAuthority")
-                    })?;
+                    let group = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "group" , "group" , account_index , provided_count) }) ?
+                    };
+                    let update_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 2usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 2usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "updateAuthority" , "updateAuthority" , account_index , provided_count) }) ?
+                    };
                     let accounts = UpdateTokenGroupUpdateAuthorityAccounts {
                         remaining: vec![],
                         group: group.clone(),
@@ -7066,27 +10954,71 @@ impl Instruction {
                     let args = InitializeTokenGroupMemberArguments {
                         extension_type: "initializeTokenGroupMember".to_string(),
                     };
-                    let member = account_keys.get(0usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 0usize, "member")
-                    })?;
-                    let member_mint = account_keys.get(1usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 1usize, "memberMint")
-                    })?;
-                    let member_mint_authority = account_keys.get(2usize).ok_or_else(|| {
-                        format!(
-                            "Missing account at index {}: {}",
-                            2usize, "memberMintAuthority"
-                        )
-                    })?;
-                    let group = account_keys.get(3usize).ok_or_else(|| {
-                        format!("Missing account at index {}: {}", 3usize, "group")
-                    })?;
-                    let group_update_authority = account_keys.get(4usize).ok_or_else(|| {
-                        format!(
-                            "Missing account at index {}: {}",
-                            4usize, "groupUpdateAuthority"
-                        )
-                    })?;
+                    let member = {
+                        let provided_count = account_keys.len();
+                        let required_count = 5usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 5usize {
+                            0usize
+                        } else {
+                            0usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "member" , "member" , account_index , provided_count) }) ?
+                    };
+                    let member_mint = {
+                        let provided_count = account_keys.len();
+                        let required_count = 5usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 5usize {
+                            1usize
+                        } else {
+                            1usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "memberMint" , "memberMint" , account_index , provided_count) }) ?
+                    };
+                    let member_mint_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 5usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 5usize {
+                            2usize
+                        } else {
+                            2usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "memberMintAuthority" , "memberMintAuthority" , account_index , provided_count) }) ?
+                    };
+                    let group = {
+                        let provided_count = account_keys.len();
+                        let required_count = 5usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 5usize {
+                            3usize
+                        } else {
+                            3usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "group" , "group" , account_index , provided_count) }) ?
+                    };
+                    let group_update_authority = {
+                        let provided_count = account_keys.len();
+                        let required_count = 5usize;
+                        if provided_count < required_count {
+                            return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                        }
+                        let account_index = if provided_count == 5usize {
+                            4usize
+                        } else {
+                            4usize - 0usize
+                        };
+                        account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "groupUpdateAuthority" , "groupUpdateAuthority" , account_index , provided_count) }) ?
+                    };
                     let accounts = InitializeTokenGroupMemberAccounts {
                         remaining: vec![],
                         member: member.clone(),
@@ -7132,12 +11064,32 @@ impl Instruction {
                     mint_authority,
                     freeze_authority,
                 };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
-                let rent = account_keys
-                    .get(1usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "rent"))?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let rent = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "rent" , "rent" , account_index , provided_count) }) ?
+                };
                 let accounts = InitializeMintAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -7148,18 +11100,58 @@ impl Instruction {
             [1u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = InitializeAccountArguments {};
-                let account = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "account"))?;
-                let mint = account_keys
-                    .get(1usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "mint"))?;
-                let owner = account_keys
-                    .get(2usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 2usize, "owner"))?;
-                let rent = account_keys
-                    .get(3usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 3usize, "rent"))?;
+                let account = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 4usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "account" , "account" , account_index , provided_count) }) ?
+                };
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 4usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let owner = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 4usize {
+                        2usize
+                    } else {
+                        2usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                };
+                let rent = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 4usize {
+                        3usize
+                    } else {
+                        3usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "rent" , "rent" , account_index , provided_count) }) ?
+                };
                 let accounts = InitializeAccountAccounts {
                     remaining: vec![],
                     account: account.clone(),
@@ -7174,12 +11166,32 @@ impl Instruction {
                 let m: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                     .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(m), e))?;
                 let args = InitializeMultisigArguments { m };
-                let multisig = account_keys.get(0usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 0usize, "multisig")
-                })?;
-                let rent = account_keys
-                    .get(1usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "rent"))?;
+                let multisig = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "multisig" , "multisig" , account_index , provided_count) }) ?
+                };
+                let rent = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "rent" , "rent" , account_index , provided_count) }) ?
+                };
                 let accounts = InitializeMultisigAccounts {
                     remaining: vec![],
                     multisig: multisig.clone(),
@@ -7192,15 +11204,45 @@ impl Instruction {
                 let amount: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                     .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(amount), e))?;
                 let args = TransferArguments { amount };
-                let source = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "source"))?;
-                let destination = account_keys.get(1usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 1usize, "destination")
-                })?;
-                let authority = account_keys.get(2usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 2usize, "authority")
-                })?;
+                let source = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "source" , "source" , account_index , provided_count) }) ?
+                };
+                let destination = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "destination" , "destination" , account_index , provided_count) }) ?
+                };
+                let authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        2usize
+                    } else {
+                        2usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                };
                 let accounts = TransferAccounts {
                     remaining: vec![],
                     source: source.clone(),
@@ -7214,15 +11256,45 @@ impl Instruction {
                 let amount: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                     .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(amount), e))?;
                 let args = ApproveArguments { amount };
-                let source = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "source"))?;
-                let delegate = account_keys.get(1usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 1usize, "delegate")
-                })?;
-                let owner = account_keys
-                    .get(2usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 2usize, "owner"))?;
+                let source = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "source" , "source" , account_index , provided_count) }) ?
+                };
+                let delegate = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "delegate" , "delegate" , account_index , provided_count) }) ?
+                };
+                let owner = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        2usize
+                    } else {
+                        2usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                };
                 let accounts = ApproveAccounts {
                     remaining: vec![],
                     source: source.clone(),
@@ -7234,12 +11306,32 @@ impl Instruction {
             [5u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = RevokeArguments {};
-                let source = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "source"))?;
-                let owner = account_keys
-                    .get(1usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "owner"))?;
+                let source = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "source" , "source" , account_index , provided_count) }) ?
+                };
+                let owner = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                };
                 let accounts = RevokeAccounts {
                     remaining: vec![],
                     source: source.clone(),
@@ -7268,12 +11360,32 @@ impl Instruction {
                     authority_type,
                     new_authority,
                 };
-                let owned = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "owned"))?;
-                let owner = account_keys
-                    .get(1usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "owner"))?;
+                let owned = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owned" , "owned" , account_index , provided_count) }) ?
+                };
+                let owner = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                };
                 let accounts = SetAuthorityAccounts {
                     remaining: vec![],
                     owned: owned.clone(),
@@ -7286,15 +11398,45 @@ impl Instruction {
                 let amount: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                     .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(amount), e))?;
                 let args = MintToArguments { amount };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
-                let token = account_keys
-                    .get(1usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "token"))?;
-                let mint_authority = account_keys.get(2usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 2usize, "mintAuthority")
-                })?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let token = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                };
+                let mint_authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        2usize
+                    } else {
+                        2usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mintAuthority" , "mintAuthority" , account_index , provided_count) }) ?
+                };
                 let accounts = MintToAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -7308,15 +11450,45 @@ impl Instruction {
                 let amount: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                     .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(amount), e))?;
                 let args = BurnArguments { amount };
-                let account = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "account"))?;
-                let mint = account_keys
-                    .get(1usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "mint"))?;
-                let authority = account_keys.get(2usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 2usize, "authority")
-                })?;
+                let account = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "account" , "account" , account_index , provided_count) }) ?
+                };
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        2usize
+                    } else {
+                        2usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                };
                 let accounts = BurnAccounts {
                     remaining: vec![],
                     account: account.clone(),
@@ -7328,15 +11500,45 @@ impl Instruction {
             [9u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = CloseAccountArguments {};
-                let account = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "account"))?;
-                let destination = account_keys.get(1usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 1usize, "destination")
-                })?;
-                let owner = account_keys
-                    .get(2usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 2usize, "owner"))?;
+                let account = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "account" , "account" , account_index , provided_count) }) ?
+                };
+                let destination = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "destination" , "destination" , account_index , provided_count) }) ?
+                };
+                let owner = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        2usize
+                    } else {
+                        2usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                };
                 let accounts = CloseAccountAccounts {
                     remaining: vec![],
                     account: account.clone(),
@@ -7348,15 +11550,45 @@ impl Instruction {
             [10u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = FreezeAccountArguments {};
-                let account = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "account"))?;
-                let mint = account_keys
-                    .get(1usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "mint"))?;
-                let owner = account_keys
-                    .get(2usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 2usize, "owner"))?;
+                let account = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "account" , "account" , account_index , provided_count) }) ?
+                };
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let owner = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        2usize
+                    } else {
+                        2usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                };
                 let accounts = FreezeAccountAccounts {
                     remaining: vec![],
                     account: account.clone(),
@@ -7368,15 +11600,45 @@ impl Instruction {
             [11u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = ThawAccountArguments {};
-                let account = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "account"))?;
-                let mint = account_keys
-                    .get(1usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "mint"))?;
-                let owner = account_keys
-                    .get(2usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 2usize, "owner"))?;
+                let account = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "account" , "account" , account_index , provided_count) }) ?
+                };
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let owner = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        2usize
+                    } else {
+                        2usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                };
                 let accounts = ThawAccountAccounts {
                     remaining: vec![],
                     account: account.clone(),
@@ -7394,18 +11656,58 @@ impl Instruction {
                         format!("Failed to deserialize {}: {}", stringify!(decimals), e)
                     })?;
                 let args = TransferCheckedArguments { amount, decimals };
-                let source = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "source"))?;
-                let mint = account_keys
-                    .get(1usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "mint"))?;
-                let destination = account_keys.get(2usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 2usize, "destination")
-                })?;
-                let authority = account_keys.get(3usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 3usize, "authority")
-                })?;
+                let source = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 4usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "source" , "source" , account_index , provided_count) }) ?
+                };
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 4usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let destination = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 4usize {
+                        2usize
+                    } else {
+                        2usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "destination" , "destination" , account_index , provided_count) }) ?
+                };
+                let authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 4usize {
+                        3usize
+                    } else {
+                        3usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                };
                 let accounts = TransferCheckedAccounts {
                     remaining: vec![],
                     source: source.clone(),
@@ -7424,18 +11726,58 @@ impl Instruction {
                         format!("Failed to deserialize {}: {}", stringify!(decimals), e)
                     })?;
                 let args = ApproveCheckedArguments { amount, decimals };
-                let source = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "source"))?;
-                let mint = account_keys
-                    .get(1usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "mint"))?;
-                let delegate = account_keys.get(2usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 2usize, "delegate")
-                })?;
-                let owner = account_keys
-                    .get(3usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 3usize, "owner"))?;
+                let source = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 4usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "source" , "source" , account_index , provided_count) }) ?
+                };
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 4usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let delegate = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 4usize {
+                        2usize
+                    } else {
+                        2usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "delegate" , "delegate" , account_index , provided_count) }) ?
+                };
+                let owner = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 4usize {
+                        3usize
+                    } else {
+                        3usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                };
                 let accounts = ApproveCheckedAccounts {
                     remaining: vec![],
                     source: source.clone(),
@@ -7454,15 +11796,45 @@ impl Instruction {
                         format!("Failed to deserialize {}: {}", stringify!(decimals), e)
                     })?;
                 let args = MintToCheckedArguments { amount, decimals };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
-                let token = account_keys
-                    .get(1usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "token"))?;
-                let mint_authority = account_keys.get(2usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 2usize, "mintAuthority")
-                })?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let token = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                };
+                let mint_authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        2usize
+                    } else {
+                        2usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mintAuthority" , "mintAuthority" , account_index , provided_count) }) ?
+                };
                 let accounts = MintToCheckedAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -7480,15 +11852,45 @@ impl Instruction {
                         format!("Failed to deserialize {}: {}", stringify!(decimals), e)
                     })?;
                 let args = BurnCheckedArguments { amount, decimals };
-                let account = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "account"))?;
-                let mint = account_keys
-                    .get(1usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "mint"))?;
-                let authority = account_keys.get(2usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 2usize, "authority")
-                })?;
+                let account = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "account" , "account" , account_index , provided_count) }) ?
+                };
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        2usize
+                    } else {
+                        2usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                };
                 let accounts = BurnCheckedAccounts {
                     remaining: vec![],
                     account: account.clone(),
@@ -7504,15 +11906,45 @@ impl Instruction {
                         |e| format!("Failed to deserialize {}: {}", stringify!(owner), e),
                     )?;
                 let args = InitializeAccount2Arguments { owner };
-                let account = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "account"))?;
-                let mint = account_keys
-                    .get(1usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "mint"))?;
-                let rent = account_keys
-                    .get(2usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 2usize, "rent"))?;
+                let account = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "account" , "account" , account_index , provided_count) }) ?
+                };
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let rent = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        2usize
+                    } else {
+                        2usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "rent" , "rent" , account_index , provided_count) }) ?
+                };
                 let accounts = InitializeAccount2Accounts {
                     remaining: vec![],
                     account: account.clone(),
@@ -7524,9 +11956,19 @@ impl Instruction {
             [17u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = SyncNativeArguments {};
-                let account = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "account"))?;
+                let account = {
+                    let provided_count = account_keys.len();
+                    let required_count = 1usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 1usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "account" , "account" , account_index , provided_count) }) ?
+                };
                 let accounts = SyncNativeAccounts {
                     remaining: vec![],
                     account: account.clone(),
@@ -7540,12 +11982,32 @@ impl Instruction {
                         |e| format!("Failed to deserialize {}: {}", stringify!(owner), e),
                     )?;
                 let args = InitializeAccount3Arguments { owner };
-                let account = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "account"))?;
-                let mint = account_keys
-                    .get(1usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "mint"))?;
+                let account = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "account" , "account" , account_index , provided_count) }) ?
+                };
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
                 let accounts = InitializeAccount3Accounts {
                     remaining: vec![],
                     account: account.clone(),
@@ -7558,9 +12020,19 @@ impl Instruction {
                 let m: u8 = <u8 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                     .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(m), e))?;
                 let args = InitializeMultisig2Arguments { m };
-                let multisig = account_keys.get(0usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 0usize, "multisig")
-                })?;
+                let multisig = {
+                    let provided_count = account_keys.len();
+                    let required_count = 1usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 1usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "multisig" , "multisig" , account_index , provided_count) }) ?
+                };
                 let accounts = InitializeMultisig2Accounts {
                     remaining: vec![],
                     multisig: multisig.clone(),
@@ -7597,9 +12069,19 @@ impl Instruction {
                     mint_authority,
                     freeze_authority,
                 };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 1usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 1usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
                 let accounts = InitializeMint2Accounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -7609,9 +12091,19 @@ impl Instruction {
             [21u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = GetAccountDataSizeArguments {};
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 1usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 1usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
                 let accounts = GetAccountDataSizeAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -7621,9 +12113,19 @@ impl Instruction {
             [22u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = InitializeImmutableOwnerArguments {};
-                let account = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "account"))?;
+                let account = {
+                    let provided_count = account_keys.len();
+                    let required_count = 1usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 1usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "account" , "account" , account_index , provided_count) }) ?
+                };
                 let accounts = InitializeImmutableOwnerAccounts {
                     remaining: vec![],
                     account: account.clone(),
@@ -7635,9 +12137,19 @@ impl Instruction {
                 let amount: u64 = <u64 as ::borsh::BorshDeserialize>::deserialize(&mut rdr)
                     .map_err(|e| format!("Failed to deserialize {}: {}", stringify!(amount), e))?;
                 let args = AmountToUiAmountArguments { amount };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 1usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 1usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
                 let accounts = AmountToUiAmountAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -7651,9 +12163,19 @@ impl Instruction {
                         format!("Failed to deserialize {}: {}", stringify!(ui_amount), e)
                     })?;
                 let args = UiAmountToAmountArguments { ui_amount };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 1usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 1usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
                 let accounts = UiAmountToAmountAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -7672,9 +12194,19 @@ impl Instruction {
                             )
                         })?;
                 let args = InitializeMintCloseAuthorityArguments { close_authority };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 1usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 1usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
                 let accounts = InitializeMintCloseAuthorityAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -7720,9 +12252,19 @@ impl Instruction {
                     maximum_fee,
                     extension_type: "initializeTransferFeeConfig".to_string(),
                 };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 1usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 1usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
                 let accounts = InitializeTransferFeeConfigAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -7745,18 +12287,58 @@ impl Instruction {
                     fee,
                     extension_type: "transferCheckedWithFee".to_string(),
                 };
-                let source = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "source"))?;
-                let mint = account_keys
-                    .get(1usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "mint"))?;
-                let destination = account_keys.get(2usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 2usize, "destination")
-                })?;
-                let authority = account_keys.get(3usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 3usize, "authority")
-                })?;
+                let source = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 4usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "source" , "source" , account_index , provided_count) }) ?
+                };
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 4usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let destination = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 4usize {
+                        2usize
+                    } else {
+                        2usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "destination" , "destination" , account_index , provided_count) }) ?
+                };
+                let authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 4usize {
+                        3usize
+                    } else {
+                        3usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                };
                 let accounts = TransferCheckedWithFeeAccounts {
                     remaining: vec![],
                     source: source.clone(),
@@ -7771,18 +12353,45 @@ impl Instruction {
                 let args = WithdrawWithheldTokensFromMintArguments {
                     extension_type: "withdrawWithheldTokensFromMint".to_string(),
                 };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
-                let fee_receiver = account_keys.get(1usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 1usize, "feeReceiver")
-                })?;
-                let withdraw_withheld_authority = account_keys.get(2usize).ok_or_else(|| {
-                    format!(
-                        "Missing account at index {}: {}",
-                        2usize, "withdrawWithheldAuthority"
-                    )
-                })?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let fee_receiver = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "feeReceiver" , "feeReceiver" , account_index , provided_count) }) ?
+                };
+                let withdraw_withheld_authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        2usize
+                    } else {
+                        2usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "withdrawWithheldAuthority" , "withdrawWithheldAuthority" , account_index , provided_count) }) ?
+                };
                 let accounts = WithdrawWithheldTokensFromMintAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -7805,18 +12414,45 @@ impl Instruction {
                     num_token_accounts,
                     extension_type: "withdrawWithheldTokensFromAccounts".to_string(),
                 };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
-                let fee_receiver = account_keys.get(1usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 1usize, "feeReceiver")
-                })?;
-                let withdraw_withheld_authority = account_keys.get(2usize).ok_or_else(|| {
-                    format!(
-                        "Missing account at index {}: {}",
-                        2usize, "withdrawWithheldAuthority"
-                    )
-                })?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let fee_receiver = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "feeReceiver" , "feeReceiver" , account_index , provided_count) }) ?
+                };
+                let withdraw_withheld_authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        2usize
+                    } else {
+                        2usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "withdrawWithheldAuthority" , "withdrawWithheldAuthority" , account_index , provided_count) }) ?
+                };
                 let accounts = WithdrawWithheldTokensFromAccountsAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -7830,9 +12466,19 @@ impl Instruction {
                 let args = HarvestWithheldTokensToMintArguments {
                     extension_type: "harvestWithheldTokensToMint".to_string(),
                 };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 1usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 1usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
                 let accounts = HarvestWithheldTokensToMintAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -7858,15 +12504,32 @@ impl Instruction {
                     maximum_fee,
                     extension_type: "setTransferFee".to_string(),
                 };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
-                let transfer_fee_config_authority = account_keys.get(1usize).ok_or_else(|| {
-                    format!(
-                        "Missing account at index {}: {}",
-                        1usize, "transferFeeConfigAuthority"
-                    )
-                })?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let transfer_fee_config_authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "transferFeeConfigAuthority" , "transferFeeConfigAuthority" , account_index , provided_count) }) ?
+                };
                 let accounts = SetTransferFeeAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -7916,9 +12579,19 @@ impl Instruction {
                     auditor_elgamal_pubkey,
                     extension_type: "initializeConfidentialTransferMint".to_string(),
                 };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 1usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 1usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
                 let accounts = InitializeConfidentialTransferMintAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -7953,12 +12626,32 @@ impl Instruction {
                     auditor_elgamal_pubkey,
                     extension_type: "updateConfidentialTransferMint".to_string(),
                 };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
-                let authority = account_keys.get(1usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 1usize, "authority")
-                })?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                };
                 let accounts = UpdateConfidentialTransferMintAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -7998,32 +12691,74 @@ impl Instruction {
                     proof_instruction_offset,
                     extension_type: "configureConfidentialTransferAccount".to_string(),
                 };
-                let token = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "token"))?;
-                let mint = account_keys
-                    .get(1usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "mint"))?;
-                let instructions_sysvar_or_context_state =
-                    account_keys.get(2usize).ok_or_else(|| {
-                        format!(
-                            "Missing account at index {}: {}",
-                            2usize, "instructionsSysvarOrContextState"
-                        )
-                    })?;
-                let record = account_keys
-                    .get(3usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 3usize, "record"))?;
-                let authority = account_keys.get(4usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 4usize, "authority")
-                })?;
+                let token = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 5usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                };
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 5usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let instructions_sysvar_or_context_state = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 5usize {
+                        2usize
+                    } else {
+                        2usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "instructionsSysvarOrContextState" , "instructionsSysvarOrContextState" , account_index , provided_count) }) ?
+                };
+                let record = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count > required_count && provided_count > 3usize {
+                        account_keys.get(3usize).map(|key| key.clone())
+                    } else {
+                        None
+                    }
+                };
+                let authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 5usize {
+                        4usize
+                    } else {
+                        4usize - 1usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                };
                 let accounts = ConfigureConfidentialTransferAccountAccounts {
                     remaining: vec![],
                     token: token.clone(),
                     mint: mint.clone(),
                     instructions_sysvar_or_context_state: instructions_sysvar_or_context_state
                         .clone(),
-                    record: Some(record.clone()),
+                    record: record,
                     authority: authority.clone(),
                 };
                 return Ok(Instruction::ConfigureConfidentialTransferAccount { accounts, args });
@@ -8033,15 +12768,45 @@ impl Instruction {
                 let args = ApproveConfidentialTransferAccountArguments {
                     extension_type: "approveConfidentialTransferAccount".to_string(),
                 };
-                let token = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "token"))?;
-                let mint = account_keys
-                    .get(1usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "mint"))?;
-                let authority = account_keys.get(2usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 2usize, "authority")
-                })?;
+                let token = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                };
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        2usize
+                    } else {
+                        2usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                };
                 let accounts = ApproveConfidentialTransferAccountAccounts {
                     remaining: vec![],
                     token: token.clone(),
@@ -8064,28 +12829,60 @@ impl Instruction {
                     proof_instruction_offset,
                     extension_type: "emptyConfidentialTransferAccount".to_string(),
                 };
-                let token = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "token"))?;
-                let instructions_sysvar_or_context_state =
-                    account_keys.get(1usize).ok_or_else(|| {
-                        format!(
-                            "Missing account at index {}: {}",
-                            1usize, "instructionsSysvarOrContextState"
-                        )
-                    })?;
-                let record = account_keys
-                    .get(2usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 2usize, "record"))?;
-                let authority = account_keys.get(3usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 3usize, "authority")
-                })?;
+                let token = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 4usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                };
+                let instructions_sysvar_or_context_state = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 4usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "instructionsSysvarOrContextState" , "instructionsSysvarOrContextState" , account_index , provided_count) }) ?
+                };
+                let record = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count > required_count && provided_count > 2usize {
+                        account_keys.get(2usize).map(|key| key.clone())
+                    } else {
+                        None
+                    }
+                };
+                let authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 4usize {
+                        3usize
+                    } else {
+                        3usize - 1usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                };
                 let accounts = EmptyConfidentialTransferAccountAccounts {
                     remaining: vec![],
                     token: token.clone(),
                     instructions_sysvar_or_context_state: instructions_sysvar_or_context_state
                         .clone(),
-                    record: Some(record.clone()),
+                    record: record,
                     authority: authority.clone(),
                 };
                 return Ok(Instruction::EmptyConfidentialTransferAccount { accounts, args });
@@ -8103,15 +12900,45 @@ impl Instruction {
                     decimals,
                     extension_type: "confidentialDeposit".to_string(),
                 };
-                let token = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "token"))?;
-                let mint = account_keys
-                    .get(1usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "mint"))?;
-                let authority = account_keys.get(2usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 2usize, "authority")
-                })?;
+                let token = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                };
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        2usize
+                    } else {
+                        2usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                };
                 let accounts = ConfidentialDepositAccounts {
                     remaining: vec![],
                     token: token.clone(),
@@ -8161,34 +12988,79 @@ impl Instruction {
                     range_proof_instruction_offset,
                     extension_type: "confidentialWithdraw".to_string(),
                 };
-                let token = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "token"))?;
-                let mint = account_keys
-                    .get(1usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "mint"))?;
-                let instructions_sysvar = account_keys.get(2usize).ok_or_else(|| {
-                    format!(
-                        "Missing account at index {}: {}",
-                        2usize, "instructionsSysvar"
-                    )
-                })?;
-                let equality_record = account_keys.get(3usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 3usize, "equalityRecord")
-                })?;
-                let range_record = account_keys.get(4usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 4usize, "rangeRecord")
-                })?;
-                let authority = account_keys.get(5usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 5usize, "authority")
-                })?;
+                let token = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 6usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                };
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 6usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let instructions_sysvar = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count > required_count && provided_count > 2usize {
+                        account_keys.get(2usize).map(|key| key.clone())
+                    } else {
+                        None
+                    }
+                };
+                let equality_record = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count > required_count && provided_count > 3usize {
+                        account_keys.get(3usize).map(|key| key.clone())
+                    } else {
+                        None
+                    }
+                };
+                let range_record = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count > required_count && provided_count > 4usize {
+                        account_keys.get(4usize).map(|key| key.clone())
+                    } else {
+                        None
+                    }
+                };
+                let authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 6usize {
+                        5usize
+                    } else {
+                        5usize - 3usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                };
                 let accounts = ConfidentialWithdrawAccounts {
                     remaining: vec![],
                     token: token.clone(),
                     mint: mint.clone(),
-                    instructions_sysvar: Some(instructions_sysvar.clone()),
-                    equality_record: Some(equality_record.clone()),
-                    range_record: Some(range_record.clone()),
+                    instructions_sysvar: instructions_sysvar,
+                    equality_record: equality_record,
+                    range_record: range_record,
                     authority: authority.clone(),
                 };
                 return Ok(Instruction::ConfidentialWithdraw { accounts, args });
@@ -8235,48 +13107,103 @@ impl Instruction {
                     range_proof_instruction_offset,
                     extension_type: "confidentialTransfer".to_string(),
                 };
-                let source_token = account_keys.get(0usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 0usize, "sourceToken")
-                })?;
-                let mint = account_keys
-                    .get(1usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "mint"))?;
-                let destination_token = account_keys.get(2usize).ok_or_else(|| {
-                    format!(
-                        "Missing account at index {}: {}",
-                        2usize, "destinationToken"
-                    )
-                })?;
-                let instructions_sysvar = account_keys.get(3usize).ok_or_else(|| {
-                    format!(
-                        "Missing account at index {}: {}",
-                        3usize, "instructionsSysvar"
-                    )
-                })?;
-                let equality_record = account_keys.get(4usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 4usize, "equalityRecord")
-                })?;
-                let ciphertext_validity_record = account_keys.get(5usize).ok_or_else(|| {
-                    format!(
-                        "Missing account at index {}: {}",
-                        5usize, "ciphertextValidityRecord"
-                    )
-                })?;
-                let range_record = account_keys.get(6usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 6usize, "rangeRecord")
-                })?;
-                let authority = account_keys.get(7usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 7usize, "authority")
-                })?;
+                let source_token = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 8usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "sourceToken" , "sourceToken" , account_index , provided_count) }) ?
+                };
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 8usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let destination_token = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 8usize {
+                        2usize
+                    } else {
+                        2usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "destinationToken" , "destinationToken" , account_index , provided_count) }) ?
+                };
+                let instructions_sysvar = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count > required_count && provided_count > 3usize {
+                        account_keys.get(3usize).map(|key| key.clone())
+                    } else {
+                        None
+                    }
+                };
+                let equality_record = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count > required_count && provided_count > 4usize {
+                        account_keys.get(4usize).map(|key| key.clone())
+                    } else {
+                        None
+                    }
+                };
+                let ciphertext_validity_record = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count > required_count && provided_count > 5usize {
+                        account_keys.get(5usize).map(|key| key.clone())
+                    } else {
+                        None
+                    }
+                };
+                let range_record = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count > required_count && provided_count > 6usize {
+                        account_keys.get(6usize).map(|key| key.clone())
+                    } else {
+                        None
+                    }
+                };
+                let authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 8usize {
+                        7usize
+                    } else {
+                        7usize - 4usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                };
                 let accounts = ConfidentialTransferAccounts {
                     remaining: vec![],
                     source_token: source_token.clone(),
                     mint: mint.clone(),
                     destination_token: destination_token.clone(),
-                    instructions_sysvar: Some(instructions_sysvar.clone()),
-                    equality_record: Some(equality_record.clone()),
-                    ciphertext_validity_record: Some(ciphertext_validity_record.clone()),
-                    range_record: Some(range_record.clone()),
+                    instructions_sysvar: instructions_sysvar,
+                    equality_record: equality_record,
+                    ciphertext_validity_record: ciphertext_validity_record,
+                    range_record: range_record,
                     authority: authority.clone(),
                 };
                 return Ok(Instruction::ConfidentialTransfer { accounts, args });
@@ -8305,12 +13232,32 @@ impl Instruction {
                     new_decryptable_available_balance,
                     extension_type: "applyConfidentialPendingBalance".to_string(),
                 };
-                let token = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "token"))?;
-                let authority = account_keys.get(1usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 1usize, "authority")
-                })?;
+                let token = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                };
+                let authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                };
                 let accounts = ApplyConfidentialPendingBalanceAccounts {
                     remaining: vec![],
                     token: token.clone(),
@@ -8323,12 +13270,32 @@ impl Instruction {
                 let args = EnableConfidentialCreditsArguments {
                     extension_type: "enableConfidentialCredits".to_string(),
                 };
-                let token = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "token"))?;
-                let authority = account_keys.get(1usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 1usize, "authority")
-                })?;
+                let token = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                };
+                let authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                };
                 let accounts = EnableConfidentialCreditsAccounts {
                     remaining: vec![],
                     token: token.clone(),
@@ -8341,12 +13308,32 @@ impl Instruction {
                 let args = DisableConfidentialCreditsArguments {
                     extension_type: "disableConfidentialCredits".to_string(),
                 };
-                let token = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "token"))?;
-                let authority = account_keys.get(1usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 1usize, "authority")
-                })?;
+                let token = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                };
+                let authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                };
                 let accounts = DisableConfidentialCreditsAccounts {
                     remaining: vec![],
                     token: token.clone(),
@@ -8359,12 +13346,32 @@ impl Instruction {
                 let args = EnableNonConfidentialCreditsArguments {
                     extension_type: "enableNonConfidentialCredits".to_string(),
                 };
-                let token = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "token"))?;
-                let authority = account_keys.get(1usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 1usize, "authority")
-                })?;
+                let token = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                };
+                let authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                };
                 let accounts = EnableNonConfidentialCreditsAccounts {
                     remaining: vec![],
                     token: token.clone(),
@@ -8377,12 +13384,32 @@ impl Instruction {
                 let args = DisableNonConfidentialCreditsArguments {
                     extension_type: "disableNonConfidentialCredits".to_string(),
                 };
-                let token = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "token"))?;
-                let authority = account_keys.get(1usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 1usize, "authority")
-                })?;
+                let token = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                };
+                let authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                };
                 let accounts = DisableNonConfidentialCreditsAccounts {
                     remaining: vec![],
                     token: token.clone(),
@@ -8452,62 +13479,124 @@ impl Instruction {
                     range_proof_instruction_offset,
                     extension_type: "confidentialTransferWithFee".to_string(),
                 };
-                let source_token = account_keys.get(0usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 0usize, "sourceToken")
-                })?;
-                let mint = account_keys
-                    .get(1usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "mint"))?;
-                let destination_token = account_keys.get(2usize).ok_or_else(|| {
-                    format!(
-                        "Missing account at index {}: {}",
-                        2usize, "destinationToken"
-                    )
-                })?;
-                let instructions_sysvar = account_keys.get(3usize).ok_or_else(|| {
-                    format!(
-                        "Missing account at index {}: {}",
-                        3usize, "instructionsSysvar"
-                    )
-                })?;
-                let equality_record = account_keys.get(4usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 4usize, "equalityRecord")
-                })?;
-                let transfer_amount_ciphertext_validity_record =
-                    account_keys.get(5usize).ok_or_else(|| {
-                        format!(
-                            "Missing account at index {}: {}",
-                            5usize, "transferAmountCiphertextValidityRecord"
-                        )
-                    })?;
-                let fee_sigma_record = account_keys.get(6usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 6usize, "feeSigmaRecord")
-                })?;
-                let fee_ciphertext_validity_record = account_keys.get(7usize).ok_or_else(|| {
-                    format!(
-                        "Missing account at index {}: {}",
-                        7usize, "feeCiphertextValidityRecord"
-                    )
-                })?;
-                let range_record = account_keys.get(8usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 8usize, "rangeRecord")
-                })?;
-                let authority = account_keys.get(9usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 9usize, "authority")
-                })?;
+                let source_token = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 10usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "sourceToken" , "sourceToken" , account_index , provided_count) }) ?
+                };
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 10usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let destination_token = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 10usize {
+                        2usize
+                    } else {
+                        2usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "destinationToken" , "destinationToken" , account_index , provided_count) }) ?
+                };
+                let instructions_sysvar = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count > required_count && provided_count > 3usize {
+                        account_keys.get(3usize).map(|key| key.clone())
+                    } else {
+                        None
+                    }
+                };
+                let equality_record = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count > required_count && provided_count > 4usize {
+                        account_keys.get(4usize).map(|key| key.clone())
+                    } else {
+                        None
+                    }
+                };
+                let transfer_amount_ciphertext_validity_record = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count > required_count && provided_count > 5usize {
+                        account_keys.get(5usize).map(|key| key.clone())
+                    } else {
+                        None
+                    }
+                };
+                let fee_sigma_record = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count > required_count && provided_count > 6usize {
+                        account_keys.get(6usize).map(|key| key.clone())
+                    } else {
+                        None
+                    }
+                };
+                let fee_ciphertext_validity_record = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count > required_count && provided_count > 7usize {
+                        account_keys.get(7usize).map(|key| key.clone())
+                    } else {
+                        None
+                    }
+                };
+                let range_record = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count > required_count && provided_count > 8usize {
+                        account_keys.get(8usize).map(|key| key.clone())
+                    } else {
+                        None
+                    }
+                };
+                let authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 10usize {
+                        9usize
+                    } else {
+                        9usize - 6usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                };
                 let accounts = ConfidentialTransferWithFeeAccounts {
                     remaining: vec![],
                     source_token: source_token.clone(),
                     mint: mint.clone(),
                     destination_token: destination_token.clone(),
-                    instructions_sysvar: Some(instructions_sysvar.clone()),
-                    equality_record: Some(equality_record.clone()),
-                    transfer_amount_ciphertext_validity_record: Some(
-                        transfer_amount_ciphertext_validity_record.clone(),
-                    ),
-                    fee_sigma_record: Some(fee_sigma_record.clone()),
-                    fee_ciphertext_validity_record: Some(fee_ciphertext_validity_record.clone()),
-                    range_record: Some(range_record.clone()),
+                    instructions_sysvar: instructions_sysvar,
+                    equality_record: equality_record,
+                    transfer_amount_ciphertext_validity_record:
+                        transfer_amount_ciphertext_validity_record,
+                    fee_sigma_record: fee_sigma_record,
+                    fee_ciphertext_validity_record: fee_ciphertext_validity_record,
+                    range_record: range_record,
                     authority: authority.clone(),
                 };
                 return Ok(Instruction::ConfidentialTransferWithFee { accounts, args });
@@ -8522,9 +13611,19 @@ impl Instruction {
                     state,
                     extension_type: "initializeDefaultAccountState".to_string(),
                 };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 1usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 1usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
                 let accounts = InitializeDefaultAccountStateAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -8541,12 +13640,32 @@ impl Instruction {
                     state,
                     extension_type: "updateDefaultAccountState".to_string(),
                 };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
-                let freeze_authority = account_keys.get(1usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 1usize, "freezeAuthority")
-                })?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let freeze_authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "freezeAuthority" , "freezeAuthority" , account_index , provided_count) }) ?
+                };
                 let accounts = UpdateDefaultAccountStateAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -8567,18 +13686,58 @@ impl Instruction {
                 let args = ReallocateArguments {
                     new_extension_types,
                 };
-                let token = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "token"))?;
-                let payer = account_keys
-                    .get(1usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "payer"))?;
-                let system_program = account_keys.get(2usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 2usize, "systemProgram")
-                })?;
-                let owner = account_keys
-                    .get(3usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 3usize, "owner"))?;
+                let token = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 4usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                };
+                let payer = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 4usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "payer" , "payer" , account_index , provided_count) }) ?
+                };
+                let system_program = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 4usize {
+                        2usize
+                    } else {
+                        2usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "systemProgram" , "systemProgram" , account_index , provided_count) }) ?
+                };
+                let owner = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 4usize {
+                        3usize
+                    } else {
+                        3usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                };
                 let accounts = ReallocateAccounts {
                     remaining: vec![],
                     token: token.clone(),
@@ -8593,12 +13752,32 @@ impl Instruction {
                 let args = EnableMemoTransfersArguments {
                     extension_type: "enableMemoTransfers".to_string(),
                 };
-                let token = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "token"))?;
-                let owner = account_keys
-                    .get(1usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "owner"))?;
+                let token = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                };
+                let owner = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                };
                 let accounts = EnableMemoTransfersAccounts {
                     remaining: vec![],
                     token: token.clone(),
@@ -8611,12 +13790,32 @@ impl Instruction {
                 let args = DisableMemoTransfersArguments {
                     extension_type: "disableMemoTransfers".to_string(),
                 };
-                let token = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "token"))?;
-                let owner = account_keys
-                    .get(1usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "owner"))?;
+                let token = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                };
+                let owner = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                };
                 let accounts = DisableMemoTransfersAccounts {
                     remaining: vec![],
                     token: token.clone(),
@@ -8627,15 +13826,45 @@ impl Instruction {
             [31u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = CreateNativeMintArguments {};
-                let payer = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "payer"))?;
-                let native_mint = account_keys.get(1usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 1usize, "nativeMint")
-                })?;
-                let system_program = account_keys.get(2usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 2usize, "systemProgram")
-                })?;
+                let payer = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "payer" , "payer" , account_index , provided_count) }) ?
+                };
+                let native_mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "nativeMint" , "nativeMint" , account_index , provided_count) }) ?
+                };
+                let system_program = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        2usize
+                    } else {
+                        2usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "systemProgram" , "systemProgram" , account_index , provided_count) }) ?
+                };
                 let accounts = CreateNativeMintAccounts {
                     remaining: vec![],
                     payer: payer.clone(),
@@ -8647,9 +13876,19 @@ impl Instruction {
             [32u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = InitializeNonTransferableMintArguments {};
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 1usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 1usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
                 let accounts = InitializeNonTransferableMintAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -8678,9 +13917,19 @@ impl Instruction {
                     rate,
                     extension_type: "initializeInterestBearingMint".to_string(),
                 };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 1usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 1usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
                 let accounts = InitializeInterestBearingMintAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -8695,12 +13944,32 @@ impl Instruction {
                     rate,
                     extension_type: "updateRateInterestBearingMint".to_string(),
                 };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
-                let rate_authority = account_keys.get(1usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 1usize, "rateAuthority")
-                })?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let rate_authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "rateAuthority" , "rateAuthority" , account_index , provided_count) }) ?
+                };
                 let accounts = UpdateRateInterestBearingMintAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -8713,12 +13982,32 @@ impl Instruction {
                 let args = EnableCpiGuardArguments {
                     extension_type: "enableCpiGuard".to_string(),
                 };
-                let token = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "token"))?;
-                let owner = account_keys
-                    .get(1usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "owner"))?;
+                let token = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                };
+                let owner = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                };
                 let accounts = EnableCpiGuardAccounts {
                     remaining: vec![],
                     token: token.clone(),
@@ -8731,12 +14020,32 @@ impl Instruction {
                 let args = DisableCpiGuardArguments {
                     extension_type: "disableCpiGuard".to_string(),
                 };
-                let token = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "token"))?;
-                let owner = account_keys
-                    .get(1usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "owner"))?;
+                let token = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "token" , "token" , account_index , provided_count) }) ?
+                };
+                let owner = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "owner" , "owner" , account_index , provided_count) }) ?
+                };
                 let accounts = DisableCpiGuardAccounts {
                     remaining: vec![],
                     token: token.clone(),
@@ -8751,9 +14060,19 @@ impl Instruction {
                         |e| format!("Failed to deserialize {}: {}", stringify!(delegate), e),
                     )?;
                 let args = InitializePermanentDelegateArguments { delegate };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 1usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 1usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
                 let accounts = InitializePermanentDelegateAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -8793,9 +14112,19 @@ impl Instruction {
                     program_id,
                     extension_type: "initializeTransferHook".to_string(),
                 };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 1usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 1usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
                 let accounts = InitializeTransferHookAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -8821,12 +14150,32 @@ impl Instruction {
                     program_id,
                     extension_type: "updateTransferHook".to_string(),
                 };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
-                let authority = account_keys.get(1usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 1usize, "authority")
-                })?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                };
                 let accounts = UpdateTransferHookAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -8867,9 +14216,19 @@ impl Instruction {
                     withdraw_withheld_authority_el_gamal_pubkey,
                     extension_type: "initializeConfidentialTransferFee".to_string(),
                 };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 1usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 1usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
                 let accounts = InitializeConfidentialTransferFeeAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -8901,32 +14260,74 @@ impl Instruction {
                     extension_type: "withdrawWithheldTokensFromMintForConfidentialTransferFee"
                         .to_string(),
                 };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
-                let destination = account_keys.get(1usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 1usize, "destination")
-                })?;
-                let instructions_sysvar_or_context_state =
-                    account_keys.get(2usize).ok_or_else(|| {
-                        format!(
-                            "Missing account at index {}: {}",
-                            2usize, "instructionsSysvarOrContextState"
-                        )
-                    })?;
-                let record = account_keys
-                    .get(3usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 3usize, "record"))?;
-                let authority = account_keys.get(4usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 4usize, "authority")
-                })?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 5usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let destination = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 5usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "destination" , "destination" , account_index , provided_count) }) ?
+                };
+                let instructions_sysvar_or_context_state = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 5usize {
+                        2usize
+                    } else {
+                        2usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "instructionsSysvarOrContextState" , "instructionsSysvarOrContextState" , account_index , provided_count) }) ?
+                };
+                let record = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count > required_count && provided_count > 3usize {
+                        account_keys.get(3usize).map(|key| key.clone())
+                    } else {
+                        None
+                    }
+                };
+                let authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 5usize {
+                        4usize
+                    } else {
+                        4usize - 1usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                };
                 let accounts = WithdrawWithheldTokensFromMintForConfidentialTransferFeeAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
                     destination: destination.clone(),
                     instructions_sysvar_or_context_state: instructions_sysvar_or_context_state
                         .clone(),
-                    record: Some(record.clone()),
+                    record: record,
                     authority: authority.clone(),
                 };
                 return Ok(
@@ -8970,25 +14371,67 @@ impl Instruction {
                     extension_type: "withdrawWithheldTokensFromAccountsForConfidentialTransferFee"
                         .to_string(),
                 };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
-                let destination = account_keys.get(1usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 1usize, "destination")
-                })?;
-                let instructions_sysvar_or_context_state =
-                    account_keys.get(2usize).ok_or_else(|| {
-                        format!(
-                            "Missing account at index {}: {}",
-                            2usize, "instructionsSysvarOrContextState"
-                        )
-                    })?;
-                let record = account_keys
-                    .get(3usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 3usize, "record"))?;
-                let authority = account_keys.get(4usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 4usize, "authority")
-                })?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 5usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let destination = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 5usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "destination" , "destination" , account_index , provided_count) }) ?
+                };
+                let instructions_sysvar_or_context_state = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 5usize {
+                        2usize
+                    } else {
+                        2usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "instructionsSysvarOrContextState" , "instructionsSysvarOrContextState" , account_index , provided_count) }) ?
+                };
+                let record = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count > required_count && provided_count > 3usize {
+                        account_keys.get(3usize).map(|key| key.clone())
+                    } else {
+                        None
+                    }
+                };
+                let authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 5usize {
+                        4usize
+                    } else {
+                        4usize - 1usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                };
                 let accounts =
                     WithdrawWithheldTokensFromAccountsForConfidentialTransferFeeAccounts {
                         remaining: vec![],
@@ -8996,7 +14439,7 @@ impl Instruction {
                         destination: destination.clone(),
                         instructions_sysvar_or_context_state: instructions_sysvar_or_context_state
                             .clone(),
-                        record: Some(record.clone()),
+                        record: record,
                         authority: authority.clone(),
                     };
                 return Ok(
@@ -9012,9 +14455,19 @@ impl Instruction {
                     extension_type: "harvestWithheldTokensToMintForConfidentialTransferFee"
                         .to_string(),
                 };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 1usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 1usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
                 let accounts = HarvestWithheldTokensToMintForConfidentialTransferFeeAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -9031,12 +14484,32 @@ impl Instruction {
                 let args = EnableHarvestToMintArguments {
                     extension_type: "enableHarvestToMint".to_string(),
                 };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
-                let authority = account_keys.get(1usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 1usize, "authority")
-                })?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                };
                 let accounts = EnableHarvestToMintAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -9049,12 +14522,32 @@ impl Instruction {
                 let args = DisableHarvestToMintArguments {
                     extension_type: "disableHarvestToMint".to_string(),
                 };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
-                let authority = account_keys.get(1usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 1usize, "authority")
-                })?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                };
                 let accounts = DisableHarvestToMintAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -9065,18 +14558,45 @@ impl Instruction {
             [38u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = WithdrawExcessLamportsArguments {};
-                let source_account = account_keys.get(0usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 0usize, "sourceAccount")
-                })?;
-                let destination_account = account_keys.get(1usize).ok_or_else(|| {
-                    format!(
-                        "Missing account at index {}: {}",
-                        1usize, "destinationAccount"
-                    )
-                })?;
-                let authority = account_keys.get(2usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 2usize, "authority")
-                })?;
+                let source_account = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "sourceAccount" , "sourceAccount" , account_index , provided_count) }) ?
+                };
+                let destination_account = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "destinationAccount" , "destinationAccount" , account_index , provided_count) }) ?
+                };
+                let authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        2usize
+                    } else {
+                        2usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                };
                 let accounts = WithdrawExcessLamportsAccounts {
                     remaining: vec![],
                     source_account: source_account.clone(),
@@ -9118,9 +14638,19 @@ impl Instruction {
                     metadata_address,
                     extension_type: "initializeMetadataPointer".to_string(),
                 };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 1usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 1usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
                 let accounts = InitializeMetadataPointerAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -9146,15 +14676,32 @@ impl Instruction {
                     metadata_address,
                     extension_type: "updateMetadataPointer".to_string(),
                 };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
-                let metadata_pointer_authority = account_keys.get(1usize).ok_or_else(|| {
-                    format!(
-                        "Missing account at index {}: {}",
-                        1usize, "metadataPointerAuthority"
-                    )
-                })?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let metadata_pointer_authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "metadataPointerAuthority" , "metadataPointerAuthority" , account_index , provided_count) }) ?
+                };
                 let accounts = UpdateMetadataPointerAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -9195,9 +14742,19 @@ impl Instruction {
                     group_address,
                     extension_type: "initializeGroupPointer".to_string(),
                 };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 1usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 1usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
                 let accounts = InitializeGroupPointerAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -9223,15 +14780,32 @@ impl Instruction {
                     group_address,
                     extension_type: "updateGroupPointer".to_string(),
                 };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
-                let group_pointer_authority = account_keys.get(1usize).ok_or_else(|| {
-                    format!(
-                        "Missing account at index {}: {}",
-                        1usize, "groupPointerAuthority"
-                    )
-                })?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let group_pointer_authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "groupPointerAuthority" , "groupPointerAuthority" , account_index , provided_count) }) ?
+                };
                 let accounts = UpdateGroupPointerAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -9272,9 +14846,19 @@ impl Instruction {
                     member_address,
                     extension_type: "initializeGroupMemberPointer".to_string(),
                 };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 1usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 1usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
                 let accounts = InitializeGroupMemberPointerAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -9300,15 +14884,32 @@ impl Instruction {
                     member_address,
                     extension_type: "updateGroupMemberPointer".to_string(),
                 };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
-                let group_member_pointer_authority = account_keys.get(1usize).ok_or_else(|| {
-                    format!(
-                        "Missing account at index {}: {}",
-                        1usize, "groupMemberPointerAuthority"
-                    )
-                })?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let group_member_pointer_authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "groupMemberPointerAuthority" , "groupMemberPointerAuthority" , account_index , provided_count) }) ?
+                };
                 let accounts = UpdateGroupMemberPointerAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -9340,9 +14941,19 @@ impl Instruction {
                     multiplier,
                     extension_type: "initializeScaledUiAmountMint".to_string(),
                 };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 1usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 1usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
                 let accounts = InitializeScaledUiAmountMintAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -9368,12 +14979,32 @@ impl Instruction {
                     effective_timestamp,
                     extension_type: "updateMultiplierScaledUiMint".to_string(),
                 };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
-                let authority = account_keys.get(1usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 1usize, "authority")
-                })?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                };
                 let accounts = UpdateMultiplierScaledUiMintAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -9400,9 +15031,19 @@ impl Instruction {
                     authority,
                     extension_type: "initializePausableConfig".to_string(),
                 };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 1usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 1usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
                 let accounts = InitializePausableConfigAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -9414,12 +15055,32 @@ impl Instruction {
                 let args = PauseArguments {
                     extension_type: "pause".to_string(),
                 };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
-                let authority = account_keys.get(1usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 1usize, "authority")
-                })?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                };
                 let accounts = PauseAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -9432,12 +15093,32 @@ impl Instruction {
                 let args = ResumeArguments {
                     extension_type: "resume".to_string(),
                 };
-                let mint = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "mint"))?;
-                let authority = account_keys.get(1usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 1usize, "authority")
-                })?;
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "authority" , "authority" , account_index , provided_count) }) ?
+                };
                 let accounts = ResumeAccounts {
                     remaining: vec![],
                     mint: mint.clone(),
@@ -9519,18 +15200,58 @@ impl Instruction {
                     uri,
                     extension_type: "initializeTokenMetadata".to_string(),
                 };
-                let metadata = account_keys.get(0usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 0usize, "metadata")
-                })?;
-                let update_authority = account_keys.get(1usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 1usize, "updateAuthority")
-                })?;
-                let mint = account_keys
-                    .get(2usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 2usize, "mint"))?;
-                let mint_authority = account_keys.get(3usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 3usize, "mintAuthority")
-                })?;
+                let metadata = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 4usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "metadata" , "metadata" , account_index , provided_count) }) ?
+                };
+                let update_authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 4usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "updateAuthority" , "updateAuthority" , account_index , provided_count) }) ?
+                };
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 4usize {
+                        2usize
+                    } else {
+                        2usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let mint_authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 4usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 4usize {
+                        3usize
+                    } else {
+                        3usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mintAuthority" , "mintAuthority" , account_index , provided_count) }) ?
+                };
                 let accounts = InitializeTokenMetadataAccounts {
                     remaining: vec![],
                     metadata: metadata.clone(),
@@ -9574,12 +15295,32 @@ impl Instruction {
                     value,
                     extension_type: "updateTokenMetadataField".to_string(),
                 };
-                let metadata = account_keys.get(0usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 0usize, "metadata")
-                })?;
-                let update_authority = account_keys.get(1usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 1usize, "updateAuthority")
-                })?;
+                let metadata = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "metadata" , "metadata" , account_index , provided_count) }) ?
+                };
+                let update_authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "updateAuthority" , "updateAuthority" , account_index , provided_count) }) ?
+                };
                 let accounts = UpdateTokenMetadataFieldAccounts {
                     remaining: vec![],
                     metadata: metadata.clone(),
@@ -9620,12 +15361,32 @@ impl Instruction {
                     key,
                     extension_type: "removeTokenMetadataKey".to_string(),
                 };
-                let metadata = account_keys.get(0usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 0usize, "metadata")
-                })?;
-                let update_authority = account_keys.get(1usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 1usize, "updateAuthority")
-                })?;
+                let metadata = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "metadata" , "metadata" , account_index , provided_count) }) ?
+                };
+                let update_authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "updateAuthority" , "updateAuthority" , account_index , provided_count) }) ?
+                };
                 let accounts = RemoveTokenMetadataKeyAccounts {
                     remaining: vec![],
                     metadata: metadata.clone(),
@@ -9652,12 +15413,32 @@ impl Instruction {
                     new_update_authority,
                     extension_type: "updateTokenMetadataUpdateAuthority".to_string(),
                 };
-                let metadata = account_keys.get(0usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 0usize, "metadata")
-                })?;
-                let update_authority = account_keys.get(1usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 1usize, "updateAuthority")
-                })?;
+                let metadata = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "metadata" , "metadata" , account_index , provided_count) }) ?
+                };
+                let update_authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "updateAuthority" , "updateAuthority" , account_index , provided_count) }) ?
+                };
                 let accounts = UpdateTokenMetadataUpdateAuthorityAccounts {
                     remaining: vec![],
                     metadata: metadata.clone(),
@@ -9679,9 +15460,19 @@ impl Instruction {
                     end,
                     extension_type: "emitTokenMetadata".to_string(),
                 };
-                let metadata = account_keys.get(0usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 0usize, "metadata")
-                })?;
+                let metadata = {
+                    let provided_count = account_keys.len();
+                    let required_count = 1usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 1usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "metadata" , "metadata" , account_index , provided_count) }) ?
+                };
                 let accounts = EmitTokenMetadataAccounts {
                     remaining: vec![],
                     metadata: metadata.clone(),
@@ -9712,15 +15503,45 @@ impl Instruction {
                     max_size,
                     extension_type: "initializeTokenGroup".to_string(),
                 };
-                let group = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "group"))?;
-                let mint = account_keys
-                    .get(1usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 1usize, "mint"))?;
-                let mint_authority = account_keys.get(2usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 2usize, "mintAuthority")
-                })?;
+                let group = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "group" , "group" , account_index , provided_count) }) ?
+                };
+                let mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mint" , "mint" , account_index , provided_count) }) ?
+                };
+                let mint_authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 3usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 3usize {
+                        2usize
+                    } else {
+                        2usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "mintAuthority" , "mintAuthority" , account_index , provided_count) }) ?
+                };
                 let accounts = InitializeTokenGroupAccounts {
                     remaining: vec![],
                     group: group.clone(),
@@ -9739,12 +15560,32 @@ impl Instruction {
                     max_size,
                     extension_type: "updateTokenGroupMaxSize".to_string(),
                 };
-                let group = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "group"))?;
-                let update_authority = account_keys.get(1usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 1usize, "updateAuthority")
-                })?;
+                let group = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "group" , "group" , account_index , provided_count) }) ?
+                };
+                let update_authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "updateAuthority" , "updateAuthority" , account_index , provided_count) }) ?
+                };
                 let accounts = UpdateTokenGroupMaxSizeAccounts {
                     remaining: vec![],
                     group: group.clone(),
@@ -9771,12 +15612,32 @@ impl Instruction {
                     new_update_authority,
                     extension_type: "updateTokenGroupUpdateAuthority".to_string(),
                 };
-                let group = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "group"))?;
-                let update_authority = account_keys.get(1usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 1usize, "updateAuthority")
-                })?;
+                let group = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "group" , "group" , account_index , provided_count) }) ?
+                };
+                let update_authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 2usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 2usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "updateAuthority" , "updateAuthority" , account_index , provided_count) }) ?
+                };
                 let accounts = UpdateTokenGroupUpdateAuthorityAccounts {
                     remaining: vec![],
                     group: group.clone(),
@@ -9789,27 +15650,71 @@ impl Instruction {
                 let args = InitializeTokenGroupMemberArguments {
                     extension_type: "initializeTokenGroupMember".to_string(),
                 };
-                let member = account_keys
-                    .get(0usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 0usize, "member"))?;
-                let member_mint = account_keys.get(1usize).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", 1usize, "memberMint")
-                })?;
-                let member_mint_authority = account_keys.get(2usize).ok_or_else(|| {
-                    format!(
-                        "Missing account at index {}: {}",
-                        2usize, "memberMintAuthority"
-                    )
-                })?;
-                let group = account_keys
-                    .get(3usize)
-                    .ok_or_else(|| format!("Missing account at index {}: {}", 3usize, "group"))?;
-                let group_update_authority = account_keys.get(4usize).ok_or_else(|| {
-                    format!(
-                        "Missing account at index {}: {}",
-                        4usize, "groupUpdateAuthority"
-                    )
-                })?;
+                let member = {
+                    let provided_count = account_keys.len();
+                    let required_count = 5usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 5usize {
+                        0usize
+                    } else {
+                        0usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "member" , "member" , account_index , provided_count) }) ?
+                };
+                let member_mint = {
+                    let provided_count = account_keys.len();
+                    let required_count = 5usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 5usize {
+                        1usize
+                    } else {
+                        1usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "memberMint" , "memberMint" , account_index , provided_count) }) ?
+                };
+                let member_mint_authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 5usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 5usize {
+                        2usize
+                    } else {
+                        2usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "memberMintAuthority" , "memberMintAuthority" , account_index , provided_count) }) ?
+                };
+                let group = {
+                    let provided_count = account_keys.len();
+                    let required_count = 5usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 5usize {
+                        3usize
+                    } else {
+                        3usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "group" , "group" , account_index , provided_count) }) ?
+                };
+                let group_update_authority = {
+                    let provided_count = account_keys.len();
+                    let required_count = 5usize;
+                    if provided_count < required_count {
+                        return Err (format ! ("Insufficient accounts: provided {}, need at least {} required accounts" , provided_count , required_count)) ;
+                    }
+                    let account_index = if provided_count == 5usize {
+                        4usize
+                    } else {
+                        4usize - 0usize
+                    };
+                    account_keys . get (account_index) . ok_or_else (|| { format ! ("Missing required account {}: {} at calculated index {} (provided {} accounts)" , "groupUpdateAuthority" , "groupUpdateAuthority" , account_index , provided_count) }) ?
+                };
                 let accounts = InitializeTokenGroupMemberAccounts {
                     remaining: vec![],
                     member: member.clone(),

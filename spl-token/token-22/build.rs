@@ -540,14 +540,57 @@ fn main() -> Result<()> {
             Some(format_ident!("{}", arg.name.to_snake_case()))
         }).collect::<Vec<_>>();
 
-        // Generate account extraction logic
+        // Generate account extraction logic with smart mapping for optional accounts
+        let total_accounts = instruction.accounts.len();
+        let required_accounts = instruction.accounts.iter().filter(|acc| !acc.is_optional).count();
+        
         let account_extractions = instruction.accounts.iter().enumerate().map(|(i, account)| {
             let account_name = format_ident!("{}", account.name.to_snake_case());
             let account_name_str = &account.name;
-            quote! {
-                let #account_name = account_keys.get(#i).ok_or_else(|| {
-                    format!("Missing account at index {}: {}", #i, #account_name_str)
-                })?;
+            
+            if account.is_optional {
+                quote! {
+                    let #account_name = {
+                        // For optional accounts, check if we have enough accounts to include this one
+                        let provided_count = account_keys.len();
+                        let required_count = #required_accounts;
+                        
+                        if provided_count > required_count && provided_count > #i {
+                            account_keys.get(#i).map(|key| key.clone())
+                        } else {
+                            None
+                        }
+                    };
+                }
+            } else {
+                // Pre-calculate how many optional accounts come before this required account
+                let optional_before = instruction.accounts.iter().take(i).filter(|acc| acc.is_optional).count();
+                
+                quote! {
+                    let #account_name = {
+                        let provided_count = account_keys.len();
+                        let required_count = #required_accounts;
+                        
+                        if provided_count < required_count {
+                            return Err(format!("Insufficient accounts: provided {}, need at least {} required accounts", 
+                                              provided_count, required_count));
+                        }
+                        
+                        // For required accounts, map them based on how many accounts we actually have
+                        let account_index = if provided_count == #total_accounts {
+                            // All accounts provided, use normal indexing
+                            #i
+                        } else {
+                            // Some optional accounts missing, adjust indexing
+                            #i - #optional_before
+                        };
+                        
+                        account_keys.get(account_index).ok_or_else(|| {
+                            format!("Missing required account {}: {} at calculated index {} (provided {} accounts)", 
+                                   #account_name_str, #account_name_str, account_index, provided_count)
+                        })?
+                    };
+                }
             }
         }).collect::<Vec<_>>();
 
@@ -555,7 +598,7 @@ fn main() -> Result<()> {
             let account_name = format_ident!("{}", account.name.to_snake_case());
             if account.is_optional {
                 quote! {
-                    #account_name: Some(#account_name.clone()),
+                    #account_name: #account_name,
                 }
             } else {
                 quote! {
