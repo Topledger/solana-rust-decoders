@@ -486,7 +486,9 @@
           },
           {
             "name": "fund_fee_rate",
-            "type": "u32"
+            "type": {
+              "option": "u32"
+            }
           }
         ]
       },
@@ -1627,6 +1629,7 @@
               "A pda, reward vault"
             ],
             "writable": true,
+            "optional": true,
             "pda": {
               "seeds": [
                 {

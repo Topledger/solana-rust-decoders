@@ -587,7 +587,7 @@ pub mod accounts_data {
         pub pool_state: String,
         pub operation_state: String,
         pub reward_token_mint: String,
-        pub reward_token_vault: String,
+        pub reward_token_vault: Option<String>,
         pub reward_token_program: String,
         pub system_program: String,
         pub rent: String,
@@ -778,7 +778,7 @@ pub mod ix_data {
         pub tick_spacing: u16,
         pub trade_fee_rate: u32,
         pub protocol_fee_rate: u32,
-        pub fund_fee_rate: u32,
+        pub fund_fee_rate: Option<u32>,
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct CreateOperationAccountArguments {}
@@ -1206,8 +1206,39 @@ impl Instruction {
                 return Ok(Instruction::CollectRemainingRewards { accounts, args });
             }
             [137u8, 52u8, 237u8, 212u8, 215u8, 117u8, 108u8, 104u8] => {
-                let mut rdr: &[u8] = rest;
-                let args = CreateAmmConfigArguments::deserialize(&mut rdr)?;
+                let args = if rest.len() >= 16 {
+                    let mut rdr: &[u8] = rest;
+                    let index = u16::deserialize(&mut rdr)?;
+                    let tick_spacing = u16::deserialize(&mut rdr)?;
+                    let trade_fee_rate = u32::deserialize(&mut rdr)?;
+                    let protocol_fee_rate = u32::deserialize(&mut rdr)?;
+                    let fund_fee_rate = u32::deserialize(&mut rdr)?;
+                    CreateAmmConfigArguments {
+                        index,
+                        tick_spacing,
+                        trade_fee_rate,
+                        protocol_fee_rate,
+                        fund_fee_rate: Some(fund_fee_rate),
+                    }
+                } else if rest.len() >= 12 {
+                    let mut rdr: &[u8] = rest;
+                    let index = u16::deserialize(&mut rdr)?;
+                    let tick_spacing = u16::deserialize(&mut rdr)?;
+                    let trade_fee_rate = u32::deserialize(&mut rdr)?;
+                    let protocol_fee_rate = u32::deserialize(&mut rdr)?;
+                    CreateAmmConfigArguments {
+                        index,
+                        tick_spacing,
+                        trade_fee_rate,
+                        protocol_fee_rate,
+                        fund_fee_rate: None,
+                    }
+                } else {
+                    anyhow::bail!(
+                        "Insufficient data for create_amm_config: got {} bytes, need at least 12",
+                        rest.len()
+                    );
+                };
                 if account_keys.len() < 3usize {
                     anyhow::bail!(
                         "Insufficient accounts: got {}, need at least {} for required accounts",
@@ -1554,27 +1585,27 @@ impl Instruction {
             [95u8, 135u8, 192u8, 196u8, 242u8, 129u8, 230u8, 68u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = InitializeRewardArguments::deserialize(&mut rdr)?;
-                if account_keys.len() < 10usize {
+                if account_keys.len() < 9usize {
                     anyhow::bail!(
                         "Insufficient accounts: got {}, need at least {} for required accounts",
                         account_keys.len(),
-                        10usize
+                        9usize
                     );
                 }
-                let mut required_iter = account_keys.iter().take(10usize);
+                let mut required_iter = account_keys.iter().take(9usize);
                 let reward_funder = required_iter.next().unwrap().clone();
                 let funder_token_account = required_iter.next().unwrap().clone();
                 let amm_config = required_iter.next().unwrap().clone();
                 let pool_state = required_iter.next().unwrap().clone();
                 let operation_state = required_iter.next().unwrap().clone();
                 let reward_token_mint = required_iter.next().unwrap().clone();
-                let reward_token_vault = required_iter.next().unwrap().clone();
                 let reward_token_program = required_iter.next().unwrap().clone();
                 let system_program = required_iter.next().unwrap().clone();
                 let rent = required_iter.next().unwrap().clone();
-                let mut optional_iter = account_keys.iter().skip(10usize);
-                let remaining = if account_keys.len() > (10usize + 0usize) {
-                    account_keys[(10usize + 0usize)..].to_vec()
+                let mut optional_iter = account_keys.iter().skip(9usize);
+                let reward_token_vault = optional_iter.next().map(|s| s.clone());
+                let remaining = if account_keys.len() > (9usize + 1usize) {
+                    account_keys[(9usize + 1usize)..].to_vec()
                 } else {
                     Vec::new()
                 };

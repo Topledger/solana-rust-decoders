@@ -325,7 +325,7 @@ fn generate_all_instructions(idl: &Idl) -> Result<(Vec<proc_macro2::TokenStream>
             }
         }).collect();
 
-        // Special handling for create_pool with incomplete data
+        // Special handling for instructions with incomplete historical data
         let args_deserialization = if ix.name == "create_pool" {
             quote! {
                 let args = if rest.len() >= 24 {
@@ -342,6 +342,41 @@ fn generate_all_instructions(idl: &Idl) -> Result<(Vec<proc_macro2::TokenStream>
                     }
                 } else {
                     anyhow::bail!("Insufficient data for create_pool: got {} bytes, need at least 16", rest.len());
+                };
+            }
+        } else if ix.name == "create_amm_config" {
+            quote! {
+                let args = if rest.len() >= 16 {
+                    // Complete data: manually deserialize all fields as non-optional
+                    let mut rdr: &[u8] = rest;
+                    let index = u16::deserialize(&mut rdr)?;
+                    let tick_spacing = u16::deserialize(&mut rdr)?;
+                    let trade_fee_rate = u32::deserialize(&mut rdr)?;
+                    let protocol_fee_rate = u32::deserialize(&mut rdr)?;
+                    let fund_fee_rate = u32::deserialize(&mut rdr)?;
+                    #args_ty {
+                        index,
+                        tick_spacing,
+                        trade_fee_rate,
+                        protocol_fee_rate,
+                        fund_fee_rate: Some(fund_fee_rate),
+                    }
+                } else if rest.len() >= 12 {
+                    // Incomplete data: missing fund_fee_rate
+                    let mut rdr: &[u8] = rest;
+                    let index = u16::deserialize(&mut rdr)?;
+                    let tick_spacing = u16::deserialize(&mut rdr)?;
+                    let trade_fee_rate = u32::deserialize(&mut rdr)?;
+                    let protocol_fee_rate = u32::deserialize(&mut rdr)?;
+                    #args_ty {
+                        index,
+                        tick_spacing,
+                        trade_fee_rate,
+                        protocol_fee_rate,
+                        fund_fee_rate: None,
+                    }
+                } else {
+                    anyhow::bail!("Insufficient data for create_amm_config: got {} bytes, need at least 12", rest.len());
                 };
             }
         } else {
