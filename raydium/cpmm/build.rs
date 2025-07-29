@@ -17,14 +17,13 @@ fn main() -> Result<()> {
         idl.types.len()
     );
 
-    // Generate typedefs
+    // Generate typedefs using built-in anchor-idl generator
     let mut opts = GeneratorOptions::default();
     opts.idl_path = path.into();
     let gen = opts.to_generator();
     let typedefs_tokens = anchor_idl::generate_typedefs(&gen.idl.types, &gen.struct_opts);
-    let typedefs_mod = typedefs_tokens;
 
-    // Instruction codegen (simplified: args structs without serde)
+    // Instruction codegen with serde support
     let (args_structs, accounts_structs, variants, arms) = generate_instructions(&idl)?;
 
     let out = quote! {
@@ -33,43 +32,78 @@ fn main() -> Result<()> {
         use ::borsh::BorshDeserialize;
         use anchor_lang::prelude::*;
 
-        pub use ix::*;
-        pub use accounts::*;
+        pub use ix_data::*;
+        pub use accounts_data::*;
         pub use typedefs::*;
 
         pub mod typedefs {
             use anchor_lang::prelude::*;
-            #typedefs_mod
+            use serde::Serialize;
+            use crate::pubkey_serializer::pubkey_serde;
+            use crate::pubkey_serializer::pubkey_serde_option;
+            
+            #typedefs_tokens
         }
 
-        pub mod accounts {
+        pub mod accounts_data {
+            use serde::Serialize;
             #(#accounts_structs)*
         }
 
-        pub mod ix {
+        pub mod ix_data {
             use super::*;
+            use crate::pubkey_serializer::pubkey_serde;
+            use crate::pubkey_serializer::pubkey_serde_option;
             #(#args_structs)*
         }
 
-        #[derive(Debug)]
-        pub enum Instruction { #(#variants)* }
+        #[derive(Debug, Serialize)]
+        #[serde(tag = "instruction_type")]
+        pub enum Instruction { 
+            #(#variants)* 
+        }
 
         impl Instruction {
             pub fn decode(account_keys: &[String], data: &[u8]) -> anyhow::Result<Self> {
-                if data.len() < 8 { anyhow::bail!("data too short"); }
+                if data.len() < 8 { 
+                    anyhow::bail!("Data too short: {}", data.len()); 
+                }
                 let (disc, rest) = data.split_at(8);
                 let disc: [u8;8] = disc.try_into().unwrap();
                 match disc {
                     #(#arms)*
-                    _ => anyhow::bail!("unknown discriminator: {:?}", disc),
+                    _ => anyhow::bail!("Unknown discriminator: {:?}", disc),
                 }
             }
         }
     };
 
     fs::create_dir_all("src").ok();
-    fs::write("src/idl.rs", out.to_string())?;
+    let generated_code = out.to_string();
+    fs::write("src/idl.rs", generated_code)?;
+    
+    // Post-process the generated file to add Serialize to typedefs
+    let idl_content = fs::read_to_string("src/idl.rs")?;
+    
+    // Simple approach: find any line with AnchorSerialize and add Serialize to it
+    let lines: Vec<&str> = idl_content.lines().collect();
+    let mut processed_lines = Vec::new();
+    
+    for line in lines {
+        if line.contains("derive(AnchorSerialize") && !line.contains("Serialize") {
+            // Add Serialize before the closing parenthesis
+            let new_line = line.replace(")]", ", Serialize)]");
+            processed_lines.push(new_line);
+        } else {
+            processed_lines.push(line.to_string());
+        }
+    }
+    
+    let processed_content = processed_lines.join("\n");
+    fs::write("src/idl.rs", processed_content)?;
+    
     Command::new("rustfmt").arg("src/idl.rs").status()?;
+    println!("cargo:warning=Generated comprehensive parser for all {} raydium CPMM instructions!", idl.instructions.len());
     Ok(())
 }
 
@@ -87,32 +121,60 @@ fn generate_instructions(idl: &Idl) -> Result<(
     for ix in &idl.instructions {
         let pascal = ix.name.to_upper_camel_case();
         let var = format_ident!("{}", pascal);
-        let args_ty = format_ident!("{}Args", pascal);
+        let args_ty = format_ident!("{}Arguments", pascal);
         let acc_ty = format_ident!("{}Accounts", pascal);
 
         // discriminator from IDL
         let disc: [u8;8] = ix.discriminator.clone().try_into().unwrap();
         let disc_tokens = disc.iter().map(|b| quote!{ #b }).collect::<Vec<_>>();
 
-        // args struct
-        let fields: Vec<_> = ix.args.iter().map(|a| {
-            let id = format_ident!("{}", a.name.to_snake_case());
-            let ty = map_type(&a.ty);
-            quote! { pub #id: #ty, }
+        // Generate args struct with serde annotations
+        let fields: Vec<_> = ix.args.iter().map(|arg| {
+            let field_ident = format_ident!("{}", arg.name.to_snake_case());
+            let ty = map_type(&arg.ty);
+
+            match &arg.ty {
+                anchor_idl::IdlType::U64 | anchor_idl::IdlType::U128 => {
+                    quote! {
+                        #[serde(serialize_with = "crate::serialize_to_string")]
+                        pub #field_ident: #ty,
+                    }
+                }
+                anchor_idl::IdlType::Pubkey => {
+                    quote! {
+                        #[serde(with = "pubkey_serde")]
+                        pub #field_ident: #ty,
+                    }
+                }
+                anchor_idl::IdlType::Option(inner) if matches!(**inner, anchor_idl::IdlType::Pubkey) => {
+                    quote! {
+                        #[serde(with = "pubkey_serde_option")]
+                        pub #field_ident: #ty,
+                    }
+                }
+                _ => {
+                    quote! {
+                        pub #field_ident: #ty,
+                    }
+                }
+            }
         }).collect();
+
         args.push(quote! {
-            #[derive(::borsh::BorshDeserialize, Debug)]
-            pub struct #args_ty { #(#fields)* }
+            #[derive(::borsh::BorshDeserialize, Debug, Serialize)]
+            pub struct #args_ty { 
+                #(#fields)* 
+            }
         });
 
-        // accounts struct (flatten)
+        // accounts struct (flatten) with Serialize
         let flat = flatten(&ix.accounts);
         let acc_fields: Vec<_> = flat.iter().map(|a| {
             let id = format_ident!("{}", a.name.as_str());
             quote! { pub #id: String, }
         }).collect();
         accs.push(quote! {
-            #[derive(Debug)]
+            #[derive(Debug, Serialize)]
             pub struct #acc_ty {
                 #(#acc_fields)*
                 pub remaining: Vec<String>,
@@ -153,9 +215,37 @@ fn map_type(t: &IdlType) -> proc_macro2::TokenStream {
         IdlType::I128 => quote!{ i128 },
         IdlType::Bytes => quote!{ Vec<u8> },
         IdlType::String => quote!{ String },
-        IdlType::Pubkey => quote!{ [u8;32] },
-        IdlType::Vec(inner) => { let i = map_type(inner); quote!{ Vec<#i> } },
-        IdlType::Defined { name, .. } => { let id = format_ident!("{}", name.to_upper_camel_case()); quote!{ #id } },
+        IdlType::Pubkey => quote!{ Pubkey },  // Changed from [u8;32] to Pubkey
+        IdlType::Vec(inner) => { 
+            let i = map_type(inner); 
+            quote!{ Vec<#i> } 
+        },
+        IdlType::Array(inner, len) => {
+            let i = map_type(inner);
+            match len {
+                anchor_idl::IdlArrayLen::Generic(_) => {
+                    // For generic array length, fall back to Vec
+                    quote! { Vec<#i> }
+                }
+                anchor_idl::IdlArrayLen::Value(size) => {
+                    let l = *size;
+                    quote! { [#i; #l] }
+                }
+            }
+        }
+        IdlType::Defined { name, .. } => { 
+            let id = format_ident!("{}", name.to_upper_camel_case()); 
+            quote!{ #id } 
+        },
+        IdlType::Option(inner) => {
+            match &**inner {
+                IdlType::Bool => quote! { bool },
+                _ => {
+                    let i = map_type(inner);
+                    quote! { Option<#i> }
+                }
+            }
+        }
         _ => quote!{ Vec<u8> },
     }
 }

@@ -10,3 +10,6 @@ wasm_pack_dev:
 convert_and_gcloud_upload:
 	go build utils/convert.go && mv convert utils/convert
 	utils/script.sh raydium cpmm 
+
+.PHONY: build_and_upload
+build_and_upload: wasm_pack convert_and_gcloud_upload

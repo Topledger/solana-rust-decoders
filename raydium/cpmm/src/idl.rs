@@ -1,12 +1,15 @@
 extern crate serde;
-pub use accounts::*;
+pub use accounts_data::*;
 use anchor_lang::prelude::*;
 #[allow(dead_code)]
 use borsh::BorshDeserialize;
-pub use ix::*;
+pub use ix_data::*;
 pub use typedefs::*;
 pub mod typedefs {
+    use crate::pubkey_serializer::pubkey_serde;
+    use crate::pubkey_serializer::pubkey_serde_option;
     use anchor_lang::prelude::*;
+    use serde::Serialize;
     #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
     pub struct AmmConfig {
         pub bump: u8,
@@ -84,8 +87,9 @@ pub mod typedefs {
         pub base_input: bool,
     }
 }
-pub mod accounts {
-    #[derive(Debug)]
+pub mod accounts_data {
+    use serde::Serialize;
+    #[derive(Debug, Serialize)]
     pub struct CollectFundFeeAccounts {
         pub owner: String,
         pub authority: String,
@@ -101,7 +105,7 @@ pub mod accounts {
         pub token_program_2022: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug)]
+    #[derive(Debug, Serialize)]
     pub struct CollectProtocolFeeAccounts {
         pub owner: String,
         pub authority: String,
@@ -117,14 +121,14 @@ pub mod accounts {
         pub token_program_2022: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug)]
+    #[derive(Debug, Serialize)]
     pub struct CreateAmmConfigAccounts {
         pub owner: String,
         pub amm_config: String,
         pub system_program: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug)]
+    #[derive(Debug, Serialize)]
     pub struct DepositAccounts {
         pub owner: String,
         pub authority: String,
@@ -141,7 +145,7 @@ pub mod accounts {
         pub lp_mint: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug)]
+    #[derive(Debug, Serialize)]
     pub struct InitializeAccounts {
         pub creator: String,
         pub amm_config: String,
@@ -165,7 +169,7 @@ pub mod accounts {
         pub rent: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug)]
+    #[derive(Debug, Serialize)]
     pub struct SwapBaseInputAccounts {
         pub payer: String,
         pub authority: String,
@@ -182,7 +186,7 @@ pub mod accounts {
         pub observation_state: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug)]
+    #[derive(Debug, Serialize)]
     pub struct SwapBaseOutputAccounts {
         pub payer: String,
         pub authority: String,
@@ -199,19 +203,19 @@ pub mod accounts {
         pub observation_state: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug)]
+    #[derive(Debug, Serialize)]
     pub struct UpdateAmmConfigAccounts {
         pub owner: String,
         pub amm_config: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug)]
+    #[derive(Debug, Serialize)]
     pub struct UpdatePoolStatusAccounts {
         pub authority: String,
         pub pool_state: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug)]
+    #[derive(Debug, Serialize)]
     pub struct WithdrawAccounts {
         pub owner: String,
         pub authority: String,
@@ -230,118 +234,143 @@ pub mod accounts {
         pub remaining: Vec<String>,
     }
 }
-pub mod ix {
+pub mod ix_data {
     use super::*;
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
-    pub struct CollectFundFeeArgs {
+    use crate::pubkey_serializer::pubkey_serde;
+    use crate::pubkey_serializer::pubkey_serde_option;
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct CollectFundFeeArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_0_requested: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_1_requested: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
-    pub struct CollectProtocolFeeArgs {
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct CollectProtocolFeeArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_0_requested: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_1_requested: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
-    pub struct CreateAmmConfigArgs {
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct CreateAmmConfigArguments {
         pub index: u16,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub trade_fee_rate: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub protocol_fee_rate: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub fund_fee_rate: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub create_pool_fee: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
-    pub struct DepositArgs {
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct DepositArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub lp_token_amount: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub maximum_token_0_amount: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub maximum_token_1_amount: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
-    pub struct InitializeArgs {
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct InitializeArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub init_amount_0: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub init_amount_1: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub open_time: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
-    pub struct SwapBaseInputArgs {
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct SwapBaseInputArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_in: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub minimum_amount_out: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
-    pub struct SwapBaseOutputArgs {
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct SwapBaseOutputArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub max_amount_in: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_out: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
-    pub struct UpdateAmmConfigArgs {
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct UpdateAmmConfigArguments {
         pub param: u8,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub value: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
-    pub struct UpdatePoolStatusArgs {
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct UpdatePoolStatusArguments {
         pub status: u8,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
-    pub struct WithdrawArgs {
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct WithdrawArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub lp_token_amount: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub minimum_token_0_amount: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub minimum_token_1_amount: u64,
     }
 }
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
+#[serde(tag = "instruction_type")]
 pub enum Instruction {
     CollectFundFee {
         accounts: CollectFundFeeAccounts,
-        args: CollectFundFeeArgs,
+        args: CollectFundFeeArguments,
     },
     CollectProtocolFee {
         accounts: CollectProtocolFeeAccounts,
-        args: CollectProtocolFeeArgs,
+        args: CollectProtocolFeeArguments,
     },
     CreateAmmConfig {
         accounts: CreateAmmConfigAccounts,
-        args: CreateAmmConfigArgs,
+        args: CreateAmmConfigArguments,
     },
     Deposit {
         accounts: DepositAccounts,
-        args: DepositArgs,
+        args: DepositArguments,
     },
     Initialize {
         accounts: InitializeAccounts,
-        args: InitializeArgs,
+        args: InitializeArguments,
     },
     SwapBaseInput {
         accounts: SwapBaseInputAccounts,
-        args: SwapBaseInputArgs,
+        args: SwapBaseInputArguments,
     },
     SwapBaseOutput {
         accounts: SwapBaseOutputAccounts,
-        args: SwapBaseOutputArgs,
+        args: SwapBaseOutputArguments,
     },
     UpdateAmmConfig {
         accounts: UpdateAmmConfigAccounts,
-        args: UpdateAmmConfigArgs,
+        args: UpdateAmmConfigArguments,
     },
     UpdatePoolStatus {
         accounts: UpdatePoolStatusAccounts,
-        args: UpdatePoolStatusArgs,
+        args: UpdatePoolStatusArguments,
     },
     Withdraw {
         accounts: WithdrawAccounts,
-        args: WithdrawArgs,
+        args: WithdrawArguments,
     },
 }
 impl Instruction {
     pub fn decode(account_keys: &[String], data: &[u8]) -> anyhow::Result<Self> {
         if data.len() < 8 {
-            anyhow::bail!("data too short");
+            anyhow::bail!("Data too short: {}", data.len());
         }
         let (disc, rest) = data.split_at(8);
         let disc: [u8; 8] = disc.try_into().unwrap();
         match disc {
             [167u8, 138u8, 78u8, 149u8, 223u8, 194u8, 6u8, 126u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = CollectFundFeeArgs::deserialize(&mut rdr)?;
+                let args = CollectFundFeeArguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
                 let owner = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
@@ -375,7 +404,7 @@ impl Instruction {
             }
             [136u8, 136u8, 252u8, 221u8, 194u8, 66u8, 126u8, 89u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = CollectProtocolFeeArgs::deserialize(&mut rdr)?;
+                let args = CollectProtocolFeeArguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
                 let owner = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
@@ -409,7 +438,7 @@ impl Instruction {
             }
             [137u8, 52u8, 237u8, 212u8, 215u8, 117u8, 108u8, 104u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = CreateAmmConfigArgs::deserialize(&mut rdr)?;
+                let args = CreateAmmConfigArguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
                 let owner = keys.next().unwrap().clone();
                 let amm_config = keys.next().unwrap().clone();
@@ -425,7 +454,7 @@ impl Instruction {
             }
             [242u8, 35u8, 198u8, 137u8, 82u8, 225u8, 242u8, 182u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = DepositArgs::deserialize(&mut rdr)?;
+                let args = DepositArguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
                 let owner = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
@@ -461,7 +490,7 @@ impl Instruction {
             }
             [175u8, 175u8, 109u8, 31u8, 13u8, 152u8, 155u8, 237u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = InitializeArgs::deserialize(&mut rdr)?;
+                let args = InitializeArguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
                 let creator = keys.next().unwrap().clone();
                 let amm_config = keys.next().unwrap().clone();
@@ -511,7 +540,7 @@ impl Instruction {
             }
             [143u8, 190u8, 90u8, 218u8, 196u8, 30u8, 51u8, 222u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = SwapBaseInputArgs::deserialize(&mut rdr)?;
+                let args = SwapBaseInputArguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
                 let payer = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
@@ -547,7 +576,7 @@ impl Instruction {
             }
             [55u8, 217u8, 98u8, 86u8, 163u8, 74u8, 180u8, 173u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = SwapBaseOutputArgs::deserialize(&mut rdr)?;
+                let args = SwapBaseOutputArguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
                 let payer = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
@@ -583,7 +612,7 @@ impl Instruction {
             }
             [49u8, 60u8, 174u8, 136u8, 154u8, 28u8, 116u8, 200u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateAmmConfigArgs::deserialize(&mut rdr)?;
+                let args = UpdateAmmConfigArguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
                 let owner = keys.next().unwrap().clone();
                 let amm_config = keys.next().unwrap().clone();
@@ -597,7 +626,7 @@ impl Instruction {
             }
             [130u8, 87u8, 108u8, 6u8, 46u8, 224u8, 117u8, 123u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdatePoolStatusArgs::deserialize(&mut rdr)?;
+                let args = UpdatePoolStatusArguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
                 let authority = keys.next().unwrap().clone();
                 let pool_state = keys.next().unwrap().clone();
@@ -611,7 +640,7 @@ impl Instruction {
             }
             [183u8, 18u8, 70u8, 156u8, 148u8, 109u8, 161u8, 34u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = WithdrawArgs::deserialize(&mut rdr)?;
+                let args = WithdrawArguments::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
                 let owner = keys.next().unwrap().clone();
                 let authority = keys.next().unwrap().clone();
@@ -647,7 +676,7 @@ impl Instruction {
                 };
                 return Ok(Instruction::Withdraw { accounts, args });
             }
-            _ => anyhow::bail!("unknown discriminator: {:?}", disc),
+            _ => anyhow::bail!("Unknown discriminator: {:?}", disc),
         }
     }
 }
