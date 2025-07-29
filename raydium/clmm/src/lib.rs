@@ -117,21 +117,6 @@ mod tests {
             }
         }
         
-        // Test event decoding (if it looks like an event)
-        if decoded_bytes.len() >= 8 && &decoded_bytes[..8] == &events::EVENT_LOG_DISCRIMINATOR {
-            println!("This looks like an event, testing event decode...");
-            match events::Event::decode(&decoded_bytes) {
-                Ok(event) => {
-                    println!("✅ Event decode successful!");
-                    println!("Decoded event: {:#?}", event);
-                }
-                Err(e) => {
-                    println!("❌ Event decode failed: {}", e);
-                }
-            }
-        } else {
-            println!("This doesn't appear to be an event (discriminator doesn't match)");
-        }
     }
     
     #[test]
@@ -176,6 +161,41 @@ mod tests {
     #[test]
     fn test_transfer_reward_owner_json_serialization() {
         // function body
+    }
+
+    #[test]
+    fn test_collect_fund_fee_historical_data() {
+        println!("Testing CollectFundFee with historical data (fewer accounts):");
+        
+        // Create a fake CollectFundFee discriminator + some args data
+        let mut data = vec![167, 138, 78, 149, 223, 194, 6, 126]; // CollectFundFee discriminator
+        data.extend_from_slice(&[0u8; 16]); // Add some dummy args (amount_0_requested, amount_1_requested)
+        
+        // Simulate historical data with only the first 8 accounts (missing the newer optional ones)
+        let historical_accounts = vec![
+            "owner".to_string(),
+            "pool_state".to_string(), 
+            "amm_config".to_string(),
+            "token_vault_0".to_string(),
+            "token_vault_1".to_string(),
+            "vault_0_mint".to_string(),
+            "vault_1_mint".to_string(),
+            "token_program".to_string(), // This is the 8th account
+            // Missing: recipient_token_account_0, recipient_token_account_1, token_program_2022
+        ];
+        
+        println!("Historical accounts count: {}", historical_accounts.len());
+        
+        // Test instruction decoding
+        match Instruction::decode(&historical_accounts, &data) {
+            Ok(instruction) => {
+                println!("✅ Historical decode successful!");
+                println!("Decoded instruction: {:#?}", instruction);
+            }
+            Err(e) => {
+                println!("❌ Historical decode failed: {}", e);
+            }
+        }
     }
 
     fn hex_dump(bytes: &[u8]) -> String {

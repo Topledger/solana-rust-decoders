@@ -436,10 +436,10 @@ pub mod accounts_data {
         pub token_vault_1: String,
         pub vault_0_mint: String,
         pub vault_1_mint: String,
-        pub recipient_token_account_0: String,
-        pub recipient_token_account_1: String,
+        pub recipient_token_account_0: Option<String>,
+        pub recipient_token_account_1: Option<String>,
         pub token_program: String,
-        pub token_program_2022: String,
+        pub token_program_2022: Option<String>,
         pub remaining: Vec<String>,
     }
     #[derive(Debug, Serialize)]
@@ -451,10 +451,10 @@ pub mod accounts_data {
         pub token_vault_1: String,
         pub vault_0_mint: String,
         pub vault_1_mint: String,
-        pub recipient_token_account_0: String,
-        pub recipient_token_account_1: String,
+        pub recipient_token_account_0: Option<String>,
+        pub recipient_token_account_1: Option<String>,
         pub token_program: String,
-        pub token_program_2022: String,
+        pub token_program_2022: Option<String>,
         pub remaining: Vec<String>,
     }
     #[derive(Debug, Serialize)]
@@ -463,10 +463,10 @@ pub mod accounts_data {
         pub funder_token_account: String,
         pub pool_state: String,
         pub reward_token_vault: String,
-        pub reward_vault_mint: String,
+        pub reward_vault_mint: Option<String>,
         pub token_program: String,
-        pub token_program_2022: String,
-        pub memo_program: String,
+        pub token_program_2022: Option<String>,
+        pub memo_program: Option<String>,
         pub remaining: Vec<String>,
     }
     #[derive(Debug, Serialize)]
@@ -493,9 +493,9 @@ pub mod accounts_data {
         pub token_vault_0: String,
         pub token_vault_1: String,
         pub observation_state: String,
-        pub tick_array_bitmap: String,
+        pub tick_array_bitmap: Option<String>,
         pub token_program_0: String,
-        pub token_program_1: String,
+        pub token_program_1: Option<String>,
         pub system_program: String,
         pub rent: String,
         pub remaining: Vec<String>,
@@ -786,8 +786,7 @@ pub mod ix_data {
     pub struct CreatePoolArguments {
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub sqrt_price_x64: u128,
-        #[serde(serialize_with = "crate::serialize_to_string")]
-        pub open_time: u64,
+        pub open_time: Option<u64>,
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct CreateSupportMintAssociatedArguments {}
@@ -1049,14 +1048,26 @@ impl Instruction {
             [123u8, 134u8, 81u8, 0u8, 49u8, 68u8, 98u8, 98u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = ClosePositionArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let nft_owner = keys.next().unwrap().clone();
-                let position_nft_mint = keys.next().unwrap().clone();
-                let position_nft_account = keys.next().unwrap().clone();
-                let personal_position = keys.next().unwrap().clone();
-                let system_program = keys.next().unwrap().clone();
-                let token_program = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 6usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        6usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(6usize);
+                let nft_owner = required_iter.next().unwrap().clone();
+                let position_nft_mint = required_iter.next().unwrap().clone();
+                let position_nft_account = required_iter.next().unwrap().clone();
+                let personal_position = required_iter.next().unwrap().clone();
+                let system_program = required_iter.next().unwrap().clone();
+                let token_program = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(6usize);
+                let remaining = if account_keys.len() > (6usize + 0usize) {
+                    account_keys[(6usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = ClosePositionAccounts {
                     nft_owner,
                     position_nft_mint,
@@ -1071,19 +1082,31 @@ impl Instruction {
             [167u8, 138u8, 78u8, 149u8, 223u8, 194u8, 6u8, 126u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = CollectFundFeeArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let owner = keys.next().unwrap().clone();
-                let pool_state = keys.next().unwrap().clone();
-                let amm_config = keys.next().unwrap().clone();
-                let token_vault_0 = keys.next().unwrap().clone();
-                let token_vault_1 = keys.next().unwrap().clone();
-                let vault_0_mint = keys.next().unwrap().clone();
-                let vault_1_mint = keys.next().unwrap().clone();
-                let recipient_token_account_0 = keys.next().unwrap().clone();
-                let recipient_token_account_1 = keys.next().unwrap().clone();
-                let token_program = keys.next().unwrap().clone();
-                let token_program_2022 = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 8usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        8usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(8usize);
+                let owner = required_iter.next().unwrap().clone();
+                let pool_state = required_iter.next().unwrap().clone();
+                let amm_config = required_iter.next().unwrap().clone();
+                let token_vault_0 = required_iter.next().unwrap().clone();
+                let token_vault_1 = required_iter.next().unwrap().clone();
+                let vault_0_mint = required_iter.next().unwrap().clone();
+                let vault_1_mint = required_iter.next().unwrap().clone();
+                let token_program = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(8usize);
+                let recipient_token_account_0 = optional_iter.next().map(|s| s.clone());
+                let recipient_token_account_1 = optional_iter.next().map(|s| s.clone());
+                let token_program_2022 = optional_iter.next().map(|s| s.clone());
+                let remaining = if account_keys.len() > (8usize + 3usize) {
+                    account_keys[(8usize + 3usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = CollectFundFeeAccounts {
                     owner,
                     pool_state,
@@ -1103,19 +1126,31 @@ impl Instruction {
             [136u8, 136u8, 252u8, 221u8, 194u8, 66u8, 126u8, 89u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = CollectProtocolFeeArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let owner = keys.next().unwrap().clone();
-                let pool_state = keys.next().unwrap().clone();
-                let amm_config = keys.next().unwrap().clone();
-                let token_vault_0 = keys.next().unwrap().clone();
-                let token_vault_1 = keys.next().unwrap().clone();
-                let vault_0_mint = keys.next().unwrap().clone();
-                let vault_1_mint = keys.next().unwrap().clone();
-                let recipient_token_account_0 = keys.next().unwrap().clone();
-                let recipient_token_account_1 = keys.next().unwrap().clone();
-                let token_program = keys.next().unwrap().clone();
-                let token_program_2022 = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 8usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        8usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(8usize);
+                let owner = required_iter.next().unwrap().clone();
+                let pool_state = required_iter.next().unwrap().clone();
+                let amm_config = required_iter.next().unwrap().clone();
+                let token_vault_0 = required_iter.next().unwrap().clone();
+                let token_vault_1 = required_iter.next().unwrap().clone();
+                let vault_0_mint = required_iter.next().unwrap().clone();
+                let vault_1_mint = required_iter.next().unwrap().clone();
+                let token_program = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(8usize);
+                let recipient_token_account_0 = optional_iter.next().map(|s| s.clone());
+                let recipient_token_account_1 = optional_iter.next().map(|s| s.clone());
+                let token_program_2022 = optional_iter.next().map(|s| s.clone());
+                let remaining = if account_keys.len() > (8usize + 3usize) {
+                    account_keys[(8usize + 3usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = CollectProtocolFeeAccounts {
                     owner,
                     pool_state,
@@ -1135,16 +1170,28 @@ impl Instruction {
             [18u8, 237u8, 166u8, 197u8, 34u8, 16u8, 213u8, 144u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = CollectRemainingRewardsArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let reward_funder = keys.next().unwrap().clone();
-                let funder_token_account = keys.next().unwrap().clone();
-                let pool_state = keys.next().unwrap().clone();
-                let reward_token_vault = keys.next().unwrap().clone();
-                let reward_vault_mint = keys.next().unwrap().clone();
-                let token_program = keys.next().unwrap().clone();
-                let token_program_2022 = keys.next().unwrap().clone();
-                let memo_program = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 5usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        5usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(5usize);
+                let reward_funder = required_iter.next().unwrap().clone();
+                let funder_token_account = required_iter.next().unwrap().clone();
+                let pool_state = required_iter.next().unwrap().clone();
+                let reward_token_vault = required_iter.next().unwrap().clone();
+                let token_program = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(5usize);
+                let reward_vault_mint = optional_iter.next().map(|s| s.clone());
+                let token_program_2022 = optional_iter.next().map(|s| s.clone());
+                let memo_program = optional_iter.next().map(|s| s.clone());
+                let remaining = if account_keys.len() > (5usize + 3usize) {
+                    account_keys[(5usize + 3usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = CollectRemainingRewardsAccounts {
                     reward_funder,
                     funder_token_account,
@@ -1161,11 +1208,23 @@ impl Instruction {
             [137u8, 52u8, 237u8, 212u8, 215u8, 117u8, 108u8, 104u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = CreateAmmConfigArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let owner = keys.next().unwrap().clone();
-                let amm_config = keys.next().unwrap().clone();
-                let system_program = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 3usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        3usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(3usize);
+                let owner = required_iter.next().unwrap().clone();
+                let amm_config = required_iter.next().unwrap().clone();
+                let system_program = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(3usize);
+                let remaining = if account_keys.len() > (3usize + 0usize) {
+                    account_keys[(3usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = CreateAmmConfigAccounts {
                     owner,
                     amm_config,
@@ -1177,11 +1236,23 @@ impl Instruction {
             [63u8, 87u8, 148u8, 33u8, 109u8, 35u8, 8u8, 104u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = CreateOperationAccountArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let owner = keys.next().unwrap().clone();
-                let operation_state = keys.next().unwrap().clone();
-                let system_program = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 3usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        3usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(3usize);
+                let owner = required_iter.next().unwrap().clone();
+                let operation_state = required_iter.next().unwrap().clone();
+                let system_program = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(3usize);
+                let remaining = if account_keys.len() > (3usize + 0usize) {
+                    account_keys[(3usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = CreateOperationAccountAccounts {
                     owner,
                     operation_state,
@@ -1191,23 +1262,49 @@ impl Instruction {
                 return Ok(Instruction::CreateOperationAccount { accounts, args });
             }
             [233u8, 146u8, 209u8, 142u8, 207u8, 104u8, 64u8, 188u8] => {
-                let mut rdr: &[u8] = rest;
-                let args = CreatePoolArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let pool_creator = keys.next().unwrap().clone();
-                let amm_config = keys.next().unwrap().clone();
-                let pool_state = keys.next().unwrap().clone();
-                let token_mint_0 = keys.next().unwrap().clone();
-                let token_mint_1 = keys.next().unwrap().clone();
-                let token_vault_0 = keys.next().unwrap().clone();
-                let token_vault_1 = keys.next().unwrap().clone();
-                let observation_state = keys.next().unwrap().clone();
-                let tick_array_bitmap = keys.next().unwrap().clone();
-                let token_program_0 = keys.next().unwrap().clone();
-                let token_program_1 = keys.next().unwrap().clone();
-                let system_program = keys.next().unwrap().clone();
-                let rent = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                let args = if rest.len() >= 24 {
+                    let mut rdr: &[u8] = rest;
+                    CreatePoolArguments::deserialize(&mut rdr)?
+                } else if rest.len() >= 16 {
+                    let mut rdr: &[u8] = rest;
+                    let sqrt_price_x64 = u128::deserialize(&mut rdr)?;
+                    CreatePoolArguments {
+                        sqrt_price_x64,
+                        open_time: None,
+                    }
+                } else {
+                    anyhow::bail!(
+                        "Insufficient data for create_pool: got {} bytes, need at least 16",
+                        rest.len()
+                    );
+                };
+                if account_keys.len() < 11usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        11usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(11usize);
+                let pool_creator = required_iter.next().unwrap().clone();
+                let amm_config = required_iter.next().unwrap().clone();
+                let pool_state = required_iter.next().unwrap().clone();
+                let token_mint_0 = required_iter.next().unwrap().clone();
+                let token_mint_1 = required_iter.next().unwrap().clone();
+                let token_vault_0 = required_iter.next().unwrap().clone();
+                let token_vault_1 = required_iter.next().unwrap().clone();
+                let observation_state = required_iter.next().unwrap().clone();
+                let token_program_0 = required_iter.next().unwrap().clone();
+                let system_program = required_iter.next().unwrap().clone();
+                let rent = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(11usize);
+                let tick_array_bitmap = optional_iter.next().map(|s| s.clone());
+                let token_program_1 = optional_iter.next().map(|s| s.clone());
+                let remaining = if account_keys.len() > (11usize + 2usize) {
+                    account_keys[(11usize + 2usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = CreatePoolAccounts {
                     pool_creator,
                     amm_config,
@@ -1229,12 +1326,24 @@ impl Instruction {
             [17u8, 251u8, 65u8, 92u8, 136u8, 242u8, 14u8, 169u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = CreateSupportMintAssociatedArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let owner = keys.next().unwrap().clone();
-                let token_mint = keys.next().unwrap().clone();
-                let support_mint_associated = keys.next().unwrap().clone();
-                let system_program = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 4usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        4usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(4usize);
+                let owner = required_iter.next().unwrap().clone();
+                let token_mint = required_iter.next().unwrap().clone();
+                let support_mint_associated = required_iter.next().unwrap().clone();
+                let system_program = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(4usize);
+                let remaining = if account_keys.len() > (4usize + 0usize) {
+                    account_keys[(4usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = CreateSupportMintAssociatedAccounts {
                     owner,
                     token_mint,
@@ -1247,20 +1356,32 @@ impl Instruction {
             [160u8, 38u8, 208u8, 111u8, 104u8, 91u8, 44u8, 1u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = DecreaseLiquidityArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let nft_owner = keys.next().unwrap().clone();
-                let nft_account = keys.next().unwrap().clone();
-                let personal_position = keys.next().unwrap().clone();
-                let pool_state = keys.next().unwrap().clone();
-                let protocol_position = keys.next().unwrap().clone();
-                let token_vault_0 = keys.next().unwrap().clone();
-                let token_vault_1 = keys.next().unwrap().clone();
-                let tick_array_lower = keys.next().unwrap().clone();
-                let tick_array_upper = keys.next().unwrap().clone();
-                let recipient_token_account_0 = keys.next().unwrap().clone();
-                let recipient_token_account_1 = keys.next().unwrap().clone();
-                let token_program = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 12usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        12usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(12usize);
+                let nft_owner = required_iter.next().unwrap().clone();
+                let nft_account = required_iter.next().unwrap().clone();
+                let personal_position = required_iter.next().unwrap().clone();
+                let pool_state = required_iter.next().unwrap().clone();
+                let protocol_position = required_iter.next().unwrap().clone();
+                let token_vault_0 = required_iter.next().unwrap().clone();
+                let token_vault_1 = required_iter.next().unwrap().clone();
+                let tick_array_lower = required_iter.next().unwrap().clone();
+                let tick_array_upper = required_iter.next().unwrap().clone();
+                let recipient_token_account_0 = required_iter.next().unwrap().clone();
+                let recipient_token_account_1 = required_iter.next().unwrap().clone();
+                let token_program = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(12usize);
+                let remaining = if account_keys.len() > (12usize + 0usize) {
+                    account_keys[(12usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = DecreaseLiquidityAccounts {
                     nft_owner,
                     nft_account,
@@ -1281,24 +1402,36 @@ impl Instruction {
             [58u8, 127u8, 188u8, 62u8, 79u8, 82u8, 196u8, 96u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = DecreaseLiquidityV2Arguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let nft_owner = keys.next().unwrap().clone();
-                let nft_account = keys.next().unwrap().clone();
-                let personal_position = keys.next().unwrap().clone();
-                let pool_state = keys.next().unwrap().clone();
-                let protocol_position = keys.next().unwrap().clone();
-                let token_vault_0 = keys.next().unwrap().clone();
-                let token_vault_1 = keys.next().unwrap().clone();
-                let tick_array_lower = keys.next().unwrap().clone();
-                let tick_array_upper = keys.next().unwrap().clone();
-                let recipient_token_account_0 = keys.next().unwrap().clone();
-                let recipient_token_account_1 = keys.next().unwrap().clone();
-                let token_program = keys.next().unwrap().clone();
-                let token_program_2022 = keys.next().unwrap().clone();
-                let memo_program = keys.next().unwrap().clone();
-                let vault_0_mint = keys.next().unwrap().clone();
-                let vault_1_mint = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 16usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        16usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(16usize);
+                let nft_owner = required_iter.next().unwrap().clone();
+                let nft_account = required_iter.next().unwrap().clone();
+                let personal_position = required_iter.next().unwrap().clone();
+                let pool_state = required_iter.next().unwrap().clone();
+                let protocol_position = required_iter.next().unwrap().clone();
+                let token_vault_0 = required_iter.next().unwrap().clone();
+                let token_vault_1 = required_iter.next().unwrap().clone();
+                let tick_array_lower = required_iter.next().unwrap().clone();
+                let tick_array_upper = required_iter.next().unwrap().clone();
+                let recipient_token_account_0 = required_iter.next().unwrap().clone();
+                let recipient_token_account_1 = required_iter.next().unwrap().clone();
+                let token_program = required_iter.next().unwrap().clone();
+                let token_program_2022 = required_iter.next().unwrap().clone();
+                let memo_program = required_iter.next().unwrap().clone();
+                let vault_0_mint = required_iter.next().unwrap().clone();
+                let vault_1_mint = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(16usize);
+                let remaining = if account_keys.len() > (16usize + 0usize) {
+                    account_keys[(16usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = DecreaseLiquidityV2Accounts {
                     nft_owner,
                     nft_account,
@@ -1323,20 +1456,32 @@ impl Instruction {
             [46u8, 156u8, 243u8, 118u8, 13u8, 205u8, 251u8, 178u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = IncreaseLiquidityArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let nft_owner = keys.next().unwrap().clone();
-                let nft_account = keys.next().unwrap().clone();
-                let pool_state = keys.next().unwrap().clone();
-                let protocol_position = keys.next().unwrap().clone();
-                let personal_position = keys.next().unwrap().clone();
-                let tick_array_lower = keys.next().unwrap().clone();
-                let tick_array_upper = keys.next().unwrap().clone();
-                let token_account_0 = keys.next().unwrap().clone();
-                let token_account_1 = keys.next().unwrap().clone();
-                let token_vault_0 = keys.next().unwrap().clone();
-                let token_vault_1 = keys.next().unwrap().clone();
-                let token_program = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 12usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        12usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(12usize);
+                let nft_owner = required_iter.next().unwrap().clone();
+                let nft_account = required_iter.next().unwrap().clone();
+                let pool_state = required_iter.next().unwrap().clone();
+                let protocol_position = required_iter.next().unwrap().clone();
+                let personal_position = required_iter.next().unwrap().clone();
+                let tick_array_lower = required_iter.next().unwrap().clone();
+                let tick_array_upper = required_iter.next().unwrap().clone();
+                let token_account_0 = required_iter.next().unwrap().clone();
+                let token_account_1 = required_iter.next().unwrap().clone();
+                let token_vault_0 = required_iter.next().unwrap().clone();
+                let token_vault_1 = required_iter.next().unwrap().clone();
+                let token_program = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(12usize);
+                let remaining = if account_keys.len() > (12usize + 0usize) {
+                    account_keys[(12usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = IncreaseLiquidityAccounts {
                     nft_owner,
                     nft_account,
@@ -1357,23 +1502,35 @@ impl Instruction {
             [133u8, 29u8, 89u8, 223u8, 69u8, 238u8, 176u8, 10u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = IncreaseLiquidityV2Arguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let nft_owner = keys.next().unwrap().clone();
-                let nft_account = keys.next().unwrap().clone();
-                let pool_state = keys.next().unwrap().clone();
-                let protocol_position = keys.next().unwrap().clone();
-                let personal_position = keys.next().unwrap().clone();
-                let tick_array_lower = keys.next().unwrap().clone();
-                let tick_array_upper = keys.next().unwrap().clone();
-                let token_account_0 = keys.next().unwrap().clone();
-                let token_account_1 = keys.next().unwrap().clone();
-                let token_vault_0 = keys.next().unwrap().clone();
-                let token_vault_1 = keys.next().unwrap().clone();
-                let token_program = keys.next().unwrap().clone();
-                let token_program_2022 = keys.next().unwrap().clone();
-                let vault_0_mint = keys.next().unwrap().clone();
-                let vault_1_mint = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 15usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        15usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(15usize);
+                let nft_owner = required_iter.next().unwrap().clone();
+                let nft_account = required_iter.next().unwrap().clone();
+                let pool_state = required_iter.next().unwrap().clone();
+                let protocol_position = required_iter.next().unwrap().clone();
+                let personal_position = required_iter.next().unwrap().clone();
+                let tick_array_lower = required_iter.next().unwrap().clone();
+                let tick_array_upper = required_iter.next().unwrap().clone();
+                let token_account_0 = required_iter.next().unwrap().clone();
+                let token_account_1 = required_iter.next().unwrap().clone();
+                let token_vault_0 = required_iter.next().unwrap().clone();
+                let token_vault_1 = required_iter.next().unwrap().clone();
+                let token_program = required_iter.next().unwrap().clone();
+                let token_program_2022 = required_iter.next().unwrap().clone();
+                let vault_0_mint = required_iter.next().unwrap().clone();
+                let vault_1_mint = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(15usize);
+                let remaining = if account_keys.len() > (15usize + 0usize) {
+                    account_keys[(15usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = IncreaseLiquidityV2Accounts {
                     nft_owner,
                     nft_account,
@@ -1397,18 +1554,30 @@ impl Instruction {
             [95u8, 135u8, 192u8, 196u8, 242u8, 129u8, 230u8, 68u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = InitializeRewardArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let reward_funder = keys.next().unwrap().clone();
-                let funder_token_account = keys.next().unwrap().clone();
-                let amm_config = keys.next().unwrap().clone();
-                let pool_state = keys.next().unwrap().clone();
-                let operation_state = keys.next().unwrap().clone();
-                let reward_token_mint = keys.next().unwrap().clone();
-                let reward_token_vault = keys.next().unwrap().clone();
-                let reward_token_program = keys.next().unwrap().clone();
-                let system_program = keys.next().unwrap().clone();
-                let rent = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 10usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        10usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(10usize);
+                let reward_funder = required_iter.next().unwrap().clone();
+                let funder_token_account = required_iter.next().unwrap().clone();
+                let amm_config = required_iter.next().unwrap().clone();
+                let pool_state = required_iter.next().unwrap().clone();
+                let operation_state = required_iter.next().unwrap().clone();
+                let reward_token_mint = required_iter.next().unwrap().clone();
+                let reward_token_vault = required_iter.next().unwrap().clone();
+                let reward_token_program = required_iter.next().unwrap().clone();
+                let system_program = required_iter.next().unwrap().clone();
+                let rent = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(10usize);
+                let remaining = if account_keys.len() > (10usize + 0usize) {
+                    account_keys[(10usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = InitializeRewardAccounts {
                     reward_funder,
                     funder_token_account,
@@ -1427,27 +1596,39 @@ impl Instruction {
             [135u8, 128u8, 47u8, 77u8, 15u8, 152u8, 240u8, 49u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = OpenPositionArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let payer = keys.next().unwrap().clone();
-                let position_nft_owner = keys.next().unwrap().clone();
-                let position_nft_mint = keys.next().unwrap().clone();
-                let position_nft_account = keys.next().unwrap().clone();
-                let metadata_account = keys.next().unwrap().clone();
-                let pool_state = keys.next().unwrap().clone();
-                let protocol_position = keys.next().unwrap().clone();
-                let tick_array_lower = keys.next().unwrap().clone();
-                let tick_array_upper = keys.next().unwrap().clone();
-                let personal_position = keys.next().unwrap().clone();
-                let token_account_0 = keys.next().unwrap().clone();
-                let token_account_1 = keys.next().unwrap().clone();
-                let token_vault_0 = keys.next().unwrap().clone();
-                let token_vault_1 = keys.next().unwrap().clone();
-                let rent = keys.next().unwrap().clone();
-                let system_program = keys.next().unwrap().clone();
-                let token_program = keys.next().unwrap().clone();
-                let associated_token_program = keys.next().unwrap().clone();
-                let metadata_program = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 19usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        19usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(19usize);
+                let payer = required_iter.next().unwrap().clone();
+                let position_nft_owner = required_iter.next().unwrap().clone();
+                let position_nft_mint = required_iter.next().unwrap().clone();
+                let position_nft_account = required_iter.next().unwrap().clone();
+                let metadata_account = required_iter.next().unwrap().clone();
+                let pool_state = required_iter.next().unwrap().clone();
+                let protocol_position = required_iter.next().unwrap().clone();
+                let tick_array_lower = required_iter.next().unwrap().clone();
+                let tick_array_upper = required_iter.next().unwrap().clone();
+                let personal_position = required_iter.next().unwrap().clone();
+                let token_account_0 = required_iter.next().unwrap().clone();
+                let token_account_1 = required_iter.next().unwrap().clone();
+                let token_vault_0 = required_iter.next().unwrap().clone();
+                let token_vault_1 = required_iter.next().unwrap().clone();
+                let rent = required_iter.next().unwrap().clone();
+                let system_program = required_iter.next().unwrap().clone();
+                let token_program = required_iter.next().unwrap().clone();
+                let associated_token_program = required_iter.next().unwrap().clone();
+                let metadata_program = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(19usize);
+                let remaining = if account_keys.len() > (19usize + 0usize) {
+                    account_keys[(19usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = OpenPositionAccounts {
                     payer,
                     position_nft_owner,
@@ -1475,30 +1656,42 @@ impl Instruction {
             [77u8, 184u8, 74u8, 214u8, 112u8, 86u8, 241u8, 199u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = OpenPositionV2Arguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let payer = keys.next().unwrap().clone();
-                let position_nft_owner = keys.next().unwrap().clone();
-                let position_nft_mint = keys.next().unwrap().clone();
-                let position_nft_account = keys.next().unwrap().clone();
-                let metadata_account = keys.next().unwrap().clone();
-                let pool_state = keys.next().unwrap().clone();
-                let protocol_position = keys.next().unwrap().clone();
-                let tick_array_lower = keys.next().unwrap().clone();
-                let tick_array_upper = keys.next().unwrap().clone();
-                let personal_position = keys.next().unwrap().clone();
-                let token_account_0 = keys.next().unwrap().clone();
-                let token_account_1 = keys.next().unwrap().clone();
-                let token_vault_0 = keys.next().unwrap().clone();
-                let token_vault_1 = keys.next().unwrap().clone();
-                let rent = keys.next().unwrap().clone();
-                let system_program = keys.next().unwrap().clone();
-                let token_program = keys.next().unwrap().clone();
-                let associated_token_program = keys.next().unwrap().clone();
-                let metadata_program = keys.next().unwrap().clone();
-                let token_program_2022 = keys.next().unwrap().clone();
-                let vault_0_mint = keys.next().unwrap().clone();
-                let vault_1_mint = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 22usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        22usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(22usize);
+                let payer = required_iter.next().unwrap().clone();
+                let position_nft_owner = required_iter.next().unwrap().clone();
+                let position_nft_mint = required_iter.next().unwrap().clone();
+                let position_nft_account = required_iter.next().unwrap().clone();
+                let metadata_account = required_iter.next().unwrap().clone();
+                let pool_state = required_iter.next().unwrap().clone();
+                let protocol_position = required_iter.next().unwrap().clone();
+                let tick_array_lower = required_iter.next().unwrap().clone();
+                let tick_array_upper = required_iter.next().unwrap().clone();
+                let personal_position = required_iter.next().unwrap().clone();
+                let token_account_0 = required_iter.next().unwrap().clone();
+                let token_account_1 = required_iter.next().unwrap().clone();
+                let token_vault_0 = required_iter.next().unwrap().clone();
+                let token_vault_1 = required_iter.next().unwrap().clone();
+                let rent = required_iter.next().unwrap().clone();
+                let system_program = required_iter.next().unwrap().clone();
+                let token_program = required_iter.next().unwrap().clone();
+                let associated_token_program = required_iter.next().unwrap().clone();
+                let metadata_program = required_iter.next().unwrap().clone();
+                let token_program_2022 = required_iter.next().unwrap().clone();
+                let vault_0_mint = required_iter.next().unwrap().clone();
+                let vault_1_mint = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(22usize);
+                let remaining = if account_keys.len() > (22usize + 0usize) {
+                    account_keys[(22usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = OpenPositionV2Accounts {
                     payer,
                     position_nft_owner,
@@ -1529,28 +1722,40 @@ impl Instruction {
             [77u8, 255u8, 174u8, 82u8, 125u8, 29u8, 201u8, 46u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = OpenPositionWithToken22NftArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let payer = keys.next().unwrap().clone();
-                let position_nft_owner = keys.next().unwrap().clone();
-                let position_nft_mint = keys.next().unwrap().clone();
-                let position_nft_account = keys.next().unwrap().clone();
-                let pool_state = keys.next().unwrap().clone();
-                let protocol_position = keys.next().unwrap().clone();
-                let tick_array_lower = keys.next().unwrap().clone();
-                let tick_array_upper = keys.next().unwrap().clone();
-                let personal_position = keys.next().unwrap().clone();
-                let token_account_0 = keys.next().unwrap().clone();
-                let token_account_1 = keys.next().unwrap().clone();
-                let token_vault_0 = keys.next().unwrap().clone();
-                let token_vault_1 = keys.next().unwrap().clone();
-                let rent = keys.next().unwrap().clone();
-                let system_program = keys.next().unwrap().clone();
-                let token_program = keys.next().unwrap().clone();
-                let associated_token_program = keys.next().unwrap().clone();
-                let token_program_2022 = keys.next().unwrap().clone();
-                let vault_0_mint = keys.next().unwrap().clone();
-                let vault_1_mint = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 20usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        20usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(20usize);
+                let payer = required_iter.next().unwrap().clone();
+                let position_nft_owner = required_iter.next().unwrap().clone();
+                let position_nft_mint = required_iter.next().unwrap().clone();
+                let position_nft_account = required_iter.next().unwrap().clone();
+                let pool_state = required_iter.next().unwrap().clone();
+                let protocol_position = required_iter.next().unwrap().clone();
+                let tick_array_lower = required_iter.next().unwrap().clone();
+                let tick_array_upper = required_iter.next().unwrap().clone();
+                let personal_position = required_iter.next().unwrap().clone();
+                let token_account_0 = required_iter.next().unwrap().clone();
+                let token_account_1 = required_iter.next().unwrap().clone();
+                let token_vault_0 = required_iter.next().unwrap().clone();
+                let token_vault_1 = required_iter.next().unwrap().clone();
+                let rent = required_iter.next().unwrap().clone();
+                let system_program = required_iter.next().unwrap().clone();
+                let token_program = required_iter.next().unwrap().clone();
+                let associated_token_program = required_iter.next().unwrap().clone();
+                let token_program_2022 = required_iter.next().unwrap().clone();
+                let vault_0_mint = required_iter.next().unwrap().clone();
+                let vault_1_mint = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(20usize);
+                let remaining = if account_keys.len() > (20usize + 0usize) {
+                    account_keys[(20usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = OpenPositionWithToken22NftAccounts {
                     payer,
                     position_nft_owner,
@@ -1579,14 +1784,26 @@ impl Instruction {
             [112u8, 52u8, 167u8, 75u8, 32u8, 201u8, 211u8, 137u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = SetRewardParamsArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let authority = keys.next().unwrap().clone();
-                let amm_config = keys.next().unwrap().clone();
-                let pool_state = keys.next().unwrap().clone();
-                let operation_state = keys.next().unwrap().clone();
-                let token_program = keys.next().unwrap().clone();
-                let token_program_2022 = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 6usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        6usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(6usize);
+                let authority = required_iter.next().unwrap().clone();
+                let amm_config = required_iter.next().unwrap().clone();
+                let pool_state = required_iter.next().unwrap().clone();
+                let operation_state = required_iter.next().unwrap().clone();
+                let token_program = required_iter.next().unwrap().clone();
+                let token_program_2022 = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(6usize);
+                let remaining = if account_keys.len() > (6usize + 0usize) {
+                    account_keys[(6usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = SetRewardParamsAccounts {
                     authority,
                     amm_config,
@@ -1601,18 +1818,30 @@ impl Instruction {
             [248u8, 198u8, 158u8, 145u8, 225u8, 117u8, 135u8, 200u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = SwapArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let payer = keys.next().unwrap().clone();
-                let amm_config = keys.next().unwrap().clone();
-                let pool_state = keys.next().unwrap().clone();
-                let input_token_account = keys.next().unwrap().clone();
-                let output_token_account = keys.next().unwrap().clone();
-                let input_vault = keys.next().unwrap().clone();
-                let output_vault = keys.next().unwrap().clone();
-                let observation_state = keys.next().unwrap().clone();
-                let token_program = keys.next().unwrap().clone();
-                let tick_array = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 10usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        10usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(10usize);
+                let payer = required_iter.next().unwrap().clone();
+                let amm_config = required_iter.next().unwrap().clone();
+                let pool_state = required_iter.next().unwrap().clone();
+                let input_token_account = required_iter.next().unwrap().clone();
+                let output_token_account = required_iter.next().unwrap().clone();
+                let input_vault = required_iter.next().unwrap().clone();
+                let output_vault = required_iter.next().unwrap().clone();
+                let observation_state = required_iter.next().unwrap().clone();
+                let token_program = required_iter.next().unwrap().clone();
+                let tick_array = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(10usize);
+                let remaining = if account_keys.len() > (10usize + 0usize) {
+                    account_keys[(10usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = SwapAccounts {
                     payer,
                     amm_config,
@@ -1631,14 +1860,26 @@ impl Instruction {
             [69u8, 125u8, 115u8, 218u8, 245u8, 186u8, 242u8, 196u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = SwapRouterBaseInArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let payer = keys.next().unwrap().clone();
-                let input_token_account = keys.next().unwrap().clone();
-                let input_token_mint = keys.next().unwrap().clone();
-                let token_program = keys.next().unwrap().clone();
-                let token_program_2022 = keys.next().unwrap().clone();
-                let memo_program = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 6usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        6usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(6usize);
+                let payer = required_iter.next().unwrap().clone();
+                let input_token_account = required_iter.next().unwrap().clone();
+                let input_token_mint = required_iter.next().unwrap().clone();
+                let token_program = required_iter.next().unwrap().clone();
+                let token_program_2022 = required_iter.next().unwrap().clone();
+                let memo_program = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(6usize);
+                let remaining = if account_keys.len() > (6usize + 0usize) {
+                    account_keys[(6usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = SwapRouterBaseInAccounts {
                     payer,
                     input_token_account,
@@ -1653,21 +1894,33 @@ impl Instruction {
             [43u8, 4u8, 237u8, 11u8, 26u8, 201u8, 30u8, 98u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = SwapV2Arguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let payer = keys.next().unwrap().clone();
-                let amm_config = keys.next().unwrap().clone();
-                let pool_state = keys.next().unwrap().clone();
-                let input_token_account = keys.next().unwrap().clone();
-                let output_token_account = keys.next().unwrap().clone();
-                let input_vault = keys.next().unwrap().clone();
-                let output_vault = keys.next().unwrap().clone();
-                let observation_state = keys.next().unwrap().clone();
-                let token_program = keys.next().unwrap().clone();
-                let token_program_2022 = keys.next().unwrap().clone();
-                let memo_program = keys.next().unwrap().clone();
-                let input_vault_mint = keys.next().unwrap().clone();
-                let output_vault_mint = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 13usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        13usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(13usize);
+                let payer = required_iter.next().unwrap().clone();
+                let amm_config = required_iter.next().unwrap().clone();
+                let pool_state = required_iter.next().unwrap().clone();
+                let input_token_account = required_iter.next().unwrap().clone();
+                let output_token_account = required_iter.next().unwrap().clone();
+                let input_vault = required_iter.next().unwrap().clone();
+                let output_vault = required_iter.next().unwrap().clone();
+                let observation_state = required_iter.next().unwrap().clone();
+                let token_program = required_iter.next().unwrap().clone();
+                let token_program_2022 = required_iter.next().unwrap().clone();
+                let memo_program = required_iter.next().unwrap().clone();
+                let input_vault_mint = required_iter.next().unwrap().clone();
+                let output_vault_mint = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(13usize);
+                let remaining = if account_keys.len() > (13usize + 0usize) {
+                    account_keys[(13usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = SwapV2Accounts {
                     payer,
                     amm_config,
@@ -1689,10 +1942,22 @@ impl Instruction {
             [7u8, 22u8, 12u8, 83u8, 242u8, 43u8, 48u8, 121u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = TransferRewardOwnerArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let authority = keys.next().unwrap().clone();
-                let pool_state = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 2usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        2usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(2usize);
+                let authority = required_iter.next().unwrap().clone();
+                let pool_state = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(2usize);
+                let remaining = if account_keys.len() > (2usize + 0usize) {
+                    account_keys[(2usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = TransferRewardOwnerAccounts {
                     authority,
                     pool_state,
@@ -1703,10 +1968,22 @@ impl Instruction {
             [49u8, 60u8, 174u8, 136u8, 154u8, 28u8, 116u8, 200u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = UpdateAmmConfigArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let owner = keys.next().unwrap().clone();
-                let amm_config = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 2usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        2usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(2usize);
+                let owner = required_iter.next().unwrap().clone();
+                let amm_config = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(2usize);
+                let remaining = if account_keys.len() > (2usize + 0usize) {
+                    account_keys[(2usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = UpdateAmmConfigAccounts {
                     owner,
                     amm_config,
@@ -1717,11 +1994,23 @@ impl Instruction {
             [127u8, 70u8, 119u8, 40u8, 188u8, 227u8, 61u8, 7u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = UpdateOperationAccountArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let owner = keys.next().unwrap().clone();
-                let operation_state = keys.next().unwrap().clone();
-                let system_program = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 3usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        3usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(3usize);
+                let owner = required_iter.next().unwrap().clone();
+                let operation_state = required_iter.next().unwrap().clone();
+                let system_program = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(3usize);
+                let remaining = if account_keys.len() > (3usize + 0usize) {
+                    account_keys[(3usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = UpdateOperationAccountAccounts {
                     owner,
                     operation_state,
@@ -1733,10 +2022,22 @@ impl Instruction {
             [130u8, 87u8, 108u8, 6u8, 46u8, 224u8, 117u8, 123u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = UpdatePoolStatusArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let authority = keys.next().unwrap().clone();
-                let pool_state = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 2usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        2usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(2usize);
+                let authority = required_iter.next().unwrap().clone();
+                let pool_state = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(2usize);
+                let remaining = if account_keys.len() > (2usize + 0usize) {
+                    account_keys[(2usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = UpdatePoolStatusAccounts {
                     authority,
                     pool_state,
@@ -1747,9 +2048,21 @@ impl Instruction {
             [163u8, 172u8, 224u8, 52u8, 11u8, 154u8, 106u8, 223u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = UpdateRewardInfosArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let pool_state = keys.next().unwrap().clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 1usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        1usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(1usize);
+                let pool_state = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(1usize);
+                let remaining = if account_keys.len() > (1usize + 0usize) {
+                    account_keys[(1usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = UpdateRewardInfosAccounts {
                     pool_state,
                     remaining,

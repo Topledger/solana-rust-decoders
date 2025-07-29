@@ -275,7 +275,15 @@ fn generate_all_instructions(idl: &Idl) -> Result<(Vec<proc_macro2::TokenStream>
         let flat = flatten_accounts(&ix.accounts);
         let acc_fields = flat.iter().map(|acc| {
             let f = format_ident!("{}", acc.name.as_str());
-            quote! { pub #f: String, }
+            
+            // Check if account is marked as optional in IDL
+            let is_optional = acc.optional;
+            
+            if is_optional {
+                quote! { pub #f: Option<String>, }
+            } else {
+                quote! { pub #f: String, }
+            }
         });
         accounts_structs.push(quote! {
             #[derive(Debug, Serialize)]
@@ -290,24 +298,82 @@ fn generate_all_instructions(idl: &Idl) -> Result<(Vec<proc_macro2::TokenStream>
             #variant { accounts: #accounts_ty, args: #args_ty },
         });
 
-        // Generate decode arm
+        // Generate decode arm with simple two-pass account mapping
+        let required_count = flat.iter().filter(|acc| !acc.optional).count();
+        let optional_count = flat.iter().filter(|acc| acc.optional).count();
+        let total_count = flat.len();
+        
         let idents: Vec<_> = flat
             .iter()
             .map(|acc| format_ident!("{}", acc.name.as_str()))
             .collect();
-        let extract = idents.iter().map(|ident| {
-            quote! {
-                let #ident = keys.next().unwrap().clone();
+        
+        // Separate required and optional account extractions
+        let required_extracts: Vec<_> = flat.iter().zip(&idents).filter_map(|(acc, ident)| {
+            if !acc.optional {
+                Some(quote! { let #ident = required_iter.next().unwrap().clone(); })
+            } else {
+                None
             }
-        });
+        }).collect();
+        
+        let optional_extracts: Vec<_> = flat.iter().zip(&idents).filter_map(|(acc, ident)| {
+            if acc.optional {
+                Some(quote! { let #ident = optional_iter.next().map(|s| s.clone()); })
+            } else {
+                None
+            }
+        }).collect();
+
+        // Special handling for create_pool with incomplete data
+        let args_deserialization = if ix.name == "create_pool" {
+            quote! {
+                let args = if rest.len() >= 24 {
+                    // Complete data: deserialize normally
+                    let mut rdr: &[u8] = rest;
+                    #args_ty::deserialize(&mut rdr)?
+                } else if rest.len() >= 16 {
+                    // Incomplete data: only sqrt_price_x64, no open_time
+                    let mut rdr: &[u8] = rest;
+                    let sqrt_price_x64 = u128::deserialize(&mut rdr)?;
+                    #args_ty {
+                        sqrt_price_x64,
+                        open_time: None,
+                    }
+                } else {
+                    anyhow::bail!("Insufficient data for create_pool: got {} bytes, need at least 16", rest.len());
+                };
+            }
+        } else {
+            quote! {
+                let mut rdr: &[u8] = rest;
+                let args = #args_ty::deserialize(&mut rdr)?;
+            }
+        };
 
         decode_arms.push(quote! {
             [#(#disc_tokens),*] => {
-                let mut rdr: &[u8] = rest;
-                let args = #args_ty::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                #(#extract)*
-                let remaining = keys.cloned().collect();
+                #args_deserialization
+                
+                // Check minimum required accounts
+                if account_keys.len() < #required_count {
+                    anyhow::bail!("Insufficient accounts: got {}, need at least {} for required accounts", 
+                        account_keys.len(), #required_count);
+                }
+                
+                // First pass: extract required accounts
+                let mut required_iter = account_keys.iter().take(#required_count);
+                #(#required_extracts)*
+                
+                // Second pass: extract optional accounts from remaining
+                let mut optional_iter = account_keys.iter().skip(#required_count);
+                #(#optional_extracts)*
+                
+                let remaining = if account_keys.len() > (#required_count + #optional_count) {
+                    account_keys[(#required_count + #optional_count)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = #accounts_ty { #(#idents),*, remaining };
                 return Ok(Instruction::#variant { accounts, args });
             }

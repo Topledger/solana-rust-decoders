@@ -165,14 +165,16 @@
             "docs": [
               "The address that receives the collected token_0 protocol fees"
             ],
-            "writable": true
+            "writable": true,
+            "optional": true
           },
           {
             "name": "recipient_token_account_1",
             "docs": [
               "The address that receives the collected token_1 protocol fees"
             ],
-            "writable": true
+            "writable": true,
+            "optional": true
           },
           {
             "name": "token_program",
@@ -186,7 +188,8 @@
             "docs": [
               "The SPL program 2022 to perform token transfers"
             ],
-            "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+            "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+            "optional": true
           }
         ],
         "args": [
@@ -274,14 +277,16 @@
             "docs": [
               "The address that receives the collected token_0 protocol fees"
             ],
-            "writable": true
+            "writable": true,
+            "optional": true
           },
           {
             "name": "recipient_token_account_1",
             "docs": [
               "The address that receives the collected token_1 protocol fees"
             ],
-            "writable": true
+            "writable": true,
+            "optional": true
           },
           {
             "name": "token_program",
@@ -295,7 +300,8 @@
             "docs": [
               "The SPL program 2022 to perform token transfers"
             ],
-            "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+            "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+            "optional": true
           }
         ],
         "args": [
@@ -362,7 +368,8 @@
             "name": "reward_vault_mint",
             "docs": [
               "The mint of reward token vault"
-            ]
+            ],
+            "optional": true
           },
           {
             "name": "token_program",
@@ -373,14 +380,16 @@
             "docs": [
               "Token program 2022"
             ],
-            "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+            "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+            "optional": true
           },
           {
             "name": "memo_program",
             "docs": [
               "memo program"
             ],
-            "address": "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr"
+            "address": "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
+            "optional": true
           }
         ],
         "args": [
@@ -728,6 +737,7 @@
               "Initialize an account to store if a tick array is initialized."
             ],
             "writable": true,
+            "optional": true,
             "pda": {
               "seeds": [
                 {
@@ -784,7 +794,8 @@
             "name": "token_program_1",
             "docs": [
               "Spl token program or token program 2022"
-            ]
+            ],
+            "optional": true
           },
           {
             "name": "system_program",
@@ -808,7 +819,9 @@
           },
           {
             "name": "open_time",
-            "type": "u64"
+            "type": {
+              "option": "u64"
+            }
           }
         ]
       },
