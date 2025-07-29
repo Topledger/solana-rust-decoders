@@ -158,6 +158,7 @@ pub mod typedefs {
         Name(String),
         Web(String),
         Img(String),
+        Unknown(Vec<u8>),
     }
     #[derive(serde :: Serialize, AnchorSerialize, AnchorDeserialize, Clone, Debug, Default)]
     pub struct PlatformParams {
@@ -1305,7 +1306,17 @@ impl Instruction {
             }
             [195u8, 60u8, 76u8, 129u8, 146u8, 45u8, 67u8, 143u8] => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdatePlatformConfigArguments::deserialize(&mut rdr)?;
+                let args = match UpdatePlatformConfigArguments::deserialize(&mut rdr) {
+                    Ok(args) => args,
+                    Err(_) => {
+                        let mut rdr_fallback: &[u8] = rest;
+                        let variant_index = u8::deserialize(&mut rdr_fallback)?;
+                        let remaining_data = rdr_fallback.to_vec();
+                        UpdatePlatformConfigArguments {
+                            param: PlatformConfigParam::Unknown(remaining_data),
+                        }
+                    }
+                };
                 let mut keys = account_keys.iter();
                 let platform_admin = keys.next().unwrap_or(&"".to_string()).clone();
                 let platform_config = keys.next().unwrap_or(&"".to_string()).clone();

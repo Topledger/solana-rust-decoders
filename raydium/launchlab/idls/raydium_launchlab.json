@@ -3775,6 +3775,12 @@
             "fields": [
               "string"
             ]
+          },
+          {
+            "name": "Unknown",
+            "fields": [
+              "bytes"
+            ]
           }
         ]
       }

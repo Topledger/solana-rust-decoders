@@ -284,10 +284,35 @@ fn generate_all_instructions(idl: &Idl) -> Result<(Vec<proc_macro2::TokenStream>
             }
         });
 
+        // Special handling for UpdatePlatformConfig to catch unknown enum variants
+        let args_deserialization = if ix.name == "update_platform_config" {
+            quote! {
+                let args = match #args_ty::deserialize(&mut rdr) {
+                    Ok(args) => args,
+                    Err(_) => {
+                        // If deserialization fails, try to handle unknown enum variants
+                        let mut rdr_fallback: &[u8] = rest;
+                        let variant_index = u8::deserialize(&mut rdr_fallback)?;
+                        
+                        // If it's an unknown variant, consume the rest as raw bytes
+                        let remaining_data = rdr_fallback.to_vec();
+                        
+                        #args_ty {
+                            param: PlatformConfigParam::Unknown(remaining_data),
+                        }
+                    }
+                };
+            }
+        } else {
+            quote! {
+                let args = #args_ty::deserialize(&mut rdr)?;
+            }
+        };
+
         decode_arms.push(quote! {
             [#(#disc_tokens),*] => {
                 let mut rdr: &[u8] = rest;
-                let args = #args_ty::deserialize(&mut rdr)?;
+                #args_deserialization
                 let mut keys = account_keys.iter();
                 #(#extract)*
                 let remaining = keys.cloned().collect();
