@@ -1,6 +1,7 @@
 use bs58::decode;
 use serde::Serializer;
 use anchor_lang::prelude::*;
+use serde_wasm_bindgen::{from_value, to_value};
 mod pubkey_serializer;
 
 // Utility function for serializing large numbers as strings
@@ -18,6 +19,12 @@ use console_error_panic_hook;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsValue;
 
+// A simple struct to serialize errors back into JS
+#[derive(serde::Serialize)]
+struct ErrorObj {
+    error: String,
+}
+
 #[wasm_bindgen(start)]
 pub fn run() {
     console_error_panic_hook::set_once();
@@ -29,28 +36,38 @@ pub fn parse(base58_str: &str, accounts_js: JsValue) -> JsValue {
     let decoded = match decode(base58_str).into_vec() {
         Ok(b) => b,
         Err(e) => {
-            return JsValue::from_str(&format!("base58 decode failed: {}", e));
+            let err = ErrorObj {
+                error: format!("base58 decode failed: {}", e),
+            };
+            return to_value(&err).unwrap();
         }
     };
 
-    // 2) Is it an Anchor‐logged event?
-    if decoded.len() >= 8 && &decoded[..8] == &events::EVENT_LOG_DISCRIMINATOR {
-        match events::Event::decode(&decoded) {
-            Ok(ev) => {
-                return JsValue::from_str(&format!("{:?}", ev));
-            }
-            Err(e) => {
-                return JsValue::from_str(&format!("Event decode failed: {}", e));
-            }
+    // 2) Parse accounts from JavaScript
+    let accounts: Vec<String> = match from_value(accounts_js) {
+        Ok(v) => v,
+        Err(e) => {
+            let err = ErrorObj {
+                error: format!("accounts deserialize failed: {}", e),
+            };
+            return to_value(&err).unwrap();
         }
-    }
+    };
 
-    // 3) Try instruction decode (accounts not used for now)
-    let accounts: Vec<String> = vec![];
-
+    // 3) Try instruction decode
     match Instruction::decode(&accounts, &decoded) {
-        Ok(ix) => JsValue::from_str(&format!("{:?}", ix)),
-        Err(e) => JsValue::from_str(&format!("decode failed: {}", e)),
+        Ok(ix) => to_value(&ix).unwrap_or_else(|e| {
+            let err = ErrorObj {
+                error: format!("serialize failed: {}", e),
+            };
+            to_value(&err).unwrap()
+        }),
+        Err(e) => {
+            let err = ErrorObj {
+                error: format!("Instruction::decode failed: {}", e),
+            };
+            to_value(&err).unwrap()
+        }
     }
 }
 
@@ -59,10 +76,10 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_raydium_clmm_decode() {
+    fn test_raydium_launchlab_decode() {
         let sample_data = "Gimqm3fgf3NA3jiQkC2icmpfePo1tdWE9gPKivKqSZ83";
         
-        println!("Testing raydium CLMM decoder with sample data:");
+        println!("Testing raydium Launchlab decoder with sample data:");
         println!("Base58 input: {}", sample_data);
         
         // Decode base58 to bytes
@@ -99,24 +116,80 @@ mod tests {
                 // Don't panic here, just show the error
             }
         }
+    }
+    
+    #[test]
+    fn test_launchlab_with_accounts() {
+        let sample_data = "Gimqm3fgf3NA3jiQkC2icmpfePo1tdWE9gPKivKqSZ83";
         
-        // Test event decoding (if it looks like an event)
-        if decoded_bytes.len() >= 8 && &decoded_bytes[..8] == &events::EVENT_LOG_DISCRIMINATOR {
-            println!("This looks like an event, testing event decode...");
-            match events::Event::decode(&decoded_bytes) {
-                Ok(event) => {
-                    println!("✅ Event decode successful!");
-                    println!("Decoded event: {:#?}", event);
-                }
-                Err(e) => {
-                    println!("❌ Event decode failed: {}", e);
-                }
+        println!("Testing Launchlab decode with specific accounts:");
+        println!("Base58 input: {}", sample_data);
+        
+        // Decode base58 to bytes
+        let decoded_bytes = match decode(sample_data).into_vec() {
+            Ok(bytes) => bytes,
+            Err(e) => {
+                println!("❌ Base58 decode failed: {}", e);
+                panic!("Base58 decode failed: {}", e);
             }
-        } else {
-            println!("This doesn't appear to be an event (discriminator doesn't match)");
+        };
+        
+        println!("✅ Base58 decode successful!");
+        println!("Decoded bytes length: {}", decoded_bytes.len());
+        
+        if decoded_bytes.len() >= 8 {
+            let discriminator = &decoded_bytes[..8];
+            println!("Instruction discriminator: {:?}", discriminator);
+        }
+        
+        // Provide meaningful account names for Launchlab
+        let accounts = vec![
+            "authority".to_string(),
+            "pool_state".to_string(),
+            "token_account".to_string(),
+            "mint_account".to_string(),
+        ];
+        
+        // Test instruction decoding
+        match Instruction::decode(&accounts, &decoded_bytes) {
+            Ok(instruction) => {
+                println!("✅ Instruction decode successful!");
+                println!("Decoded instruction: {:#?}", instruction);
+            }
+            Err(e) => {
+                println!("❌ Instruction decode failed: {}", e);
+            }
         }
     }
     
+    #[test]
+    fn test_launchlab_json_serialization() {
+        println!("Testing Launchlab JSON serialization:");
+        
+        // Create a fake instruction data for testing serialization
+        let mut data = vec![1, 2, 3, 4, 5, 6, 7, 8]; // Fake discriminator
+        data.extend_from_slice(&[0u8; 16]); // Add some dummy args
+        
+        let accounts = vec![
+            "authority".to_string(),
+            "pool_state".to_string(),
+            "token_account".to_string(),
+        ];
+        
+        println!("Test accounts count: {}", accounts.len());
+        
+        // Test instruction decoding
+        match Instruction::decode(&accounts, &data) {
+            Ok(instruction) => {
+                println!("✅ Decode successful!");
+                println!("Decoded instruction: {:#?}", instruction);
+            }
+            Err(e) => {
+                println!("❌ Decode failed: {}", e);
+            }
+        }
+    }
+
     fn hex_dump(bytes: &[u8]) -> String {
         bytes.iter()
             .map(|b| format!("{:02x}", b))

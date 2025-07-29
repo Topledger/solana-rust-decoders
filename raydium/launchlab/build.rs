@@ -7,6 +7,8 @@ use quote::{format_ident, quote};
 use serde_json::from_str;
 use std::{fs, process::Command};
 
+use syn;
+
 fn main() -> Result<()> {
     let path = "idls/raydium_launchlab.json";
     let idl_json = fs::read_to_string(path)?;
@@ -21,8 +23,68 @@ fn main() -> Result<()> {
     let gen = opts.to_generator();
     let typedefs_tokens = anchor_idl::generate_typedefs(&gen.idl.types, &gen.struct_opts);
 
-    // Use typedefs as-is without adding custom derives (like CLMM)
-    let typedefs_with_serde = typedefs_tokens;
+    // Generate typedefs with Serialize support for JSON output
+    println!("cargo:warning=About to process typedefs for serialization");
+    let mut file = syn::parse2::<syn::File>(typedefs_tokens)?;
+    for item in &mut file.items {
+        if let syn::Item::Struct(s) = item {
+            // ensure Serialize derive
+            let derive_attr: syn::Attribute = syn::parse_quote!(#[derive(serde::Serialize)]);
+            s.attrs.insert(0, derive_attr);
+            // annotate Pubkey and Option<Pubkey> fields
+            for field in &mut s.fields {
+                match &field.ty {
+                    // plain Pubkey
+                    syn::Type::Path(path) if path.path.segments.last().unwrap().ident == "Pubkey" => {
+                        let attr: syn::Attribute = syn::parse_quote!(#[serde(with = "pubkey_serde")]);
+                        field.attrs.insert(0, attr);
+                    }
+                    // Option<Pubkey>
+                    syn::Type::Path(path) if path.path.segments.len() == 1 && path.path.segments[0].ident == "Option" => {
+                        if let syn::PathArguments::AngleBracketed(ab) = &path.path.segments[0].arguments {
+                            if let Some(syn::GenericArgument::Type(inner_ty)) = ab.args.first() {
+                                if let syn::Type::Path(inner_path) = inner_ty {
+                                    if inner_path.path.segments.last().unwrap().ident == "Pubkey" {
+                                        let attr: syn::Attribute = syn::parse_quote!(#[serde(with = "pubkey_serde_option")]);
+                                        field.attrs.insert(0, attr);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    syn::Type::Array(arr) => {
+                        // skip serializing very large fixed arrays (len > 32) to avoid serde limitations
+                        if let syn::Expr::Lit(expr_lit) = &arr.len {
+                            if let syn::Lit::Int(lit_int) = &expr_lit.lit {
+                                if let Ok(len_val) = lit_int.base10_parse::<usize>() {
+                                    if len_val > 32 {
+                                        let attr: syn::Attribute = syn::parse_quote!(#[serde(skip_serializing)]);
+                                        field.attrs.insert(0, attr);
+                                        continue;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    syn::Type::Path(path) if {
+                        let id = &path.path.segments.last().unwrap().ident;
+                        id == "u64" || id == "u128"
+                    } => {
+                        let attr: syn::Attribute = syn::parse_quote!(#[serde(serialize_with = "crate::serialize_to_string")]);
+                        field.attrs.insert(0, attr);
+                    }
+                    _ => {}
+                }
+            }
+        }
+        if let syn::Item::Enum(e) = item {
+            // ensure Serialize derive on enums too
+            let derive_attr: syn::Attribute = syn::parse_quote!(#[derive(serde::Serialize)]);
+            e.attrs.insert(0, derive_attr);
+        }
+    }
+    let typedefs_with_serde = quote! { #file };
+    println!("cargo:warning=Finished processing typedefs");
 
     // Generate all instruction structs and decoders
     let (args_structs, accounts_structs, instruction_variants, decode_arms) = generate_all_instructions(&idl)?;
@@ -38,7 +100,6 @@ fn main() -> Result<()> {
 
         use ::borsh::BorshDeserialize;
         use anchor_lang::prelude::*;
-        use serde::Serialize;
 
         pub use ix_data::*;
         pub use typedefs::*;
@@ -46,6 +107,9 @@ fn main() -> Result<()> {
 
         pub mod typedefs {
             use anchor_lang::prelude::*;
+            use serde::Serialize;
+            use crate::pubkey_serializer::pubkey_serde;
+            use crate::pubkey_serializer::pubkey_serde_option;
             
             #typedefs_with_serde
             
@@ -66,10 +130,13 @@ fn main() -> Result<()> {
         pub mod ix_data {
             use serde::Serialize;
             use super::*;
+            use crate::pubkey_serializer::pubkey_serde;
+            use crate::pubkey_serializer::pubkey_serde_option;
             #(#args_structs)*
         }
 
-        #[derive(Debug)]
+        #[derive(Debug, serde::Serialize)]
+        #[serde(tag = "instruction_type")]
         pub enum Instruction {
             #(#instruction_variants)*
         }
@@ -94,7 +161,8 @@ fn main() -> Result<()> {
         pub mod events {
             use super::*;
 
-            #[derive(Debug)]
+            #[derive(Debug, serde::Serialize)]
+            #[serde(tag = "event_type")]
             pub enum Event {
                 #(#event_variants)*
             }
@@ -121,9 +189,11 @@ fn main() -> Result<()> {
         }
     };
 
-    fs::write("src/idl.rs", out.to_string())?;
+    let generated_code = out.to_string();
+    fs::write("src/idl.rs", generated_code)?;
+    
     Command::new("rustfmt").arg("src/idl.rs").status()?;
-    println!("cargo:warning=Generated Launchlab parser for {} instructions and {} events!", 
+    println!("cargo:warning=Generated comprehensive parser for all {} raydium Launchlab instructions and {} events!", 
         idl.instructions.len(), idl.events.len());
     Ok(())
 }
@@ -145,15 +215,40 @@ fn generate_all_instructions(idl: &Idl) -> Result<(Vec<proc_macro2::TokenStream>
             .map_err(|_| anyhow::anyhow!("Invalid discriminator length for instruction {}", ix.name))?;
         let disc_tokens = disc_bytes.iter().map(|b| quote! { #b }).collect::<Vec<_>>();
 
-        // Generate args struct
+        // Generate args struct with serde annotations
         let args_fields: Vec<_> = ix.args.iter().map(|arg| {
             let field_ident = format_ident!("{}", arg.name.to_snake_case());
             let ty = map_idl_type(&arg.ty);
-            quote! { pub #field_ident: #ty, }
+
+            match &arg.ty {
+                anchor_idl::IdlType::U64 | anchor_idl::IdlType::U128 => {
+                    quote! {
+                        #[serde(serialize_with = "crate::serialize_to_string")]
+                        pub #field_ident: #ty,
+                    }
+                }
+                anchor_idl::IdlType::Pubkey => {
+                    quote! {
+                        #[serde(with = "pubkey_serde")]
+                        pub #field_ident: #ty,
+                    }
+                }
+                anchor_idl::IdlType::Option(inner) if matches!(**inner, anchor_idl::IdlType::Pubkey) => {
+                    quote! {
+                        #[serde(with = "pubkey_serde_option")]
+                        pub #field_ident: #ty,
+                    }
+                }
+                _ => {
+                    quote! {
+                        pub #field_ident: #ty,
+                    }
+                }
+            }
         }).collect();
 
         args_structs.push(quote! {
-            #[derive(::borsh::BorshDeserialize, Debug)]
+            #[derive(::borsh::BorshDeserialize, Debug, serde::Serialize)]
             pub struct #args_ty {
                 #(#args_fields)*
             }
@@ -166,7 +261,7 @@ fn generate_all_instructions(idl: &Idl) -> Result<(Vec<proc_macro2::TokenStream>
             quote! { pub #f: String, }
         });
         accounts_structs.push(quote! {
-            #[derive(Debug, Serialize)]
+            #[derive(Debug, serde::Serialize)]
             pub struct #accounts_ty {
                 #(#acc_fields)*
                 pub remaining: Vec<String>,
@@ -253,7 +348,7 @@ fn map_idl_type(ty: &IdlType) -> proc_macro2::TokenStream {
         IdlType::I128 => quote! { i128 },
         IdlType::Bytes => quote! { Vec<u8> },
         IdlType::String => quote! { String },
-        IdlType::Pubkey => quote! { [u8; 32usize] },
+        IdlType::Pubkey => quote! { Pubkey },  // Changed from [u8; 32usize] to Pubkey
         IdlType::Vec(inner) => {
             let i = map_idl_type(inner);
             quote! { Vec<#i> }
@@ -276,8 +371,13 @@ fn map_idl_type(ty: &IdlType) -> proc_macro2::TokenStream {
             quote! { #id }
         }
         IdlType::Option(inner) => {
-            let i = map_idl_type(inner);
-            quote! { Option<#i> }
+            match &**inner {
+                IdlType::Bool => quote! { bool },
+                _ => {
+                    let i = map_idl_type(inner);
+                    quote! { Option<#i> }
+                }
+            }
         }
         _ => {
             // For any unsupported types, fall back to Vec<u8>

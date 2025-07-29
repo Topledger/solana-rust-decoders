@@ -4,95 +4,152 @@ use anchor_lang::prelude::*;
 #[allow(dead_code)]
 use borsh::BorshDeserialize;
 pub use ix_data::*;
-use serde::Serialize;
 pub use typedefs::*;
 pub mod typedefs {
+    use crate::pubkey_serializer::pubkey_serde;
+    use crate::pubkey_serializer::pubkey_serde_option;
     use anchor_lang::prelude::*;
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    use serde::Serialize;
+    #[derive(
+        serde :: Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default,
+    )]
     pub struct ClaimVestedEvent {
+        #[serde(with = "pubkey_serde")]
         pub pool_state: Pubkey,
+        #[serde(with = "pubkey_serde")]
         pub beneficiary: Pubkey,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub claim_amount: u64,
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    #[derive(
+        serde :: Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default,
+    )]
     pub struct ConstantCurve {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub supply: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub total_base_sell: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub total_quote_fund_raising: u64,
         pub migrate_type: u8,
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    #[derive(
+        serde :: Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default,
+    )]
     pub struct CreateVestingEvent {
+        #[serde(with = "pubkey_serde")]
         pub pool_state: Pubkey,
+        #[serde(with = "pubkey_serde")]
         pub beneficiary: Pubkey,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub share_amount: u64,
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, Copy)]
+    #[derive(serde :: Serialize, AnchorSerialize, AnchorDeserialize, Clone, Debug, Copy)]
     pub enum CurveParams {
         Constant { data: ConstantCurve },
         Fixed { data: FixedCurve },
         Linear { data: LinearCurve },
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    #[derive(
+        serde :: Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default,
+    )]
     pub struct FixedCurve {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub supply: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub total_quote_fund_raising: u64,
         pub migrate_type: u8,
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    #[derive(
+        serde :: Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default,
+    )]
     pub struct GlobalConfig {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub epoch: u64,
         pub curve_type: u8,
         pub index: u16,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub migrate_fee: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub trade_fee_rate: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub max_share_fee_rate: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub min_base_supply: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub max_lock_rate: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub min_base_sell_rate: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub min_base_migrate_rate: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub min_quote_fund_raising: u64,
+        #[serde(with = "pubkey_serde")]
         pub quote_mint: Pubkey,
+        #[serde(with = "pubkey_serde")]
         pub protocol_fee_owner: Pubkey,
+        #[serde(with = "pubkey_serde")]
         pub migrate_fee_owner: Pubkey,
+        #[serde(with = "pubkey_serde")]
         pub migrate_to_amm_wallet: Pubkey,
+        #[serde(with = "pubkey_serde")]
         pub migrate_to_cpswap_wallet: Pubkey,
         pub padding: [u64; 16],
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    #[derive(
+        serde :: Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default,
+    )]
     pub struct LinearCurve {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub supply: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub total_quote_fund_raising: u64,
         pub migrate_type: u8,
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    #[derive(
+        serde :: Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default,
+    )]
     pub struct MigrateNftInfo {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub platform_scale: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub creator_scale: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub burn_scale: u64,
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, Default)]
+    #[derive(serde :: Serialize, AnchorSerialize, AnchorDeserialize, Clone, Debug, Default)]
     pub struct MintParams {
         pub decimals: u8,
         pub name: String,
         pub symbol: String,
         pub uri: String,
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug)]
+    #[derive(serde :: Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug)]
     pub struct PlatformConfig {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub epoch: u64,
+        #[serde(with = "pubkey_serde")]
         pub platform_fee_wallet: Pubkey,
+        #[serde(with = "pubkey_serde")]
         pub platform_nft_wallet: Pubkey,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub platform_scale: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub creator_scale: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub burn_scale: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub fee_rate: u64,
+        #[serde(skip_serializing)]
         pub name: [u8; 64],
+        #[serde(skip_serializing)]
         pub web: [u8; 256],
+        #[serde(skip_serializing)]
         pub img: [u8; 256],
+        #[serde(skip_serializing)]
         pub padding: [u8; 256],
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug)]
+    #[derive(serde :: Serialize, AnchorSerialize, AnchorDeserialize, Clone, Debug)]
     pub enum PlatformConfigParam {
         FeeWallet(Pubkey),
         NFTWallet(Pubkey),
@@ -102,52 +159,76 @@ pub mod typedefs {
         Web(String),
         Img(String),
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, Default)]
+    #[derive(serde :: Serialize, AnchorSerialize, AnchorDeserialize, Clone, Debug, Default)]
     pub struct PlatformParams {
         pub migrate_nft_info: MigrateNftInfo,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub fee_rate: u64,
         pub name: String,
         pub web: String,
         pub img: String,
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, Default)]
+    #[derive(serde :: Serialize, AnchorSerialize, AnchorDeserialize, Clone, Debug, Default)]
     pub struct PoolCreateEvent {
+        #[serde(with = "pubkey_serde")]
         pub pool_state: Pubkey,
+        #[serde(with = "pubkey_serde")]
         pub creator: Pubkey,
+        #[serde(with = "pubkey_serde")]
         pub config: Pubkey,
         pub base_mint_param: MintParams,
         pub curve_param: CurveParams,
         pub vesting_param: VestingParams,
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    #[derive(
+        serde :: Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default,
+    )]
     pub struct PoolState {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub epoch: u64,
         pub auth_bump: u8,
         pub status: u8,
         pub base_decimals: u8,
         pub quote_decimals: u8,
         pub migrate_type: u8,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub supply: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub total_base_sell: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub virtual_base: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub virtual_quote: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub real_base: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub real_quote: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub total_quote_fund_raising: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub quote_protocol_fee: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub platform_fee: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub migrate_fee: u64,
         pub vesting_schedule: VestingSchedule,
+        #[serde(with = "pubkey_serde")]
         pub global_config: Pubkey,
+        #[serde(with = "pubkey_serde")]
         pub platform_config: Pubkey,
+        #[serde(with = "pubkey_serde")]
         pub base_mint: Pubkey,
+        #[serde(with = "pubkey_serde")]
         pub quote_mint: Pubkey,
+        #[serde(with = "pubkey_serde")]
         pub base_vault: Pubkey,
+        #[serde(with = "pubkey_serde")]
         pub quote_vault: Pubkey,
+        #[serde(with = "pubkey_serde")]
         pub creator: Pubkey,
         pub padding: [u64; 8],
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, Copy)]
+    #[derive(serde :: Serialize, AnchorSerialize, AnchorDeserialize, Clone, Debug, Copy)]
     pub enum PoolStatus {
         Fund,
         Migrate,
@@ -158,7 +239,7 @@ pub mod typedefs {
             Self::Fund
         }
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, Copy)]
+    #[derive(serde :: Serialize, AnchorSerialize, AnchorDeserialize, Clone, Debug, Copy)]
     pub enum TradeDirection {
         Buy,
         Sell,
@@ -168,45 +249,79 @@ pub mod typedefs {
             Self::Buy
         }
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    #[derive(
+        serde :: Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default,
+    )]
     pub struct TradeEvent {
+        #[serde(with = "pubkey_serde")]
         pub pool_state: Pubkey,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub total_base_sell: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub virtual_base: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub virtual_quote: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub real_base_before: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub real_quote_before: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub real_base_after: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub real_quote_after: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_in: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_out: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub protocol_fee: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub platform_fee: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub share_fee: u64,
         pub trade_direction: TradeDirection,
         pub pool_status: PoolStatus,
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    #[derive(
+        serde :: Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default,
+    )]
     pub struct VestingParams {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub total_locked_amount: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub cliff_period: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub unlock_period: u64,
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    #[derive(
+        serde :: Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default,
+    )]
     pub struct VestingRecord {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub epoch: u64,
+        #[serde(with = "pubkey_serde")]
         pub pool: Pubkey,
+        #[serde(with = "pubkey_serde")]
         pub beneficiary: Pubkey,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub claimed_amount: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub token_share_amount: u64,
         pub padding: [u64; 8],
     }
-    #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    #[derive(
+        serde :: Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default,
+    )]
     pub struct VestingSchedule {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub total_locked_amount: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub cliff_period: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub unlock_period: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub start_time: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub allocated_share_amount: u64,
     }
     impl Default for CurveParams {
@@ -219,7 +334,7 @@ pub mod typedefs {
 }
 pub mod accounts_data {
     use serde::Serialize;
-    #[derive(Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct BuyExactInAccounts {
         pub payer: String,
         pub authority: String,
@@ -238,7 +353,7 @@ pub mod accounts_data {
         pub program: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct BuyExactOutAccounts {
         pub payer: String,
         pub authority: String,
@@ -257,7 +372,7 @@ pub mod accounts_data {
         pub program: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct ClaimPlatformFeeAccounts {
         pub platform_fee_wallet: String,
         pub authority: String,
@@ -271,7 +386,7 @@ pub mod accounts_data {
         pub associated_token_program: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct ClaimVestedTokenAccounts {
         pub beneficiary: String,
         pub authority: String,
@@ -285,7 +400,7 @@ pub mod accounts_data {
         pub associated_token_program: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct CollectFeeAccounts {
         pub owner: String,
         pub authority: String,
@@ -297,7 +412,7 @@ pub mod accounts_data {
         pub token_program: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct CollectMigrateFeeAccounts {
         pub owner: String,
         pub authority: String,
@@ -309,7 +424,7 @@ pub mod accounts_data {
         pub token_program: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct CreateConfigAccounts {
         pub owner: String,
         pub global_config: String,
@@ -321,7 +436,7 @@ pub mod accounts_data {
         pub system_program: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct CreatePlatformConfigAccounts {
         pub platform_admin: String,
         pub platform_fee_wallet: String,
@@ -330,7 +445,7 @@ pub mod accounts_data {
         pub system_program: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct CreateVestingAccountAccounts {
         pub creator: String,
         pub beneficiary: String,
@@ -339,7 +454,7 @@ pub mod accounts_data {
         pub system_program: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct InitializeAccounts {
         pub payer: String,
         pub creator: String,
@@ -361,7 +476,7 @@ pub mod accounts_data {
         pub program: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct MigrateToAmmAccounts {
         pub payer: String,
         pub base_mint: String,
@@ -397,7 +512,7 @@ pub mod accounts_data {
         pub rent_program: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct MigrateToCpswapAccounts {
         pub payer: String,
         pub base_mint: String,
@@ -429,7 +544,7 @@ pub mod accounts_data {
         pub metadata_program: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct SellExactInAccounts {
         pub payer: String,
         pub authority: String,
@@ -448,7 +563,7 @@ pub mod accounts_data {
         pub program: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct SellExactOutAccounts {
         pub payer: String,
         pub authority: String,
@@ -467,13 +582,13 @@ pub mod accounts_data {
         pub program: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateConfigAccounts {
         pub owner: String,
         pub global_config: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdatePlatformConfigAccounts {
         pub platform_admin: String,
         pub platform_config: String,
@@ -482,79 +597,100 @@ pub mod accounts_data {
 }
 pub mod ix_data {
     use super::*;
+    use crate::pubkey_serializer::pubkey_serde;
+    use crate::pubkey_serializer::pubkey_serde_option;
     use serde::Serialize;
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct BuyExactInArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_in: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub minimum_amount_out: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub share_fee_rate: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct BuyExactOutArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_out: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub maximum_amount_in: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub share_fee_rate: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct ClaimPlatformFeeArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct ClaimVestedTokenArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct CollectFeeArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct CollectMigrateFeeArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct CreateConfigArguments {
         pub curve_type: u8,
         pub index: u16,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub migrate_fee: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub trade_fee_rate: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct CreatePlatformConfigArguments {
         pub platform_params: PlatformParams,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct CreateVestingAccountArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub share_amount: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct InitializeArguments {
         pub base_mint_param: MintParams,
         pub curve_param: CurveParams,
         pub vesting_param: VestingParams,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct MigrateToAmmArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub base_lot_size: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub quote_lot_size: u64,
         pub market_vault_signer_nonce: u8,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct MigrateToCpswapArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct SellExactInArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_in: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub minimum_amount_out: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub share_fee_rate: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct SellExactOutArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_out: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub maximum_amount_in: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub share_fee_rate: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct UpdateConfigArguments {
         pub param: u8,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub value: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct UpdatePlatformConfigArguments {
         pub param: PlatformConfigParam,
     }
 }
-#[derive(Debug)]
+#[derive(Debug, serde :: Serialize)]
+#[serde(tag = "instruction_type")]
 pub enum Instruction {
     BuyExactIn {
         accounts: BuyExactInAccounts,
@@ -1187,7 +1323,8 @@ impl Instruction {
 }
 pub mod events {
     use super::*;
-    #[derive(Debug)]
+    #[derive(Debug, serde :: Serialize)]
+    #[serde(tag = "event_type")]
     pub enum Event {
         ClaimVestedEvent { args: ClaimVestedEvent },
         CreateVestingEvent { args: CreateVestingEvent },
