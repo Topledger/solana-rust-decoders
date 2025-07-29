@@ -43,7 +43,27 @@ pub fn parse(base58_str: &str, accounts_js: JsValue) -> JsValue {
         }
     };
 
-    // 2) Parse accounts from JavaScript
+    // 2) Is it an Anchor‐logged event?
+    if decoded.len() >= 8 && &decoded[..8] == &events::EVENT_LOG_DISCRIMINATOR {
+        match events::Event::decode(&decoded) {
+            Ok(ev) => {
+                return to_value(&ev).unwrap_or_else(|e| {
+                    let err = ErrorObj {
+                        error: format!("event serialize failed: {}", e),
+                    };
+                    to_value(&err).unwrap()
+                })
+            }
+            Err(e) => {
+                let err = ErrorObj {
+                    error: format!("Event decode failed: {}", e),
+                };
+                return to_value(&err).unwrap();
+            }
+        }
+    }
+
+    // 3) Otherwise, treat it as an instruction
     let accounts: Vec<String> = match from_value(accounts_js) {
         Ok(v) => v,
         Err(e) => {
@@ -54,7 +74,7 @@ pub fn parse(base58_str: &str, accounts_js: JsValue) -> JsValue {
         }
     };
 
-    // 3) Try instruction decode
+    // 4) Try instruction decode
     match Instruction::decode(&accounts, &decoded) {
         Ok(ix) => to_value(&ix).unwrap_or_else(|e| {
             let err = ErrorObj {
