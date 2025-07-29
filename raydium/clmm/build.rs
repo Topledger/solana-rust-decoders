@@ -329,9 +329,14 @@ fn generate_all_instructions(idl: &Idl) -> Result<(Vec<proc_macro2::TokenStream>
         let args_deserialization = if ix.name == "create_pool" {
             quote! {
                 let args = if rest.len() >= 24 {
-                    // Complete data: deserialize normally
+                    // Complete data: manually deserialize all fields as non-optional
                     let mut rdr: &[u8] = rest;
-                    #args_ty::deserialize(&mut rdr)?
+                    let sqrt_price_x64 = u128::deserialize(&mut rdr)?;
+                    let open_time = u64::deserialize(&mut rdr)?;
+                    #args_ty {
+                        sqrt_price_x64,
+                        open_time: Some(open_time),
+                    }
                 } else if rest.len() >= 16 {
                     // Incomplete data: only sqrt_price_x64, no open_time
                     let mut rdr: &[u8] = rest;

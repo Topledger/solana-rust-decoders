@@ -1295,7 +1295,12 @@ impl Instruction {
             [233u8, 146u8, 209u8, 142u8, 207u8, 104u8, 64u8, 188u8] => {
                 let args = if rest.len() >= 24 {
                     let mut rdr: &[u8] = rest;
-                    CreatePoolArguments::deserialize(&mut rdr)?
+                    let sqrt_price_x64 = u128::deserialize(&mut rdr)?;
+                    let open_time = u64::deserialize(&mut rdr)?;
+                    CreatePoolArguments {
+                        sqrt_price_x64,
+                        open_time: Some(open_time),
+                    }
                 } else if rest.len() >= 16 {
                     let mut rdr: &[u8] = rest;
                     let sqrt_price_x64 = u128::deserialize(&mut rdr)?;
