@@ -443,6 +443,7 @@ pub mod accounts_data {
         pub platform_fee_wallet: String,
         pub platform_nft_wallet: String,
         pub platform_config: String,
+        pub cpswap_config: String,
         pub system_program: String,
         pub remaining: Vec<String>,
     }
@@ -992,6 +993,7 @@ impl Instruction {
                 let platform_fee_wallet = keys.next().unwrap_or(&"".to_string()).clone();
                 let platform_nft_wallet = keys.next().unwrap_or(&"".to_string()).clone();
                 let platform_config = keys.next().unwrap_or(&"".to_string()).clone();
+                let cpswap_config = keys.next().unwrap_or(&"".to_string()).clone();
                 let system_program = keys.next().unwrap_or(&"".to_string()).clone();
                 let remaining = keys.cloned().collect();
                 let accounts = CreatePlatformConfigAccounts {
@@ -999,6 +1001,7 @@ impl Instruction {
                     platform_fee_wallet,
                     platform_nft_wallet,
                     platform_config,
+                    cpswap_config,
                     system_program,
                     remaining,
                 };

@@ -1135,6 +1135,9 @@
           }
         },
         {
+          "name": "cpswap_config"
+        },
+        {
           "name": "system_program",
           "docs": [
             "Required for account creation"
