@@ -39,6 +39,44 @@ fn main() -> Result<()> {
 
         pub mod ix_data {
             use serde::Serialize;
+            
+            // Define Fee struct for SPL Stake Pool
+            #[derive(::borsh::BorshDeserialize, Debug, serde::Serialize)]
+            pub struct Fee {
+                #[serde(serialize_with = "crate::serialize_to_string")]
+                pub denominator: u64,
+                #[serde(serialize_with = "crate::serialize_to_string")]
+                pub numerator: u64,
+            }
+            
+            // Define FeeType enum for SPL Stake Pool
+            #[derive(::borsh::BorshDeserialize, Debug, serde::Serialize)]
+            #[serde(tag = "type", content = "value")]
+            pub enum FeeType {
+                SolReferral(u8),
+                StakeReferral(u8),
+                Epoch(Fee),
+                StakeWithdrawal(Fee),
+                SolDeposit(Fee),
+                StakeDeposit(Fee),
+                SolWithdrawal(Fee),
+            }
+            
+            // Define FundingType enum for SPL Stake Pool
+            #[derive(::borsh::BorshDeserialize, Debug, serde::Serialize)]
+            pub enum FundingType {
+                StakeDeposit,
+                SolDeposit,
+                SolWithdraw,
+            }
+            
+            // Define PreferredValidatorType enum for SPL Stake Pool
+            #[derive(::borsh::BorshDeserialize, Debug, serde::Serialize)]
+            pub enum PreferredValidatorType {
+                Deposit,
+                Withdraw,
+            }
+            
             #(#args_structs)*
         }
 
@@ -112,26 +150,49 @@ fn generate_instructions(instructions: &[Value]) -> Result<(Vec<proc_macro2::Tok
             index as u8
         };
 
-        // Generate simple args struct - skip complex types for now
-        let empty_args = vec![];
-        let args = ix["args"].as_array().unwrap_or(&empty_args);
-        let args_fields: Vec<_> = args.iter().map(|arg| {
-            let field_name = arg["name"].as_str().unwrap();
-            let field_ident = format_ident!("{}", field_name.to_snake_case());
-            let ty_json = &arg["type"];
-            let ty = map_simple_type(ty_json);
-            // For large integers, serialize as string to avoid JS number limit
-            if let Some(s) = ty_json.as_str() {
-                match s {
-                    "u64" | "u128" => {
-                        quote! { #[serde(serialize_with = "crate::serialize_to_string")] pub #field_ident: #ty, }
-                    }
-                    _ => quote! { pub #field_ident: #ty, },
+            // Generate args struct with proper Fee type handling
+    let empty_args = vec![];
+    let args = ix["args"].as_array().unwrap_or(&empty_args);
+    let args_fields: Vec<_> = args.iter().map(|arg| {
+        let field_name = arg["name"].as_str().unwrap();
+        let field_ident = format_ident!("{}", field_name.to_snake_case());
+        let ty_json = &arg["type"];
+        let ty = map_simple_type(ty_json);
+        
+        // Special handling for custom type arguments
+        if let Some(obj) = ty_json.as_object() {
+            if let Some(defined_name) = obj.get("defined").and_then(|v| v.as_str()) {
+                match defined_name {
+                    "Fee" => return quote! { pub #field_ident: Fee, },
+                    "FeeType" => return quote! { pub #field_ident: FeeType, },
+                    "FundingType" => return quote! { pub #field_ident: FundingType, },
+                    "PreferredValidatorType" => return quote! { pub #field_ident: PreferredValidatorType, },
+                    _ => {} // Fall through to default handling
                 }
-            } else {
-                quote! { pub #field_ident: #ty, }
             }
-        }).collect();
+        }
+        
+        // Handle special serialization cases
+        if let Some(s) = ty_json.as_str() {
+            match s {
+                "u64" | "u128" => {
+                    quote! { #[serde(serialize_with = "crate::serialize_to_string")] pub #field_ident: #ty, }
+                }
+                _ => quote! { pub #field_ident: #ty, },
+            }
+        } else if let Some(obj) = ty_json.as_object() {
+            if let Some(option_inner) = obj.get("option") {
+                if let Some(s) = option_inner.as_str() {
+                    if s == "publicKey" {
+                        return quote! { #[serde(with = "crate::pubkey_serializer::pubkey_serde_option")] pub #field_ident: #ty, };
+                    }
+                }
+            }
+            quote! { pub #field_ident: #ty, }
+        } else {
+            quote! { pub #field_ident: #ty, }
+        }
+    }).collect();
 
         args_structs.push(quote! {
             #[derive(::borsh::BorshDeserialize, Debug, serde::Serialize)]
@@ -146,7 +207,15 @@ fn generate_instructions(instructions: &[Value]) -> Result<(Vec<proc_macro2::Tok
         let acc_fields = accounts.iter().map(|acc| {
             let acc_name = acc["name"].as_str().unwrap();
             let f = format_ident!("{}", acc_name.to_snake_case());
-            quote! { pub #f: String, }
+            
+            // Check if account is marked as optional in IDL
+            let is_optional = acc.get("isOptional").and_then(|v| v.as_bool()).unwrap_or(false);
+            
+            if is_optional {
+                quote! { pub #f: Option<String>, }
+            } else {
+                quote! { pub #f: String, }
+            }
         });
         accounts_structs.push(quote! {
             #[derive(Debug, serde::Serialize)]
@@ -164,24 +233,62 @@ fn generate_instructions(instructions: &[Value]) -> Result<(Vec<proc_macro2::Tok
             },
         });
 
-        // Generate decode arm
+        // Generate decode arm with proper optional account handling
+        let required_count = accounts.iter().filter(|acc| {
+            !acc.get("isOptional").and_then(|v| v.as_bool()).unwrap_or(false)
+        }).count();
+        let optional_count = accounts.iter().filter(|acc| {
+            acc.get("isOptional").and_then(|v| v.as_bool()).unwrap_or(false)
+        }).count();
+        
         let idents: Vec<_> = accounts
             .iter()
             .map(|acc| format_ident!("{}", acc["name"].as_str().unwrap().to_snake_case()))
             .collect();
-        let extract = idents.iter().map(|ident| {
-            quote! {
-                let #ident = keys.next().unwrap_or(&"".to_string()).clone();
+        
+        // Separate required and optional account extractions
+        let required_extracts: Vec<_> = accounts.iter().zip(&idents).filter_map(|(acc, ident)| {
+            let is_optional = acc.get("isOptional").and_then(|v| v.as_bool()).unwrap_or(false);
+            if !is_optional {
+                Some(quote! { let #ident = required_iter.next().unwrap().clone(); })
+            } else {
+                None
             }
-        });
+        }).collect();
+        
+        let optional_extracts: Vec<_> = accounts.iter().zip(&idents).filter_map(|(acc, ident)| {
+            let is_optional = acc.get("isOptional").and_then(|v| v.as_bool()).unwrap_or(false);
+            if is_optional {
+                Some(quote! { let #ident = optional_iter.next().map(|s| s.clone()); })
+            } else {
+                None
+            }
+        }).collect();
 
         decode_arms.push(quote! {
             #tag => {
                 let mut rdr: &[u8] = rest;
                 let args = #args_ty::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                #(#extract)*
-                let remaining = keys.cloned().collect();
+                
+                // Check minimum required accounts
+                if account_keys.len() < #required_count {
+                    anyhow::bail!("Insufficient accounts: got {}, need at least {} for required accounts", 
+                        account_keys.len(), #required_count);
+                }
+                
+                // First pass: extract required accounts
+                let mut required_iter = account_keys.iter().take(#required_count);
+                #(#required_extracts)*
+                
+                // Second pass: extract optional accounts from remaining
+                let mut optional_iter = account_keys.iter().skip(#required_count);
+                #(#optional_extracts)*
+                
+                let remaining = if account_keys.len() > (#required_count + #optional_count) {
+                    account_keys[(#required_count + #optional_count)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = #accounts_ty { #(#idents),*, remaining };
                 return Ok(Instruction::#variant { accounts, args });
             }
@@ -215,8 +322,15 @@ fn map_simple_type(ty: &Value) -> proc_macro2::TokenStream {
     } else if let Some(obj) = ty.as_object() {
         if let Some(_vec) = obj.get("vec") {
             quote! { Vec<u8> }  // Simplified - all vecs become Vec<u8>
-        } else if let Some(_option) = obj.get("option") {
-            quote! { Option<Vec<u8>> }  // Simplified - all options become Option<Vec<u8>>
+        } else if let Some(option_inner) = obj.get("option") {
+            if let Some(s) = option_inner.as_str() {
+                match s {
+                    "publicKey" => quote! { Option<[u8; 32]> },
+                    _ => quote! { Option<Vec<u8>> },
+                }
+            } else {
+                quote! { Option<Vec<u8>> }  // Default for complex option types
+            }
         } else if let Some(_array) = obj.get("array") {
             quote! { Vec<u8> }  // Simplified - all arrays become Vec<u8>
         } else if let Some(_defined) = obj.get("defined") {

@@ -17,7 +17,7 @@ pub mod accounts_data {
         pub pool_mint: String,
         pub manager_pool_account: String,
         pub token_program: String,
-        pub deposit_authority: String,
+        pub deposit_authority: Option<String>,
         pub remaining: Vec<String>,
     }
     #[derive(Debug, serde :: Serialize)]
@@ -269,6 +269,21 @@ pub mod accounts_data {
         pub remaining: Vec<String>,
     }
     #[derive(Debug, serde :: Serialize)]
+    pub struct DecreaseValidatorStakeWithReserveAccounts {
+        pub stake_pool: String,
+        pub staker: String,
+        pub stake_pool_withdraw_authority: String,
+        pub validator_list: String,
+        pub reserve_stake: String,
+        pub validator_stake: String,
+        pub transient_stake: String,
+        pub sysvar_clock: String,
+        pub sysvar_stake_history: String,
+        pub system_program: String,
+        pub stake_program: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, serde :: Serialize)]
     pub struct RedelegateAccounts {
         pub stake_pool: String,
         pub staker: String,
@@ -359,10 +374,39 @@ pub mod accounts_data {
 pub mod ix_data {
     use serde::Serialize;
     #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
+    pub struct Fee {
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub denominator: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub numerator: u64,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
+    #[serde(tag = "type", content = "value")]
+    pub enum FeeType {
+        SolReferral(u8),
+        StakeReferral(u8),
+        Epoch(Fee),
+        StakeWithdrawal(Fee),
+        SolDeposit(Fee),
+        StakeDeposit(Fee),
+        SolWithdrawal(Fee),
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
+    pub enum FundingType {
+        StakeDeposit,
+        SolDeposit,
+        SolWithdraw,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
+    pub enum PreferredValidatorType {
+        Deposit,
+        Withdraw,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct InitializeArguments {
-        pub fee: Vec<u8>,
-        pub withdrawal_fee: Vec<u8>,
-        pub deposit_fee: Vec<u8>,
+        pub fee: Fee,
+        pub withdrawal_fee: Fee,
+        pub deposit_fee: Fee,
         pub referral_fee: u8,
         pub max_validators: u32,
     }
@@ -388,8 +432,9 @@ pub mod ix_data {
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct SetPreferredValidatorArguments {
-        pub validator_type: Vec<u8>,
-        pub validator_vote_address: Option<Vec<u8>>,
+        pub validator_type: PreferredValidatorType,
+        #[serde(with = "crate::pubkey_serializer::pubkey_serde_option")]
+        pub validator_vote_address: Option<[u8; 32]>,
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct UpdateValidatorListBalanceArguments {
@@ -411,7 +456,7 @@ pub mod ix_data {
     pub struct SetManagerArguments {}
     #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct SetFeeArguments {
-        pub fee: Vec<u8>,
+        pub fee: FeeType,
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct SetStakerArguments {}
@@ -422,7 +467,7 @@ pub mod ix_data {
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct SetFundingAuthorityArguments {
-        pub funding_type: Vec<u8>,
+        pub funding_type: FundingType,
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct WithdrawSolArguments {
@@ -458,6 +503,13 @@ pub mod ix_data {
         pub transient_stake_seed: u64,
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub ephemeral_stake_seed: u64,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
+    pub struct DecreaseValidatorStakeWithReserveArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub lamports: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub transient_stake_seed: u64,
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct RedelegateArguments {
@@ -583,6 +635,10 @@ pub enum Instruction {
         accounts: DecreaseAdditionalValidatorStakeAccounts,
         args: DecreaseAdditionalValidatorStakeArguments,
     },
+    DecreaseValidatorStakeWithReserve {
+        accounts: DecreaseValidatorStakeWithReserveAccounts,
+        args: DecreaseValidatorStakeWithReserveArguments,
+    },
     Redelegate {
         accounts: RedelegateAccounts,
         args: RedelegateArguments,
@@ -615,18 +671,30 @@ impl Instruction {
             0u8 => {
                 let mut rdr: &[u8] = rest;
                 let args = InitializeArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let stake_pool = keys.next().unwrap_or(&"".to_string()).clone();
-                let manager = keys.next().unwrap_or(&"".to_string()).clone();
-                let staker = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_pool_withdraw_authority = keys.next().unwrap_or(&"".to_string()).clone();
-                let validator_list = keys.next().unwrap_or(&"".to_string()).clone();
-                let reserve_stake = keys.next().unwrap_or(&"".to_string()).clone();
-                let pool_mint = keys.next().unwrap_or(&"".to_string()).clone();
-                let manager_pool_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let token_program = keys.next().unwrap_or(&"".to_string()).clone();
-                let deposit_authority = keys.next().unwrap_or(&"".to_string()).clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 9usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        9usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(9usize);
+                let stake_pool = required_iter.next().unwrap().clone();
+                let manager = required_iter.next().unwrap().clone();
+                let staker = required_iter.next().unwrap().clone();
+                let stake_pool_withdraw_authority = required_iter.next().unwrap().clone();
+                let validator_list = required_iter.next().unwrap().clone();
+                let reserve_stake = required_iter.next().unwrap().clone();
+                let pool_mint = required_iter.next().unwrap().clone();
+                let manager_pool_account = required_iter.next().unwrap().clone();
+                let token_program = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(9usize);
+                let deposit_authority = optional_iter.next().map(|s| s.clone());
+                let remaining = if account_keys.len() > (9usize + 1usize) {
+                    account_keys[(9usize + 1usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = InitializeAccounts {
                     stake_pool,
                     manager,
@@ -645,21 +713,33 @@ impl Instruction {
             1u8 => {
                 let mut rdr: &[u8] = rest;
                 let args = AddValidatorToPoolArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let stake_pool = keys.next().unwrap_or(&"".to_string()).clone();
-                let staker = keys.next().unwrap_or(&"".to_string()).clone();
-                let reserve_stake_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_pool_withdraw = keys.next().unwrap_or(&"".to_string()).clone();
-                let validator_list = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake = keys.next().unwrap_or(&"".to_string()).clone();
-                let validator = keys.next().unwrap_or(&"".to_string()).clone();
-                let sysvar_rent = keys.next().unwrap_or(&"".to_string()).clone();
-                let sysvar_clock = keys.next().unwrap_or(&"".to_string()).clone();
-                let sysvar_stake_history = keys.next().unwrap_or(&"".to_string()).clone();
-                let sysvar_stake_config = keys.next().unwrap_or(&"".to_string()).clone();
-                let system_program = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_program = keys.next().unwrap_or(&"".to_string()).clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 13usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        13usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(13usize);
+                let stake_pool = required_iter.next().unwrap().clone();
+                let staker = required_iter.next().unwrap().clone();
+                let reserve_stake_account = required_iter.next().unwrap().clone();
+                let stake_pool_withdraw = required_iter.next().unwrap().clone();
+                let validator_list = required_iter.next().unwrap().clone();
+                let stake = required_iter.next().unwrap().clone();
+                let validator = required_iter.next().unwrap().clone();
+                let sysvar_rent = required_iter.next().unwrap().clone();
+                let sysvar_clock = required_iter.next().unwrap().clone();
+                let sysvar_stake_history = required_iter.next().unwrap().clone();
+                let sysvar_stake_config = required_iter.next().unwrap().clone();
+                let system_program = required_iter.next().unwrap().clone();
+                let stake_program = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(13usize);
+                let remaining = if account_keys.len() > (13usize + 0usize) {
+                    account_keys[(13usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = AddValidatorToPoolAccounts {
                     stake_pool,
                     staker,
@@ -681,16 +761,28 @@ impl Instruction {
             2u8 => {
                 let mut rdr: &[u8] = rest;
                 let args = RemoveValidatorFromPoolArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let stake_pool = keys.next().unwrap_or(&"".to_string()).clone();
-                let staker = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_pool_withdraw = keys.next().unwrap_or(&"".to_string()).clone();
-                let validator_list = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let transient_stake_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let sysvar_clock = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_program = keys.next().unwrap_or(&"".to_string()).clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 8usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        8usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(8usize);
+                let stake_pool = required_iter.next().unwrap().clone();
+                let staker = required_iter.next().unwrap().clone();
+                let stake_pool_withdraw = required_iter.next().unwrap().clone();
+                let validator_list = required_iter.next().unwrap().clone();
+                let stake_account = required_iter.next().unwrap().clone();
+                let transient_stake_account = required_iter.next().unwrap().clone();
+                let sysvar_clock = required_iter.next().unwrap().clone();
+                let stake_program = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(8usize);
+                let remaining = if account_keys.len() > (8usize + 0usize) {
+                    account_keys[(8usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = RemoveValidatorFromPoolAccounts {
                     stake_pool,
                     staker,
@@ -707,18 +799,30 @@ impl Instruction {
             3u8 => {
                 let mut rdr: &[u8] = rest;
                 let args = DecreaseValidatorStakeArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let stake_pool = keys.next().unwrap_or(&"".to_string()).clone();
-                let staker = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_pool_withdraw_authority = keys.next().unwrap_or(&"".to_string()).clone();
-                let validator_list = keys.next().unwrap_or(&"".to_string()).clone();
-                let canonical_stake_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let transient_stake_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let sysvar_clock = keys.next().unwrap_or(&"".to_string()).clone();
-                let sysvar_rent = keys.next().unwrap_or(&"".to_string()).clone();
-                let system_program = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_program = keys.next().unwrap_or(&"".to_string()).clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 10usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        10usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(10usize);
+                let stake_pool = required_iter.next().unwrap().clone();
+                let staker = required_iter.next().unwrap().clone();
+                let stake_pool_withdraw_authority = required_iter.next().unwrap().clone();
+                let validator_list = required_iter.next().unwrap().clone();
+                let canonical_stake_account = required_iter.next().unwrap().clone();
+                let transient_stake_account = required_iter.next().unwrap().clone();
+                let sysvar_clock = required_iter.next().unwrap().clone();
+                let sysvar_rent = required_iter.next().unwrap().clone();
+                let system_program = required_iter.next().unwrap().clone();
+                let stake_program = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(10usize);
+                let remaining = if account_keys.len() > (10usize + 0usize) {
+                    account_keys[(10usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = DecreaseValidatorStakeAccounts {
                     stake_pool,
                     staker,
@@ -737,23 +841,34 @@ impl Instruction {
             4u8 => {
                 let mut rdr: &[u8] = rest;
                 let args = IncreaseValidatorStakeArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let stake_pool = keys.next().unwrap_or(&"".to_string()).clone();
-                let staker = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_pool_withdraw_authority = keys.next().unwrap_or(&"".to_string()).clone();
-                let validator_list = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_pool_reserve_stake = keys.next().unwrap_or(&"".to_string()).clone();
-                let transient_stake_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let validator_stake_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let validator_vote_account_to_delegate_to =
-                    keys.next().unwrap_or(&"".to_string()).clone();
-                let sysvar_clock = keys.next().unwrap_or(&"".to_string()).clone();
-                let sysvar_rent = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_history_sysvar = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_config_sysvar = keys.next().unwrap_or(&"".to_string()).clone();
-                let system_program = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_program = keys.next().unwrap_or(&"".to_string()).clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 14usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        14usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(14usize);
+                let stake_pool = required_iter.next().unwrap().clone();
+                let staker = required_iter.next().unwrap().clone();
+                let stake_pool_withdraw_authority = required_iter.next().unwrap().clone();
+                let validator_list = required_iter.next().unwrap().clone();
+                let stake_pool_reserve_stake = required_iter.next().unwrap().clone();
+                let transient_stake_account = required_iter.next().unwrap().clone();
+                let validator_stake_account = required_iter.next().unwrap().clone();
+                let validator_vote_account_to_delegate_to = required_iter.next().unwrap().clone();
+                let sysvar_clock = required_iter.next().unwrap().clone();
+                let sysvar_rent = required_iter.next().unwrap().clone();
+                let stake_history_sysvar = required_iter.next().unwrap().clone();
+                let stake_config_sysvar = required_iter.next().unwrap().clone();
+                let system_program = required_iter.next().unwrap().clone();
+                let stake_program = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(14usize);
+                let remaining = if account_keys.len() > (14usize + 0usize) {
+                    account_keys[(14usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = IncreaseValidatorStakeAccounts {
                     stake_pool,
                     staker,
@@ -776,11 +891,23 @@ impl Instruction {
             5u8 => {
                 let mut rdr: &[u8] = rest;
                 let args = SetPreferredValidatorArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let stake_pool_address = keys.next().unwrap_or(&"".to_string()).clone();
-                let staker = keys.next().unwrap_or(&"".to_string()).clone();
-                let validator_list = keys.next().unwrap_or(&"".to_string()).clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 3usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        3usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(3usize);
+                let stake_pool_address = required_iter.next().unwrap().clone();
+                let staker = required_iter.next().unwrap().clone();
+                let validator_list = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(3usize);
+                let remaining = if account_keys.len() > (3usize + 0usize) {
+                    account_keys[(3usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = SetPreferredValidatorAccounts {
                     stake_pool_address,
                     staker,
@@ -792,17 +919,29 @@ impl Instruction {
             6u8 => {
                 let mut rdr: &[u8] = rest;
                 let args = UpdateValidatorListBalanceArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let stake_pool = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_pool_withdraw_authority = keys.next().unwrap_or(&"".to_string()).clone();
-                let storage_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let reserve_stake_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let sysvar_clock = keys.next().unwrap_or(&"".to_string()).clone();
-                let sysvar_stake_history = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_program = keys.next().unwrap_or(&"".to_string()).clone();
-                let validator_stake_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let transient_stake_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 9usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        9usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(9usize);
+                let stake_pool = required_iter.next().unwrap().clone();
+                let stake_pool_withdraw_authority = required_iter.next().unwrap().clone();
+                let storage_account = required_iter.next().unwrap().clone();
+                let reserve_stake_account = required_iter.next().unwrap().clone();
+                let sysvar_clock = required_iter.next().unwrap().clone();
+                let sysvar_stake_history = required_iter.next().unwrap().clone();
+                let stake_program = required_iter.next().unwrap().clone();
+                let validator_stake_account = required_iter.next().unwrap().clone();
+                let transient_stake_account = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(9usize);
+                let remaining = if account_keys.len() > (9usize + 0usize) {
+                    account_keys[(9usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = UpdateValidatorListBalanceAccounts {
                     stake_pool,
                     stake_pool_withdraw_authority,
@@ -820,16 +959,27 @@ impl Instruction {
             7u8 => {
                 let mut rdr: &[u8] = rest;
                 let args = UpdateStakePoolBalanceArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let stake_pool = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_pool_withdraw_authority = keys.next().unwrap_or(&"".to_string()).clone();
-                let validator_stake_list = keys.next().unwrap_or(&"".to_string()).clone();
-                let reserve_stake_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let account_to_receive_pool_fee_tokens =
-                    keys.next().unwrap_or(&"".to_string()).clone();
-                let pool_mint_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let pool_token_program = keys.next().unwrap_or(&"".to_string()).clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 7usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        7usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(7usize);
+                let stake_pool = required_iter.next().unwrap().clone();
+                let stake_pool_withdraw_authority = required_iter.next().unwrap().clone();
+                let validator_stake_list = required_iter.next().unwrap().clone();
+                let reserve_stake_account = required_iter.next().unwrap().clone();
+                let account_to_receive_pool_fee_tokens = required_iter.next().unwrap().clone();
+                let pool_mint_account = required_iter.next().unwrap().clone();
+                let pool_token_program = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(7usize);
+                let remaining = if account_keys.len() > (7usize + 0usize) {
+                    account_keys[(7usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = UpdateStakePoolBalanceAccounts {
                     stake_pool,
                     stake_pool_withdraw_authority,
@@ -845,10 +995,22 @@ impl Instruction {
             8u8 => {
                 let mut rdr: &[u8] = rest;
                 let args = CleanupRemovedValidatorEntriesArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let stake_pool = keys.next().unwrap_or(&"".to_string()).clone();
-                let validator_list_storage = keys.next().unwrap_or(&"".to_string()).clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 2usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        2usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(2usize);
+                let stake_pool = required_iter.next().unwrap().clone();
+                let validator_list_storage = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(2usize);
+                let remaining = if account_keys.len() > (2usize + 0usize) {
+                    account_keys[(2usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = CleanupRemovedValidatorEntriesAccounts {
                     stake_pool,
                     validator_list_storage,
@@ -859,23 +1021,35 @@ impl Instruction {
             9u8 => {
                 let mut rdr: &[u8] = rest;
                 let args = DepositStakeArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let stake_pool = keys.next().unwrap_or(&"".to_string()).clone();
-                let validator_stake_list = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_pool_deposit_authority = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_pool_withdraw_authority = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let validator_stake_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let reserve_stake_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let user_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let pool_tokens_amount = keys.next().unwrap_or(&"".to_string()).clone();
-                let pool_fees_amount = keys.next().unwrap_or(&"".to_string()).clone();
-                let pool_token_mint_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let sysvar_clock_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let sysvar_stake_history_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let pool_token_program_id = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_program_id = keys.next().unwrap_or(&"".to_string()).clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 15usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        15usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(15usize);
+                let stake_pool = required_iter.next().unwrap().clone();
+                let validator_stake_list = required_iter.next().unwrap().clone();
+                let stake_pool_deposit_authority = required_iter.next().unwrap().clone();
+                let stake_pool_withdraw_authority = required_iter.next().unwrap().clone();
+                let stake_account = required_iter.next().unwrap().clone();
+                let validator_stake_account = required_iter.next().unwrap().clone();
+                let reserve_stake_account = required_iter.next().unwrap().clone();
+                let user_account = required_iter.next().unwrap().clone();
+                let pool_tokens_amount = required_iter.next().unwrap().clone();
+                let pool_fees_amount = required_iter.next().unwrap().clone();
+                let pool_token_mint_account = required_iter.next().unwrap().clone();
+                let sysvar_clock_account = required_iter.next().unwrap().clone();
+                let sysvar_stake_history_account = required_iter.next().unwrap().clone();
+                let pool_token_program_id = required_iter.next().unwrap().clone();
+                let stake_program_id = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(15usize);
+                let remaining = if account_keys.len() > (15usize + 0usize) {
+                    account_keys[(15usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = DepositStakeAccounts {
                     stake_pool,
                     validator_stake_list,
@@ -899,23 +1073,34 @@ impl Instruction {
             10u8 => {
                 let mut rdr: &[u8] = rest;
                 let args = WithdrawStakeArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let stake_pool = keys.next().unwrap_or(&"".to_string()).clone();
-                let validator_stake_list = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_pool_withdraw_authority = keys.next().unwrap_or(&"".to_string()).clone();
-                let validator_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let uninitialized_stake_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let user_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let user_transfer_authority = keys.next().unwrap_or(&"".to_string()).clone();
+                if account_keys.len() < 13usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        13usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(13usize);
+                let stake_pool = required_iter.next().unwrap().clone();
+                let validator_stake_list = required_iter.next().unwrap().clone();
+                let stake_pool_withdraw_authority = required_iter.next().unwrap().clone();
+                let validator_account = required_iter.next().unwrap().clone();
+                let uninitialized_stake_account = required_iter.next().unwrap().clone();
+                let user_account = required_iter.next().unwrap().clone();
+                let user_transfer_authority = required_iter.next().unwrap().clone();
                 let user_account_with_pool_tokens_to_burn_from =
-                    keys.next().unwrap_or(&"".to_string()).clone();
-                let account_to_receive_pool_fee_tokens =
-                    keys.next().unwrap_or(&"".to_string()).clone();
-                let pool_token_mint_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let sysvar_clock_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let pool_token_program_id = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_program_id = keys.next().unwrap_or(&"".to_string()).clone();
-                let remaining = keys.cloned().collect();
+                    required_iter.next().unwrap().clone();
+                let account_to_receive_pool_fee_tokens = required_iter.next().unwrap().clone();
+                let pool_token_mint_account = required_iter.next().unwrap().clone();
+                let sysvar_clock_account = required_iter.next().unwrap().clone();
+                let pool_token_program_id = required_iter.next().unwrap().clone();
+                let stake_program_id = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(13usize);
+                let remaining = if account_keys.len() > (13usize + 0usize) {
+                    account_keys[(13usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = WithdrawStakeAccounts {
                     stake_pool,
                     validator_stake_list,
@@ -937,12 +1122,24 @@ impl Instruction {
             11u8 => {
                 let mut rdr: &[u8] = rest;
                 let args = SetManagerArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let stake_pool = keys.next().unwrap_or(&"".to_string()).clone();
-                let manager = keys.next().unwrap_or(&"".to_string()).clone();
-                let new_manager = keys.next().unwrap_or(&"".to_string()).clone();
-                let new_fee_receiver = keys.next().unwrap_or(&"".to_string()).clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 4usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        4usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(4usize);
+                let stake_pool = required_iter.next().unwrap().clone();
+                let manager = required_iter.next().unwrap().clone();
+                let new_manager = required_iter.next().unwrap().clone();
+                let new_fee_receiver = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(4usize);
+                let remaining = if account_keys.len() > (4usize + 0usize) {
+                    account_keys[(4usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = SetManagerAccounts {
                     stake_pool,
                     manager,
@@ -955,10 +1152,22 @@ impl Instruction {
             12u8 => {
                 let mut rdr: &[u8] = rest;
                 let args = SetFeeArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let stake_pool = keys.next().unwrap_or(&"".to_string()).clone();
-                let manager = keys.next().unwrap_or(&"".to_string()).clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 2usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        2usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(2usize);
+                let stake_pool = required_iter.next().unwrap().clone();
+                let manager = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(2usize);
+                let remaining = if account_keys.len() > (2usize + 0usize) {
+                    account_keys[(2usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = SetFeeAccounts {
                     stake_pool,
                     manager,
@@ -969,11 +1178,23 @@ impl Instruction {
             13u8 => {
                 let mut rdr: &[u8] = rest;
                 let args = SetStakerArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let stake_pool = keys.next().unwrap_or(&"".to_string()).clone();
-                let current_staker = keys.next().unwrap_or(&"".to_string()).clone();
-                let new_staker = keys.next().unwrap_or(&"".to_string()).clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 3usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        3usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(3usize);
+                let stake_pool = required_iter.next().unwrap().clone();
+                let current_staker = required_iter.next().unwrap().clone();
+                let new_staker = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(3usize);
+                let remaining = if account_keys.len() > (3usize + 0usize) {
+                    account_keys[(3usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = SetStakerAccounts {
                     stake_pool,
                     current_staker,
@@ -985,19 +1206,31 @@ impl Instruction {
             14u8 => {
                 let mut rdr: &[u8] = rest;
                 let args = DepositSolArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let stake_pool = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_pool_withdraw_authority = keys.next().unwrap_or(&"".to_string()).clone();
-                let reserve_stake_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let depositer = keys.next().unwrap_or(&"".to_string()).clone();
-                let user_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let fee_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let referral_fee_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let pool_token_mint = keys.next().unwrap_or(&"".to_string()).clone();
-                let system_program = keys.next().unwrap_or(&"".to_string()).clone();
-                let token_program_id = keys.next().unwrap_or(&"".to_string()).clone();
-                let deposit_authority = keys.next().unwrap_or(&"".to_string()).clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 11usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        11usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(11usize);
+                let stake_pool = required_iter.next().unwrap().clone();
+                let stake_pool_withdraw_authority = required_iter.next().unwrap().clone();
+                let reserve_stake_account = required_iter.next().unwrap().clone();
+                let depositer = required_iter.next().unwrap().clone();
+                let user_account = required_iter.next().unwrap().clone();
+                let fee_account = required_iter.next().unwrap().clone();
+                let referral_fee_account = required_iter.next().unwrap().clone();
+                let pool_token_mint = required_iter.next().unwrap().clone();
+                let system_program = required_iter.next().unwrap().clone();
+                let token_program_id = required_iter.next().unwrap().clone();
+                let deposit_authority = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(11usize);
+                let remaining = if account_keys.len() > (11usize + 0usize) {
+                    account_keys[(11usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = DepositSolAccounts {
                     stake_pool,
                     stake_pool_withdraw_authority,
@@ -1017,11 +1250,23 @@ impl Instruction {
             15u8 => {
                 let mut rdr: &[u8] = rest;
                 let args = SetFundingAuthorityArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let stake_pool = keys.next().unwrap_or(&"".to_string()).clone();
-                let manager = keys.next().unwrap_or(&"".to_string()).clone();
-                let new_authority = keys.next().unwrap_or(&"".to_string()).clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 3usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        3usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(3usize);
+                let stake_pool = required_iter.next().unwrap().clone();
+                let manager = required_iter.next().unwrap().clone();
+                let new_authority = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(3usize);
+                let remaining = if account_keys.len() > (3usize + 0usize) {
+                    account_keys[(3usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = SetFundingAuthorityAccounts {
                     stake_pool,
                     manager,
@@ -1033,21 +1278,33 @@ impl Instruction {
             16u8 => {
                 let mut rdr: &[u8] = rest;
                 let args = WithdrawSolArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let stake_pool = keys.next().unwrap_or(&"".to_string()).clone();
-                let withdraw_authority = keys.next().unwrap_or(&"".to_string()).clone();
-                let transfer_authority = keys.next().unwrap_or(&"".to_string()).clone();
-                let burn_pool_tokens = keys.next().unwrap_or(&"".to_string()).clone();
-                let reserve_stake_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let withdraw_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let fee_token_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let pool_token_mint = keys.next().unwrap_or(&"".to_string()).clone();
-                let sysvar_clock = keys.next().unwrap_or(&"".to_string()).clone();
-                let sysvar_stake_history = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_program = keys.next().unwrap_or(&"".to_string()).clone();
-                let token_program = keys.next().unwrap_or(&"".to_string()).clone();
-                let sol_withdraw_authority = keys.next().unwrap_or(&"".to_string()).clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 13usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        13usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(13usize);
+                let stake_pool = required_iter.next().unwrap().clone();
+                let withdraw_authority = required_iter.next().unwrap().clone();
+                let transfer_authority = required_iter.next().unwrap().clone();
+                let burn_pool_tokens = required_iter.next().unwrap().clone();
+                let reserve_stake_account = required_iter.next().unwrap().clone();
+                let withdraw_account = required_iter.next().unwrap().clone();
+                let fee_token_account = required_iter.next().unwrap().clone();
+                let pool_token_mint = required_iter.next().unwrap().clone();
+                let sysvar_clock = required_iter.next().unwrap().clone();
+                let sysvar_stake_history = required_iter.next().unwrap().clone();
+                let stake_program = required_iter.next().unwrap().clone();
+                let token_program = required_iter.next().unwrap().clone();
+                let sol_withdraw_authority = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(13usize);
+                let remaining = if account_keys.len() > (13usize + 0usize) {
+                    account_keys[(13usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = WithdrawSolAccounts {
                     stake_pool,
                     withdraw_authority,
@@ -1069,16 +1326,28 @@ impl Instruction {
             17u8 => {
                 let mut rdr: &[u8] = rest;
                 let args = CreateTokenMetadataArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let stake_pool = keys.next().unwrap_or(&"".to_string()).clone();
-                let manager = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_pool_withdraw_authority = keys.next().unwrap_or(&"".to_string()).clone();
-                let pool_mint = keys.next().unwrap_or(&"".to_string()).clone();
-                let payer = keys.next().unwrap_or(&"".to_string()).clone();
-                let token_metadata = keys.next().unwrap_or(&"".to_string()).clone();
-                let mpl_token_metadata = keys.next().unwrap_or(&"".to_string()).clone();
-                let system_program = keys.next().unwrap_or(&"".to_string()).clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 8usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        8usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(8usize);
+                let stake_pool = required_iter.next().unwrap().clone();
+                let manager = required_iter.next().unwrap().clone();
+                let stake_pool_withdraw_authority = required_iter.next().unwrap().clone();
+                let pool_mint = required_iter.next().unwrap().clone();
+                let payer = required_iter.next().unwrap().clone();
+                let token_metadata = required_iter.next().unwrap().clone();
+                let mpl_token_metadata = required_iter.next().unwrap().clone();
+                let system_program = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(8usize);
+                let remaining = if account_keys.len() > (8usize + 0usize) {
+                    account_keys[(8usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = CreateTokenMetadataAccounts {
                     stake_pool,
                     manager,
@@ -1095,13 +1364,25 @@ impl Instruction {
             18u8 => {
                 let mut rdr: &[u8] = rest;
                 let args = UpdateTokenMetadataArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let stake_pool = keys.next().unwrap_or(&"".to_string()).clone();
-                let manager = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_pool_withdraw_authority = keys.next().unwrap_or(&"".to_string()).clone();
-                let token_metadata = keys.next().unwrap_or(&"".to_string()).clone();
-                let mpl_token_metadata = keys.next().unwrap_or(&"".to_string()).clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 5usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        5usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(5usize);
+                let stake_pool = required_iter.next().unwrap().clone();
+                let manager = required_iter.next().unwrap().clone();
+                let stake_pool_withdraw_authority = required_iter.next().unwrap().clone();
+                let token_metadata = required_iter.next().unwrap().clone();
+                let mpl_token_metadata = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(5usize);
+                let remaining = if account_keys.len() > (5usize + 0usize) {
+                    account_keys[(5usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = UpdateTokenMetadataAccounts {
                     stake_pool,
                     manager,
@@ -1115,23 +1396,34 @@ impl Instruction {
             19u8 => {
                 let mut rdr: &[u8] = rest;
                 let args = IncreaseAdditionalValidatorStakeArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let stake_pool = keys.next().unwrap_or(&"".to_string()).clone();
-                let staker = keys.next().unwrap_or(&"".to_string()).clone();
-                let withdraw_authority = keys.next().unwrap_or(&"".to_string()).clone();
-                let validator_list = keys.next().unwrap_or(&"".to_string()).clone();
-                let reserve_stake_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let uninitialized_ephemeral_stake_account =
-                    keys.next().unwrap_or(&"".to_string()).clone();
-                let transient_stake_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let validator_stake_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let validator_vote_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let clock_sysvar = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_history_sysvar = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_config_sysvar = keys.next().unwrap_or(&"".to_string()).clone();
-                let system_program = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_program = keys.next().unwrap_or(&"".to_string()).clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 14usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        14usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(14usize);
+                let stake_pool = required_iter.next().unwrap().clone();
+                let staker = required_iter.next().unwrap().clone();
+                let withdraw_authority = required_iter.next().unwrap().clone();
+                let validator_list = required_iter.next().unwrap().clone();
+                let reserve_stake_account = required_iter.next().unwrap().clone();
+                let uninitialized_ephemeral_stake_account = required_iter.next().unwrap().clone();
+                let transient_stake_account = required_iter.next().unwrap().clone();
+                let validator_stake_account = required_iter.next().unwrap().clone();
+                let validator_vote_account = required_iter.next().unwrap().clone();
+                let clock_sysvar = required_iter.next().unwrap().clone();
+                let stake_history_sysvar = required_iter.next().unwrap().clone();
+                let stake_config_sysvar = required_iter.next().unwrap().clone();
+                let system_program = required_iter.next().unwrap().clone();
+                let stake_program = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(14usize);
+                let remaining = if account_keys.len() > (14usize + 0usize) {
+                    account_keys[(14usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = IncreaseAdditionalValidatorStakeAccounts {
                     stake_pool,
                     staker,
@@ -1154,20 +1446,31 @@ impl Instruction {
             20u8 => {
                 let mut rdr: &[u8] = rest;
                 let args = DecreaseAdditionalValidatorStakeArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let stake_pool = keys.next().unwrap_or(&"".to_string()).clone();
-                let staker = keys.next().unwrap_or(&"".to_string()).clone();
-                let withdraw_authority = keys.next().unwrap_or(&"".to_string()).clone();
-                let validator_list = keys.next().unwrap_or(&"".to_string()).clone();
-                let source_canonical_stake_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let uninitialized_ephemeral_stake_account =
-                    keys.next().unwrap_or(&"".to_string()).clone();
-                let transient_stake_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let clock_sysvar = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_history_sysvar = keys.next().unwrap_or(&"".to_string()).clone();
-                let system_program = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_program = keys.next().unwrap_or(&"".to_string()).clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 11usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        11usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(11usize);
+                let stake_pool = required_iter.next().unwrap().clone();
+                let staker = required_iter.next().unwrap().clone();
+                let withdraw_authority = required_iter.next().unwrap().clone();
+                let validator_list = required_iter.next().unwrap().clone();
+                let source_canonical_stake_account = required_iter.next().unwrap().clone();
+                let uninitialized_ephemeral_stake_account = required_iter.next().unwrap().clone();
+                let transient_stake_account = required_iter.next().unwrap().clone();
+                let clock_sysvar = required_iter.next().unwrap().clone();
+                let stake_history_sysvar = required_iter.next().unwrap().clone();
+                let system_program = required_iter.next().unwrap().clone();
+                let stake_program = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(11usize);
+                let remaining = if account_keys.len() > (11usize + 0usize) {
+                    account_keys[(11usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = DecreaseAdditionalValidatorStakeAccounts {
                     stake_pool,
                     staker,
@@ -1186,27 +1489,80 @@ impl Instruction {
             }
             21u8 => {
                 let mut rdr: &[u8] = rest;
+                let args = DecreaseValidatorStakeWithReserveArguments::deserialize(&mut rdr)?;
+                if account_keys.len() < 11usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        11usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(11usize);
+                let stake_pool = required_iter.next().unwrap().clone();
+                let staker = required_iter.next().unwrap().clone();
+                let stake_pool_withdraw_authority = required_iter.next().unwrap().clone();
+                let validator_list = required_iter.next().unwrap().clone();
+                let reserve_stake = required_iter.next().unwrap().clone();
+                let validator_stake = required_iter.next().unwrap().clone();
+                let transient_stake = required_iter.next().unwrap().clone();
+                let sysvar_clock = required_iter.next().unwrap().clone();
+                let sysvar_stake_history = required_iter.next().unwrap().clone();
+                let system_program = required_iter.next().unwrap().clone();
+                let stake_program = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(11usize);
+                let remaining = if account_keys.len() > (11usize + 0usize) {
+                    account_keys[(11usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
+                let accounts = DecreaseValidatorStakeWithReserveAccounts {
+                    stake_pool,
+                    staker,
+                    stake_pool_withdraw_authority,
+                    validator_list,
+                    reserve_stake,
+                    validator_stake,
+                    transient_stake,
+                    sysvar_clock,
+                    sysvar_stake_history,
+                    system_program,
+                    stake_program,
+                    remaining,
+                };
+                return Ok(Instruction::DecreaseValidatorStakeWithReserve { accounts, args });
+            }
+            22u8 => {
+                let mut rdr: &[u8] = rest;
                 let args = RedelegateArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let stake_pool = keys.next().unwrap_or(&"".to_string()).clone();
-                let staker = keys.next().unwrap_or(&"".to_string()).clone();
-                let withdraw_authority = keys.next().unwrap_or(&"".to_string()).clone();
-                let validator_list = keys.next().unwrap_or(&"".to_string()).clone();
-                let source_canonical_stake_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let source_transient_stake_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let uninitialized_ephemeral_stake_account =
-                    keys.next().unwrap_or(&"".to_string()).clone();
-                let destination_transient_stake_account =
-                    keys.next().unwrap_or(&"".to_string()).clone();
-                let destination_stake_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let destination_validator_vote_account =
-                    keys.next().unwrap_or(&"".to_string()).clone();
-                let clock_sysvar = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_history_sysvar = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_config_sysvar = keys.next().unwrap_or(&"".to_string()).clone();
-                let system_program = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_program = keys.next().unwrap_or(&"".to_string()).clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 15usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        15usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(15usize);
+                let stake_pool = required_iter.next().unwrap().clone();
+                let staker = required_iter.next().unwrap().clone();
+                let withdraw_authority = required_iter.next().unwrap().clone();
+                let validator_list = required_iter.next().unwrap().clone();
+                let source_canonical_stake_account = required_iter.next().unwrap().clone();
+                let source_transient_stake_account = required_iter.next().unwrap().clone();
+                let uninitialized_ephemeral_stake_account = required_iter.next().unwrap().clone();
+                let destination_transient_stake_account = required_iter.next().unwrap().clone();
+                let destination_stake_account = required_iter.next().unwrap().clone();
+                let destination_validator_vote_account = required_iter.next().unwrap().clone();
+                let clock_sysvar = required_iter.next().unwrap().clone();
+                let stake_history_sysvar = required_iter.next().unwrap().clone();
+                let stake_config_sysvar = required_iter.next().unwrap().clone();
+                let system_program = required_iter.next().unwrap().clone();
+                let stake_program = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(15usize);
+                let remaining = if account_keys.len() > (15usize + 0usize) {
+                    account_keys[(15usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = RedelegateAccounts {
                     stake_pool,
                     staker,
@@ -1227,26 +1583,38 @@ impl Instruction {
                 };
                 return Ok(Instruction::Redelegate { accounts, args });
             }
-            22u8 => {
+            23u8 => {
                 let mut rdr: &[u8] = rest;
                 let args = DepositStakeWithSlippageArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let stake_pool = keys.next().unwrap_or(&"".to_string()).clone();
-                let validator_list = keys.next().unwrap_or(&"".to_string()).clone();
-                let deposit_authority = keys.next().unwrap_or(&"".to_string()).clone();
-                let withdraw_authority = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let validator_stake_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let reserve_stake_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let pool_token_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let fee_token_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let referral_fee_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let pool_token_mint_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let sysvar_clock_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let sysvar_stake_history = keys.next().unwrap_or(&"".to_string()).clone();
-                let pool_token_program = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_program = keys.next().unwrap_or(&"".to_string()).clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 15usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        15usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(15usize);
+                let stake_pool = required_iter.next().unwrap().clone();
+                let validator_list = required_iter.next().unwrap().clone();
+                let deposit_authority = required_iter.next().unwrap().clone();
+                let withdraw_authority = required_iter.next().unwrap().clone();
+                let stake_account = required_iter.next().unwrap().clone();
+                let validator_stake_account = required_iter.next().unwrap().clone();
+                let reserve_stake_account = required_iter.next().unwrap().clone();
+                let pool_token_account = required_iter.next().unwrap().clone();
+                let fee_token_account = required_iter.next().unwrap().clone();
+                let referral_fee_account = required_iter.next().unwrap().clone();
+                let pool_token_mint_account = required_iter.next().unwrap().clone();
+                let sysvar_clock_account = required_iter.next().unwrap().clone();
+                let sysvar_stake_history = required_iter.next().unwrap().clone();
+                let pool_token_program = required_iter.next().unwrap().clone();
+                let stake_program = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(15usize);
+                let remaining = if account_keys.len() > (15usize + 0usize) {
+                    account_keys[(15usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = DepositStakeWithSlippageAccounts {
                     stake_pool,
                     validator_list,
@@ -1267,24 +1635,36 @@ impl Instruction {
                 };
                 return Ok(Instruction::DepositStakeWithSlippage { accounts, args });
             }
-            23u8 => {
+            24u8 => {
                 let mut rdr: &[u8] = rest;
                 let args = WithdrawStakeWithSlippageArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let stake_pool = keys.next().unwrap_or(&"".to_string()).clone();
-                let validator_list = keys.next().unwrap_or(&"".to_string()).clone();
-                let withdraw_authority = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let withdrawal_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let new_withdraw_authority = keys.next().unwrap_or(&"".to_string()).clone();
-                let user_transfer_authority = keys.next().unwrap_or(&"".to_string()).clone();
-                let burn_pool_tokens = keys.next().unwrap_or(&"".to_string()).clone();
-                let fee_token_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let pool_token_mint = keys.next().unwrap_or(&"".to_string()).clone();
-                let sysvar_clock_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let pool_token_program = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_program = keys.next().unwrap_or(&"".to_string()).clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 13usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        13usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(13usize);
+                let stake_pool = required_iter.next().unwrap().clone();
+                let validator_list = required_iter.next().unwrap().clone();
+                let withdraw_authority = required_iter.next().unwrap().clone();
+                let stake_account = required_iter.next().unwrap().clone();
+                let withdrawal_account = required_iter.next().unwrap().clone();
+                let new_withdraw_authority = required_iter.next().unwrap().clone();
+                let user_transfer_authority = required_iter.next().unwrap().clone();
+                let burn_pool_tokens = required_iter.next().unwrap().clone();
+                let fee_token_account = required_iter.next().unwrap().clone();
+                let pool_token_mint = required_iter.next().unwrap().clone();
+                let sysvar_clock_account = required_iter.next().unwrap().clone();
+                let pool_token_program = required_iter.next().unwrap().clone();
+                let stake_program = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(13usize);
+                let remaining = if account_keys.len() > (13usize + 0usize) {
+                    account_keys[(13usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = WithdrawStakeWithSlippageAccounts {
                     stake_pool,
                     validator_list,
@@ -1303,22 +1683,34 @@ impl Instruction {
                 };
                 return Ok(Instruction::WithdrawStakeWithSlippage { accounts, args });
             }
-            24u8 => {
+            25u8 => {
                 let mut rdr: &[u8] = rest;
                 let args = DepositSolWithSlippageArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let stake_pool = keys.next().unwrap_or(&"".to_string()).clone();
-                let withdraw_authority = keys.next().unwrap_or(&"".to_string()).clone();
-                let reserve_stake_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let deposit_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let pool_token_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let fee_token_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let referral_fee_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let pool_token_mint = keys.next().unwrap_or(&"".to_string()).clone();
-                let system_program = keys.next().unwrap_or(&"".to_string()).clone();
-                let token_program = keys.next().unwrap_or(&"".to_string()).clone();
-                let sol_deposit_authority = keys.next().unwrap_or(&"".to_string()).clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 11usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        11usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(11usize);
+                let stake_pool = required_iter.next().unwrap().clone();
+                let withdraw_authority = required_iter.next().unwrap().clone();
+                let reserve_stake_account = required_iter.next().unwrap().clone();
+                let deposit_account = required_iter.next().unwrap().clone();
+                let pool_token_account = required_iter.next().unwrap().clone();
+                let fee_token_account = required_iter.next().unwrap().clone();
+                let referral_fee_account = required_iter.next().unwrap().clone();
+                let pool_token_mint = required_iter.next().unwrap().clone();
+                let system_program = required_iter.next().unwrap().clone();
+                let token_program = required_iter.next().unwrap().clone();
+                let sol_deposit_authority = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(11usize);
+                let remaining = if account_keys.len() > (11usize + 0usize) {
+                    account_keys[(11usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = DepositSolWithSlippageAccounts {
                     stake_pool,
                     withdraw_authority,
@@ -1335,24 +1727,36 @@ impl Instruction {
                 };
                 return Ok(Instruction::DepositSolWithSlippage { accounts, args });
             }
-            25u8 => {
+            26u8 => {
                 let mut rdr: &[u8] = rest;
                 let args = WithdrawSolWithSlippageArguments::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                let stake_pool = keys.next().unwrap_or(&"".to_string()).clone();
-                let withdraw_authority = keys.next().unwrap_or(&"".to_string()).clone();
-                let transfer_authority = keys.next().unwrap_or(&"".to_string()).clone();
-                let pool_token_burn = keys.next().unwrap_or(&"".to_string()).clone();
-                let reserve_stake_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let withdraw_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let fee_token_account = keys.next().unwrap_or(&"".to_string()).clone();
-                let pool_token_mint = keys.next().unwrap_or(&"".to_string()).clone();
-                let sysvar_clock = keys.next().unwrap_or(&"".to_string()).clone();
-                let sysvar_stake_history = keys.next().unwrap_or(&"".to_string()).clone();
-                let stake_program = keys.next().unwrap_or(&"".to_string()).clone();
-                let token_program = keys.next().unwrap_or(&"".to_string()).clone();
-                let sol_withdraw_authority = keys.next().unwrap_or(&"".to_string()).clone();
-                let remaining = keys.cloned().collect();
+                if account_keys.len() < 13usize {
+                    anyhow::bail!(
+                        "Insufficient accounts: got {}, need at least {} for required accounts",
+                        account_keys.len(),
+                        13usize
+                    );
+                }
+                let mut required_iter = account_keys.iter().take(13usize);
+                let stake_pool = required_iter.next().unwrap().clone();
+                let withdraw_authority = required_iter.next().unwrap().clone();
+                let transfer_authority = required_iter.next().unwrap().clone();
+                let pool_token_burn = required_iter.next().unwrap().clone();
+                let reserve_stake_account = required_iter.next().unwrap().clone();
+                let withdraw_account = required_iter.next().unwrap().clone();
+                let fee_token_account = required_iter.next().unwrap().clone();
+                let pool_token_mint = required_iter.next().unwrap().clone();
+                let sysvar_clock = required_iter.next().unwrap().clone();
+                let sysvar_stake_history = required_iter.next().unwrap().clone();
+                let stake_program = required_iter.next().unwrap().clone();
+                let token_program = required_iter.next().unwrap().clone();
+                let sol_withdraw_authority = required_iter.next().unwrap().clone();
+                let mut optional_iter = account_keys.iter().skip(13usize);
+                let remaining = if account_keys.len() > (13usize + 0usize) {
+                    account_keys[(13usize + 0usize)..].to_vec()
+                } else {
+                    Vec::new()
+                };
                 let accounts = WithdrawSolWithSlippageAccounts {
                     stake_pool,
                     withdraw_authority,
