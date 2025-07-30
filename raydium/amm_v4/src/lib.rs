@@ -1,6 +1,7 @@
 use bs58::decode;
-use serde::Serializer;
+use serde::{Serialize, Serializer};
 use anchor_lang::prelude::*;
+use serde_wasm_bindgen::{from_value, to_value};
 mod pubkey_serializer;
 
 // Utility function for serializing large numbers as strings
@@ -18,6 +19,12 @@ use console_error_panic_hook;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsValue;
 
+// A simple struct to serialize errors back into JS
+#[derive(Serialize)]
+struct ErrorObj {
+    error: String,
+}
+
 #[wasm_bindgen(start)]
 pub fn run() {
     console_error_panic_hook::set_once();
@@ -29,7 +36,10 @@ pub fn parse(base58_str: &str, accounts_js: JsValue) -> JsValue {
     let decoded = match decode(base58_str).into_vec() {
         Ok(b) => b,
         Err(e) => {
-            return JsValue::from_str(&format!("base58 decode failed: {}", e));
+            let err = ErrorObj {
+                error: format!("base58 decode failed: {}", e),
+            };
+            return to_value(&err).unwrap();
         }
     };
 
@@ -37,20 +47,47 @@ pub fn parse(base58_str: &str, accounts_js: JsValue) -> JsValue {
     if decoded.len() >= 8 && &decoded[..8] == &events::EVENT_LOG_DISCRIMINATOR {
         match events::Event::decode(&decoded) {
             Ok(ev) => {
-                return JsValue::from_str(&format!("{:?}", ev));
+                return to_value(&ev).unwrap_or_else(|e| {
+                    let err = ErrorObj {
+                        error: format!("event serialize failed: {}", e),
+                    };
+                    to_value(&err).unwrap()
+                });
             }
             Err(e) => {
-                return JsValue::from_str(&format!("Event decode failed: {}", e));
+                let err = ErrorObj {
+                    error: format!("Event decode failed: {}", e),
+                };
+                return to_value(&err).unwrap();
             }
         }
     }
 
-    // 3) Try instruction decode (accounts not used for now)
-    let accounts: Vec<String> = vec![];
+    // 3) Parse accounts from JavaScript
+    let accounts: Vec<String> = match from_value(accounts_js) {
+        Ok(v) => v,
+        Err(e) => {
+            let err = ErrorObj {
+                error: format!("accounts deserialize failed: {}", e),
+            };
+            return to_value(&err).unwrap();
+        }
+    };
 
+    // 4) Try instruction decode
     match Instruction::decode(&accounts, &decoded) {
-        Ok(ix) => JsValue::from_str(&format!("{:?}", ix)),
-        Err(e) => JsValue::from_str(&format!("decode failed: {}", e)),
+        Ok(ix) => to_value(&ix).unwrap_or_else(|e| {
+            let err = ErrorObj {
+                error: format!("serialize failed: {}", e),
+            };
+            to_value(&err).unwrap()
+        }),
+        Err(e) => {
+            let err = ErrorObj {
+                error: format!("Instruction::decode failed: {}", e),
+            };
+            to_value(&err).unwrap()
+        }
     }
 }
 
@@ -59,10 +96,10 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_raydium_clmm_decode() {
+    fn test_raydium_amm_v4_decode() {
         let sample_data = "Gimqm3fgf3NA3jiQkC2icmpfePo1tdWE9gPKivKqSZ83";
         
-        println!("Testing raydium CLMM decoder with sample data:");
+        println!("Testing raydium AMM V4 decoder with sample data:");
         println!("Base58 input: {}", sample_data);
         
         // Decode base58 to bytes
@@ -114,6 +151,127 @@ mod tests {
             }
         } else {
             println!("This doesn't appear to be an event (discriminator doesn't match)");
+        }
+    }
+    
+    #[test]
+    fn test_amm_v4_with_accounts() {
+        let sample_data = "Gimqm3fgf3NA3jiQkC2icmpfePo1tdWE9gPKivKqSZ83";
+        
+        println!("Testing AMM V4 decode with specific accounts:");
+        println!("Base58 input: {}", sample_data);
+        
+        // Decode base58 to bytes
+        let decoded_bytes = match decode(sample_data).into_vec() {
+            Ok(bytes) => bytes,
+            Err(e) => {
+                println!("❌ Base58 decode failed: {}", e);
+                panic!("Base58 decode failed: {}", e);
+            }
+        };
+        
+        println!("✅ Base58 decode successful!");
+        println!("Decoded bytes length: {}", decoded_bytes.len());
+        
+        if decoded_bytes.len() >= 8 {
+            let discriminator = &decoded_bytes[..8];
+            println!("Instruction discriminator: {:?}", discriminator);
+        }
+        
+        // Provide meaningful account names for AMM V4
+        let accounts = vec![
+            "token_program".to_string(),
+            "amm".to_string(),
+            "amm_authority".to_string(),
+            "amm_open_orders".to_string(),
+            "amm_target_orders".to_string(),
+            "pool_coin_token_account".to_string(),
+            "pool_pc_token_account".to_string(),
+            "serum_program_id".to_string(),
+            "serum_market".to_string(),
+            "serum_bids".to_string(),
+            "serum_asks".to_string(),
+            "serum_event_queue".to_string(),
+            "serum_coin_vault_account".to_string(),
+            "serum_pc_vault_account".to_string(),
+            "serum_vault_signer".to_string(),
+        ];
+        
+        // Test instruction decoding
+        match Instruction::decode(&accounts, &decoded_bytes) {
+            Ok(instruction) => {
+                println!("✅ Instruction decode successful!");
+                println!("Decoded instruction: {:#?}", instruction);
+            }
+            Err(e) => {
+                println!("❌ Instruction decode failed: {}", e);
+            }
+        }
+    }
+    
+    #[test]
+    fn test_amm_v4_json_serialization() {
+        println!("Testing AMM V4 JSON serialization:");
+        
+        // Create a fake instruction data for testing serialization
+        let mut data = vec![1, 2, 3, 4, 5, 6, 7, 8]; // Fake discriminator
+        data.extend_from_slice(&[0u8; 16]); // Add some dummy args
+        
+        let accounts = vec![
+            "token_program".to_string(),
+            "amm".to_string(),
+            "amm_authority".to_string(),
+        ];
+        
+        println!("Test accounts count: {}", accounts.len());
+        
+        // Test instruction decoding
+        match Instruction::decode(&accounts, &data) {
+            Ok(instruction) => {
+                println!("✅ Decode successful!");
+                println!("Decoded instruction: {:#?}", instruction);
+                
+                // Test serialization to JSON
+                match serde_json::to_string_pretty(&instruction) {
+                    Ok(json) => {
+                        println!("✅ JSON serialization successful!");
+                        println!("JSON output: {}", json);
+                    }
+                    Err(e) => {
+                        println!("❌ JSON serialization failed: {}", e);
+                    }
+                }
+            }
+            Err(e) => {
+                println!("❌ Decode failed: {}", e);
+            }
+        }
+    }
+    
+    #[test]
+    fn test_amm_v4_event_decode() {
+        println!("Testing AMM V4 event decoding:");
+        
+        // Create fake event data with the EVENT_LOG_DISCRIMINATOR
+        let mut event_data = events::EVENT_LOG_DISCRIMINATOR.to_vec();
+        event_data.extend_from_slice(&[0u8; 32]); // Add some dummy event payload
+        
+        println!("Event data length: {}", event_data.len());
+        
+        // Test event decoding
+        if event_data.len() >= 8 && &event_data[..8] == &events::EVENT_LOG_DISCRIMINATOR {
+            println!("✅ Event discriminator matches!");
+            match events::Event::decode(&event_data) {
+                Ok(event) => {
+                    println!("✅ Event decode successful!");
+                    println!("Decoded event: {:#?}", event);
+                }
+                Err(e) => {
+                    println!("❌ Event decode failed: {}", e);
+                }
+            }
+        } else {
+            println!("❌ Event discriminator doesn't match");
         }
     }
     

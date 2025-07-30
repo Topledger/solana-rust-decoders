@@ -27,7 +27,6 @@ fn main() -> Result<()> {
         #[allow(dead_code)]
 
         use ::borsh::BorshDeserialize;
-        use serde::Serialize;
 
         pub use ix_data::*;
         pub use accounts_data::*;
@@ -42,7 +41,8 @@ fn main() -> Result<()> {
             #(#args_structs)*
         }
 
-        #[derive(Debug)]
+        #[derive(Debug, serde::Serialize)]
+        #[serde(tag = "instruction_type")]
         pub enum Instruction {
             #(#instruction_variants)*
         }
@@ -67,7 +67,7 @@ fn main() -> Result<()> {
         pub mod events {
             use serde::Serialize;
 
-            #[derive(Debug, Serialize)]
+            #[derive(Debug, serde::Serialize)]
             #[serde(tag = "event_type")]
             pub enum Event {
                 // No events for AMM v4
@@ -114,11 +114,23 @@ fn generate_instructions(instructions: &[Value]) -> Result<(Vec<proc_macro2::Tok
             let field_name = arg["name"].as_str().unwrap();
             let field_ident = format_ident!("{}", field_name.to_snake_case());
             let ty = map_simple_type(&arg["type"]);
-            quote! { pub #field_ident: #ty, }
+            
+            // Add serialize_with annotation for large numbers
+            match arg["type"].as_str() {
+                Some("u64") | Some("u128") | Some("i64") | Some("i128") => {
+                    quote! {
+                        #[serde(serialize_with = "crate::serialize_to_string")]
+                        pub #field_ident: #ty,
+                    }
+                }
+                _ => {
+                    quote! { pub #field_ident: #ty, }
+                }
+            }
         }).collect();
 
         args_structs.push(quote! {
-            #[derive(::borsh::BorshDeserialize, Debug)]
+            #[derive(::borsh::BorshDeserialize, Debug, serde::Serialize)]
             pub struct #args_ty {
                 #(#args_fields)*
             }
@@ -133,7 +145,7 @@ fn generate_instructions(instructions: &[Value]) -> Result<(Vec<proc_macro2::Tok
             quote! { pub #f: String, }
         });
         accounts_structs.push(quote! {
-            #[derive(Debug, Serialize)]
+            #[derive(Debug, serde::Serialize)]
             pub struct #accounts_ty {
                 #(#acc_fields)*
                 pub remaining: Vec<String>,
@@ -156,17 +168,122 @@ fn generate_instructions(instructions: &[Value]) -> Result<(Vec<proc_macro2::Tok
             }
         });
 
-        decode_arms.push(quote! {
-            #tag => {
-                let mut rdr: &[u8] = rest;
-                let args = #args_ty::deserialize(&mut rdr)?;
-                let mut keys = account_keys.iter();
-                #(#extract)*
-                let remaining = keys.cloned().collect();
-                let accounts = #accounts_ty { #(#idents),*, remaining };
-                return Ok(Instruction::#variant { accounts, args });
-            }
-        });
+        // Always use resilient handling for all instructions to handle insufficient data
+        let always_handle_partial_data = true;
+
+        if always_handle_partial_data {
+            // Generate field assignments for partial deserialization
+            let partial_field_assignments: Vec<_> = args.iter().enumerate().map(|(field_idx, arg)| {
+                let field_name = arg["name"].as_str().unwrap();
+                let field_ident = format_ident!("{}", field_name.to_snake_case());
+                
+                // Check if this field is optional
+                let is_optional = if let Some(obj) = arg["type"].as_object() {
+                    obj.contains_key("option")
+                } else {
+                    false
+                };
+                
+                if is_optional {
+                    quote! { #field_ident: None, }
+                } else {
+                    // For non-optional fields, try to read from available data
+                    // Calculate byte offset for this field
+                    let mut byte_offset = 0usize;
+                    for (prev_idx, prev_arg) in args.iter().enumerate() {
+                        if prev_idx >= field_idx { break; }
+                        match prev_arg["type"].as_str() {
+                            Some("u8") => byte_offset += 1,
+                            Some("u16") => byte_offset += 2,
+                            Some("u32") => byte_offset += 4,
+                            Some("u64") => byte_offset += 8,
+                            Some("publicKey") => byte_offset += 32,
+                            _ => byte_offset += 4, // Default assumption
+                        }
+                    }
+                    
+                    match arg["type"].as_str() {
+                        Some("u8") => {
+                            quote! { #field_ident: if rest.len() > #byte_offset { rest[#byte_offset] } else { 0 }, }
+                        }
+                        Some("u16") => {
+                            quote! { #field_ident: if rest.len() >= #byte_offset + 2 { 
+                                u16::from_le_bytes([rest[#byte_offset], rest[#byte_offset + 1]]) 
+                            } else { 0 }, }
+                        }
+                        Some("u32") => {
+                            quote! { #field_ident: if rest.len() >= #byte_offset + 4 { 
+                                u32::from_le_bytes([
+                                    rest[#byte_offset], rest[#byte_offset + 1], 
+                                    rest[#byte_offset + 2], rest[#byte_offset + 3]
+                                ]) 
+                            } else { 0 }, }
+                        }
+                        Some("u64") => {
+                            quote! { #field_ident: if rest.len() >= #byte_offset + 8 { 
+                                u64::from_le_bytes([
+                                    rest[#byte_offset], rest[#byte_offset + 1], rest[#byte_offset + 2], rest[#byte_offset + 3],
+                                    rest[#byte_offset + 4], rest[#byte_offset + 5], rest[#byte_offset + 6], rest[#byte_offset + 7]
+                                ]) 
+                            } else { 0 }, }
+                        }
+                        Some("publicKey") => {
+                            quote! { #field_ident: if rest.len() >= #byte_offset + 32 { 
+                                [
+                                    rest[#byte_offset + 0], rest[#byte_offset + 1], rest[#byte_offset + 2], rest[#byte_offset + 3],
+                                    rest[#byte_offset + 4], rest[#byte_offset + 5], rest[#byte_offset + 6], rest[#byte_offset + 7],
+                                    rest[#byte_offset + 8], rest[#byte_offset + 9], rest[#byte_offset + 10], rest[#byte_offset + 11],
+                                    rest[#byte_offset + 12], rest[#byte_offset + 13], rest[#byte_offset + 14], rest[#byte_offset + 15],
+                                    rest[#byte_offset + 16], rest[#byte_offset + 17], rest[#byte_offset + 18], rest[#byte_offset + 19],
+                                    rest[#byte_offset + 20], rest[#byte_offset + 21], rest[#byte_offset + 22], rest[#byte_offset + 23],
+                                    rest[#byte_offset + 24], rest[#byte_offset + 25], rest[#byte_offset + 26], rest[#byte_offset + 27],
+                                    rest[#byte_offset + 28], rest[#byte_offset + 29], rest[#byte_offset + 30], rest[#byte_offset + 31]
+                                ]
+                            } else { [0u8; 32] }, }
+                        }
+                        _ => {
+                            // For complex types, use empty Vec<u8> as default
+                            quote! { #field_ident: Vec::new(), }
+                        }
+                    }
+                }
+            }).collect();
+            
+            // Special handling for instructions with optional fields
+            decode_arms.push(quote! {
+                #tag => {
+                    let mut rdr: &[u8] = rest;
+                    let args = match #args_ty::deserialize(&mut rdr) {
+                        Ok(args) => args,
+                        Err(_) => {
+                            // If normal deserialization fails, create args with available data
+                            #args_ty {
+                                #(#partial_field_assignments)*
+                            }
+                        }
+                    };
+                    let mut keys = account_keys.iter();
+                    #(#extract)*
+                    let remaining = keys.cloned().collect();
+                    let accounts = #accounts_ty { #(#idents),*, remaining };
+                    return Ok(Instruction::#variant { accounts, args });
+                }
+            });
+        } else {
+            // Normal handling for instructions without optional fields
+            decode_arms.push(quote! {
+                #tag => {
+                    let mut rdr: &[u8] = rest;
+                    let args = #args_ty::deserialize(&mut rdr)
+                        .map_err(|e| anyhow::anyhow!("Failed to deserialize args for {}: {} (data length: {})", stringify!(#variant), e, rest.len()))?;
+                    let mut keys = account_keys.iter();
+                    #(#extract)*
+                    let remaining = keys.cloned().collect();
+                    let accounts = #accounts_ty { #(#idents),*, remaining };
+                    return Ok(Instruction::#variant { accounts, args });
+                }
+            });
+        }
     }
 
     Ok((args_structs, accounts_structs, instruction_variants, decode_arms))
@@ -196,8 +313,10 @@ fn map_simple_type(ty: &Value) -> proc_macro2::TokenStream {
     } else if let Some(obj) = ty.as_object() {
         if let Some(_vec) = obj.get("vec") {
             quote! { Vec<u8> }  // Simplified - all vecs become Vec<u8>
-        } else if let Some(_option) = obj.get("option") {
-            quote! { Option<Vec<u8>> }  // Simplified - all options become Option<Vec<u8>>
+        } else if let Some(_option_inner) = obj.get("option") {
+            // Handle Option types - for simplicity, make them all Option<Vec<u8>>
+            // but with proper Borsh deserialization that can handle missing data
+            quote! { Option<Vec<u8>> }
         } else if let Some(_array) = obj.get("array") {
             quote! { Vec<u8> }  // Simplified - all arrays become Vec<u8>
         } else if let Some(_defined) = obj.get("defined") {

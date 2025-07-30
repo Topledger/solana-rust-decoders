@@ -3,10 +3,9 @@ pub use accounts_data::*;
 #[allow(dead_code)]
 use borsh::BorshDeserialize;
 pub use ix_data::*;
-use serde::Serialize;
 pub mod accounts_data {
     use serde::Serialize;
-    #[derive(Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct InitializeAccounts {
         pub token_program: String,
         pub system_program: String,
@@ -28,7 +27,7 @@ pub mod accounts_data {
         pub user_wallet: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct Initialize2Accounts {
         pub token_program: String,
         pub spl_associated_token_account: String,
@@ -53,7 +52,7 @@ pub mod accounts_data {
         pub user_lp_token_account: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct MonitorStepAccounts {
         pub token_program: String,
         pub rent: String,
@@ -76,7 +75,7 @@ pub mod accounts_data {
         pub serum_asks: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct DepositAccounts {
         pub token_program: String,
         pub amm: String,
@@ -94,7 +93,7 @@ pub mod accounts_data {
         pub serum_event_queue: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct WithdrawAccounts {
         pub token_program: String,
         pub amm: String,
@@ -120,7 +119,7 @@ pub mod accounts_data {
         pub serum_asks: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct MigrateToOpenBookAccounts {
         pub token_program: String,
         pub system_program: String,
@@ -145,7 +144,7 @@ pub mod accounts_data {
         pub admin: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct SetParamsAccounts {
         pub token_program: String,
         pub amm: String,
@@ -165,7 +164,7 @@ pub mod accounts_data {
         pub amm_admin_account: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct WithdrawPnlAccounts {
         pub token_program: String,
         pub amm: String,
@@ -186,7 +185,7 @@ pub mod accounts_data {
         pub serum_vault_signer: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct WithdrawSrmAccounts {
         pub token_program: String,
         pub amm: String,
@@ -196,7 +195,7 @@ pub mod accounts_data {
         pub dest_srm_token: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct SwapBaseInAccounts {
         pub token_program: String,
         pub amm: String,
@@ -218,7 +217,7 @@ pub mod accounts_data {
         pub user_source_owner: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct PreInitializeAccounts {
         pub token_program: String,
         pub system_program: String,
@@ -236,7 +235,7 @@ pub mod accounts_data {
         pub user_wallet: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct SwapBaseOutAccounts {
         pub token_program: String,
         pub amm: String,
@@ -258,7 +257,7 @@ pub mod accounts_data {
         pub user_source_owner: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct SimulateInfoAccounts {
         pub amm: String,
         pub amm_authority: String,
@@ -270,7 +269,7 @@ pub mod accounts_data {
         pub serum_event_queue: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct AdminCancelOrdersAccounts {
         pub token_program: String,
         pub amm: String,
@@ -291,7 +290,7 @@ pub mod accounts_data {
         pub serum_asks: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct CreateConfigAccountAccounts {
         pub admin: String,
         pub amm_config: String,
@@ -300,7 +299,7 @@ pub mod accounts_data {
         pub rent: String,
         pub remaining: Vec<String>,
     }
-    #[derive(Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     pub struct UpdateConfigAccountAccounts {
         pub admin: String,
         pub amm_config: String,
@@ -309,37 +308,45 @@ pub mod accounts_data {
 }
 pub mod ix_data {
     use serde::Serialize;
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct InitializeArguments {
         pub nonce: u8,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub open_time: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct Initialize2Arguments {
         pub nonce: u8,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub open_time: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub init_pc_amount: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub init_coin_amount: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct MonitorStepArguments {
         pub plan_order_limit: u16,
         pub place_order_limit: u16,
         pub cancel_order_limit: u16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct DepositArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub max_coin_amount: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub max_pc_amount: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub base_side: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct WithdrawArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct MigrateToOpenBookArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct SetParamsArguments {
         pub param: u8,
         pub value: Option<Vec<u8>>,
@@ -348,45 +355,51 @@ pub mod ix_data {
         pub last_order_distance: Option<Vec<u8>>,
         pub need_take_amounts: Option<Vec<u8>>,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct WithdrawPnlArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct WithdrawSrmArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct SwapBaseInArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_in: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub minimum_amount_out: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct PreInitializeArguments {
         pub nonce: u8,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct SwapBaseOutArguments {
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub max_amount_in: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount_out: u64,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct SimulateInfoArguments {
         pub param: u8,
         pub swap_base_in_value: Option<Vec<u8>>,
         pub swap_base_out_value: Option<Vec<u8>>,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct AdminCancelOrdersArguments {
         pub limit: u16,
     }
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct CreateConfigAccountArguments {}
-    #[derive(:: borsh :: BorshDeserialize, Debug)]
+    #[derive(:: borsh :: BorshDeserialize, Debug, serde :: Serialize)]
     pub struct UpdateConfigAccountArguments {
         pub param: u8,
         pub owner: [u8; 32],
     }
 }
-#[derive(Debug)]
+#[derive(Debug, serde :: Serialize)]
+#[serde(tag = "instruction_type")]
 pub enum Instruction {
     Initialize {
         accounts: InitializeAccounts,
@@ -463,7 +476,26 @@ impl Instruction {
         match tag {
             0u8 => {
                 let mut rdr: &[u8] = rest;
-                let args = InitializeArguments::deserialize(&mut rdr)?;
+                let args = match InitializeArguments::deserialize(&mut rdr) {
+                    Ok(args) => args,
+                    Err(_) => InitializeArguments {
+                        nonce: if rest.len() > 0usize { rest[0usize] } else { 0 },
+                        open_time: if rest.len() >= 1usize + 8 {
+                            u64::from_le_bytes([
+                                rest[1usize],
+                                rest[1usize + 1],
+                                rest[1usize + 2],
+                                rest[1usize + 3],
+                                rest[1usize + 4],
+                                rest[1usize + 5],
+                                rest[1usize + 6],
+                                rest[1usize + 7],
+                            ])
+                        } else {
+                            0
+                        },
+                    },
+                };
                 let mut keys = account_keys.iter();
                 let token_program = keys.next().unwrap_or(&"".to_string()).clone();
                 let system_program = keys.next().unwrap_or(&"".to_string()).clone();
@@ -509,7 +541,54 @@ impl Instruction {
             }
             1u8 => {
                 let mut rdr: &[u8] = rest;
-                let args = Initialize2Arguments::deserialize(&mut rdr)?;
+                let args = match Initialize2Arguments::deserialize(&mut rdr) {
+                    Ok(args) => args,
+                    Err(_) => Initialize2Arguments {
+                        nonce: if rest.len() > 0usize { rest[0usize] } else { 0 },
+                        open_time: if rest.len() >= 1usize + 8 {
+                            u64::from_le_bytes([
+                                rest[1usize],
+                                rest[1usize + 1],
+                                rest[1usize + 2],
+                                rest[1usize + 3],
+                                rest[1usize + 4],
+                                rest[1usize + 5],
+                                rest[1usize + 6],
+                                rest[1usize + 7],
+                            ])
+                        } else {
+                            0
+                        },
+                        init_pc_amount: if rest.len() >= 9usize + 8 {
+                            u64::from_le_bytes([
+                                rest[9usize],
+                                rest[9usize + 1],
+                                rest[9usize + 2],
+                                rest[9usize + 3],
+                                rest[9usize + 4],
+                                rest[9usize + 5],
+                                rest[9usize + 6],
+                                rest[9usize + 7],
+                            ])
+                        } else {
+                            0
+                        },
+                        init_coin_amount: if rest.len() >= 17usize + 8 {
+                            u64::from_le_bytes([
+                                rest[17usize],
+                                rest[17usize + 1],
+                                rest[17usize + 2],
+                                rest[17usize + 3],
+                                rest[17usize + 4],
+                                rest[17usize + 5],
+                                rest[17usize + 6],
+                                rest[17usize + 7],
+                            ])
+                        } else {
+                            0
+                        },
+                    },
+                };
                 let mut keys = account_keys.iter();
                 let token_program = keys.next().unwrap_or(&"".to_string()).clone();
                 let spl_associated_token_account = keys.next().unwrap_or(&"".to_string()).clone();
@@ -561,7 +640,26 @@ impl Instruction {
             }
             2u8 => {
                 let mut rdr: &[u8] = rest;
-                let args = MonitorStepArguments::deserialize(&mut rdr)?;
+                let args = match MonitorStepArguments::deserialize(&mut rdr) {
+                    Ok(args) => args,
+                    Err(_) => MonitorStepArguments {
+                        plan_order_limit: if rest.len() >= 0usize + 2 {
+                            u16::from_le_bytes([rest[0usize], rest[0usize + 1]])
+                        } else {
+                            0
+                        },
+                        place_order_limit: if rest.len() >= 2usize + 2 {
+                            u16::from_le_bytes([rest[2usize], rest[2usize + 1]])
+                        } else {
+                            0
+                        },
+                        cancel_order_limit: if rest.len() >= 4usize + 2 {
+                            u16::from_le_bytes([rest[4usize], rest[4usize + 1]])
+                        } else {
+                            0
+                        },
+                    },
+                };
                 let mut keys = account_keys.iter();
                 let token_program = keys.next().unwrap_or(&"".to_string()).clone();
                 let rent = keys.next().unwrap_or(&"".to_string()).clone();
@@ -609,7 +707,53 @@ impl Instruction {
             }
             3u8 => {
                 let mut rdr: &[u8] = rest;
-                let args = DepositArguments::deserialize(&mut rdr)?;
+                let args = match DepositArguments::deserialize(&mut rdr) {
+                    Ok(args) => args,
+                    Err(_) => DepositArguments {
+                        max_coin_amount: if rest.len() >= 0usize + 8 {
+                            u64::from_le_bytes([
+                                rest[0usize],
+                                rest[0usize + 1],
+                                rest[0usize + 2],
+                                rest[0usize + 3],
+                                rest[0usize + 4],
+                                rest[0usize + 5],
+                                rest[0usize + 6],
+                                rest[0usize + 7],
+                            ])
+                        } else {
+                            0
+                        },
+                        max_pc_amount: if rest.len() >= 8usize + 8 {
+                            u64::from_le_bytes([
+                                rest[8usize],
+                                rest[8usize + 1],
+                                rest[8usize + 2],
+                                rest[8usize + 3],
+                                rest[8usize + 4],
+                                rest[8usize + 5],
+                                rest[8usize + 6],
+                                rest[8usize + 7],
+                            ])
+                        } else {
+                            0
+                        },
+                        base_side: if rest.len() >= 16usize + 8 {
+                            u64::from_le_bytes([
+                                rest[16usize],
+                                rest[16usize + 1],
+                                rest[16usize + 2],
+                                rest[16usize + 3],
+                                rest[16usize + 4],
+                                rest[16usize + 5],
+                                rest[16usize + 6],
+                                rest[16usize + 7],
+                            ])
+                        } else {
+                            0
+                        },
+                    },
+                };
                 let mut keys = account_keys.iter();
                 let token_program = keys.next().unwrap_or(&"".to_string()).clone();
                 let amm = keys.next().unwrap_or(&"".to_string()).clone();
@@ -647,7 +791,25 @@ impl Instruction {
             }
             4u8 => {
                 let mut rdr: &[u8] = rest;
-                let args = WithdrawArguments::deserialize(&mut rdr)?;
+                let args = match WithdrawArguments::deserialize(&mut rdr) {
+                    Ok(args) => args,
+                    Err(_) => WithdrawArguments {
+                        amount: if rest.len() >= 0usize + 8 {
+                            u64::from_le_bytes([
+                                rest[0usize],
+                                rest[0usize + 1],
+                                rest[0usize + 2],
+                                rest[0usize + 3],
+                                rest[0usize + 4],
+                                rest[0usize + 5],
+                                rest[0usize + 6],
+                                rest[0usize + 7],
+                            ])
+                        } else {
+                            0
+                        },
+                    },
+                };
                 let mut keys = account_keys.iter();
                 let token_program = keys.next().unwrap_or(&"".to_string()).clone();
                 let amm = keys.next().unwrap_or(&"".to_string()).clone();
@@ -701,7 +863,10 @@ impl Instruction {
             }
             5u8 => {
                 let mut rdr: &[u8] = rest;
-                let args = MigrateToOpenBookArguments::deserialize(&mut rdr)?;
+                let args = match MigrateToOpenBookArguments::deserialize(&mut rdr) {
+                    Ok(args) => args,
+                    Err(_) => MigrateToOpenBookArguments {},
+                };
                 let mut keys = account_keys.iter();
                 let token_program = keys.next().unwrap_or(&"".to_string()).clone();
                 let system_program = keys.next().unwrap_or(&"".to_string()).clone();
@@ -753,7 +918,17 @@ impl Instruction {
             }
             6u8 => {
                 let mut rdr: &[u8] = rest;
-                let args = SetParamsArguments::deserialize(&mut rdr)?;
+                let args = match SetParamsArguments::deserialize(&mut rdr) {
+                    Ok(args) => args,
+                    Err(_) => SetParamsArguments {
+                        param: if rest.len() > 0usize { rest[0usize] } else { 0 },
+                        value: None,
+                        new_pubkey: None,
+                        fees: None,
+                        last_order_distance: None,
+                        need_take_amounts: None,
+                    },
+                };
                 let mut keys = account_keys.iter();
                 let token_program = keys.next().unwrap_or(&"".to_string()).clone();
                 let amm = keys.next().unwrap_or(&"".to_string()).clone();
@@ -795,7 +970,10 @@ impl Instruction {
             }
             7u8 => {
                 let mut rdr: &[u8] = rest;
-                let args = WithdrawPnlArguments::deserialize(&mut rdr)?;
+                let args = match WithdrawPnlArguments::deserialize(&mut rdr) {
+                    Ok(args) => args,
+                    Err(_) => WithdrawPnlArguments {},
+                };
                 let mut keys = account_keys.iter();
                 let token_program = keys.next().unwrap_or(&"".to_string()).clone();
                 let amm = keys.next().unwrap_or(&"".to_string()).clone();
@@ -839,7 +1017,25 @@ impl Instruction {
             }
             8u8 => {
                 let mut rdr: &[u8] = rest;
-                let args = WithdrawSrmArguments::deserialize(&mut rdr)?;
+                let args = match WithdrawSrmArguments::deserialize(&mut rdr) {
+                    Ok(args) => args,
+                    Err(_) => WithdrawSrmArguments {
+                        amount: if rest.len() >= 0usize + 8 {
+                            u64::from_le_bytes([
+                                rest[0usize],
+                                rest[0usize + 1],
+                                rest[0usize + 2],
+                                rest[0usize + 3],
+                                rest[0usize + 4],
+                                rest[0usize + 5],
+                                rest[0usize + 6],
+                                rest[0usize + 7],
+                            ])
+                        } else {
+                            0
+                        },
+                    },
+                };
                 let mut keys = account_keys.iter();
                 let token_program = keys.next().unwrap_or(&"".to_string()).clone();
                 let amm = keys.next().unwrap_or(&"".to_string()).clone();
@@ -861,7 +1057,39 @@ impl Instruction {
             }
             9u8 => {
                 let mut rdr: &[u8] = rest;
-                let args = SwapBaseInArguments::deserialize(&mut rdr)?;
+                let args = match SwapBaseInArguments::deserialize(&mut rdr) {
+                    Ok(args) => args,
+                    Err(_) => SwapBaseInArguments {
+                        amount_in: if rest.len() >= 0usize + 8 {
+                            u64::from_le_bytes([
+                                rest[0usize],
+                                rest[0usize + 1],
+                                rest[0usize + 2],
+                                rest[0usize + 3],
+                                rest[0usize + 4],
+                                rest[0usize + 5],
+                                rest[0usize + 6],
+                                rest[0usize + 7],
+                            ])
+                        } else {
+                            0
+                        },
+                        minimum_amount_out: if rest.len() >= 8usize + 8 {
+                            u64::from_le_bytes([
+                                rest[8usize],
+                                rest[8usize + 1],
+                                rest[8usize + 2],
+                                rest[8usize + 3],
+                                rest[8usize + 4],
+                                rest[8usize + 5],
+                                rest[8usize + 6],
+                                rest[8usize + 7],
+                            ])
+                        } else {
+                            0
+                        },
+                    },
+                };
                 let mut keys = account_keys.iter();
                 let token_program = keys.next().unwrap_or(&"".to_string()).clone();
                 let amm = keys.next().unwrap_or(&"".to_string()).clone();
@@ -907,7 +1135,12 @@ impl Instruction {
             }
             10u8 => {
                 let mut rdr: &[u8] = rest;
-                let args = PreInitializeArguments::deserialize(&mut rdr)?;
+                let args = match PreInitializeArguments::deserialize(&mut rdr) {
+                    Ok(args) => args,
+                    Err(_) => PreInitializeArguments {
+                        nonce: if rest.len() > 0usize { rest[0usize] } else { 0 },
+                    },
+                };
                 let mut keys = account_keys.iter();
                 let token_program = keys.next().unwrap_or(&"".to_string()).clone();
                 let system_program = keys.next().unwrap_or(&"".to_string()).clone();
@@ -945,7 +1178,39 @@ impl Instruction {
             }
             11u8 => {
                 let mut rdr: &[u8] = rest;
-                let args = SwapBaseOutArguments::deserialize(&mut rdr)?;
+                let args = match SwapBaseOutArguments::deserialize(&mut rdr) {
+                    Ok(args) => args,
+                    Err(_) => SwapBaseOutArguments {
+                        max_amount_in: if rest.len() >= 0usize + 8 {
+                            u64::from_le_bytes([
+                                rest[0usize],
+                                rest[0usize + 1],
+                                rest[0usize + 2],
+                                rest[0usize + 3],
+                                rest[0usize + 4],
+                                rest[0usize + 5],
+                                rest[0usize + 6],
+                                rest[0usize + 7],
+                            ])
+                        } else {
+                            0
+                        },
+                        amount_out: if rest.len() >= 8usize + 8 {
+                            u64::from_le_bytes([
+                                rest[8usize],
+                                rest[8usize + 1],
+                                rest[8usize + 2],
+                                rest[8usize + 3],
+                                rest[8usize + 4],
+                                rest[8usize + 5],
+                                rest[8usize + 6],
+                                rest[8usize + 7],
+                            ])
+                        } else {
+                            0
+                        },
+                    },
+                };
                 let mut keys = account_keys.iter();
                 let token_program = keys.next().unwrap_or(&"".to_string()).clone();
                 let amm = keys.next().unwrap_or(&"".to_string()).clone();
@@ -991,7 +1256,14 @@ impl Instruction {
             }
             12u8 => {
                 let mut rdr: &[u8] = rest;
-                let args = SimulateInfoArguments::deserialize(&mut rdr)?;
+                let args = match SimulateInfoArguments::deserialize(&mut rdr) {
+                    Ok(args) => args,
+                    Err(_) => SimulateInfoArguments {
+                        param: if rest.len() > 0usize { rest[0usize] } else { 0 },
+                        swap_base_in_value: None,
+                        swap_base_out_value: None,
+                    },
+                };
                 let mut keys = account_keys.iter();
                 let amm = keys.next().unwrap_or(&"".to_string()).clone();
                 let amm_authority = keys.next().unwrap_or(&"".to_string()).clone();
@@ -1017,7 +1289,16 @@ impl Instruction {
             }
             13u8 => {
                 let mut rdr: &[u8] = rest;
-                let args = AdminCancelOrdersArguments::deserialize(&mut rdr)?;
+                let args = match AdminCancelOrdersArguments::deserialize(&mut rdr) {
+                    Ok(args) => args,
+                    Err(_) => AdminCancelOrdersArguments {
+                        limit: if rest.len() >= 0usize + 2 {
+                            u16::from_le_bytes([rest[0usize], rest[0usize + 1]])
+                        } else {
+                            0
+                        },
+                    },
+                };
                 let mut keys = account_keys.iter();
                 let token_program = keys.next().unwrap_or(&"".to_string()).clone();
                 let amm = keys.next().unwrap_or(&"".to_string()).clone();
@@ -1061,7 +1342,10 @@ impl Instruction {
             }
             14u8 => {
                 let mut rdr: &[u8] = rest;
-                let args = CreateConfigAccountArguments::deserialize(&mut rdr)?;
+                let args = match CreateConfigAccountArguments::deserialize(&mut rdr) {
+                    Ok(args) => args,
+                    Err(_) => CreateConfigAccountArguments {},
+                };
                 let mut keys = account_keys.iter();
                 let admin = keys.next().unwrap_or(&"".to_string()).clone();
                 let amm_config = keys.next().unwrap_or(&"".to_string()).clone();
@@ -1081,7 +1365,50 @@ impl Instruction {
             }
             15u8 => {
                 let mut rdr: &[u8] = rest;
-                let args = UpdateConfigAccountArguments::deserialize(&mut rdr)?;
+                let args = match UpdateConfigAccountArguments::deserialize(&mut rdr) {
+                    Ok(args) => args,
+                    Err(_) => UpdateConfigAccountArguments {
+                        param: if rest.len() > 0usize { rest[0usize] } else { 0 },
+                        owner: if rest.len() >= 1usize + 32 {
+                            [
+                                rest[1usize + 0],
+                                rest[1usize + 1],
+                                rest[1usize + 2],
+                                rest[1usize + 3],
+                                rest[1usize + 4],
+                                rest[1usize + 5],
+                                rest[1usize + 6],
+                                rest[1usize + 7],
+                                rest[1usize + 8],
+                                rest[1usize + 9],
+                                rest[1usize + 10],
+                                rest[1usize + 11],
+                                rest[1usize + 12],
+                                rest[1usize + 13],
+                                rest[1usize + 14],
+                                rest[1usize + 15],
+                                rest[1usize + 16],
+                                rest[1usize + 17],
+                                rest[1usize + 18],
+                                rest[1usize + 19],
+                                rest[1usize + 20],
+                                rest[1usize + 21],
+                                rest[1usize + 22],
+                                rest[1usize + 23],
+                                rest[1usize + 24],
+                                rest[1usize + 25],
+                                rest[1usize + 26],
+                                rest[1usize + 27],
+                                rest[1usize + 28],
+                                rest[1usize + 29],
+                                rest[1usize + 30],
+                                rest[1usize + 31],
+                            ]
+                        } else {
+                            [0u8; 32]
+                        },
+                    },
+                };
                 let mut keys = account_keys.iter();
                 let admin = keys.next().unwrap_or(&"".to_string()).clone();
                 let amm_config = keys.next().unwrap_or(&"".to_string()).clone();
@@ -1099,7 +1426,7 @@ impl Instruction {
 }
 pub mod events {
     use serde::Serialize;
-    #[derive(Debug, Serialize)]
+    #[derive(Debug, serde :: Serialize)]
     #[serde(tag = "event_type")]
     pub enum Event {}
     pub const EVENT_LOG_DISCRIMINATOR: [u8; 8] = [0; 8];
