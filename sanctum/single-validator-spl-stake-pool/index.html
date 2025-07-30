@@ -15,34 +15,11 @@
       // Test case 1: Initialize with 9 required accounts only (no optional deposit_authority)
       let accounts = [
         "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB", // stake_pool
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB", // manager
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB", // staker
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB", // stake_pool_withdraw_authority
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB", // validator_list
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB", // reserve_stake
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB", // pool_mint
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB", // manager_pool_account
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB"  // token_program
-        // deposit_authority is optional and not provided
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB" // manager
+        
     ];
-      console.log("Test 1 - Without optional deposit_authority:");
       console.log(parse(data, accounts));
       
-      // Test case 2: Initialize with 10 accounts (including optional deposit_authority)
-      let accountsWithOptional = [
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB", // stake_pool
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB", // manager
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB", // staker
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB", // stake_pool_withdraw_authority
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB", // validator_list
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB", // reserve_stake
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB", // pool_mint
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB", // manager_pool_account
-        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB", // token_program
-        "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1"  // deposit_authority (optional)
-    ];
-      console.log("Test 2 - With optional deposit_authority:");
-      console.log(parse(data, accountsWithOptional));
     });
   </script>
 </body>

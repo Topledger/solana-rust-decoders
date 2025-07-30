@@ -848,7 +848,8 @@
         {
           "name": "depositAuthority",
           "isMut": false,
-          "isSigner": true
+          "isSigner": true,
+          "isOptional": true
         }
       ],
       "args": [
@@ -878,7 +879,8 @@
         {
           "name": "newAuthority",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "isOptional": true
         }
       ],
       "args": [
@@ -960,7 +962,8 @@
         {
           "name": "solWithdrawAuthority",
           "isMut": false,
-          "isSigner": true
+          "isSigner": true,
+          "isOptional": true
         }
       ],
       "args": [
@@ -1662,7 +1665,8 @@
         {
           "name": "solDepositAuthority",
           "isMut": false,
-          "isSigner": true
+          "isSigner": true,
+          "isOptional": true
         }
       ],
       "args": [
@@ -1746,7 +1750,8 @@
         {
           "name": "solWithdrawAuthority",
           "isMut": false,
-          "isSigner": true
+          "isSigner": true,
+          "isOptional": true
         }
       ],
       "args": [

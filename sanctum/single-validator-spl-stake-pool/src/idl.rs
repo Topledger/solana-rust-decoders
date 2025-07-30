@@ -187,14 +187,14 @@ pub mod accounts_data {
         pub pool_token_mint: String,
         pub system_program: String,
         pub token_program_id: String,
-        pub deposit_authority: String,
+        pub deposit_authority: Option<String>,
         pub remaining: Vec<String>,
     }
     #[derive(Debug, serde :: Serialize)]
     pub struct SetFundingAuthorityAccounts {
         pub stake_pool: String,
         pub manager: String,
-        pub new_authority: String,
+        pub new_authority: Option<String>,
         pub remaining: Vec<String>,
     }
     #[derive(Debug, serde :: Serialize)]
@@ -211,7 +211,7 @@ pub mod accounts_data {
         pub sysvar_stake_history: String,
         pub stake_program: String,
         pub token_program: String,
-        pub sol_withdraw_authority: String,
+        pub sol_withdraw_authority: Option<String>,
         pub remaining: Vec<String>,
     }
     #[derive(Debug, serde :: Serialize)]
@@ -350,7 +350,7 @@ pub mod accounts_data {
         pub pool_token_mint: String,
         pub system_program: String,
         pub token_program: String,
-        pub sol_deposit_authority: String,
+        pub sol_deposit_authority: Option<String>,
         pub remaining: Vec<String>,
     }
     #[derive(Debug, serde :: Serialize)]
@@ -367,7 +367,7 @@ pub mod accounts_data {
         pub sysvar_stake_history: String,
         pub stake_program: String,
         pub token_program: String,
-        pub sol_withdraw_authority: String,
+        pub sol_withdraw_authority: Option<String>,
         pub remaining: Vec<String>,
     }
 }
@@ -1206,14 +1206,14 @@ impl Instruction {
             14u8 => {
                 let mut rdr: &[u8] = rest;
                 let args = DepositSolArguments::deserialize(&mut rdr)?;
-                if account_keys.len() < 11usize {
+                if account_keys.len() < 10usize {
                     anyhow::bail!(
                         "Insufficient accounts: got {}, need at least {} for required accounts",
                         account_keys.len(),
-                        11usize
+                        10usize
                     );
                 }
-                let mut required_iter = account_keys.iter().take(11usize);
+                let mut required_iter = account_keys.iter().take(10usize);
                 let stake_pool = required_iter.next().unwrap().clone();
                 let stake_pool_withdraw_authority = required_iter.next().unwrap().clone();
                 let reserve_stake_account = required_iter.next().unwrap().clone();
@@ -1224,10 +1224,10 @@ impl Instruction {
                 let pool_token_mint = required_iter.next().unwrap().clone();
                 let system_program = required_iter.next().unwrap().clone();
                 let token_program_id = required_iter.next().unwrap().clone();
-                let deposit_authority = required_iter.next().unwrap().clone();
-                let mut optional_iter = account_keys.iter().skip(11usize);
-                let remaining = if account_keys.len() > (11usize + 0usize) {
-                    account_keys[(11usize + 0usize)..].to_vec()
+                let mut optional_iter = account_keys.iter().skip(10usize);
+                let deposit_authority = optional_iter.next().map(|s| s.clone());
+                let remaining = if account_keys.len() > (10usize + 1usize) {
+                    account_keys[(10usize + 1usize)..].to_vec()
                 } else {
                     Vec::new()
                 };
@@ -1250,20 +1250,20 @@ impl Instruction {
             15u8 => {
                 let mut rdr: &[u8] = rest;
                 let args = SetFundingAuthorityArguments::deserialize(&mut rdr)?;
-                if account_keys.len() < 3usize {
+                if account_keys.len() < 2usize {
                     anyhow::bail!(
                         "Insufficient accounts: got {}, need at least {} for required accounts",
                         account_keys.len(),
-                        3usize
+                        2usize
                     );
                 }
-                let mut required_iter = account_keys.iter().take(3usize);
+                let mut required_iter = account_keys.iter().take(2usize);
                 let stake_pool = required_iter.next().unwrap().clone();
                 let manager = required_iter.next().unwrap().clone();
-                let new_authority = required_iter.next().unwrap().clone();
-                let mut optional_iter = account_keys.iter().skip(3usize);
-                let remaining = if account_keys.len() > (3usize + 0usize) {
-                    account_keys[(3usize + 0usize)..].to_vec()
+                let mut optional_iter = account_keys.iter().skip(2usize);
+                let new_authority = optional_iter.next().map(|s| s.clone());
+                let remaining = if account_keys.len() > (2usize + 1usize) {
+                    account_keys[(2usize + 1usize)..].to_vec()
                 } else {
                     Vec::new()
                 };
@@ -1278,14 +1278,14 @@ impl Instruction {
             16u8 => {
                 let mut rdr: &[u8] = rest;
                 let args = WithdrawSolArguments::deserialize(&mut rdr)?;
-                if account_keys.len() < 13usize {
+                if account_keys.len() < 12usize {
                     anyhow::bail!(
                         "Insufficient accounts: got {}, need at least {} for required accounts",
                         account_keys.len(),
-                        13usize
+                        12usize
                     );
                 }
-                let mut required_iter = account_keys.iter().take(13usize);
+                let mut required_iter = account_keys.iter().take(12usize);
                 let stake_pool = required_iter.next().unwrap().clone();
                 let withdraw_authority = required_iter.next().unwrap().clone();
                 let transfer_authority = required_iter.next().unwrap().clone();
@@ -1298,10 +1298,10 @@ impl Instruction {
                 let sysvar_stake_history = required_iter.next().unwrap().clone();
                 let stake_program = required_iter.next().unwrap().clone();
                 let token_program = required_iter.next().unwrap().clone();
-                let sol_withdraw_authority = required_iter.next().unwrap().clone();
-                let mut optional_iter = account_keys.iter().skip(13usize);
-                let remaining = if account_keys.len() > (13usize + 0usize) {
-                    account_keys[(13usize + 0usize)..].to_vec()
+                let mut optional_iter = account_keys.iter().skip(12usize);
+                let sol_withdraw_authority = optional_iter.next().map(|s| s.clone());
+                let remaining = if account_keys.len() > (12usize + 1usize) {
+                    account_keys[(12usize + 1usize)..].to_vec()
                 } else {
                     Vec::new()
                 };
@@ -1686,14 +1686,14 @@ impl Instruction {
             25u8 => {
                 let mut rdr: &[u8] = rest;
                 let args = DepositSolWithSlippageArguments::deserialize(&mut rdr)?;
-                if account_keys.len() < 11usize {
+                if account_keys.len() < 10usize {
                     anyhow::bail!(
                         "Insufficient accounts: got {}, need at least {} for required accounts",
                         account_keys.len(),
-                        11usize
+                        10usize
                     );
                 }
-                let mut required_iter = account_keys.iter().take(11usize);
+                let mut required_iter = account_keys.iter().take(10usize);
                 let stake_pool = required_iter.next().unwrap().clone();
                 let withdraw_authority = required_iter.next().unwrap().clone();
                 let reserve_stake_account = required_iter.next().unwrap().clone();
@@ -1704,10 +1704,10 @@ impl Instruction {
                 let pool_token_mint = required_iter.next().unwrap().clone();
                 let system_program = required_iter.next().unwrap().clone();
                 let token_program = required_iter.next().unwrap().clone();
-                let sol_deposit_authority = required_iter.next().unwrap().clone();
-                let mut optional_iter = account_keys.iter().skip(11usize);
-                let remaining = if account_keys.len() > (11usize + 0usize) {
-                    account_keys[(11usize + 0usize)..].to_vec()
+                let mut optional_iter = account_keys.iter().skip(10usize);
+                let sol_deposit_authority = optional_iter.next().map(|s| s.clone());
+                let remaining = if account_keys.len() > (10usize + 1usize) {
+                    account_keys[(10usize + 1usize)..].to_vec()
                 } else {
                     Vec::new()
                 };
@@ -1730,14 +1730,14 @@ impl Instruction {
             26u8 => {
                 let mut rdr: &[u8] = rest;
                 let args = WithdrawSolWithSlippageArguments::deserialize(&mut rdr)?;
-                if account_keys.len() < 13usize {
+                if account_keys.len() < 12usize {
                     anyhow::bail!(
                         "Insufficient accounts: got {}, need at least {} for required accounts",
                         account_keys.len(),
-                        13usize
+                        12usize
                     );
                 }
-                let mut required_iter = account_keys.iter().take(13usize);
+                let mut required_iter = account_keys.iter().take(12usize);
                 let stake_pool = required_iter.next().unwrap().clone();
                 let withdraw_authority = required_iter.next().unwrap().clone();
                 let transfer_authority = required_iter.next().unwrap().clone();
@@ -1750,10 +1750,10 @@ impl Instruction {
                 let sysvar_stake_history = required_iter.next().unwrap().clone();
                 let stake_program = required_iter.next().unwrap().clone();
                 let token_program = required_iter.next().unwrap().clone();
-                let sol_withdraw_authority = required_iter.next().unwrap().clone();
-                let mut optional_iter = account_keys.iter().skip(13usize);
-                let remaining = if account_keys.len() > (13usize + 0usize) {
-                    account_keys[(13usize + 0usize)..].to_vec()
+                let mut optional_iter = account_keys.iter().skip(12usize);
+                let sol_withdraw_authority = optional_iter.next().map(|s| s.clone());
+                let remaining = if account_keys.len() > (12usize + 1usize) {
+                    account_keys[(12usize + 1usize)..].to_vec()
                 } else {
                     Vec::new()
                 };
