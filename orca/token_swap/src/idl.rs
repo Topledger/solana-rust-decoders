@@ -51,6 +51,8 @@ pub mod typedefs {
 
     #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Serialize)]
     pub struct InitializeArgs {
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub nonce: Option<u8>,
         pub fees: Fees,
         pub swap_curve: SwapCurve,
     }
@@ -65,27 +67,57 @@ pub mod typedefs {
 
     #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Serialize)]
     pub struct RemoveLiquidityTypesArgs {
+        #[serde(serialize_with = "u64_to_string")]
         pub pool_token_amount: u64,
+        #[serde(serialize_with = "u64_to_string")]
         pub maximum_token_a_amount: u64,
+        #[serde(serialize_with = "u64_to_string")]
         pub maximum_token_b_amount: u64,
     }
 
     #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Serialize)]
-    pub struct DepositArgs {
+    pub struct DepositAllTokenTypesArgs {
+        #[serde(serialize_with = "u64_to_string")]
         pub pool_token_amount: u64,
+        #[serde(serialize_with = "u64_to_string")]
         pub minimum_token_a_amount: u64,
+        #[serde(serialize_with = "u64_to_string")]
+        pub minimum_token_b_amount: u64,
+    }
+
+    #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct WithdrawAllTokenTypesArgs {
+        #[serde(serialize_with = "u64_to_string")]
+        pub pool_token_amount: u64,
+        #[serde(serialize_with = "u64_to_string")]
+        pub minimum_token_a_amount: u64,
+        #[serde(serialize_with = "u64_to_string")]
+        pub minimum_token_b_amount: u64,
+    }
+
+    #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Serialize)]
+    pub struct DepositArgs {
+        #[serde(serialize_with = "u64_to_string")]
+        pub pool_token_amount: u64,
+        #[serde(serialize_with = "u64_to_string")]
+        pub minimum_token_a_amount: u64,
+        #[serde(serialize_with = "u64_to_string")]
         pub minimum_token_b_amount: u64,
     }
 
     #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Serialize)]
     pub struct DepositSingleTokenTypeExactAmountInArgs {
+        #[serde(serialize_with = "u64_to_string")]
         pub source_token_amount: u64,
+        #[serde(serialize_with = "u64_to_string")]
         pub minimum_pool_token_amount: u64,
     }
 
     #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Serialize)]
     pub struct WithdrawSingleTokenTypeExactAmountOutArgs {
+        #[serde(serialize_with = "u64_to_string")]
         pub destination_token_amount: u64,
+        #[serde(serialize_with = "u64_to_string")]
         pub maximum_pool_token_amount: u64,
     }
 }
@@ -178,6 +210,34 @@ pub mod accounts_data {
         pub fee_account: String,
         pub token_program: String,
     }
+    #[derive(Debug, Serialize)]
+    pub struct DepositAllTokenTypesAccounts {
+        pub token_swap: String,
+        pub authority: String,
+        pub user_transfer_authority: String,
+        pub source_a: String,
+        pub source_b: String,
+        pub into_a: String,
+        pub into_b: String,
+        pub pool_token: String,
+        pub pool_account: String,
+        pub token_program: String,
+    }
+
+    #[derive(Debug, Serialize)]
+    pub struct WithdrawAllTokenTypesAccounts {
+        pub token_swap: String,
+        pub authority: String,
+        pub user_transfer_authority: String,
+        pub pool_mint: String,
+        pub source_pool_account: String,
+        pub to_a: String,
+        pub to_b: String,
+        pub user_account_a: String,
+        pub user_account_b: String,
+        pub fee_account: String,
+        pub token_program: String,
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -210,6 +270,14 @@ pub enum Instruction {
     RemoveLiquidity { accounts: accounts_data::RemoveLiquidityTypesAccounts, args: typedefs::RemoveLiquidityTypesArgs },
     DepositSingleTokenTypeExactAmountIn { accounts: accounts_data::DepositSingleTokenTypeExactAmountInAccounts, args: typedefs::DepositSingleTokenTypeExactAmountInArgs },
     WithdrawSingleTokenTypeExactAmountOut { accounts: accounts_data::WithdrawSingleTokenTypeExactAmountOutAccounts, args: typedefs::WithdrawSingleTokenTypeExactAmountOutArgs },
+    DepositAllTokenTypes {
+        accounts: accounts_data::DepositAllTokenTypesAccounts,
+        args: typedefs::DepositAllTokenTypesArgs,
+    },
+    WithdrawAllTokenTypes {
+        accounts: accounts_data::WithdrawAllTokenTypesAccounts,
+        args: typedefs::WithdrawAllTokenTypesArgs,
+    },
 }
 
 impl Instruction {
@@ -219,7 +287,36 @@ impl Instruction {
         let mut slice_reader = rest;
         match tag {
             0 => {
-                let args = typedefs::InitializeArgs::deserialize(&mut slice_reader)?;
+                let fees_len       = std::mem::size_of::<Fees>();            // 8 fields × 8 bytes = 64
+                let curve_len      = std::mem::size_of::<SwapCurve>();       // 1 byte + 32 bytes = 33
+                let old_layout_len = 1 + fees_len + curve_len;               // 1 nonce byte
+                let new_layout_len =     fees_len + curve_len;               // no nonce
+
+                // pick which one and strip off the nonce if present
+                let (nonce, mut rdr_bytes) = match rest.len() {
+                    x if x == old_layout_len =>
+                        (Some(rest[0]), &rest[1..]),
+                    x if x == new_layout_len =>
+                        (None, rest),
+                    // fallback: if it’s _too_ long assume old layout
+                    x if x >  old_layout_len =>
+                        (Some(rest[0]), &rest[1..]),
+                    other =>
+                        return Err(anyhow!("Invalid Initialize payload size: {}", other)),
+                };
+
+                // now rdr_bytes is exactly [ fees_data (64) | curve_data (33) ]
+                let mut rdr = rdr_bytes;
+                let fees       = Fees::deserialize(&mut rdr)?;
+                let swap_curve = SwapCurve::deserialize(&mut rdr)?;
+
+                let args = typedefs::InitializeArgs {
+                    nonce,
+                    fees,
+                    swap_curve,
+                };
+
+                // let args = typedefs::InitializeArgs::deserialize(&mut slice_reader)?;
                 let accounts = accounts_data::InitializeAccounts {
                     token_swap_account: keys.next().unwrap().clone(),
                     swap_authority: keys.next().unwrap().clone(),
@@ -315,6 +412,8 @@ impl Instruction {
                 };
                 Ok(Instruction::WithdrawSingleTokenTypeExactAmountOut { accounts, args })
             }
+
+            
             _ => Err(anyhow!("Unknown instruction tag: {}", tag)),
         }
     }
