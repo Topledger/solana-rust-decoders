@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en-US">
+
+<head>
+  <meta charset="utf-8" />
+  <title>single-validator-spl-stake-pool example</title>
+</head>
+
+<body>
+  <script type="module">
+    import init, { parse } from "./pkg/single_validator_stake_pool.js";
+    init().then(() => {
+      let join_key = "5kkPihtAaNhVHmAShzyRw3vg3dQFAiEA888BmvTHU3v8nRCKQSp4j52EVapC6QRyLivuWmPWvVx9NBBShLdcMqMp_0_1";
+      let data = "29E";
+      // Test case 1: Initialize with 9 required accounts only (no optional deposit_authority)
+      let accounts = [
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB", // stake_pool
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB" // manager
+        
+    ];
+      console.log(parse(data, accounts));
+      
+    });
+  </script>
+</body>
+
+</html> 

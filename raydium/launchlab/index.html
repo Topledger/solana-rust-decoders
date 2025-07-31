@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en-US">
+
+<head>
+  <meta charset="utf-8" />
+  <title>raydium-launchlab example</title>
+</head>
+
+<body>
+  <script type="module">
+    import init, { parse } from "./pkg/launchlab.js";
+    init().then(() => {
+      let join_key = "5kkPihtAaNhVHmAShzyRw3vg3dQFAiEA888BmvTHU3v8nRCKQSp4j52EVapC6QRyLivuWmPWvVx9NBBShLdcMqMp_0_1";
+      let data = "iBing5vG7FFYVVoD3CZyLVpGSuCazuZ4tqXaKdwAgvKFVHzuK4zw7LqgsrrZffEdXFMp69a4do6uJsAfaxR9fHCwJ28pdp99ihgYbsfsG96p2aiT7nx9pHumN4RMJWathLhhu4N43bvKwemdCGLaM7xPJ83g3JsdMsMg4g8HJ3DkeKjeKPNVJ6mNPw64urNkq1jNfx3WFamn8k58yZtSXkRRfTcibVeDj89T9NCQqSrEVKNWaWamHPy5xLrKaarvhNGdZMeDQNDji2KKShXkZ853fc3sz63LkvxtCmmSmpaYycYeZZRVPFfF1aa8u8YqqdNFnCMfV9WzSTqxtjrnLBN3E7Fr6ZNPMHvxL59mNYCisBYHCAGHR6qGMYz3aL63ZYpoZ8Jj";
+      let accounts = [
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        
+    ];
+      console.log(parse(data, accounts));
+    });
+  </script>
+</body>
+
+</html> 

@@ -1,0 +1,32 @@
+[package]
+name = "raydium_cpmm"
+version = "1.0.0"
+edition = "2021"
+
+[lib]
+name = "cpmm"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+bs58 = "0.5"
+anyhow = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+serde-wasm-bindgen = "0.5"
+wasm-bindgen = { version = "0.2", features = ["serde-serialize"] }
+console_error_panic_hook = "0.1"
+anchor-lang = { version = "0.31.1", features = ["idl-build", "derive"] }
+borsh = "0.10"
+
+[build-dependencies]
+anchor-idl = "0.4.1"
+serde_json = "1.0"
+quote = "1.0"
+heck = "0.4"
+syn = { version = "1", features = ["full", "parsing"] }
+anyhow = "1.0"
+proc-macro2 = "1"
+
+[profile.release]
+lto = true
+opt-level = 's'
+strip = "debuginfo" 
