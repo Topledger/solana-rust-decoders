@@ -150,9 +150,9 @@ pub mod ix_data {
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct InitReferralAccountArgs {
-        pub partner_name: String,
         pub validator_vote_key: Option<String>,
         pub keep_self_stake_pct: u8,
+        pub partner_name: String,
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct UpdateReferralArgs {

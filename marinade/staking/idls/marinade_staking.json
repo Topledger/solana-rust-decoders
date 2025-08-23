@@ -331,10 +331,6 @@
       ],
       "args": [
         {
-          "name": "partnerName",
-          "type": "string"
-        },
-        {
           "name": "validatorVoteKey",
           "type": {
             "option": "publicKey"
@@ -343,6 +339,10 @@
         {
           "name": "keepSelfStakePct",
           "type": "u8"
+        },
+        {
+          "name": "partnerName",
+          "type": "string"
         }
       ]
     },

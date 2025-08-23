@@ -1,0 +1,1 @@
+/Users/admin/solana-rust-decoders/native_staking/target/wasm32-unknown-unknown/release/libnative_staking.rlib: /Users/admin/solana-rust-decoders/native_staking/src/instruction.rs /Users/admin/solana-rust-decoders/native_staking/src/lib.rs

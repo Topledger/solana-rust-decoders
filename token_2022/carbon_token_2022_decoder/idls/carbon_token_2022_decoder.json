@@ -1,0 +1,3221 @@
+{
+  "version": "0.9.1",
+  "name": "carbon_token_2022_decoder",
+  "programId": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+  "instructions": [
+    {
+      "name": "initializeMint",
+      "discriminant": {
+        "type": "u8",
+        "value": 0
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "decimals",
+          "type": "u8"
+        },
+        {
+          "name": "mintAuthority",
+          "type": "pubkey"
+        },
+        {
+          "name": "freezeAuthority",
+          "type": {
+            "option": "pubkey"
+          }
+        }
+      ]
+    },
+    {
+      "name": "initializeAccount",
+      "discriminant": {
+        "type": "u8",
+        "value": 1
+      },
+      "accounts": [
+        {
+          "name": "account",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initializeMultisig",
+      "discriminant": {
+        "type": "u8",
+        "value": 2
+      },
+      "accounts": [
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "m",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "transfer",
+      "discriminant": {
+        "type": "u8",
+        "value": 3
+      },
+      "accounts": [
+        {
+          "name": "source",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "destination",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "approve",
+      "discriminant": {
+        "type": "u8",
+        "value": 4
+      },
+      "accounts": [
+        {
+          "name": "source",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "delegate",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "revoke",
+      "discriminant": {
+        "type": "u8",
+        "value": 5
+      },
+      "accounts": [
+        {
+          "name": "source",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "setAuthority",
+      "discriminant": {
+        "type": "u8",
+        "value": 6
+      },
+      "accounts": [
+        {
+          "name": "owned",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "authorityType",
+          "type": {
+            "defined": "AuthorityType"
+          }
+        },
+        {
+          "name": "newAuthority",
+          "type": {
+            "option": "pubkey"
+          }
+        }
+      ]
+    },
+    {
+      "name": "mintTo",
+      "discriminant": {
+        "type": "u8",
+        "value": 7
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "token",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mintAuthority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "burn",
+      "discriminant": {
+        "type": "u8",
+        "value": 8
+      },
+      "accounts": [
+        {
+          "name": "account",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "closeAccount",
+      "discriminant": {
+        "type": "u8",
+        "value": 9
+      },
+      "accounts": [
+        {
+          "name": "account",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "destination",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "freezeAccount",
+      "discriminant": {
+        "type": "u8",
+        "value": 10
+      },
+      "accounts": [
+        {
+          "name": "account",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "thawAccount",
+      "discriminant": {
+        "type": "u8",
+        "value": 11
+      },
+      "accounts": [
+        {
+          "name": "account",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "transferChecked",
+      "discriminant": {
+        "type": "u8",
+        "value": 12
+      },
+      "accounts": [
+        {
+          "name": "source",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "destination",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "decimals",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "approveChecked",
+      "discriminant": {
+        "type": "u8",
+        "value": 13
+      },
+      "accounts": [
+        {
+          "name": "source",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "delegate",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "decimals",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "mintToChecked",
+      "discriminant": {
+        "type": "u8",
+        "value": 14
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "token",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mintAuthority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "decimals",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "burnChecked",
+      "discriminant": {
+        "type": "u8",
+        "value": 15
+      },
+      "accounts": [
+        {
+          "name": "account",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "decimals",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "initializeAccount2",
+      "discriminant": {
+        "type": "u8",
+        "value": 16
+      },
+      "accounts": [
+        {
+          "name": "account",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "owner",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "syncNative",
+      "discriminant": {
+        "type": "u8",
+        "value": 17
+      },
+      "accounts": [
+        {
+          "name": "account",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initializeAccount3",
+      "discriminant": {
+        "type": "u8",
+        "value": 18
+      },
+      "accounts": [
+        {
+          "name": "account",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "owner",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "initializeMultisig2",
+      "discriminant": {
+        "type": "u8",
+        "value": 19
+      },
+      "accounts": [
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "m",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "initializeMint2",
+      "discriminant": {
+        "type": "u8",
+        "value": 20
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "decimals",
+          "type": "u8"
+        },
+        {
+          "name": "mintAuthority",
+          "type": "pubkey"
+        },
+        {
+          "name": "freezeAuthority",
+          "type": {
+            "option": "pubkey"
+          }
+        }
+      ]
+    },
+    {
+      "name": "getAccountDataSize",
+      "discriminant": {
+        "type": "u8",
+        "value": 21
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initializeImmutableOwner",
+      "discriminant": {
+        "type": "u8",
+        "value": 22
+      },
+      "accounts": [
+        {
+          "name": "account",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "amountToUiAmount",
+      "discriminant": {
+        "type": "u8",
+        "value": 23
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "uiAmountToAmount",
+      "discriminant": {
+        "type": "u8",
+        "value": 24
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "uiAmount",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "initializeMintCloseAuthority",
+      "discriminant": {
+        "type": "u8",
+        "value": 25
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "closeAuthority",
+          "type": {
+            "option": "pubkey"
+          }
+        }
+      ]
+    },
+    {
+      "name": "initializeTransferFeeConfig",
+      "discriminant": {
+        "type": "u8",
+        "value": 26
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "transferFeeConfigAuthority",
+          "type": {
+            "option": "pubkey"
+          }
+        },
+        {
+          "name": "withdrawWithheldAuthority",
+          "type": {
+            "option": "pubkey"
+          }
+        },
+        {
+          "name": "transferFeeBasisPoints",
+          "type": "u16"
+        },
+        {
+          "name": "maximumFee",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "transferCheckedWithFee",
+      "discriminant": {
+        "type": "u8",
+        "value": 27
+      },
+      "accounts": [
+        {
+          "name": "source",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "destination",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "decimals",
+          "type": "u8"
+        },
+        {
+          "name": "fee",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "withdrawWithheldTokensFromMint",
+      "discriminant": {
+        "type": "u8",
+        "value": 28
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "feeReceiver",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "withdrawWithheldAuthority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "withdrawWithheldTokensFromAccounts",
+      "discriminant": {
+        "type": "u8",
+        "value": 29
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "feeReceiver",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "withdrawWithheldAuthority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "numTokenAccounts",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "harvestWithheldTokensToMint",
+      "discriminant": {
+        "type": "u8",
+        "value": 30
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "setTransferFee",
+      "discriminant": {
+        "type": "u8",
+        "value": 31
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transferFeeConfigAuthority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "transferFeeBasisPoints",
+          "type": "u16"
+        },
+        {
+          "name": "maximumFee",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "initializeConfidentialTransferMint",
+      "discriminant": {
+        "type": "u8",
+        "value": 32
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "authority",
+          "type": {
+            "option": "pubkey"
+          }
+        },
+        {
+          "name": "autoApproveNewAccounts",
+          "type": "bool"
+        },
+        {
+          "name": "auditorElgamalPubkey",
+          "type": {
+            "option": "pubkey"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateConfidentialTransferMint",
+      "discriminant": {
+        "type": "u8",
+        "value": 33
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "autoApproveNewAccounts",
+          "type": "bool"
+        },
+        {
+          "name": "auditorElgamalPubkey",
+          "type": {
+            "option": "pubkey"
+          }
+        }
+      ]
+    },
+    {
+      "name": "configureConfidentialTransferAccount",
+      "discriminant": {
+        "type": "u8",
+        "value": 27
+      },
+      "accounts": [
+        {
+          "name": "token",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "instructionsSysvarOrContextState",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "record",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "confidentialTransferDiscriminator",
+          "type": "u8"
+        },
+        {
+          "name": "decryptableZeroBalance",
+          "type": {
+            "array": ["u8", 36]
+          }
+        },
+        {
+          "name": "maximumPendingBalanceCreditCounter",
+          "type": "u64"
+        },
+        {
+          "name": "proofInstructionOffset",
+          "type": "i8"
+        }
+      ]
+    },
+    {
+      "name": "approveConfidentialTransferAccount",
+      "discriminant": {
+        "type": "u8",
+        "value": 34
+      },
+      "accounts": [
+        {
+          "name": "token",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "emptyConfidentialTransferAccount",
+      "discriminant": {
+        "type": "u8",
+        "value": 35
+      },
+      "accounts": [
+        {
+          "name": "token",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "instructionsSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "proofInstructionOffset",
+          "type": "u16"
+        }
+      ]
+    },
+    {
+      "name": "confidentialDeposit",
+      "discriminant": {
+        "type": "u8",
+        "value": 27
+      },
+      "accounts": [
+        {
+          "name": "token",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "confidentialTransferDiscriminator",
+          "type": "u8"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "decimals",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "confidentialWithdraw",
+      "discriminant": {
+        "type": "u8",
+        "value": 27
+      },
+      "accounts": [
+        {
+          "name": "token",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "instructionsSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "equalityRecord",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rangeRecord",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "confidentialTransferDiscriminator",
+          "type": "u8"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "decimals",
+          "type": "u8"
+        },
+        {
+          "name": "newDecryptableAvailableBalance",
+          "type": {
+            "array": ["u8", 36]
+          }
+        },
+        {
+          "name": "equalityProofInstructionOffset",
+          "type": "i8"
+        },
+        {
+          "name": "rangeProofInstructionOffset",
+          "type": "i8"
+        }
+      ]
+    },
+    {
+      "name": "confidentialTransfer",
+      "discriminant": {
+        "type": "u8",
+        "value": 27
+      },
+      "accounts": [
+        {
+          "name": "sourceToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "destinationToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "instructionsSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "equalityRecord",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ciphertextValidityRecord",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rangeRecord",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "confidentialTransferDiscriminator",
+          "type": "u8"
+        },
+        {
+          "name": "newSourceDecryptableAvailableBalance",
+          "type": {
+            "array": ["u8", 36]
+          }
+        },
+        {
+          "name": "equalityProofInstructionOffset",
+          "type": "i8"
+        },
+        {
+          "name": "ciphertextValidityProofInstructionOffset",
+          "type": "i8"
+        },
+        {
+          "name": "rangeProofInstructionOffset",
+          "type": "i8"
+        }
+      ]
+    },
+    {
+      "name": "applyConfidentialPendingBalance",
+      "discriminant": {
+        "type": "u8",
+        "value": 36
+      },
+      "accounts": [
+        {
+          "name": "token",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "expectedPendingBalanceCreditCounter",
+          "type": "u64"
+        },
+        {
+          "name": "newDecryptableAvailableBalance",
+          "type": {
+            "array": ["u8", 36]
+          }
+        }
+      ]
+    },
+    {
+      "name": "enableConfidentialCredits",
+      "discriminant": {
+        "type": "u8",
+        "value": 37
+      },
+      "accounts": [
+        {
+          "name": "token",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "disableConfidentialCredits",
+      "discriminant": {
+        "type": "u8",
+        "value": 38
+      },
+      "accounts": [
+        {
+          "name": "token",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "enableNonConfidentialCredits",
+      "discriminant": {
+        "type": "u8",
+        "value": 39
+      },
+      "accounts": [
+        {
+          "name": "token",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "disableNonConfidentialCredits",
+      "discriminant": {
+        "type": "u8",
+        "value": 40
+      },
+      "accounts": [
+        {
+          "name": "token",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "confidentialTransferWithFee",
+      "discriminant": {
+        "type": "u8",
+        "value": 27
+      },
+      "accounts": [
+        {
+          "name": "sourceToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "destinationToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "instructionsSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "equalityRecord",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "transferAmountCiphertextValidityRecord",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "feeSigmaRecord",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "feeCiphertextValidityRecord",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rangeRecord",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "confidentialTransferDiscriminator",
+          "type": "u8"
+        },
+        {
+          "name": "newSourceDecryptableAvailableBalance",
+          "type": {
+            "array": ["u8", 36]
+          }
+        },
+        {
+          "name": "equalityProofInstructionOffset",
+          "type": "i8"
+        },
+        {
+          "name": "transferAmountCiphertextValidityProofInstructionOffset",
+          "type": "i8"
+        },
+        {
+          "name": "feeSigmaProofInstructionOffset",
+          "type": "i8"
+        },
+        {
+          "name": "feeCiphertextValidityProofInstructionOffset",
+          "type": "i8"
+        },
+        {
+          "name": "rangeProofInstructionOffset",
+          "type": "i8"
+        }
+      ]
+    },
+    {
+      "name": "initializeDefaultAccountState",
+      "discriminant": {
+        "type": "u8",
+        "value": 41
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "state",
+          "type": {
+            "defined": "AccountState"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateDefaultAccountState",
+      "discriminant": {
+        "type": "u8",
+        "value": 42
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "freezeAuthority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "state",
+          "type": {
+            "defined": "AccountState"
+          }
+        }
+      ]
+    },
+    {
+      "name": "reallocate",
+      "discriminant": {
+        "type": "u8",
+        "value": 43
+      },
+      "accounts": [
+        {
+          "name": "account",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "extensionTypes",
+          "type": {
+            "vec": {
+              "defined": "ExtensionType"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "enableMemoTransfers",
+      "discriminant": {
+        "type": "u8",
+        "value": 44
+      },
+      "accounts": [
+        {
+          "name": "token",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "disableMemoTransfers",
+      "discriminant": {
+        "type": "u8",
+        "value": 45
+      },
+      "accounts": [
+        {
+          "name": "token",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "createNativeMint",
+      "discriminant": {
+        "type": "u8",
+        "value": 46
+      },
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "nativeMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initializeNonTransferableMint",
+      "discriminant": {
+        "type": "u8",
+        "value": 47
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initializeInterestBearingMint",
+      "discriminant": {
+        "type": "u8",
+        "value": 33
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "interestBearingMintDiscriminator",
+          "type": "u8"
+        },
+        {
+          "name": "rateAuthority",
+          "type": {
+            "option": "pubkey"
+          }
+        },
+        {
+          "name": "rate",
+          "type": "i16"
+        }
+      ]
+    },
+    {
+      "name": "updateRateInterestBearingMint",
+      "discriminant": {
+        "type": "u8",
+        "value": 48
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rateAuthority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "rate",
+          "type": "i16"
+        }
+      ]
+    },
+    {
+      "name": "enableCpiGuard",
+      "discriminant": {
+        "type": "u8",
+        "value": 33
+      },
+      "accounts": [
+        {
+          "name": "token",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "cpiGuardDiscriminator",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "disableCpiGuard",
+      "discriminant": {
+        "type": "u8",
+        "value": 34
+      },
+      "accounts": [
+        {
+          "name": "token",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "cpiGuardDiscriminator",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "initializePermanentDelegate",
+      "discriminant": {
+        "type": "u8",
+        "value": 49
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "delegate",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "initializeTransferHook",
+      "discriminant": {
+        "type": "u8",
+        "value": 50
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "authority",
+          "type": {
+            "option": "pubkey"
+          }
+        },
+        {
+          "name": "programId",
+          "type": {
+            "option": "pubkey"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateTransferHook",
+      "discriminant": {
+        "type": "u8",
+        "value": 51
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "programId",
+          "type": {
+            "option": "pubkey"
+          }
+        }
+      ]
+    },
+    {
+      "name": "initializeConfidentialTransferFee",
+      "discriminant": {
+        "type": "u8",
+        "value": 52
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "authority",
+          "type": {
+            "option": "pubkey"
+          }
+        },
+        {
+          "name": "elgamalPubkey",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "withdrawWithheldTokensFromMintForConfidentialTransferFee",
+      "discriminant": {
+        "type": "u8",
+        "value": 53
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "destination",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "instructionsSysvarOrContextState",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "record",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "proofInstructionOffset",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "withdrawWithheldTokensFromAccountsForConfidentialTransferFee",
+      "discriminant": {
+        "type": "u8",
+        "value": 54
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "destination",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "instructionsSysvarOrContextState",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "record",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "numTokenAccounts",
+          "type": "u8"
+        },
+        {
+          "name": "proofInstructionOffset",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "harvestWithheldTokensToMintForConfidentialTransferFee",
+      "discriminant": {
+        "type": "u8",
+        "value": 55
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "enableHarvestToMint",
+      "discriminant": {
+        "type": "u8",
+        "value": 56
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "disableHarvestToMint",
+      "discriminant": {
+        "type": "u8",
+        "value": 57
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "withdrawExcessLamports",
+      "discriminant": {
+        "type": "u8",
+        "value": 58
+      },
+      "accounts": [
+        {
+          "name": "source",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "destination",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initializeMetadataPointer",
+      "discriminant": {
+        "type": "u8",
+        "value": 59
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "authority",
+          "type": {
+            "option": "pubkey"
+          }
+        },
+        {
+          "name": "metadataAddress",
+          "type": {
+            "option": "pubkey"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateMetadataPointer",
+      "discriminant": {
+        "type": "u8",
+        "value": 60
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "metadataAddress",
+          "type": {
+            "option": "pubkey"
+          }
+        }
+      ]
+    },
+    {
+      "name": "initializeGroupPointer",
+      "discriminant": {
+        "type": "u8",
+        "value": 61
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "authority",
+          "type": {
+            "option": "pubkey"
+          }
+        },
+        {
+          "name": "groupAddress",
+          "type": {
+            "option": "pubkey"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateGroupPointer",
+      "discriminant": {
+        "type": "u8",
+        "value": 62
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "groupAddress",
+          "type": {
+            "option": "pubkey"
+          }
+        }
+      ]
+    },
+    {
+      "name": "initializeGroupMemberPointer",
+      "discriminant": {
+        "type": "u8",
+        "value": 63
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "authority",
+          "type": {
+            "option": "pubkey"
+          }
+        },
+        {
+          "name": "memberAddress",
+          "type": {
+            "option": "pubkey"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateGroupMemberPointer",
+      "discriminant": {
+        "type": "u8",
+        "value": 64
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "memberAddress",
+          "type": {
+            "option": "pubkey"
+          }
+        }
+      ]
+    },
+    {
+      "name": "initializeTokenMetadata",
+      "discriminant": {
+        "type": "bytes",
+        "value": [210, 225, 30, 162, 88, 184, 77, 141]
+      },
+      "accounts": [
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "updateAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mintAuthority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "symbol",
+          "type": "string"
+        },
+        {
+          "name": "uri",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "updateTokenMetadataField",
+      "discriminant": {
+        "type": "bytes",
+        "value": [221, 227, 49, 45, 181, 202, 220, 200]
+      },
+      "accounts": [
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "updateAuthority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "field",
+          "type": {
+            "defined": "TokenMetadataField"
+          }
+        },
+        {
+          "name": "value",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "removeTokenMetadataKey",
+      "discriminant": {
+        "type": "bytes",
+        "value": [234, 18, 32, 56, 89, 141, 37, 181]
+      },
+      "accounts": [
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "updateAuthority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "idempotent",
+          "type": "bool"
+        },
+        {
+          "name": "key",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "updateTokenMetadataUpdateAuthority",
+      "discriminant": {
+        "type": "bytes",
+        "value": [133, 250, 37, 21, 110, 163, 26, 121]
+      },
+      "accounts": [
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "currentAuthority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "newAuthority",
+          "type": {
+            "option": "pubkey"
+          }
+        }
+      ]
+    },
+    {
+      "name": "emitTokenMetadata",
+      "discriminant": {
+        "type": "bytes",
+        "value": [250, 166, 180, 250, 13, 12, 184, 70]
+      },
+      "accounts": [
+        {
+          "name": "metadata",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "start",
+          "type": {
+            "option": "u64"
+          }
+        },
+        {
+          "name": "end",
+          "type": {
+            "option": "u64"
+          }
+        }
+      ]
+    },
+    {
+      "name": "initializeTokenGroup",
+      "discriminant": {
+        "type": "bytes",
+        "value": [121, 113, 108, 39, 54, 51, 0, 4]
+      },
+      "accounts": [
+        {
+          "name": "group",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mintAuthority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "updateAuthority",
+          "type": {
+            "option": "pubkey"
+          }
+        },
+        {
+          "name": "maxSize",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "updateTokenGroupMaxSize",
+      "discriminant": {
+        "type": "bytes",
+        "value": [54, 118, 181, 104, 161, 238, 149, 45]
+      },
+      "accounts": [
+        {
+          "name": "group",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "updateAuthority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "maxSize",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "updateTokenGroupUpdateAuthority",
+      "discriminant": {
+        "type": "bytes",
+        "value": [140, 151, 37, 143, 78, 36, 137, 241]
+      },
+      "accounts": [
+        {
+          "name": "group",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "currentAuthority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "newAuthority",
+          "type": {
+            "option": "pubkey"
+          }
+        }
+      ]
+    },
+    {
+      "name": "initializeTokenGroupMember",
+      "discriminant": {
+        "type": "bytes",
+        "value": [25, 145, 147, 156, 40, 222, 155, 2]
+      },
+      "accounts": [
+        {
+          "name": "member",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "memberMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "memberMintAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "group",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "groupUpdateAuthority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initializeScaledUiAmountMint",
+      "discriminant": {
+        "type": "u8",
+        "value": 43
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "authority",
+          "type": {
+            "option": "pubkey"
+          }
+        },
+        {
+          "name": "multiplier",
+          "type": "f64"
+        },
+        {
+          "name": "timestamp",
+          "type": {
+            "option": "i64"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateMultiplierScaledUiMint",
+      "discriminant": {
+        "type": "u8",
+        "value": 43
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "multiplier",
+          "type": "f64"
+        },
+        {
+          "name": "timestamp",
+          "type": {
+            "option": "i64"
+          }
+        }
+      ]
+    },
+    {
+      "name": "initializePausableConfig",
+      "discriminant": {
+        "type": "u8",
+        "value": 44
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "authority",
+          "type": {
+            "option": "pubkey"
+          }
+        }
+      ]
+    },
+    {
+      "name": "pause",
+      "discriminant": {
+        "type": "u8",
+        "value": 44
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "resume",
+      "discriminant": {
+        "type": "u8",
+        "value": 44
+      },
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Mint",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "mintAuthority",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "supply",
+            "type": "u64"
+          },
+          {
+            "name": "decimals",
+            "type": "u8"
+          },
+          {
+            "name": "isInitialized",
+            "type": "bool"
+          },
+          {
+            "name": "freezeAuthority",
+            "type": {
+              "option": "pubkey"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Token",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "delegate",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "state",
+            "type": {
+              "defined": "AccountState"
+            }
+          },
+          {
+            "name": "isNative",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "delegatedAmount",
+            "type": "u64"
+          },
+          {
+            "name": "closeAuthority",
+            "type": {
+              "option": "pubkey"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Multisig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "m",
+            "type": "u8"
+          },
+          {
+            "name": "n",
+            "type": "u8"
+          },
+          {
+            "name": "isInitialized",
+            "type": "bool"
+          },
+          {
+            "name": "signers",
+            "type": {
+              "array": ["pubkey", 11]
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "AccountState",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Uninitialized"
+          },
+          {
+            "name": "Initialized"
+          },
+          {
+            "name": "Frozen"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AuthorityType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "MintTokens"
+          },
+          {
+            "name": "FreezeAccount"
+          },
+          {
+            "name": "AccountOwner"
+          },
+          {
+            "name": "CloseAccount"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TokenMetadataField",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Name"
+          },
+          {
+            "name": "Symbol"
+          },
+          {
+            "name": "Uri"
+          },
+          {
+            "name": "Key",
+            "fields": [
+              {
+                "name": "key",
+                "type": "string"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "ExtensionType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Uninitialized"
+          },
+          {
+            "name": "TransferFeeConfig"
+          },
+          {
+            "name": "TransferFeeAmount"
+          },
+          {
+            "name": "MintCloseAuthority"
+          },
+          {
+            "name": "ConfidentialTransferMint"
+          },
+          {
+            "name": "ConfidentialTransferAccount"
+          },
+          {
+            "name": "DefaultAccountState"
+          },
+          {
+            "name": "ImmutableOwner"
+          },
+          {
+            "name": "MemoTransfer"
+          },
+          {
+            "name": "NonTransferable"
+          },
+          {
+            "name": "InterestBearingConfig"
+          },
+          {
+            "name": "CpiGuard"
+          },
+          {
+            "name": "PermanentDelegate"
+          },
+          {
+            "name": "NonTransferableAccount"
+          },
+          {
+            "name": "TransferHook"
+          },
+          {
+            "name": "TransferHookAccount"
+          },
+          {
+            "name": "ConfidentialTransferFee"
+          },
+          {
+            "name": "ConfidentialTransferFeeAmount"
+          },
+          {
+            "name": "MetadataPointer"
+          },
+          {
+            "name": "TokenMetadata"
+          },
+          {
+            "name": "GroupPointer"
+          },
+          {
+            "name": "TokenGroup"
+          },
+          {
+            "name": "GroupMemberPointer"
+          },
+          {
+            "name": "TokenGroupMember"
+          },
+          {
+            "name": "ScaledUiAmountConfig"
+          },
+          {
+            "name": "PausableConfig"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TransferFee",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "epoch",
+            "type": "u64"
+          },
+          {
+            "name": "maximumFee",
+            "type": "u64"
+          },
+          {
+            "name": "transferFeeBasisPoints",
+            "type": "u16"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Extension",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Uninitialized"
+          },
+          {
+            "name": "TransferFeeConfig",
+            "fields": [
+              {
+                "name": "transferFeeConfigAuthority",
+                "type": "pubkey"
+              },
+              {
+                "name": "withdrawWithheldAuthority",
+                "type": "pubkey"
+              },
+              {
+                "name": "withheldAmount",
+                "type": "u64"
+              },
+              {
+                "name": "olderTransferFee",
+                "type": {
+                  "defined": "TransferFee"
+                }
+              },
+              {
+                "name": "newerTransferFee",
+                "type": {
+                  "defined": "TransferFee"
+                }
+              }
+            ]
+          },
+          {
+            "name": "TransferFeeAmount",
+            "fields": [
+              {
+                "name": "withheldAmount",
+                "type": "u64"
+              }
+            ]
+          },
+          {
+            "name": "MintCloseAuthority",
+            "fields": [
+              {
+                "name": "closeAuthority",
+                "type": "pubkey"
+              }
+            ]
+          },
+          {
+            "name": "ConfidentialTransferMint",
+            "fields": [
+              {
+                "name": "authority",
+                "type": {
+                  "option": "pubkey"
+                }
+              },
+              {
+                "name": "autoApproveNewAccounts",
+                "type": "bool"
+              },
+              {
+                "name": "auditorElgamalPubkey",
+                "type": {
+                  "option": "pubkey"
+                }
+              }
+            ]
+          },
+          {
+            "name": "ConfidentialTransferAccount",
+            "fields": [
+              {
+                "name": "approved",
+                "type": "bool"
+              },
+              {
+                "name": "elgamalPubkey",
+                "type": "pubkey"
+              },
+              {
+                "name": "pendingBalanceLow",
+                "type": {
+                  "array": ["u8", 64]
+                }
+              },
+              {
+                "name": "pendingBalanceHigh",
+                "type": {
+                  "array": ["u8", 64]
+                }
+              },
+              {
+                "name": "availableBalance",
+                "type": {
+                  "array": ["u8", 64]
+                }
+              },
+              {
+                "name": "decryptableAvailableBalance",
+                "type": {
+                  "array": ["u8", 36]
+                }
+              },
+              {
+                "name": "allowConfidentialCredits",
+                "type": "bool"
+              },
+              {
+                "name": "allowNonConfidentialCredits",
+                "type": "bool"
+              },
+              {
+                "name": "pendingBalanceCreditCounter",
+                "type": "u64"
+              },
+              {
+                "name": "maximumPendingBalanceCreditCounter",
+                "type": "u64"
+              },
+              {
+                "name": "expectedPendingBalanceCreditCounter",
+                "type": "u64"
+              },
+              {
+                "name": "actualPendingBalanceCreditCounter",
+                "type": "u64"
+              }
+            ]
+          },
+          {
+            "name": "DefaultAccountState",
+            "fields": [
+              {
+                "name": "state",
+                "type": {
+                  "defined": "AccountState"
+                }
+              }
+            ]
+          },
+          {
+            "name": "ImmutableOwner"
+          },
+          {
+            "name": "MemoTransfer",
+            "fields": [
+              {
+                "name": "requireIncomingTransferMemos",
+                "type": "bool"
+              }
+            ]
+          },
+          {
+            "name": "NonTransferable"
+          },
+          {
+            "name": "InterestBearingConfig",
+            "fields": [
+              {
+                "name": "rateAuthority",
+                "type": "pubkey"
+              },
+              {
+                "name": "initializationTimestamp",
+                "type": "u64"
+              },
+              {
+                "name": "preUpdateAverageRate",
+                "type": "i16"
+              },
+              {
+                "name": "lastUpdateTimestamp",
+                "type": "u64"
+              },
+              {
+                "name": "currentRate",
+                "type": "i16"
+              }
+            ]
+          },
+          {
+            "name": "CpiGuard",
+            "fields": [
+              {
+                "name": "lockCpi",
+                "type": "bool"
+              }
+            ]
+          },
+          {
+            "name": "PermanentDelegate",
+            "fields": [
+              {
+                "name": "delegate",
+                "type": "pubkey"
+              }
+            ]
+          },
+          {
+            "name": "NonTransferableAccount"
+          },
+          {
+            "name": "TransferHook",
+            "fields": [
+              {
+                "name": "authority",
+                "type": "pubkey"
+              },
+              {
+                "name": "programId",
+                "type": "pubkey"
+              }
+            ]
+          },
+          {
+            "name": "TransferHookAccount",
+            "fields": [
+              {
+                "name": "transferring",
+                "type": "bool"
+              }
+            ]
+          },
+          {
+            "name": "ConfidentialTransferFee",
+            "fields": [
+              {
+                "name": "authority",
+                "type": {
+                  "option": "pubkey"
+                }
+              },
+              {
+                "name": "elgamalPubkey",
+                "type": "pubkey"
+              },
+              {
+                "name": "harvestToMintEnabled",
+                "type": "bool"
+              },
+              {
+                "name": "withheldAmount",
+                "type": {
+                  "array": ["u8", 64]
+                }
+              }
+            ]
+          },
+          {
+            "name": "ConfidentialTransferFeeAmount",
+            "fields": [
+              {
+                "name": "withheldAmount",
+                "type": {
+                  "array": ["u8", 64]
+                }
+              }
+            ]
+          },
+          {
+            "name": "MetadataPointer",
+            "fields": [
+              {
+                "name": "authority",
+                "type": {
+                  "option": "pubkey"
+                }
+              },
+              {
+                "name": "metadataAddress",
+                "type": {
+                  "option": "pubkey"
+                }
+              }
+            ]
+          },
+          {
+            "name": "TokenMetadata",
+            "fields": [
+              {
+                "name": "updateAuthority",
+                "type": {
+                  "option": "pubkey"
+                }
+              },
+              {
+                "name": "mint",
+                "type": "pubkey"
+              },
+              {
+                "name": "name",
+                "type": "string"
+              },
+              {
+                "name": "symbol",
+                "type": "string"
+              },
+              {
+                "name": "uri",
+                "type": "string"
+              },
+              {
+                "name": "additionalMetadata",
+                "type": {
+                  "vec": {
+                    "tuple": ["string", "string"]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "name": "GroupPointer",
+            "fields": [
+              {
+                "name": "authority",
+                "type": {
+                  "option": "pubkey"
+                }
+              },
+              {
+                "name": "groupAddress",
+                "type": {
+                  "option": "pubkey"
+                }
+              }
+            ]
+          },
+          {
+            "name": "TokenGroup",
+            "fields": [
+              {
+                "name": "updateAuthority",
+                "type": {
+                  "option": "pubkey"
+                }
+              },
+              {
+                "name": "mint",
+                "type": "pubkey"
+              },
+              {
+                "name": "size",
+                "type": "u64"
+              },
+              {
+                "name": "maxSize",
+                "type": "u64"
+              }
+            ]
+          },
+          {
+            "name": "GroupMemberPointer",
+            "fields": [
+              {
+                "name": "authority",
+                "type": {
+                  "option": "pubkey"
+                }
+              },
+              {
+                "name": "memberAddress",
+                "type": {
+                  "option": "pubkey"
+                }
+              }
+            ]
+          },
+          {
+            "name": "TokenGroupMember",
+            "fields": [
+              {
+                "name": "mint",
+                "type": "pubkey"
+              },
+              {
+                "name": "group",
+                "type": "pubkey"
+              },
+              {
+                "name": "memberNumber",
+                "type": "u64"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [],
+  "metadata": {
+    "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+  }
+}
