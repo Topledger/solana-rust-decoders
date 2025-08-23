@@ -1,6 +1,6 @@
-
 use anyhow::{anyhow, Result};
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use std::convert::TryInto;
 
 // BPF Loader Upgradeable discriminators
@@ -107,36 +107,41 @@ pub struct DebugInfo {
     pub error_message: String,
 }
 
-// Main instruction enum
+// Main instruction enum - FIXED: All instructions now have args field
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = "instruction_type")]
 pub enum Instruction {
     InitializeBuffer {
-        accounts: InitializeBufferAccounts,
+        args: serde_json::Value,  // Empty object {}
+        input_accounts: Vec<String>,
     },
     Write {
-        args: WriteArgs,
-        accounts: WriteAccounts,
+        args: serde_json::Value,
+        input_accounts: Vec<String>,
     },
     DeployWithMaxDataLen {
-        args: DeployWithMaxDataLenArgs,
-        accounts: DeployWithMaxDataLenAccounts,
+        args: serde_json::Value,
+        input_accounts: Vec<String>,
     },
     Upgrade {
-        accounts: UpgradeAccounts,
+        args: serde_json::Value,  // Empty object {}
+        input_accounts: Vec<String>,
     },
     SetAuthority {
-        accounts: SetAuthorityAccounts,
+        args: serde_json::Value,  // Empty object {}
+        input_accounts: Vec<String>,
     },
     Close {
-        accounts: CloseAccounts,
+        args: serde_json::Value,  // Empty object {}
+        input_accounts: Vec<String>,
     },
     ExtendProgram {
-        args: ExtendProgramArgs,
-        accounts: ExtendProgramAccounts,
+        args: serde_json::Value,
+        input_accounts: Vec<String>,
     },
     SetAuthorityChecked {
-        accounts: SetAuthorityCheckedAccounts,
+        args: serde_json::Value,  // Empty object {}
+        input_accounts: Vec<String>,
     },
     UnknownInstruction {
         debug_info: DebugInfo,
@@ -166,7 +171,10 @@ impl Instruction {
                     buffer: account_keys.get(0).unwrap_or(&"".to_string()).to_string(),
                     authority: account_keys.get(1).map(|s| s.to_string()),
                 };
-                Ok(Instruction::InitializeBuffer { accounts })
+                Ok(Instruction::InitializeBuffer { 
+                    args: serde_json::Value::Object(serde_json::Map::new()), // Empty object
+                    input_accounts: account_keys.to_vec()
+                })
             }
 
             WRITE_DISCRIMINATOR => {
@@ -201,7 +209,10 @@ impl Instruction {
                     authority: account_keys.get(1).unwrap_or(&"".to_string()).to_string(),
                 };
                 
-                Ok(Instruction::Write { args, accounts })
+                Ok(Instruction::Write { 
+                    args: serde_json::to_value(&args)?,
+                    input_accounts: account_keys.to_vec()
+                })
             }
 
             DEPLOY_WITH_MAX_DATA_LEN_DISCRIMINATOR => {
@@ -229,7 +240,10 @@ impl Instruction {
                     authority: account_keys.get(7).unwrap_or(&"".to_string()).to_string(),
                 };
                 
-                Ok(Instruction::DeployWithMaxDataLen { args, accounts })
+                Ok(Instruction::DeployWithMaxDataLen { 
+                    args: serde_json::to_value(&args)?,
+                    input_accounts: account_keys.to_vec()
+                })
             }
 
             UPGRADE_DISCRIMINATOR => {
@@ -242,7 +256,10 @@ impl Instruction {
                     clock: account_keys.get(5).unwrap_or(&"".to_string()).to_string(),
                     authority: account_keys.get(6).unwrap_or(&"".to_string()).to_string(),
                 };
-                Ok(Instruction::Upgrade { accounts })
+                Ok(Instruction::Upgrade { 
+                    args: serde_json::Value::Object(serde_json::Map::new()), // Empty object
+                    input_accounts: account_keys.to_vec()
+                })
             }
 
             SET_AUTHORITY_DISCRIMINATOR => {
@@ -251,7 +268,10 @@ impl Instruction {
                     current_authority: account_keys.get(1).unwrap_or(&"".to_string()).to_string(),
                     new_authority: account_keys.get(2).map(|s| s.to_string()),
                 };
-                Ok(Instruction::SetAuthority { accounts })
+                Ok(Instruction::SetAuthority { 
+                    args: serde_json::Value::Object(serde_json::Map::new()), // Empty object
+                    input_accounts: account_keys.to_vec()
+                })
             }
 
             CLOSE_DISCRIMINATOR => {
@@ -261,7 +281,10 @@ impl Instruction {
                     authority: account_keys.get(2).map(|s| s.to_string()),
                     program: account_keys.get(3).map(|s| s.to_string()),
                 };
-                Ok(Instruction::Close { accounts })
+                Ok(Instruction::Close { 
+                    args: serde_json::Value::Object(serde_json::Map::new()), // Empty object
+                    input_accounts: account_keys.to_vec()
+                })
             }
 
             EXTEND_PROGRAM_DISCRIMINATOR => {
@@ -285,7 +308,10 @@ impl Instruction {
                     payer: account_keys.get(3).map(|s| s.to_string()),
                 };
                 
-                Ok(Instruction::ExtendProgram { args, accounts })
+                Ok(Instruction::ExtendProgram { 
+                    args: serde_json::to_value(&args)?,
+                    input_accounts: account_keys.to_vec()
+                })
             }
 
             SET_AUTHORITY_CHECKED_DISCRIMINATOR => {
@@ -294,7 +320,10 @@ impl Instruction {
                     current_authority: account_keys.get(1).unwrap_or(&"".to_string()).to_string(),
                     new_authority: account_keys.get(2).unwrap_or(&"".to_string()).to_string(),
                 };
-                Ok(Instruction::SetAuthorityChecked { accounts })
+                Ok(Instruction::SetAuthorityChecked { 
+                    args: serde_json::Value::Object(serde_json::Map::new()), // Empty object
+                    input_accounts: account_keys.to_vec()
+                })
             }
 
             _ => {
@@ -305,7 +334,3 @@ impl Instruction {
         }
     }
 }
-
-
-
-
