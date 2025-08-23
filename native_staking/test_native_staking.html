@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<!--
+╔══════════════════════════════════════════════════════════════════════════════════════╗
+║                           GENERIC PARSER TESTING SCRIPT                             ║
+║                          Configuration Guide for Different Programs                  ║
+╚══════════════════════════════════════════════════════════════════════════════════════╝
+
+🔧 TO ADAPT THIS SCRIPT FOR DIFFERENT SOLANA PROGRAM PARSERS:
+
+1. 📁 WASM FILES (Line ~100):
+   Change: script src="./pkg/native_staking.js"
+   To:     script src="./pkg/jupiter.js"              (your program's WASM file)
+
+2. 🎯 PROGRAM CONFIGURATION (Line ~400):
+   Update these constants:
+   
+   const IDL_INSTRUCTIONS = {
+       // Native Staking (current):
+       0: "Initialize", 1: "Authorize", 2: "DelegateStake", ...
+       
+       // Jupiter example:
+       0: "Route", 1: "RouteWithTokenLedger", 2: "SwapBaseIn", ...
+       
+       // Orca example: 
+       0: "Initialize", 1: "Swap", 2: "DepositAllTokenTypes", ...
+   };
+
+3. 🔗 ACCOUNT FIELD MAPPING (Line ~430):
+   Update ACCOUNT_FIELDS object:
+   
+   const ACCOUNT_FIELDS = {
+       // Native Staking (current):
+       "Initialize": ["stake", "rentSysvar"],
+       "MoveStake": ["sourceStake", "destinationStake", "stakeAuthority"],
+       
+       // Jupiter example:
+       "Route": ["tokenProgram", "userTransferAuthority", "userSourceTokenAccount"],
+       "SwapBaseIn": ["market", "requestQueue", "eventQueue"],
+       
+       // Orca example:
+       "Swap": ["tokenSwap", "authority", "userTransferAuthority"],
+       "Deposit": ["tokenSwap", "swapAuthority", "userTransferAuthority"],
+   };
+
+4. 🔢 DISCRIMINATOR RANGE (Line ~700):
+   Update discriminator validation:
+   
+   // Native Staking: 0-17
+   if (discriminator >= 0 && discriminator <= 17) {
+   
+   // Jupiter: 0-25  
+   if (discriminator >= 0 && discriminator <= 25) {
+   
+   // Orca: 0-12
+   if (discriminator >= 0 && discriminator <= 12) {
+
+5. 🗄️ DUNE API CONFIGURATION (Line ~530):
+   Update query ID and API key:
+   
+   // Native Staking (current):
+   const response = await fetch('https://api.dune.com/api/v1/query/5402199/results?limit=1000', {
+   
+   // Jupiter example:
+   const response = await fetch('https://api.dune.com/api/v1/query/1234567/results?limit=1000', {
+   
+   // Your API Key (same for all):
+   headers: { 'X-Dune-API-Key': 'YOUR_DUNE_API_KEY_HERE' }
+
+6. 📋 PAGE TITLE AND HEADERS (Line ~4 & ~120):
+   Update display names:
+   <title>Native Staking Parser - Manual Test</title>      → <title>Jupiter Parser Test</title>
+   <h1>Native Staking Parser - Manual Test</h1>           → <h1>Jupiter Parser - Manual Test</h1>
+
+📋 REQUIRED DUNE API SCHEMA (DO NOT CHANGE):
+Your Dune query MUST return this exact format:
+{
+    "result": {
+        "rows": [
+            {
+                "tx_id": "transaction_signature_string",           // Transaction ID
+                "data_base58": "base58_encoded_instruction_data", // Instruction data  
+                "account_arguments": ["pubkey1", "pubkey2", ...]  // Account addresses
+            }
+        ]
+    }
+}
+
+🎯 WASM PARSER REQUIREMENTS (DO NOT CHANGE):
+Your Rust WASM module MUST export a function with this signature:
+parse(instruction_data: string, accounts: Array<string>) -> object
+
+✅ EVERYTHING ELSE STAYS THE SAME:
+- UI layout and styling
+- Tab structure (Success/Failed)  
+- Error handling logic
+- Solscan link generation
+- Report formatting
+- Statistics calculation
+- Account field mapping logic
+
+🚀 HOW TO RUN:
+
+QUICK START:
+./start_server.sh
+Then open: http://localhost:3000/test_native_staking.html
+
+MANUAL STEPS:
+1. cd /Users/admin/solana-rust-decoders/native_staking
+2. python3 -m http.server 3000
+3. Open browser: http://localhost:3000/test_native_staking.html
+
+STOP SERVER:
+pkill -f "python3 -m http.server"    (kills all HTTP servers)
+OR
+Ctrl+C in the terminal running the server
+
+CONFIGURATION STEPS:
+1. Update the 6 configuration sections above
+2. Replace WASM files in ./pkg/ directory  
+3. Ensure your Dune query returns the required schema
+4. Restart server and test
+
+-->
+<html>
+<head>
+    <title>Native Staking Parser - Manual Test</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #00ff00;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #00ff00;
+            padding-bottom: 20px;
+        }
+        .section {
+            background: #002200;
+            border: 1px solid #00ff00;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .input-group {
+            margin: 15px 0;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .input {
+            width: 100%;
+            background: #003300;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            padding: 10px;
+            font-family: inherit;
+            font-size: 14px;
+        }
+        .textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        .btn {
+            background: #003300;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            padding: 12px 24px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        .btn:hover {
+            background: #00ff00;
+            color: #000;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #00ff00;
+            min-height: 100px;
+        }
+        .success {
+            border-color: #00ff00;
+            background: #001100;
+        }
+        .error {
+            border-color: #ff4444;
+            background: #220011;
+            color: #ff8888;
+        }
+        .info {
+            border-color: #ffaa00;
+            background: #221100;
+            color: #ffcc44;
+        }
+        .code {
+            background: #000;
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 3px solid #00ff00;
+            font-size: 12px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+
+        .data-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .data-card {
+            background: #001100;
+            border: 1px solid #006600;
+            padding: 10px;
+            text-align: center;
+        }
+        .tab-container {
+            margin-top: 20px;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #00ff00;
+        }
+        .tab-btn {
+            background: #003300;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            border-bottom: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-family: inherit;
+            margin-right: 5px;
+        }
+        .tab-btn.active {
+            background: #00ff00;
+            color: #000;
+        }
+        .tab-btn:hover {
+            background: #005500;
+        }
+        .tab-btn.active:hover {
+            background: #00ff00;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px 0;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Native Staking Parser - Manual Test</h1>
+            <p>Input your base58 instruction data and see the parser results</p>
+        </div>
+
+        <div class="section">
+            <h2>Input Data</h2>
+            
+            <div class="input-group">
+                <label for="base58Data">Base58 Instruction Data:</label>
+                <textarea id="base58Data" class="input textarea" 
+                    placeholder="Paste your base58 encoded instruction data here..."></textarea>
+            </div>
+
+            <div class="input-group">
+                <label for="accounts">Account Arguments (JSON array):</label>
+                <textarea id="accounts" class="input textarea" 
+                    placeholder='["account1", "account2", "account3"]'></textarea>
+            </div>
+
+            <button id="parseBtn" class="btn">Parse Instruction</button>
+            <button id="clearBtn" class="btn">Clear</button>
+        </div>
+
+        <div class="section">
+            <h2>Data Analysis</h2>
+            <div class="data-info" id="dataInfo">
+                <div class="data-card">
+                    <div><strong>Length:</strong></div>
+                    <div id="dataLength">-</div>
+                </div>
+                <div class="data-card">
+                    <div><strong>Discriminator:</strong></div>
+                    <div id="discriminator">-</div>
+                </div>
+                <div class="data-card">
+                    <div><strong>Instruction:</strong></div>
+                    <div id="instructionType">-</div>
+                </div>
+                <div class="data-card">
+                    <div><strong>Status:</strong></div>
+                    <div id="parseStatus">Ready</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Parser Result</h2>
+            <div id="result" class="result info">
+                Enter instruction data above and click "Parse Instruction" to see results
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Test Report from Dune API</h2>
+            <p>Fetch real transaction data from Dune and analyze parser performance</p>
+            
+            <div style="background: #221100; border: 1px solid #ffaa00; padding: 10px; margin: 10px 0; font-size: 12px;">
+                <strong>To get live data:</strong> Replace 'YOUR_DUNE_API_KEY_HERE' in the code with your actual Dune API key.<br>
+                Get free API key at: <a href="https://dune.com/settings/api" target="_blank" style="color: #00ccff;">https://dune.com/settings/api</a>
+            </div>
+            
+            <button id="fetchReportBtn" class="btn">Generate Test Report</button>
+            <button id="stopReportBtn" class="btn" style="display:none;" disabled>Stop</button>
+            
+            <div id="reportStatus" class="result info" style="margin-top: 15px;">
+                Click "Generate Test Report" to start fetching data from Dune API
+            </div>
+
+            <div id="reportResults" style="display:none;">
+                <div class="section">
+                    <h3>Overall Statistics</h3>
+                    <div id="overallStats" class="data-info"></div>
+                </div>
+
+                <div class="section">
+                    <h3>IDL vs API Coverage</h3>
+                    <div id="coverageStats" class="data-info"></div>
+                </div>
+
+                <div class="section">
+                    <h3>Results</h3>
+                    <div class="tab-container">
+                        <div class="tabs">
+                            <button class="tab-btn active" onclick="showTab('success')">Success</button>
+                            <button class="tab-btn" onclick="showTab('failed')">Failed</button>
+                        </div>
+                        <div id="success-tab" class="tab-content active">
+                            <div id="successResults"></div>
+                        </div>
+                        <div id="failed-tab" class="tab-content">
+                            <div id="failedResults"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import init, { parse } from './pkg/native_staking.js';
+
+        // Instruction names mapping
+        const INSTRUCTION_NAMES = {
+            0: "Initialize", 1: "Authorize", 2: "DelegateStake", 3: "Split",
+            4: "Withdraw", 5: "Deactivate", 6: "SetLockup", 7: "Merge",
+            8: "AuthorizeWithSeed", 9: "InitializeChecked", 10: "AuthorizeChecked",
+            11: "AuthorizeCheckedWithSeed", 12: "SetLockupChecked", 13: "GetMinimumDelegation",
+            14: "DeactivateDelinquent", 15: "Redelegate", 16: "MoveStake", 17: "MoveLamports"
+        };
+
+
+
+        let wasmReady = false;
+
+        async function initWasm() {
+            try {
+                await init();
+                wasmReady = true;
+                console.log('WASM module loaded');
+                document.getElementById('parseStatus').textContent = 'Ready';
+                document.getElementById('parseBtn').disabled = false;
+            } catch (error) {
+                console.error('Failed to load WASM:', error);
+                document.getElementById('parseStatus').textContent = 'WASM Load Failed';
+                showResult('error', `Failed to load WASM module: ${error.message}`);
+            }
+        }
+
+        function analyzeData(base58Data) {
+            try {
+                // Simple base58 decode for analysis
+                const decoded = base58Decode(base58Data);
+                const length = decoded.length;
+                let discriminator = null;
+                
+                if (length >= 4) {
+                    discriminator = decoded[0] | (decoded[1] << 8) | (decoded[2] << 16) | (decoded[3] << 24);
+                }
+
+                document.getElementById('dataLength').textContent = `${length} bytes`;
+                document.getElementById('discriminator').textContent = discriminator !== null ? discriminator : 'N/A';
+                
+                // Check if discriminator is valid for native staking (0-17)
+                let instructionText = 'Unknown';
+                if (discriminator !== null) {
+                    if (discriminator >= 0 && discriminator <= 17 && INSTRUCTION_NAMES[discriminator]) {
+                        instructionText = INSTRUCTION_NAMES[discriminator];
+                    } else {
+                        instructionText = `NOT Native Staking (${discriminator})`;
+                    }
+                }
+                
+                document.getElementById('instructionType').textContent = instructionText;
+                
+            } catch (error) {
+                document.getElementById('dataLength').textContent = 'Invalid';
+                document.getElementById('discriminator').textContent = 'Invalid';
+                document.getElementById('instructionType').textContent = 'Invalid';
+            }
+        }
+
+        function base58Decode(str) {
+            const ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+            
+            // Count leading 1s
+            let leadingOnes = 0;
+            for (const char of str) {
+                if (char === '1') leadingOnes++;
+                else break;
+            }
+            
+            // Convert to big integer
+            let num = 0n;
+            for (const char of str) {
+                const val = ALPHABET.indexOf(char);
+                if (val < 0) throw new Error('Invalid character');
+                num = num * 58n + BigInt(val);
+            }
+            
+            // Convert to bytes
+            const bytes = [];
+            while (num > 0n) {
+                bytes.unshift(Number(num % 256n));
+                num = num / 256n;
+            }
+            
+            // Add leading zeros for leading 1s
+            for (let i = 0; i < leadingOnes; i++) {
+                bytes.unshift(0);
+            }
+            
+            return new Uint8Array(bytes);
+        }
+
+        function showResult(type, content) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = `result ${type}`;
+            resultDiv.innerHTML = content;
+        }
+
+        async function parseInstruction() {
+            if (!wasmReady) {
+                showResult('error', 'WASM module not ready');
+                return;
+            }
+
+            const base58Data = document.getElementById('base58Data').value.trim();
+            const accountsText = document.getElementById('accounts').value.trim();
+
+            if (!base58Data) {
+                showResult('error', 'Please enter base58 instruction data');
+                return;
+            }
+
+            // Pre-check if this looks like a native staking instruction
+            try {
+                const decoded = base58Decode(base58Data);
+                if (decoded.length >= 4) {
+                    const discriminator = decoded[0] | (decoded[1] << 8) | (decoded[2] << 16) | (decoded[3] << 24);
+                    if (discriminator < 0 || discriminator > 17) {
+                        showResult('error', `
+                            <h3>NOT A NATIVE STAKING INSTRUCTION</h3>
+                            <p><strong>Discriminator:</strong> ${discriminator}</p>
+                            <p><strong>Valid Range:</strong> 0-17</p>
+                            <p>This instruction data is for a different Solana program.</p>
+                            <p><strong>Native Staking Instructions:</strong></p>
+                            <ul>
+                                <li>0: Initialize</li>
+                                <li>1: Authorize</li>
+                                <li>2: DelegateStake</li>
+                                <li>3: Split</li>
+                                <li>4: Withdraw</li>
+                                <li>5: Deactivate</li>
+                                <li>6-17: Other staking operations</li>
+                            </ul>
+                        `);
+                        document.getElementById('parseStatus').textContent = 'Invalid Instruction';
+                        return;
+                    }
+                }
+            } catch (e) {
+                // Continue with WASM parsing if base58 decode fails
+            }
+
+            document.getElementById('parseStatus').textContent = 'Parsing...';
+
+            try {
+                // Parse accounts
+                let accounts = [];
+                if (accountsText) {
+                    try {
+                        accounts = JSON.parse(accountsText);
+                        if (!Array.isArray(accounts)) {
+                            throw new Error('Accounts must be an array');
+                        }
+                    } catch (e) {
+                        showResult('error', `Invalid accounts JSON: ${e.message}`);
+                        document.getElementById('parseStatus').textContent = 'Error';
+                        return;
+                    }
+                }
+
+                // Parse with WASM
+                const result = parse(base58Data, accounts);
+                
+                document.getElementById('parseStatus').textContent = 'Success';
+                
+                showResult('success', `
+                    <h3>PARSE SUCCESS</h3>
+                    <div class="code">${JSON.stringify(result, null, 2)}</div>
+                    <p><strong>Instruction Type:</strong> ${result.instruction_type}</p>
+                    ${result.args ? `<p><strong>Has Arguments:</strong> Yes</p>` : ''}
+                    ${result.accounts ? `<p><strong>Has Accounts:</strong> Yes</p>` : ''}
+                `);
+
+            } catch (error) {
+                document.getElementById('parseStatus').textContent = 'Failed';
+                
+                showResult('error', `
+                    <h3>PARSE FAILED</h3>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                    <p><strong>This could mean:</strong></p>
+                    <ul>
+                        <li>Invalid base58 encoding</li>
+                        <li>Unknown instruction discriminator</li>
+                        <li>Incorrect data format for this instruction type</li>
+                        <li>Missing or incorrect account arguments</li>
+                    </ul>
+                `);
+            }
+        }
+
+        function clearInputs() {
+            document.getElementById('base58Data').value = '';
+            document.getElementById('accounts').value = '';
+            document.getElementById('dataLength').textContent = '-';
+            document.getElementById('discriminator').textContent = '-';
+            document.getElementById('instructionType').textContent = '-';
+            document.getElementById('parseStatus').textContent = 'Ready';
+            showResult('info', 'Enter instruction data above and click "Parse Instruction" to see results');
+        }
+
+        // Global function for tab switching
+        window.showTab = function(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        };
+
+        // Account field names from IDL (global scope)
+        const ACCOUNT_FIELDS = {
+            "Initialize": ["stake", "rentSysvar"],
+            "Authorize": ["stake", "clockSysvar", "authority", "lockupAuthority"],
+            "DelegateStake": ["stake", "voteAccount", "clockSysvar", "stakeHistorySysvar", "unused", "stakeAuthority"],
+            "Split": ["stake", "newStake", "stakeAuthority"],
+            "Withdraw": ["stake", "to", "clockSysvar", "stakeHistorySysvar", "withdrawAuthority", "lockupAuthority"],
+            "Deactivate": ["delegatedStake", "clockSysvar", "stakeAuthority"],
+            "SetLockup": ["stake", "lockupAuthority"],
+            "Merge": ["destinationStake", "sourceStake", "clockSysvar", "stakeHistorySysvar", "stakeAuthority"],
+            "AuthorizeWithSeed": ["stake", "authorityBase", "clockSysvar", "lockupAuthority"],
+            "InitializeChecked": ["stake", "rentSysvar", "stakerAuthority", "withdrawerAuthority"],
+            "AuthorizeChecked": ["stake", "clockSysvar", "authority", "newAuthority", "lockupAuthority"],
+            "AuthorizeCheckedWithSeed": ["stake", "authorityBase", "clockSysvar", "newAuthority", "lockupAuthority"],
+            "SetLockupChecked": ["stake", "lockupAuthority"],
+            "GetMinimumDelegation": [],
+            "DeactivateDelinquent": ["delinquentStake", "delinquentVoteAccount", "referenceStake", "referenceVoteAccount"],
+            "Redelegate": ["stake", "uninitializedStake", "voteAccount", "stakeConfig", "stakeAuthority"],
+            "MoveStake": ["sourceStake", "destinationStake", "stakeAuthority"],
+            "MoveLamports": ["sourceStake", "destinationStake", "stakeAuthority"]
+        };
+
+        // Helper function to format accounts with field names
+        function formatAccountsWithFields(accounts, instructionName) {
+            const fields = ACCOUNT_FIELDS[instructionName];
+            if (!fields || fields.length === 0) {
+                return accounts.map((acc, i) => `[${i}] ${acc}`).join('\n');
+            }
+            
+            return accounts.map((acc, i) => {
+                const fieldName = fields[i] || `unknown_${i}`;
+                return `[${i}] ${fieldName}: ${acc}`;
+            }).join('\n');
+        }
+
+
+
+        // Test Report Functionality
+        let reportAborted = false;
+
+        async function generateTestReport() {
+            reportAborted = false;
+            document.getElementById('fetchReportBtn').style.display = 'none';
+            document.getElementById('stopReportBtn').style.display = 'inline-block';
+            document.getElementById('stopReportBtn').disabled = false;
+            document.getElementById('reportResults').style.display = 'none';
+
+            showReportStatus('info', 'Fetching data from Dune API...');
+
+            try {
+                // Fetch real data from Dune API
+                showReportStatus('info', 'Fetching latest transactions from Dune API...');
+                
+                // Try multiple endpoints for latest native staking transactions
+                let transactions = [];
+                let dataSource = 'Unknown';
+                
+                // Primary endpoint - latest native staking transactions
+                try {
+                    const response = await fetch('https://api.dune.com/api/v1/query/5402199/results?limit=1000', {
+                        headers: {
+                            'X-Dune-API-Key': 'UK20z3ZzgPjGaxuha6Uc4bvnS6F5YwSZ' // Replace with your actual API key
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log('Dune API Response:', data); // Debug log
+                        
+                        transactions = data.result?.rows || [];
+                        dataSource = 'Dune API (Live)';
+                        
+                        if (transactions.length === 0) {
+                            showReportStatus('info', `Dune API returned 0 transactions. Query might be empty or outdated.`);
+                            console.log('Full API response structure:', JSON.stringify(data, null, 2));
+                        } else {
+                            showReportStatus('success', `Fetched ${transactions.length} transactions from Dune API`);
+                        }
+                    } else if (response.status === 401) {
+                        const errorText = await response.text();
+                        console.log('Auth error response:', errorText);
+                        throw new Error('Invalid Dune API key - please add your key');
+                    } else {
+                        const errorText = await response.text();
+                        console.log(`API Error ${response.status}:`, errorText);
+                        throw new Error(`Dune API returned ${response.status}: ${errorText}`);
+                    }
+                } catch (duneError) {
+                    console.log('Primary Dune API failed:', duneError);
+                    
+                    // Try alternative query IDs or public endpoints
+                    try {
+                        showReportStatus('info', 'Trying alternative Dune endpoint...');
+                        
+                        const altResponse = await fetch('https://api.dune.com/api/v1/query/2615782/results', {
+                            headers: {
+                                'X-Dune-API-Key': 'UK20z3ZzgPjGaxuha6Uc4bvnS6F5YwSZ'
+                            }
+                        });
+                        
+                        if (altResponse.ok) {
+                            const altData = await altResponse.json();
+                            console.log('Alternative API Response:', altData);
+                            transactions = altData.result?.rows || [];
+                            dataSource = 'Dune API (Alternative Query)';
+                            showReportStatus('success', `Fetched ${transactions.length} transactions from alternative endpoint`);
+                        } else {
+                            throw new Error(`Alternative endpoint failed: ${altResponse.status}`);
+                        }
+                    } catch (altError) {
+                        console.log('Alternative API also failed:', altError);
+                        
+                        // Final fallback to demo data
+                        showReportStatus('info', `All Dune APIs failed. Primary: ${duneError.message}, Alt: ${altError.message}. Using demo data...`);
+                        
+                        transactions = [
+                            {
+                                transaction_id: "5kkPihtAaNhVHmAShzyRw3vg3dQFAiEA888BmvTHU3v8nRCKQSp4j52EVapC6QRyLivuWmPWvVx9NBBShLdcMqMp",
+                                instruction_data: "1111ETzLikiK1okP4JW2nzqbt3Km6F7hyoK5wjzVhjhRTJdW8wUsBamJB5nGtfuEqFiqe1ipKanuWwMdu3wAzThkbVcPwTV3xigJZAcCee5KSduFHsESP735oDzQR8nfEGTjrNyc7FctpaDJeuzC4FDG6eG7P",
+                                account_arguments: ["9JhW5CsHqKTBuEQGpXxA7GEGnptNtUTU85KkPGsGTxcF", "SysvarRent111111111111111111111111111111111"]
+                            },
+                            {
+                                transaction_id: "2Hg9KjL5nP8VwQ3xR7mYzBfNtX6vS4qAcWpJkMoFrGd1",
+                                instruction_data: "AgAAAAA",
+                                account_arguments: ["9JhW5CsHqKTBuEQGpXxA7GEGnptNtUTU85KkPGsGTxcF", "HUr6Pia4cByKPgD4EAzdDfcqsvmnWT6dPjm2UroTyo7z", "SysvarC1ock11111111111111111111111111111111", "SysvarStakeHistory1111111111111111111111111", "StakeConfig11111111111111111111111111111111", "5c7XvvD4RLeYjXsiGb2pXxArrxHnjM3EsawQtFGPy15r"]
+                            },
+                            {
+                                transaction_id: "4NbY8zP9qW3eR5tL6sM1xXvC7qA2mK0jG4fH8dS7bR1N",
+                                instruction_data: "3Bxs412MvVNQj175",
+                                account_arguments: ["9JhW5CsHqKTBuEQGpXxA7GEGnptNtUTU85KkPGsGTxcF", "NewStakeAccount2222222222222222222222222222", "5c7XvvD4RLeYjXsiGb2pXxArrxHnjM3EsawQtFGPy15r"]
+                            }
+                        ];
+                        dataSource = 'Demo Data (All APIs Failed)';
+                    }
+                }
+
+                if (reportAborted) return;
+
+                // IDL instruction mapping
+                const IDL_INSTRUCTIONS = {
+                    0: "Initialize", 1: "Authorize", 2: "DelegateStake", 3: "Split",
+                    4: "Withdraw", 5: "Deactivate", 6: "SetLockup", 7: "Merge",
+                    8: "AuthorizeWithSeed", 9: "InitializeChecked", 10: "AuthorizeChecked",
+                    11: "AuthorizeCheckedWithSeed", 12: "SetLockupChecked", 13: "GetMinimumDelegation",
+                    14: "DeactivateDelinquent", 15: "Redelegate", 16: "MoveStake", 17: "MoveLamports"
+                };
+
+
+
+                // Analytics
+                const stats = {
+                    total: transactions.length,
+                    byInstruction: {},
+                    successful: 0,
+                    failed: 0,
+                    successfulTxns: [],
+                    failedTxns: [],
+                    errors: {},
+                    coverage: { idl: Object.keys(IDL_INSTRUCTIONS).length, api: 0 }
+                };
+
+                // Initialize instruction counters
+                Object.keys(IDL_INSTRUCTIONS).forEach(disc => {
+                    stats.byInstruction[disc] = { name: IDL_INSTRUCTIONS[disc], count: 0, success: 0, failed: 0 };
+                });
+
+                showReportStatus('info', 'Testing parser on real data...');
+
+                // Debug: Log first transaction structure
+                if (transactions.length > 0) {
+                    console.log('First transaction structure:', transactions[0]);
+                    console.log('Transaction keys:', Object.keys(transactions[0]));
+                }
+
+                // Process each transaction
+                for (let i = 0; i < transactions.length && !reportAborted; i++) {
+                    const tx = transactions[i];
+                    
+                    if (i % 50 === 0) {
+                        showReportStatus('info', `Processing ${i}/${transactions.length} transactions...`);
+                        await new Promise(resolve => setTimeout(resolve, 10)); // Allow UI updates
+                    }
+
+                    try {
+                        // Get instruction data - try multiple field names
+                        const instructionData = tx.data_base58 || tx.instruction_data || tx.data || tx.instructionData || tx.base58_data;
+                        if (!instructionData) {
+                            throw new Error('No instruction data found in transaction');
+                        }
+
+                        // Get accounts - try multiple field names  
+                        let accounts = tx.account_arguments || tx.accounts || tx.accountKeys || [];
+                        if (typeof accounts === 'string') {
+                            accounts = JSON.parse(accounts);
+                        }
+                        
+                        // Get transaction ID - try multiple field names
+                        const transactionId = tx.tx_id || tx.transaction_id || tx.signature || tx.id || 'unknown';
+                        
+                        // Try to parse with our WASM parser
+                        const result = parse(instructionData, accounts || []);
+                        
+                        // Extract discriminator for classification
+                        const decoded = base58Decode(instructionData);
+                        const discriminator = decoded.length >= 4 ? 
+                            (decoded[0] | (decoded[1] << 8) | (decoded[2] << 16) | (decoded[3] << 24)) : -1;
+
+                        if (discriminator >= 0 && discriminator <= 17) {
+                            stats.byInstruction[discriminator].count++;
+                            stats.byInstruction[discriminator].success++;
+                            stats.successful++;
+
+                            // Store successful transaction details
+                            stats.successfulTxns.push({
+                                transaction_id: transactionId,
+                                instruction_data: instructionData,
+                                discriminator: discriminator,
+                                instruction_name: IDL_INSTRUCTIONS[discriminator],
+                                accounts: accounts || [],
+                                args: result.args || {},
+                                result: result
+                            });
+                        }
+
+                    } catch (error) {
+                        stats.failed++;
+                        
+                        // Get data fields safely for failed transactions too
+                        const instructionData = tx.data_base58 || tx.instruction_data || tx.data || tx.instructionData || tx.base58_data || 'missing';
+                        const transactionId = tx.tx_id || tx.transaction_id || tx.signature || tx.id || 'unknown';
+                        
+                        // Try to extract discriminator and accounts even for failed parses
+                        let discriminator = -1;
+                        let instructionName = 'Unknown';
+                        let accounts = [];
+                        
+                        try {
+                            if (instructionData && instructionData !== 'missing') {
+                                const decoded = base58Decode(instructionData);
+                                discriminator = decoded.length >= 4 ? 
+                                    (decoded[0] | (decoded[1] << 8) | (decoded[2] << 16) | (decoded[3] << 24)) : -1;
+
+                                if (discriminator >= 0 && discriminator <= 17) {
+                                    stats.byInstruction[discriminator].count++;
+                                    stats.byInstruction[discriminator].failed++;
+                                    instructionName = IDL_INSTRUCTIONS[discriminator];
+                                }
+                            }
+                        } catch (e) {
+                            console.log('Failed to decode discriminator:', e);
+                        }
+
+                        try {
+                            let accountsRaw = tx.account_arguments || tx.accounts || tx.accountKeys || [];
+                            accounts = typeof accountsRaw === 'string' ? JSON.parse(accountsRaw) : accountsRaw;
+                        } catch (e) {
+                            console.log('Failed to parse accounts:', e);
+                        }
+
+                        // Store failed transaction details
+                        stats.failedTxns.push({
+                            transaction_id: transactionId,
+                            instruction_data: instructionData,
+                            discriminator: discriminator,
+                            instruction_name: instructionName,
+                            accounts: accounts,
+                            error: error.message
+                        });
+
+                        // Categorize errors
+                        const errorType = error.message.split(':')[0] || 'Unknown Error';
+                        stats.errors[errorType] = (stats.errors[errorType] || 0) + 1;
+                    }
+                }
+
+                if (reportAborted) return;
+
+                // Calculate API coverage
+                stats.coverage.api = Object.values(stats.byInstruction).filter(inst => inst.count > 0).length;
+
+                // Display results
+                displayTestReport(stats, IDL_INSTRUCTIONS, dataSource);
+                showReportStatus('success', `Test report generated successfully! (${dataSource})`);
+
+            } catch (error) {
+                if (!reportAborted) {
+                    showReportStatus('error', `Error: ${error.message}`);
+                }
+            } finally {
+                document.getElementById('fetchReportBtn').style.display = 'inline-block';
+                document.getElementById('stopReportBtn').style.display = 'none';
+            }
+        }
+
+        function stopReport() {
+            reportAborted = true;
+            showReportStatus('info', 'Report generation stopped');
+            document.getElementById('fetchReportBtn').style.display = 'inline-block';
+            document.getElementById('stopReportBtn').style.display = 'none';
+        }
+
+        function showReportStatus(type, message) {
+            const statusDiv = document.getElementById('reportStatus');
+            statusDiv.className = `result ${type}`;
+            statusDiv.innerHTML = message;
+        }
+
+        function displayTestReport(stats, IDL_INSTRUCTIONS, dataSource = 'Unknown') {
+            document.getElementById('reportResults').style.display = 'block';
+
+            // Overall Stats
+            document.getElementById('overallStats').innerHTML = `
+                <div class="data-card">
+                    <div><strong>Data Source:</strong></div>
+                    <div style="color: ${dataSource.includes('Live') ? '#00ff00' : '#ffaa00'};">${dataSource}</div>
+                </div>
+                <div class="data-card">
+                    <div><strong>Total Transactions:</strong></div>
+                    <div>${stats.total}</div>
+                </div>
+                <div class="data-card">
+                    <div><strong>Successful:</strong></div>
+                    <div style="color: #00ff00;">${stats.successful}</div>
+                </div>
+                <div class="data-card">
+                    <div><strong>Failed:</strong></div>
+                    <div style="color: #ff4444;">${stats.failed}</div>
+                </div>
+                <div class="data-card">
+                    <div><strong>Success Rate:</strong></div>
+                    <div>${stats.total > 0 ? ((stats.successful/stats.total)*100).toFixed(1) : 0}%</div>
+                </div>
+            `;
+
+            // Coverage Stats
+            document.getElementById('coverageStats').innerHTML = `
+                <div class="data-card">
+                    <div><strong>IDL Instructions:</strong></div>
+                    <div>${stats.coverage.idl}</div>
+                </div>
+                <div class="data-card">
+                    <div><strong>Found in Data:</strong></div>
+                    <div>${stats.coverage.api}</div>
+                </div>
+                <div class="data-card">
+                    <div><strong>Coverage:</strong></div>
+                    <div>${((stats.coverage.api / stats.coverage.idl) * 100).toFixed(1)}%</div>
+                </div>
+            `;
+
+            // Success Tab - Compact and aligned format
+            let successHtml = `<h4>Successful Transactions (${stats.successful})</h4>`;
+            if (stats.successfulTxns.length > 0) {
+                successHtml += '<div style="max-height: 600px; overflow-y: auto;">';
+                stats.successfulTxns.forEach((tx, index) => {
+                    successHtml += `
+                        <div style="background: #001100; border: 1px solid #00ff00; margin: 8px 0; padding: 12px; border-radius: 4px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <h5 style="margin: 0; color: #00ff00; font-size: 14px;">${index + 1}. ${tx.instruction_name} (Disc: ${tx.discriminator})</h5>
+                                <a href="https://solscan.io/tx/${tx.transaction_id}" target="_blank" style="color: #00ccff; text-decoration: none; font-size: 12px; background: #003366; padding: 4px 8px; border-radius: 3px;">Solscan</a>
+                            </div>
+                            
+                            <div style="font-size: 11px; margin-bottom: 8px;">
+                                <strong style="color: #ffff99;">TX:</strong> <code style="font-size: 10px;">${tx.transaction_id}</code>
+                            </div>
+                            
+                            <div style="margin-bottom: 8px;">
+                                <strong style="color: #ffff99;">Accounts:</strong>
+                                <div style="background: #000; padding: 6px; margin: 4px 0; border-radius: 3px; font-family: monospace; font-size: 10px; line-height: 1.3;">
+${formatAccountsWithFields(tx.accounts, tx.instruction_name)}
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <strong style="color: #ffff99;">Parsed Result:</strong>
+                                <div style="background: #000; padding: 6px; margin: 4px 0; border-radius: 3px; font-family: monospace; font-size: 10px; line-height: 1.3; white-space: pre-wrap;">${JSON.stringify(tx.args || tx.result, null, 2)}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                successHtml += '</div>';
+            } else {
+                successHtml += '<p>No successful transactions found.</p>';
+            }
+            document.getElementById('successResults').innerHTML = successHtml;
+
+            // Failed Tab - Compact and aligned format
+            let failedHtml = `<h4>Failed Transactions (${stats.failed})</h4>`;
+            if (stats.failedTxns.length > 0) {
+                failedHtml += '<div style="max-height: 600px; overflow-y: auto;">';
+                stats.failedTxns.forEach((tx, index) => {
+                    failedHtml += `
+                        <div style="background: #220011; border: 1px solid #ff4444; margin: 8px 0; padding: 12px; border-radius: 4px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <h5 style="margin: 0; color: #ff6666; font-size: 14px;">${index + 1}. ${tx.instruction_name} (Disc: ${tx.discriminator})</h5>
+                                <a href="https://solscan.io/tx/${tx.transaction_id}" target="_blank" style="color: #00ccff; text-decoration: none; font-size: 12px; background: #003366; padding: 4px 8px; border-radius: 3px;">Solscan</a>
+                            </div>
+                            
+                            <div style="font-size: 11px; margin-bottom: 8px;">
+                                <strong style="color: #ffff99;">TX:</strong> <code style="font-size: 10px;">${tx.transaction_id}</code>
+                            </div>
+                            
+                            <div style="margin-bottom: 8px;">
+                                <strong style="color: #ff8888;">Error:</strong> <span style="color: #ff8888; font-size: 11px;">${tx.error}</span>
+                            </div>
+                            
+                            <div style="margin-bottom: 8px;">
+                                <strong style="color: #ffff99;">Accounts:</strong>
+                                <div style="background: #000; padding: 6px; margin: 4px 0; border-radius: 3px; font-family: monospace; font-size: 10px; line-height: 1.3;">
+${tx.accounts.length > 0 ? formatAccountsWithFields(tx.accounts, tx.instruction_name) : 'No accounts'}
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <strong style="color: #ffff99;">Raw Data:</strong>
+                                <div style="background: #000; padding: 6px; margin: 4px 0; border-radius: 3px; font-family: monospace; font-size: 10px; word-break: break-all;">${tx.instruction_data}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                failedHtml += '</div>';
+                
+                // Error summary
+                failedHtml += '<div style="margin-top: 20px; padding: 10px; background: #220000; border: 1px solid #ff4444; border-radius: 4px;">';
+                failedHtml += '<h4 style="margin: 0 0 10px 0; color: #ff6666;">Error Summary</h4>';
+                Object.keys(stats.errors).forEach(error => {
+                    failedHtml += `<div style="margin: 4px 0; font-size: 12px;"><strong>${error}:</strong> ${stats.errors[error]} occurrences</div>`;
+                });
+                failedHtml += '</div>';
+            } else {
+                failedHtml += '<p>No failed transactions found.</p>';
+            }
+            document.getElementById('failedResults').innerHTML = failedHtml;
+        }
+
+        // Event listeners
+        document.getElementById('parseBtn').onclick = parseInstruction;
+        document.getElementById('clearBtn').onclick = clearInputs;
+        document.getElementById('fetchReportBtn').onclick = generateTestReport;
+        document.getElementById('stopReportBtn').onclick = stopReport;
+        
+        document.getElementById('base58Data').oninput = function() {
+            const data = this.value.trim();
+            if (data) {
+                analyzeData(data);
+            }
+        };
+
+        // Initialize
+        initWasm();
+    </script>
+</body>
+</html> 
