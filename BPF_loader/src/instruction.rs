@@ -215,30 +215,25 @@ impl Instruction {
             }
 
             WRITE_DISCRIMINATOR => {
-                // Write instruction has offset (4 bytes) + data length (4 bytes) + data
-                if rest.len() < 8 {
-                    let mut debug = debug_info;
-                    debug.error_message = format!(
-                        "Write instruction expects at least 8 bytes but got {} bytes",
-                        rest.len()
-                    );
-                    return Ok(Instruction::UnknownInstruction { debug_info: debug });
-                }
-
-                let offset = u32::from_le_bytes(rest[0..4].try_into().unwrap());
-                let data_len = u32::from_le_bytes(rest[4..8].try_into().unwrap()) as usize;
+                // Write instruction may have offset (4 bytes) + data length (4 bytes) + data
+                let offset = if rest.len() >= 4 {
+                    u32::from_le_bytes(rest[0..4].try_into().unwrap())
+                } else {
+                    0 // Default offset if not specified
+                };
                 
-                if rest.len() < 8 + data_len {
-                    let mut debug = debug_info;
-                    debug.error_message = format!(
-                        "Write instruction expects {} bytes for data but got {} bytes",
-                        8 + data_len,
-                        rest.len()
-                    );
-                    return Ok(Instruction::UnknownInstruction { debug_info: debug });
-                }
-
-                let bytes = rest[8..8 + data_len].to_vec();
+                let (data_len, bytes) = if rest.len() >= 8 {
+                    let data_len = u32::from_le_bytes(rest[4..8].try_into().unwrap()) as usize;
+                    let actual_data_len = std::cmp::min(data_len, rest.len().saturating_sub(8));
+                    let bytes = if actual_data_len > 0 {
+                        rest[8..8 + actual_data_len].to_vec()
+                    } else {
+                        Vec::new()
+                    };
+                    (data_len, bytes)
+                } else {
+                    (0, Vec::new()) // Default values if not specified
+                };
                 
                 let args = WriteArgs { offset, bytes };
                 let accounts = WriteAccounts {
@@ -253,17 +248,13 @@ impl Instruction {
             }
 
             DEPLOY_WITH_MAX_DATA_LEN_DISCRIMINATOR => {
-                // DeployWithMaxDataLen has 8 bytes for max_data_len
-                if rest.len() < 8 {
-                    let mut debug = debug_info;
-                    debug.error_message = format!(
-                        "DeployWithMaxDataLen instruction expects 8 bytes but got {} bytes",
-                        rest.len()
-                    );
-                    return Ok(Instruction::UnknownInstruction { debug_info: debug });
-                }
-
-                let max_data_len = u64::from_le_bytes(rest[0..8].try_into().unwrap());
+                // DeployWithMaxDataLen may have 8 bytes for max_data_len
+                let max_data_len = if rest.len() >= 8 {
+                    u64::from_le_bytes(rest[0..8].try_into().unwrap())
+                } else {
+                    0 // Default max_data_len if not specified
+                };
+                
                 let args = DeployWithMaxDataLenArgs { max_data_len };
                 
                 let accounts = DeployWithMaxDataLenAccounts {
@@ -300,17 +291,13 @@ impl Instruction {
             }
 
             SET_AUTHORITY_DISCRIMINATOR => {
-                // SetAuthority has 4 bytes for authority_type + optional 32 bytes for new_authority
-                if rest.len() < 4 {
-                    let mut debug = debug_info;
-                    debug.error_message = format!(
-                        "SetAuthority instruction expects at least 4 bytes but got {} bytes",
-                        rest.len()
-                    );
-                    return Ok(Instruction::UnknownInstruction { debug_info: debug });
-                }
-
-                let authority_type = u32::from_le_bytes(rest[0..4].try_into().unwrap());
+                // SetAuthority may have 4 bytes for authority_type + optional 32 bytes for new_authority
+                let authority_type = if rest.len() >= 4 {
+                    u32::from_le_bytes(rest[0..4].try_into().unwrap())
+                } else {
+                    0 // Default authority type if not specified
+                };
+                
                 let new_authority = if rest.len() >= 36 {
                     // Has new authority (32 bytes)
                     Some(bs58::encode(&rest[4..36]).into_string())
@@ -343,17 +330,13 @@ impl Instruction {
             }
 
             EXTEND_PROGRAM_DISCRIMINATOR => {
-                // ExtendProgram has 4 bytes for additional_bytes
-                if rest.len() < 4 {
-                    let mut debug = debug_info;
-                    debug.error_message = format!(
-                        "ExtendProgram instruction expects 4 bytes but got {} bytes",
-                        rest.len()
-                    );
-                    return Ok(Instruction::UnknownInstruction { debug_info: debug });
-                }
-
-                let additional_bytes = u32::from_le_bytes(rest[0..4].try_into().unwrap());
+                // ExtendProgram may have 4 bytes for additional_bytes
+                let additional_bytes = if rest.len() >= 4 {
+                    u32::from_le_bytes(rest[0..4].try_into().unwrap())
+                } else {
+                    0 // Default additional_bytes if not specified
+                };
+                
                 let args = ExtendProgramArgs { additional_bytes };
                 
                 let accounts = ExtendProgramAccounts {
@@ -370,17 +353,12 @@ impl Instruction {
             }
 
             SET_AUTHORITY_CHECKED_DISCRIMINATOR => {
-                // SetAuthorityChecked has 4 bytes for authority_type
-                if rest.len() < 4 {
-                    let mut debug = debug_info;
-                    debug.error_message = format!(
-                        "SetAuthorityChecked instruction expects 4 bytes but got {} bytes",
-                        rest.len()
-                    );
-                    return Ok(Instruction::UnknownInstruction { debug_info: debug });
-                }
-
-                let authority_type = u32::from_le_bytes(rest[0..4].try_into().unwrap());
+                // SetAuthorityChecked may have 4 bytes for authority_type or be minimal
+                let authority_type = if rest.len() >= 4 {
+                    u32::from_le_bytes(rest[0..4].try_into().unwrap())
+                } else {
+                    0 // Default authority type if not specified
+                };
 
                 let accounts = SetAuthorityCheckedAccounts {
                     target: account_keys.get(0).unwrap_or(&"".to_string()).to_string(),
