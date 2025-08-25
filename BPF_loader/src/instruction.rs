@@ -176,6 +176,16 @@ impl Instruction {
         map
     }
 
+    // Helper function to convert SetAuthorityArgs to HashMap
+    fn set_authority_args_to_map(authority_type: u32, new_authority: Option<String>) -> HashMap<String, serde_json::Value> {
+        let mut map = HashMap::new();
+        map.insert("authority_type".to_string(), serde_json::Value::Number(serde_json::Number::from(authority_type)));
+        if let Some(auth) = new_authority {
+            map.insert("new_authority".to_string(), serde_json::Value::String(auth));
+        }
+        map
+    }
+
     pub fn decode(account_keys: &[String], data: &[u8]) -> Result<Self> {
         if data.len() < 4 {
             return Err(anyhow!("instruction data too short"));
@@ -290,13 +300,31 @@ impl Instruction {
             }
 
             SET_AUTHORITY_DISCRIMINATOR => {
+                // SetAuthority has 4 bytes for authority_type + optional 32 bytes for new_authority
+                if rest.len() < 4 {
+                    let mut debug = debug_info;
+                    debug.error_message = format!(
+                        "SetAuthority instruction expects at least 4 bytes but got {} bytes",
+                        rest.len()
+                    );
+                    return Ok(Instruction::UnknownInstruction { debug_info: debug });
+                }
+
+                let authority_type = u32::from_le_bytes(rest[0..4].try_into().unwrap());
+                let new_authority = if rest.len() >= 36 {
+                    // Has new authority (32 bytes)
+                    Some(bs58::encode(&rest[4..36]).into_string())
+                } else {
+                    None
+                };
+
                 let accounts = SetAuthorityAccounts {
                     target: account_keys.get(0).unwrap_or(&"".to_string()).to_string(),
                     current_authority: account_keys.get(1).unwrap_or(&"".to_string()).to_string(),
                     new_authority: account_keys.get(2).map(|s| s.to_string()),
                 };
                 Ok(Instruction::SetAuthority { 
-                    args: Self::empty_args(),
+                    args: Self::set_authority_args_to_map(authority_type, new_authority),
                     accounts: accounts,
                 })
             }
@@ -342,13 +370,25 @@ impl Instruction {
             }
 
             SET_AUTHORITY_CHECKED_DISCRIMINATOR => {
+                // SetAuthorityChecked has 4 bytes for authority_type
+                if rest.len() < 4 {
+                    let mut debug = debug_info;
+                    debug.error_message = format!(
+                        "SetAuthorityChecked instruction expects 4 bytes but got {} bytes",
+                        rest.len()
+                    );
+                    return Ok(Instruction::UnknownInstruction { debug_info: debug });
+                }
+
+                let authority_type = u32::from_le_bytes(rest[0..4].try_into().unwrap());
+
                 let accounts = SetAuthorityCheckedAccounts {
                     target: account_keys.get(0).unwrap_or(&"".to_string()).to_string(),
                     current_authority: account_keys.get(1).unwrap_or(&"".to_string()).to_string(),
                     new_authority: account_keys.get(2).unwrap_or(&"".to_string()).to_string(),
                 };
                 Ok(Instruction::SetAuthorityChecked { 
-                    args: Self::empty_args(),
+                    args: Self::set_authority_args_to_map(authority_type, None),
                     accounts: accounts,
                 })
             }
