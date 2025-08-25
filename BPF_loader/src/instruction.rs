@@ -1,6 +1,6 @@
 use anyhow::{anyhow, Result};
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
+use std::collections::HashMap;
 use std::convert::TryInto;
 
 // BPF Loader Upgradeable discriminators
@@ -107,41 +107,41 @@ pub struct DebugInfo {
     pub error_message: String,
 }
 
-// Main instruction enum - FIXED: All instructions now have args field
+// Main instruction enum - FIXED: All instructions now have args and accounts fields
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = "instruction_type")]
 pub enum Instruction {
     InitializeBuffer {
-        args: serde_json::Value,  // Empty object {}
-        input_accounts: Vec<String>,
+        args: HashMap<String, serde_json::Value>,
+        accounts: InitializeBufferAccounts,
     },
     Write {
-        args: serde_json::Value,
-        input_accounts: Vec<String>,
+        args: HashMap<String, serde_json::Value>,
+        accounts: WriteAccounts,
     },
     DeployWithMaxDataLen {
-        args: serde_json::Value,
-        input_accounts: Vec<String>,
+        args: HashMap<String, serde_json::Value>,
+        accounts: DeployWithMaxDataLenAccounts,
     },
     Upgrade {
-        args: serde_json::Value,  // Empty object {}
-        input_accounts: Vec<String>,
+        args: HashMap<String, serde_json::Value>,
+        accounts: UpgradeAccounts,
     },
     SetAuthority {
-        args: serde_json::Value,  // Empty object {}
-        input_accounts: Vec<String>,
+        args: HashMap<String, serde_json::Value>,
+        accounts: SetAuthorityAccounts,
     },
     Close {
-        args: serde_json::Value,  // Empty object {}
-        input_accounts: Vec<String>,
+        args: HashMap<String, serde_json::Value>,
+        accounts: CloseAccounts,
     },
     ExtendProgram {
-        args: serde_json::Value,
-        input_accounts: Vec<String>,
+        args: HashMap<String, serde_json::Value>,
+        accounts: ExtendProgramAccounts,
     },
     SetAuthorityChecked {
-        args: serde_json::Value,  // Empty object {}
-        input_accounts: Vec<String>,
+        args: HashMap<String, serde_json::Value>,
+        accounts: SetAuthorityCheckedAccounts,
     },
     UnknownInstruction {
         debug_info: DebugInfo,
@@ -149,6 +149,33 @@ pub enum Instruction {
 }
 
 impl Instruction {
+    // Helper function to create empty args HashMap
+    fn empty_args() -> HashMap<String, serde_json::Value> {
+        HashMap::new()
+    }
+
+    // Helper function to convert WriteArgs to HashMap
+    fn write_args_to_map(args: &WriteArgs) -> HashMap<String, serde_json::Value> {
+        let mut map = HashMap::new();
+        map.insert("offset".to_string(), serde_json::Value::Number(serde_json::Number::from(args.offset)));
+        map.insert("bytes".to_string(), serde_json::to_value(&args.bytes).unwrap_or(serde_json::Value::Null));
+        map
+    }
+
+    // Helper function to convert DeployWithMaxDataLenArgs to HashMap
+    fn deploy_args_to_map(args: &DeployWithMaxDataLenArgs) -> HashMap<String, serde_json::Value> {
+        let mut map = HashMap::new();
+        map.insert("max_data_len".to_string(), serde_json::Value::Number(serde_json::Number::from(args.max_data_len)));
+        map
+    }
+
+    // Helper function to convert ExtendProgramArgs to HashMap
+    fn extend_args_to_map(args: &ExtendProgramArgs) -> HashMap<String, serde_json::Value> {
+        let mut map = HashMap::new();
+        map.insert("additional_bytes".to_string(), serde_json::Value::Number(serde_json::Number::from(args.additional_bytes)));
+        map
+    }
+
     pub fn decode(account_keys: &[String], data: &[u8]) -> Result<Self> {
         if data.len() < 4 {
             return Err(anyhow!("instruction data too short"));
@@ -172,8 +199,8 @@ impl Instruction {
                     authority: account_keys.get(1).map(|s| s.to_string()),
                 };
                 Ok(Instruction::InitializeBuffer { 
-                    args: serde_json::Value::Object(serde_json::Map::new()), // Empty object
-                    input_accounts: account_keys.to_vec()
+                    args: Self::empty_args(),
+                    accounts: accounts,
                 })
             }
 
@@ -210,8 +237,8 @@ impl Instruction {
                 };
                 
                 Ok(Instruction::Write { 
-                    args: serde_json::to_value(&args)?,
-                    input_accounts: account_keys.to_vec()
+                    args: Self::write_args_to_map(&args),
+                    accounts: accounts,
                 })
             }
 
@@ -241,8 +268,8 @@ impl Instruction {
                 };
                 
                 Ok(Instruction::DeployWithMaxDataLen { 
-                    args: serde_json::to_value(&args)?,
-                    input_accounts: account_keys.to_vec()
+                    args: Self::deploy_args_to_map(&args),
+                    accounts: accounts,
                 })
             }
 
@@ -257,8 +284,8 @@ impl Instruction {
                     authority: account_keys.get(6).unwrap_or(&"".to_string()).to_string(),
                 };
                 Ok(Instruction::Upgrade { 
-                    args: serde_json::Value::Object(serde_json::Map::new()), // Empty object
-                    input_accounts: account_keys.to_vec()
+                    args: Self::empty_args(),
+                    accounts: accounts,
                 })
             }
 
@@ -269,8 +296,8 @@ impl Instruction {
                     new_authority: account_keys.get(2).map(|s| s.to_string()),
                 };
                 Ok(Instruction::SetAuthority { 
-                    args: serde_json::Value::Object(serde_json::Map::new()), // Empty object
-                    input_accounts: account_keys.to_vec()
+                    args: Self::empty_args(),
+                    accounts: accounts,
                 })
             }
 
@@ -282,8 +309,8 @@ impl Instruction {
                     program: account_keys.get(3).map(|s| s.to_string()),
                 };
                 Ok(Instruction::Close { 
-                    args: serde_json::Value::Object(serde_json::Map::new()), // Empty object
-                    input_accounts: account_keys.to_vec()
+                    args: Self::empty_args(),
+                    accounts: accounts,
                 })
             }
 
@@ -309,8 +336,8 @@ impl Instruction {
                 };
                 
                 Ok(Instruction::ExtendProgram { 
-                    args: serde_json::to_value(&args)?,
-                    input_accounts: account_keys.to_vec()
+                    args: Self::extend_args_to_map(&args),
+                    accounts: accounts,
                 })
             }
 
@@ -321,8 +348,8 @@ impl Instruction {
                     new_authority: account_keys.get(2).unwrap_or(&"".to_string()).to_string(),
                 };
                 Ok(Instruction::SetAuthorityChecked { 
-                    args: serde_json::Value::Object(serde_json::Map::new()), // Empty object
-                    input_accounts: account_keys.to_vec()
+                    args: Self::empty_args(),
+                    accounts: accounts,
                 })
             }
 
