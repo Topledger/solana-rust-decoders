@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>GMX Solana — Parser Tester (Success/Failed Tabs)</title>
+<style>
+  :root { --bg:#0f172a; --panel:#111827; --ink:#e5e7eb; --muted:#9ca3af; --b1:#1f2937; --b2:#374151; --ok:#10b981; --warn:#f59e0b; --err:#ef4444; --acc:#60a5fa; }
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell}
+  .wrap{max-width:1200px;margin:28px auto;padding:0 16px}
+  h1{font-size:20px;margin:0 0 10px}
+  .card{background:var(--panel);border:1px solid var(--b1);border-radius:12px;padding:16px;margin:12px 0}
+  label{display:block;font-weight:700;margin:10px 0 6px}
+  textarea,input{width:100%;padding:10px;border-radius:10px;border:1px solid var(--b2);background:#0b1021;color:var(--ink);font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Courier New",monospace}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  .row > *{flex:1}
+  button{border:0;border-radius:10px;padding:10px 14px;cursor:pointer;font-weight:800}
+  .btn{background:var(--b1);border:1px solid var(--b2);color:var(--ink)}
+  .btn:hover{filter:brightness(1.1)} .btn-acc{background:var(--acc);color:#0b142a} .btn-ok{background:var(--ok);color:#00281b}
+  .status{display:inline-block;padding:4px 8px;border-radius:8px;font-size:12px;margin-left:8px}
+  .s-load{background:#fef3c7;color:#92400e} .s-ok{background:#d1fae5;color:#065f46} .s-err{background:#fee2e2;color:#7f1d1d}
+  .pill{display:inline-block;background:#0b1021;border:1px solid var(--b2);padding:4px 10px;border-radius:999px;font-size:12px}
+  .muted{color:var(--muted)}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{border-top:1px solid var(--b1);padding:10px;text-align:left;vertical-align:top}
+  th{position:sticky;top:0;background:#0e1426}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Courier New",monospace;word-break:break-word}
+  .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .right{margin-left:auto}
+  .hide{display:none}
+
+  /* tabs */
+  .tabs{display:flex;gap:6px;border-bottom:1px solid var(--b1);margin-bottom:12px}
+  .tab{padding:8px 12px;border:1px solid var(--b1);border-bottom:none;border-radius:10px 10px 0 0;background:#0c1227;cursor:pointer}
+  .tab.active{background:#0e142e}
+  .tabcount{font-weight:700;margin-left:6px}
+  .reason{font-size:12px;color:#fca5a5}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🚀 GMX Solana — Parser Tester</h1>
+
+  <!-- Controls -->
+  <div class="card">
+    <div class="row">
+      <div>
+        <label for="b58">Base58 Instruction</label>
+        <textarea id="b58" rows="3" placeholder="Paste Base58 instruction data..."></textarea>
+        <div class="muted" id="b58Info"></div>
+      </div>
+      <div>
+        <label for="accs">Account Keys (JSON Array)</label>
+        <textarea id="accs" rows="3" placeholder='["account1","account2",...]'>[]</textarea>
+      </div>
+    </div>
+    <div class="toolbar" style="margin-top:10px">
+      <button class="btn-acc" id="btnParse">Parse</button>
+      <span id="parseStatus" class="status hide"></span>
+      <div class="right"></div>
+      <span class="pill">Dune</span>
+      <input id="duneQueryId" value="5402199" title="Dune Query ID" />
+      <input id="duneKey" value="UK20z3ZzgPjGaxuha6Uc4bvnS6F5YwSZ" title="Dune API Key" />
+      <button class="btn" id="btnDune">Dune Report</button>
+      <span id="duneStatus" class="status hide"></span>
+    </div>
+  </div>
+
+  <!-- Single parse output -->
+  <div class="card hide" id="singleCard">
+    <div class="toolbar">
+      <span class="pill">Single Parse Result</span>
+      <div class="right muted" id="decodedLen"></div>
+    </div>
+    <table>
+      <tbody>
+        <tr><th style="width:200px">Instruction Type</th><td class="mono" id="s_type"></td></tr>
+        <tr><th>Args</th><td class="mono" id="s_args"></td></tr>
+        <tr><th>Accounts</th><td class="mono" id="s_inaccs"></td></tr>
+        <tr><th>Raw Base58</th><td class="mono" id="s_b58"></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Dune parsed: tabs -->
+  <div class="card hide" id="duneCard">
+    <div class="toolbar">
+      <span class="pill">Dune Parsed Transactions</span>
+      <div id="duneSummary" class="muted"></div>
+      <div class="right"></div>
+      <button id="exportJSON" class="btn-ok">Export JSON</button>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" data-tab="success">Success <span id="cntSuccess" class="tabcount">0</span></div>
+      <div class="tab" data-tab="failed">Failed <span id="cntFailed" class="tabcount">0</span></div>
+    </div>
+
+    <!-- Success table -->
+    <div id="tab-success">
+      <div style="overflow:auto;max-height:60vh">
+        <table id="tblSuccess">
+          <thead>
+            <tr>
+              <th>tx_id</th>
+              <th>instruction_type</th>
+              <th>args</th>
+              <th>accounts</th>
+              <th>data (base58)</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Failed table -->
+    <div id="tab-failed" class="hide">
+      <div style="overflow:auto;max-height:60vh">
+        <table id="tblFailed">
+          <thead>
+            <tr>
+              <th>tx_id</th>
+              <th>reason</th>
+              <th>accounts</th>
+              <th>data (base58)</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Optional: bs58 to show decoded length -->
+<script src="https://unpkg.com/bs58@5.0.0/dist/index.umd.js"></script>
+
+<script type="module">
+  // ====== WASM loader ======
+  let wasm, wasmReady = false;
+  (async function init() {
+    try {
+      const mod = await import('./pkg/gmx_solana.js'); // ensure ./pkg exists
+      await mod.default();
+      wasm = mod; wasmReady = true;
+      console.log('✅ WASM ready');
+    } catch (e) {
+      console.error('WASM load failed:', e);
+      setStatus('parseStatus','err','WASM load failed: ' + e.message);
+    }
+  })();
+
+  // ====== DOM helpers ======
+  const $ = s => document.querySelector(s);
+  function setStatus(id, kind, text){ const el = document.getElementById(id); el.className='status '+(kind==='ok'?'s-ok':kind==='err'?'s-err':'s-load'); el.textContent=text; el.classList.remove('hide'); }
+  function hide(el){ el.classList.add('hide'); } function show(el){ el.classList.remove('hide'); }
+  function safeJSON(s){ try{ return JSON.parse(s) } catch{ return null } }
+  function escapeHTML(s){ return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;', "'":'&#39;'}[m])) }
+  function addRow(tbody, cells){ const tr=document.createElement('tr'); tr.innerHTML=cells.map(c=>`<td class="mono">${escapeHTML(c)}</td>`).join(''); tbody.appendChild(tr); }
+
+  // tabs
+  for (const t of document.querySelectorAll('.tab')){
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+      t.classList.add('active');
+      const name = t.getAttribute('data-tab');
+      show(document.getElementById('tab-'+name));
+      for (const other of ['success','failed'].filter(n=>n!==name)) hide(document.getElementById('tab-'+other));
+    });
+  }
+
+  // live Base58 decoded-length info
+  $('#b58').addEventListener('input', () => {
+    const v = $('#b58').value.trim();
+    try{ if(!v){ $('#b58Info').textContent=''; return; } const bytes=bs58.default.decode(v); $('#b58Info').textContent=`decoded bytes: ${bytes.length}`; }
+    catch{ $('#b58Info').textContent='⚠️ invalid base58'; }
+  });
+
+  // ====== Single Parse ======
+  $('#btnParse').addEventListener('click', () => {
+    if (!wasmReady){ setStatus('parseStatus','err','WASM not ready'); return; }
+    const base58 = $('#b58').value.trim();
+    if (!base58){ setStatus('parseStatus','err','Enter Base58'); return; }
+
+    let accounts=[]; try{ const raw=$('#accs').value.trim(); accounts = raw? JSON.parse(raw): []; } catch{ setStatus('parseStatus','err','Accounts must be JSON array'); return; }
+
+    setStatus('parseStatus','load','Parsing...');
+    try{
+      const res = wasm.parse(base58, accounts);
+      const parsed = typeof res==='string' ? (safeJSON(res) ?? { raw_response:res }) : (res ?? {});
+      $('#s_type').textContent   = parsed.instruction_type ?? 'Unknown';
+      $('#s_args').textContent   = JSON.stringify(parsed.args ?? {}, null, 2);
+      $('#s_inaccs').textContent = JSON.stringify(parsed.accounts ?? [], null, 2);
+      $('#s_b58').textContent    = base58;
+      try{ $('#decodedLen').textContent = `decoded bytes: ${bs58.default.decode(base58).length}`; }catch{ $('#decodedLen').textContent=''; }
+      show($('#singleCard')); setStatus('parseStatus','ok','Success');
+    }catch(e){ hide($('#singleCard')); setStatus('parseStatus','err','Parse error: '+e.message); }
+  });
+
+  // ====== Dune Report (two tabs) ======
+  let exportRows = [];
+  $('#btnDune').addEventListener('click', async () => {
+    const queryId = $('#duneQueryId').value.trim() || '5402199';
+    const apiKey  = $('#duneKey').value.trim();
+    if (!apiKey){ setStatus('duneStatus','err','Missing Dune API key'); return; }
+    if (!wasmReady){ setStatus('duneStatus','err','WASM not ready'); return; }
+
+    setStatus('duneStatus','load','Fetching...');
+    hide($('#duneCard'));
+
+    try{
+      const url = `https://api.dune.com/api/v1/query/${encodeURIComponent(queryId)}/results?limit=1000`;
+      const resp = await fetch(url, { headers: { 'X-Dune-API-Key': apiKey }});
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const data = await resp.json();
+      const rows = (data?.result?.rows) ?? [];
+
+      const succBody = $('#tblSuccess tbody'); succBody.innerHTML='';
+      const failBody = $('#tblFailed tbody'); failBody.innerHTML='';
+      let ok=0, fail=0; exportRows = [];
+
+      for (const r of rows){
+        // Expect array rows: [tx_id, block_time, instruction_data_base58, accounts_json]
+        const tx_id = Array.isArray(r) ? (r[0] ?? 'N/A') : (r.tx_id ?? r.signature ?? 'N/A');
+        const base58 = Array.isArray(r) ? (r[2] ?? null) : (r.data_base58 ?? r.data ?? null);
+        const accountsRaw = Array.isArray(r) ? (r[3] ?? '[]') : (r.account_arguments ?? '[]');
+
+        let accounts=[]; try{ accounts = typeof accountsRaw === 'string' ? JSON.parse(accountsRaw) : (accountsRaw ?? []); } catch{ accounts=[]; }
+
+        if (!base58 || base58 === 'N/A' || base58 === 'null') {
+          // No instruction data
+          addRow(failBody, [tx_id, 'No instruction data', JSON.stringify(accounts), String(base58 ?? 'N/A')]);
+          exportRows.push({ tx_id, data: base58 ?? 'N/A', accounts, reason: 'No instruction data' });
+          fail++; continue;
+        }
+
+        try{
+          const res = wasm.parse(base58, accounts);
+          const parsed = typeof res==='string' ? (safeJSON(res) ?? { raw_response:res }) : (res ?? {});
+          const insType = parsed.instruction_type ?? 'Unknown';
+          const args    = parsed.args ?? {};
+
+          if (insType === 'Unknown') {
+            addRow(failBody, [tx_id, 'Unknown instruction type', JSON.stringify(accounts), base58]);
+            exportRows.push({ tx_id, data: base58, accounts, reason: 'Unknown instruction type' });
+            fail++;
+        } else {
+            const named = parsed.accounts ?? [];
+            addRow(succBody, [tx_id, insType, JSON.stringify(args), JSON.stringify(named), base58]);
+            exportRows.push({ tx_id, data: base58, accounts: named, args, instruction_type: insType });
+            ok++;
+          }        
+        } catch(e){
+          addRow(failBody, [tx_id, 'Parse error: ' + e.message, JSON.stringify(accounts), base58]);
+          exportRows.push({ tx_id, data: base58, accounts, reason: 'Parse error: ' + e.message });
+          fail++;
+        }
+      }
+
+      $('#cntSuccess').textContent = String(ok);
+      $('#cntFailed').textContent  = String(fail);
+      $('#duneSummary').textContent = `Total: ${rows.length} • Success: ${ok} • Failed: ${fail}`;
+      show($('#duneCard')); setStatus('duneStatus','ok','Done');
+    }catch(e){
+      setStatus('duneStatus','err','Dune error: ' + e.message);
+    }
+  });
+
+  // ====== Export JSON ======
+  $('#exportJSON').addEventListener('click', () => {
+    const blob = new Blob([JSON.stringify(exportRows, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = Object.assign(document.createElement('a'), { href: url, download: 'dune_parsed.json' });
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  });
+</script>
+</body>
+</html>
