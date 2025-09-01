@@ -10,6 +10,9 @@ use wasm_bindgen::JsValue;
 // === Compile-time embedded IDL (adjust path if needed) ===
 const GMX_IDL: &str = include_str!("../idls/gmx_solana.json");
 
+// Anchor-style event wrapper prefix (8 bytes)
+const EVENT_LOG_DISCRIMINATOR: [u8; 8] = [228, 69, 165, 46, 81, 203, 154, 29]; // e4 45 a5 2e 51 cb 9a 1d
+
 #[wasm_bindgen(start)]
 pub fn run() {
     console_error_panic_hook::set_once();
@@ -34,7 +37,6 @@ fn load_idl() -> Option<Value> {
 }
 
 fn anchor_disc_for(name_snake: &str) -> [u8; 8] {
-    // Anchor discriminator: first 8 bytes of sha256("global:" + name)
     let mut h = Sha256::new();
     h.update(b"global:");
     h.update(name_snake.as_bytes());
@@ -42,6 +44,11 @@ fn anchor_disc_for(name_snake: &str) -> [u8; 8] {
     let mut out = [0u8; 8];
     out.copy_from_slice(&digest[..8]);
     out
+}
+
+// Return a JS object (not a JSON string)
+fn to_js(v: &serde_json::Value) -> JsValue {
+    serde_wasm_bindgen::to_value(v).unwrap_or_else(|_| JsValue::from_str(&v.to_string()))
 }
 
 fn find_instr_by_disc<'a>(idl: &'a Value, disc: &[u8]) -> Option<&'a Value> {
@@ -67,21 +74,18 @@ fn find_instr_by_disc<'a>(idl: &'a Value, disc: &[u8]) -> Option<&'a Value> {
     }
     None
 }
+
 // === Events index: discriminator ([u8;8]) -> event JSON node from IDL ===
 fn build_event_index<'a>(idl: &'a Value) -> std::collections::HashMap<[u8; 8], &'a Value> {
     let mut m = std::collections::HashMap::new();
     if let Some(arr) = idl.get("events").and_then(|v| v.as_array()) {
         for ev in arr {
-            if let (Some(name), Some(darr)) = (
-                ev.get("name").and_then(|v| v.as_str()),
-                ev.get("discriminator").and_then(|v| v.as_array()),
-            ) {
+            if let Some(darr) = ev.get("discriminator").and_then(|v| v.as_array()) {
                 if darr.len() == 8 {
                     let mut disc = [0u8; 8];
                     for i in 0..8 {
                         disc[i] = darr[i].as_u64().unwrap_or(0) as u8;
                     }
-                    // name is not used here, we just map disc -> the event node
                     m.insert(disc, ev);
                 }
             }
@@ -90,7 +94,7 @@ fn build_event_index<'a>(idl: &'a Value) -> std::collections::HashMap<[u8; 8], &
     m
 }
 
-// === Find a struct type definition by name in IDL.types ===
+// === Find a struct/enum type definition by name in IDL.types ===
 fn find_type_by_name<'a>(idl: &'a Value, name: &str) -> Option<&'a Value> {
     let arr = idl.get("types")?.as_array()?;
     arr.iter()
@@ -106,7 +110,6 @@ struct AccountSpec {
     optional: bool,
 }
 
-// IDL accounts can nest via "accounts": [...]. We flatten to leaves in order. (IDL uses "writable"/"signer") :contentReference[oaicite:3]{index=3}
 fn flatten_accounts_schema(v: &Value, prefix: &str, out: &mut Vec<AccountSpec>) {
     let Some(arr) = v.as_array() else { return; };
     for item in arr {
@@ -115,10 +118,8 @@ fn flatten_accounts_schema(v: &Value, prefix: &str, out: &mut Vec<AccountSpec>) 
         let optional = item.get("optional").and_then(|x| x.as_bool()).unwrap_or(false);
 
         if let Some(children) = item.get("accounts") {
-            // group node → recurse
             flatten_accounts_schema(children, &path, out);
         } else {
-            // leaf node
             let writable = item.get("writable").and_then(|x| x.as_bool()).unwrap_or(false);
             let signer   = item.get("signer").and_then(|x| x.as_bool()).unwrap_or(false);
             out.push(AccountSpec { path, writable, signer, optional });
@@ -126,7 +127,7 @@ fn flatten_accounts_schema(v: &Value, prefix: &str, out: &mut Vec<AccountSpec>) 
     }
 }
 
-// Accept accounts as simple strings OR objects with pubkey (plus optional flags, ignored here)
+// Accept accounts as simple strings OR objects with pubkey (plus optional flags)
 #[derive(Deserialize)]
 #[serde(untagged)]
 enum AccountInput {
@@ -148,7 +149,7 @@ impl AccountInput {
 
 // ---------- primitive kinds ----------
 #[derive(Clone, Copy, Debug)]
-enum Prim { U8, I8, U16, I16, U32, I32, U64, I64, U128, I128, Bool, Pubkey } // "pubkey" is 32 bytes
+enum Prim { U8, I8, U16, I16, U32, I32, U64, I64, U128, I128, Bool, Pubkey }
 
 fn parse_prim_ty(s: &str) -> Option<Prim> {
     Some(match s {
@@ -158,7 +159,7 @@ fn parse_prim_ty(s: &str) -> Option<Prim> {
         "u64" => Prim::U64, "i64" => Prim::I64,
         "u128" => Prim::U128, "i128" => Prim::I128,
         "bool" => Prim::Bool,
-        "pubkey" => Prim::Pubkey, // your IDL uses "pubkey" for 32B keys :contentReference[oaicite:4]{index=4}
+        "pubkey" => Prim::Pubkey,
         _ => return None,
     })
 }
@@ -217,7 +218,7 @@ where F: FnMut(usize) -> Option<Value> {
     Some(Value::Array(vec))
 }
 
-// ---------- type index (to know which "defined" types are bytemuck) ----------
+// ---------- type index ----------
 fn build_type_index<'a>(idl: &'a Value) -> std::collections::HashMap<&'a str, (&'a Value, bool)> {
     let mut m = std::collections::HashMap::new();
     if let Some(types) = idl.get("types").and_then(|v| v.as_array()) {
@@ -234,15 +235,109 @@ fn build_type_index<'a>(idl: &'a Value) -> std::collections::HashMap<&'a str, (&
     m
 }
 
+// ---------- generic type support ----------
+type GenericEnv<'a> = std::collections::HashMap<String, &'a Value>;
+
+fn resolve_generic<'a>(ty: &'a Value, genv: &GenericEnv<'a>) -> Option<&'a Value> {
+    if let Some(g) = ty.get("generic").and_then(|v| v.as_str()) {
+        return genv.get(g).copied();
+    }
+    None
+}
+
+fn type_kind<'a>(type_def: &'a Value) -> Option<&'a str> {
+    type_def.get("type")?.get("kind")?.as_str()
+}
+
+fn read_enum_tag(buf: &[u8], off: &mut usize, repr: Option<&Value>) -> Option<u64> {
+    // Anchor enums default to u8 tag; if repr is an object/string, we only special-case u16/u32/u64.
+    if let Some(r) = repr {
+        if let Some(rs) = r.as_str() {
+            return match rs {
+                "u16" => Some(u16::from_le_bytes(read::<2>(buf, off)?) as u64),
+                "u32" => Some(u32::from_le_bytes(read::<4>(buf, off)?) as u64),
+                "u64" => Some(u64::from_le_bytes(read::<8>(buf, off)?)),
+                _ => Some(u8::from_le_bytes(read::<1>(buf, off)?) as u64),
+            };
+        }
+    }
+    Some(u8::from_le_bytes(read::<1>(buf, off)?) as u64)
+}
+
 // ---------- recursive decoders ----------
+fn decode_type_borsh_enum(
+    type_def: &Value,
+    idl: &Value,
+    type_index: &std::collections::HashMap<&str, (&Value, bool)>,
+    buf: &[u8],
+    off: &mut usize,
+    genv: &GenericEnv,
+) -> Option<Value> {
+    let t = type_def.get("type")?;
+    let variants = t.get("variants")?.as_array()?;
+    let repr = t.get("repr");
+    let tag = read_enum_tag(buf, off, repr)?; // advances offset
+
+    // choose variant by explicit discriminant or index
+    let mut chosen: Option<&Value> = None;
+    for (i, v) in variants.iter().enumerate() {
+        if let Some(disc) = v.get("discriminant").and_then(|x| x.as_u64()) {
+            if disc == tag { chosen = Some(v); break; }
+        } else if tag == i as u64 {
+            chosen = Some(v); break;
+        }
+    }
+    let var = chosen?;
+    let vname = var.get("name")?.as_str()?.to_string();
+    let fields_v = var.get("fields");
+
+    let payload = if let Some(fa) = fields_v.and_then(|x| x.as_array()) {
+        if fa.is_empty() {
+            Value::Object(serde_json::Map::new())
+        } else if fa[0].get("name").is_some() {
+            // struct-like
+            let mut m = serde_json::Map::new();
+            for f in fa {
+                let fname = f.get("name")?.as_str()?;
+                let fty   = f.get("type").unwrap_or(&Value::Null);
+                let val = decode_type_borsh(fty, idl, type_index, buf, off, genv)
+                    .unwrap_or(json!({"_error":"decode failed"}));
+                m.insert(fname.to_string(), val);
+            }
+            Value::Object(m)
+        } else {
+            // tuple-like
+            let mut arr = Vec::with_capacity(fa.len());
+            for fty in fa {
+                let fty = fty.get("type").unwrap_or(fty);
+                let val = decode_type_borsh(fty, idl, type_index, buf, off, genv)
+                    .unwrap_or(json!({"_error":"decode failed"}));
+                arr.push(val);
+            }
+            Value::Array(arr)
+        }
+    } else {
+        // unit variant
+        Value::Object(serde_json::Map::new())
+    };
+
+    let mut outer = serde_json::Map::new();
+    outer.insert(vname, payload);
+    Some(Value::Object(outer))
+}
+
 fn decode_type_borsh(
     ty: &Value,
     idl: &Value,
     type_index: &std::collections::HashMap<&str, (&Value, bool)>,
     buf: &[u8],
     off: &mut usize,
+    genv: &GenericEnv,
 ) -> Option<Value> {
-    // literal primitive?
+    if let Some(resolved) = resolve_generic(ty, genv) {
+        return decode_type_borsh(resolved, idl, type_index, buf, off, genv);
+    }
+
     if let Some(s) = ty.as_str() {
         if let Some(p) = parse_prim_ty(s) { return decode_prim_borsh(buf, off, p); }
         if s == "string" { return decode_borsh_string(buf, off).map(Value::String); }
@@ -250,32 +345,28 @@ fn decode_type_borsh(
         return Some(json!({"_unsupported_prim": s}));
     }
 
-    // Option<T>
     if let Some(o) = ty.get("option") {
         let tag = read::<1>(buf, off)?[0];
         if tag == 0 { return Some(Value::Null); }
-        if tag == 1 { return decode_type_borsh(o, idl, type_index, buf, off); }
+        if tag == 1 { return decode_type_borsh(o, idl, type_index, buf, off, genv); }
         return Some(json!({"_error":"invalid option tag"}));
     }
 
-    // Vec<T>
     if let Some(vt) = ty.get("vec") {
         let len = read_le_u32(buf, off)? as usize;
         let mut arr = Vec::with_capacity(len);
         for _ in 0..len {
-            arr.push(decode_type_borsh(vt, idl, type_index, buf, off)?);
+            arr.push(decode_type_borsh(vt, idl, type_index, buf, off, genv)?);
         }
         return Some(Value::Array(arr));
     }
 
-    // Array [T, N]
     if let Some(arr) = ty.get("array").and_then(|v| v.as_array()) {
         if arr.len() != 2 { return Some(json!({"_error":"invalid array schema"})); }
         let n = arr[1].as_u64().unwrap_or(0) as usize;
-        return decode_fixed_array(n, |_| decode_type_borsh(&arr[0], idl, type_index, buf, off));
+        return decode_fixed_array(n, |_| decode_type_borsh(&arr[0], idl, type_index, buf, off, genv));
     }
 
-    // Defined type
     if let Some(def) = ty.get("defined") {
         let name = if def.is_object() {
             def.get("name").and_then(|v| v.as_str())
@@ -284,44 +375,74 @@ fn decode_type_borsh(
             Some(x) => *x,
             None => return Some(json!({"_unknown_defined_type": name})),
         };
-        if is_bytemuck {
-            return decode_type_bytemuck(defn, idl, type_index, buf, off);
-        } else {
-            return decode_type_borsh_struct(defn, idl, type_index, buf, off);
-        }
-    }
 
-    Some(json!({"_unsupported_type": ty}))
+        // build generic environment for this instantiation
+        let mut new_env: GenericEnv = genv.clone();
+        if let Some(inst_generics) = def.get("generics").and_then(|v| v.as_array()) {
+            if let Some(def_generics) = defn.get("generics").and_then(|v| v.as_array()) {
+                for (i, formal) in def_generics.iter().enumerate() {
+                    if let Some(fname) = formal.get("name").and_then(|v| v.as_str()) {
+                        if let Some(actual) = inst_generics.get(i) {
+                            // FIX: resolve pass-through generics against outer env to avoid infinite recursion
+                            let mut actual_ty = actual.get("type").unwrap_or(actual);
+                            if let Some(resolved) = resolve_generic(actual_ty, genv) {
+                                actual_ty = resolved;
+                            }
+                            new_env.insert(fname.to_string(), actual_ty);
+                        }
+                    }
+                }
+            }
+        }
+
+        match type_kind(defn).unwrap_or("struct") {
+            "enum" => decode_type_borsh_enum(defn, idl, type_index, buf, off, &new_env),
+            _ => {
+                if is_bytemuck {
+                    decode_type_bytemuck(defn, idl, type_index, buf, off, &new_env)
+                } else {
+                    decode_type_borsh_struct(defn, idl, type_index, buf, off, &new_env)
+                }
+            }
+        }
+    } else {
+        Some(json!({"_unsupported_type": ty}))
+    }
 }
 
-// Borsh struct (fields may be primitives / options / arrays / nested defined)
 fn decode_type_borsh_struct(
     type_def: &Value,
-    idl: &Value,
+    _idl: &Value,
     type_index: &std::collections::HashMap<&str, (&Value, bool)>,
     buf: &[u8],
     off: &mut usize,
+    genv: &GenericEnv,
 ) -> Option<Value> {
     let fields = type_def.get("type")?.get("fields")?.as_array()?;
     let mut out = serde_json::Map::new();
     for f in fields {
         let name = f.get("name")?.as_str()?;
         let fty  = f.get("type")?;
-        let val  = decode_type_borsh(fty, idl, type_index, buf, off)
+        let val  = decode_type_borsh(fty, _idl, type_index, buf, off, genv)
             .unwrap_or(json!({"_error":"decode failed"}));
         out.insert(name.to_string(), val);
     }
     Some(Value::Object(out))
 }
 
-// Bytemuck struct = fixed-size, C layout; only fixed-size fields (no string/vec/option tags)
+// Bytemuck struct = fixed-size, C layout; only fixed-size fields
 fn decode_type_bytemuck(
     type_def: &Value,
     idl: &Value,
     type_index: &std::collections::HashMap<&str, (&Value, bool)>,
     buf: &[u8],
     off: &mut usize,
+    genv: &GenericEnv,
 ) -> Option<Value> {
+    if type_kind(type_def) == Some("enum") {
+        return decode_type_borsh_enum(type_def, idl, type_index, buf, off, genv);
+    }
+
     let fields = type_def.get("type")?.get("fields")?.as_array()?;
     let mut out = serde_json::Map::new();
 
@@ -331,13 +452,16 @@ fn decode_type_bytemuck(
         type_index: &std::collections::HashMap<&str, (&Value, bool)>,
         buf: &[u8],
         off: &mut usize,
+        genv: &GenericEnv,
     ) -> Option<Value> {
+        if let Some(resolved) = resolve_generic(ty, genv) {
+            return decode_bytemuck_field(resolved, idl, type_index, buf, off, genv);
+        }
+
         if let Some(s) = ty.as_str() {
             if let Some(p) = parse_prim_ty(s) {
-                // fixed-size primitives
                 return decode_prim_borsh(buf, off, p);
             }
-            // strings/bytes are not valid bytemuck fields
             if s == "string" || s == "bytes" {
                 return Some(json!({"_unsupported_in_bytemuck": s}));
             }
@@ -347,7 +471,7 @@ fn decode_type_bytemuck(
         if let Some(arr) = ty.get("array").and_then(|v| v.as_array()) {
             if arr.len() != 2 { return Some(json!({"_error":"invalid array schema"})); }
             let n = arr[1].as_u64().unwrap_or(0) as usize;
-            return decode_fixed_array(n, |_| decode_bytemuck_field(&arr[0], idl, type_index, buf, off));
+            return decode_fixed_array(n, |_| decode_bytemuck_field(&arr[0], idl, type_index, buf, off, genv));
         }
 
         if let Some(def) = ty.get("defined") {
@@ -358,11 +482,33 @@ fn decode_type_bytemuck(
                 Some(x) => *x,
                 None => return Some(json!({"_unknown_defined_type": name})),
             };
+
+            let mut new_env: GenericEnv = genv.clone();
+            if let Some(inst_generics) = def.get("generics").and_then(|v| v.as_array()) {
+                if let Some(def_generics) = defn.get("generics").and_then(|v| v.as_array()) {
+                    for (i, formal) in def_generics.iter().enumerate() {
+                        if let Some(fname) = formal.get("name").and_then(|v| v.as_str()) {
+                            if let Some(actual) = inst_generics.get(i) {
+                                // FIX: resolve pass-through generics against outer env
+                                let mut actual_ty = actual.get("type").unwrap_or(actual);
+                                if let Some(resolved) = resolve_generic(actual_ty, genv) {
+                                    actual_ty = resolved;
+                                }
+                                new_env.insert(fname.to_string(), actual_ty);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if type_kind(defn) == Some("enum") {
+                return decode_type_borsh_enum(defn, idl, type_index, buf, off, &new_env);
+            }
+
             if is_b {
-                return decode_type_bytemuck(defn, idl, type_index, buf, off);
+                return decode_type_bytemuck(defn, idl, type_index, buf, off, &new_env);
             } else {
-                // Allow non-bytemuck struct inside bytemuck as a best-effort (rare)
-                return decode_type_borsh_struct(defn, idl, type_index, buf, off);
+                return decode_type_borsh_struct(defn, idl, type_index, buf, off, &new_env);
             }
         }
 
@@ -374,7 +520,7 @@ fn decode_type_bytemuck(
     for f in fields {
         let name = f.get("name")?.as_str()?;
         let fty  = f.get("type")?;
-        let val  = decode_bytemuck_field(fty, idl, type_index, buf, off)
+        let val  = decode_bytemuck_field(fty, idl, type_index, buf, off, genv)
             .unwrap_or(json!({"_error":"decode failed"}));
         out.insert(name.to_string(), val);
     }
@@ -392,12 +538,13 @@ fn decode_args_from_idl(
     let Some(args) = args_v.as_array() else { return Value::Object(serde_json::Map::new()) };
     let mut off = 0usize;
     let mut out = serde_json::Map::new();
+    let genv: GenericEnv = GenericEnv::new();
 
     for arg in args {
         let Some(name) = arg.get("name").and_then(|v| v.as_str()) else { continue };
         let ty = arg.get("type").cloned().unwrap_or(Value::Null);
 
-        let val = decode_type_borsh(&ty, idl, type_index, payload, &mut off)
+        let val = decode_type_borsh(&ty, idl, type_index, payload, &mut off, &genv)
             .unwrap_or(json!({"_error":"not enough bytes"}));
 
         out.insert(name.to_string(), val);
@@ -409,52 +556,69 @@ fn decode_args_from_idl(
 // ---------- public entry ----------
 #[wasm_bindgen]
 pub fn parse(data_base58: &str, account_keys: JsValue) -> JsValue {
-    // Accept accounts as strings or objects {pubkey, ...}
-    let accounts_in: Vec<AccountInput> =
-        serde_wasm_bindgen::from_value(account_keys).unwrap_or_default();
-    let accounts_raw: Vec<String> = accounts_in.iter().map(|a| a.pubkey().to_string()).collect();
-
-    // base58 → bytes
     let data = match b58decode(data_base58).into_vec() {
         Ok(d) => d,
         Err(e) => {
-            return JsValue::from_str(
-                &serde_json::json!({ "error": format!("Failed to decode base58: {}", e) }).to_string(),
-            )
+            return to_js(&json!({ "error": format!("Failed to decode base58: {}", e) }));
         }
     };
     if data.len() < 8 {
-        return JsValue::from_str(
-            &serde_json::json!({ "error":"Instruction/event data too short", "len": data.len() }).to_string(),
-        );
+        return to_js(&json!({ "error":"Instruction/event data too short", "len": data.len() }));
     }
 
-    // Load IDL + indices
     let Some(idl) = load_idl() else {
-        return JsValue::from_str(
-            &serde_json::json!({ "error":"Failed to parse embedded IDL" }).to_string(),
-        );
+        return to_js(&json!({ "error":"Failed to parse embedded IDL" }));
     };
     let type_index  = build_type_index(&idl);
     let event_index = build_event_index(&idl);
 
-    // tiny util
-    fn to_hex(bytes: &[u8]) -> String {
-        bytes.iter().map(|b| format!("{:02x}", b)).collect::<Vec<_>>().join("")
+    // --- Event path: [0..8)=wrapper, [8..16)=event disc, [16..]=payload
+    if data.len() >= 16 {
+        let wrapper: [u8; 8] = { let mut x=[0u8;8]; x.copy_from_slice(&data[..8]); x };
+        if wrapper == EVENT_LOG_DISCRIMINATOR {
+            let disc: [u8; 8] = { let mut x=[0u8;8]; x.copy_from_slice(&data[8..16]); x };
+            let payload = &data[16..];
+
+            if let Some(ev_node) = event_index.get(&disc) {
+                let ev_name = ev_node.get("name").and_then(|v| v.as_str()).unwrap_or("UnknownEvent");
+                if find_type_by_name(&idl, ev_name).is_none() {
+                    return to_js(&json!({ "error": format!("event type `{}` not found in IDL.types", ev_name) }));
+                }
+                let defined_ev = serde_json::json!({ "defined": { "name": ev_name } });
+                let mut off = 0usize;
+                let genv: GenericEnv = GenericEnv::new();
+                if let Some(decoded) = decode_type_borsh(&defined_ev, &idl, &type_index, payload, &mut off, &genv) {
+                    return to_js(&json!({
+                        "event_type": ev_name,
+                        "args": decoded
+                    }));
+                } else {
+                    return to_js(&json!({ "error":"event decode failed at offset 16" }));
+                }
+            } else {
+                return to_js(&json!({
+                    "error": "Unknown event discriminator",
+                    "discriminator": disc,
+                    "len": data.len()
+                }));
+            }
+        }
     }
 
-    // ─── Discriminator @ 0 ───
+    // --- Instruction fallback (only when wrapper mismatches) ---
     let disc0: [u8; 8] = { let mut x=[0u8;8]; x.copy_from_slice(&data[..8]); x };
-    let payload0 = &data[8..];
-
-    // 1) INSTRUCTION first (primary path)
     if let Some(ix) = find_instr_by_disc(&idl, &disc0) {
+        // only now deserialize account keys (avoid doing it for events)
+        let accounts_in: Vec<AccountInput> =
+            serde_wasm_bindgen::from_value(account_keys).unwrap_or_default();
+        let accounts_raw: Vec<String> = accounts_in.iter().map(|a| a.pubkey().to_string()).collect();
+
         let name_snake   = ix.get("name").and_then(|v| v.as_str()).unwrap_or("unknown");
         let name_display = snake_to_pascal(name_snake);
         let args_v       = ix.get("args").cloned().unwrap_or(serde_json::Value::Null);
-        let args         = decode_args_from_idl(&args_v, &idl, &type_index, payload0);
+        let args         = decode_args_from_idl(&args_v, &idl, &type_index, &data[8..]);
 
-        // map accounts (flattened)
+        // map accounts (flattened) using provided list
         let mut specs: Vec<AccountSpec> = Vec::new();
         if let Some(ix_accounts) = ix.get("accounts") {
             flatten_accounts_schema(ix_accounts, "", &mut specs);
@@ -470,72 +634,16 @@ pub fn parse(data_base58: &str, account_keys: JsValue) -> JsValue {
             }
         }
 
-        let resp = serde_json::json!({
+        return to_js(&json!({
             "instruction_type": name_display,
             "accounts": serde_json::Value::Object(accounts_map),
             "args": args
-        });
-        return JsValue::from_str(&resp.to_string());
+        }));
     }
 
-    // 2) EVENT at offset 0 (raw log payloads)
-    if let Some(ev_node) = event_index.get(&disc0) {
-        let ev_name = ev_node.get("name").and_then(|v| v.as_str()).unwrap_or("UnknownEvent");
-
-        if find_type_by_name(&idl, ev_name).is_none() {
-            return JsValue::from_str(
-                &serde_json::json!({ "error": format!("event type `{}` not found in IDL.types", ev_name) }).to_string(),
-            );
-        }
-        let defined_ev = serde_json::json!({ "defined": { "name": ev_name } });
-        let mut off = 0usize;
-        if let Some(decoded) = decode_type_borsh(&defined_ev, &idl, &type_index, payload0, &mut off) {
-            let resp = serde_json::json!({
-                "event_type": ev_name,
-                "args": decoded
-            });
-            return JsValue::from_str(&resp.to_string());
-        } else {
-            return JsValue::from_str(&serde_json::json!({ "error":"event decode failed at offset 0" }).to_string());
-        }
-    }
-
-    // 3) (Optional) EVENT embedded at offset +8
-    if data.len() >= 16 {
-        let disc1: [u8; 8] = { let mut x=[0u8;8]; x.copy_from_slice(&data[8..16]); x };
-        let payload1 = &data[16..];
-
-        if let Some(ev_node) = event_index.get(&disc1) {
-            let ev_name = ev_node.get("name").and_then(|v| v.as_str()).unwrap_or("UnknownEvent");
-            if find_type_by_name(&idl, ev_name).is_none() {
-                return JsValue::from_str(
-                    &serde_json::json!({ "error": format!("event type `{}` not found in IDL.types", ev_name) }).to_string(),
-                );
-            }
-            let defined_ev = serde_json::json!({ "defined": { "name": ev_name } });
-            let mut off = 0usize;
-            if let Some(decoded) = decode_type_borsh(&defined_ev, &idl, &type_index, payload1, &mut off) {
-                let resp = serde_json::json!({
-                    "event_type": ev_name,
-                    "args": decoded,
-                    "embedded_event": true,
-                    "outer_discriminator_hex": to_hex(&disc0)
-                });
-                return JsValue::from_str(&resp.to_string());
-            } else {
-                return JsValue::from_str(&serde_json::json!({
-                    "error":"event decode failed at offset 8",
-                    "outer_discriminator_hex": to_hex(&disc0)
-                }).to_string());
-            }
-        }
-    }
-
-    // 4) no match
-    let resp = serde_json::json!({
-        "error": "Unknown discriminator (no instruction at 0, no event at 0 or 8)",
-        "disc0_hex": to_hex(&disc0),
+    // No match
+    to_js(&json!({
+        "error": "Unknown discriminator",
         "len": data.len()
-    });
-    JsValue::from_str(&resp.to_string())
+    }))
 }

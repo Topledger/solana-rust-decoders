@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en-US">
+
+<head>
+  <meta charset="utf-8" />
+  <title>hello-wasm example</title>
+</head>
+
+<body>
+  <script type="module">
+    import init, { parse } from "./pkg/gmx_solana.js";
+    init().then(() => {
+      let join_key = "5kkPihtAaNhVHmAShzyRw3vg3dQFAiEA888BmvTHU3v8nRCKQSp4j52EVapC6QRyLivuWmPWvVx9NBBShLdcMqMp_0_1";
+      let data = "4X3jkBDemNrj4iFTE19uNyr5vA4WnbCRwzjzXqYpsDu6KhUJrZxA3TY6eVwkyw9sDVZA7thuYKQXcU4uMRnRtBPdmLk7pYZbXxa1iiUaoosmMfMDrVsw6GeGKgr5CMubTtNDZ9vFXoYDMzMXQSWpw1eYVGmSpLb8cwz1SBkY5cCCBJTxSPvfkqK5AVw63LgBn9TAze6xr7HNgrzVRnuQtYxXdRByUPQys4nZr7HQ1F3HRSBHDV2m12j7Q5U4T2MCrHyS69Pwy8DLY6pg14h7cuUtjQpZnfdmhXbCz1hKUWZbrSTvrS8QBaLdMESFf9p9wBmUAJeA7KrvGRuHzmoNKFZJapwdcTZ6oof9411DQ5oTgW1BR3sbNPA7ZRHwaNwm5ajC9Aav1Q783Czoj24hcMwjQPnFLjg3w33ze1M8MsxPAZjKFjXLPbzBtxKGTYt8mawkw3sg7WswhLfta1ZueqSEvqpJu1MGDWsXqenpYR9pYUvtwXQTvQWxcgfxHtDKco93SNsEmh6tAd9ek46a5GHu";
+      let accounts = [
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        
+    ];
+      console.log(parse(data, accounts));
+    });
+  </script>
+</body>
+
+</html>

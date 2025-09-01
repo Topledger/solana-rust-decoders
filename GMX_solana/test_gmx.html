@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-<title>GMX Solana — Parser Tester (Success/Failed Tabs)</title>
+<title>GMX Solana — Parser Tester (v2)</title>
 <style>
   :root { --bg:#0f172a; --panel:#111827; --ink:#e5e7eb; --muted:#9ca3af; --b1:#1f2937; --b2:#374151; --ok:#10b981; --warn:#f59e0b; --err:#ef4444; --acc:#60a5fa; }
   *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell}
@@ -28,18 +28,15 @@
   .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   .right{margin-left:auto}
   .hide{display:none}
-
-  /* tabs */
   .tabs{display:flex;gap:6px;border-bottom:1px solid var(--b1);margin-bottom:12px}
   .tab{padding:8px 12px;border:1px solid var(--b1);border-bottom:none;border-radius:10px 10px 0 0;background:#0c1227;cursor:pointer}
   .tab.active{background:#0e142e}
   .tabcount{font-weight:700;margin-left:6px}
-  .reason{font-size:12px;color:#fca5a5}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>🚀 GMX Solana — Parser Tester</h1>
+  <h1>🚀 GMX Solana — Parser Tester (v2)</h1>
 
   <!-- Controls -->
   <div class="card">
@@ -50,20 +47,22 @@
         <div class="muted" id="b58Info"></div>
       </div>
       <div>
-        <label for="accs">Account Keys (JSON Array)</label>
-        <textarea id="accs" rows="3" placeholder='["account1","account2",...]'>[]</textarea>
+        <label for="accs">Account Keys (JSON Array / Array of Objects / Map)</label>
+        <textarea id="accs" rows="3" placeholder='["pubkey1","pubkey2",...] or [{"pubkey":"..","index":0},...] or {"user":"..","market":".."}'>[]</textarea>
       </div>
     </div>
     <div class="toolbar" style="margin-top:10px">
       <button class="btn-acc" id="btnParse">Parse</button>
+      <button class="btn" id="btnClear">Clear</button>
       <span id="parseStatus" class="status hide"></span>
       <div class="right"></div>
       <span class="pill">Dune</span>
       <input id="duneQueryId" value="5402199" title="Dune Query ID" />
-      <input id="duneKey" value="UK20z3ZzgPjGaxuha6Uc4bvnS6F5YwSZ" title="Dune API Key" />
+      <input id="duneKey" placeholder="Dune API Key" title="Dune API Key" />
       <button class="btn" id="btnDune">Dune Report</button>
       <span id="duneStatus" class="status hide"></span>
     </div>
+    <div class="muted" style="margin-top:6px">Tip: serve this file via <code>python -m http.server</code> in the folder that contains <code>./pkg/gmx_solana.js</code>.</div>
   </div>
 
   <!-- Single parse output -->
@@ -74,7 +73,7 @@
     </div>
     <table>
       <tbody>
-        <tr><th style="width:200px">Instruction Type</th><td class="mono" id="s_type"></td></tr>
+        <tr><th style="width:220px">Instruction Type / Event</th><td class="mono" id="s_type"></td></tr>
         <tr><th>Args</th><td class="mono" id="s_args"></td></tr>
         <tr><th>Accounts</th><td class="mono" id="s_inaccs"></td></tr>
         <tr><th>Raw Base58</th><td class="mono" id="s_b58"></td></tr>
@@ -82,13 +81,14 @@
     </table>
   </div>
 
-  <!-- Dune parsed: tabs -->
+  <!-- Dune parsed -->
   <div class="card hide" id="duneCard">
     <div class="toolbar">
       <span class="pill">Dune Parsed Transactions</span>
       <div id="duneSummary" class="muted"></div>
       <div class="right"></div>
       <button id="exportJSON" class="btn-ok">Export JSON</button>
+      <button id="exportCSV" class="btn">Export CSV (Failed)</button>
     </div>
 
     <div class="tabs">
@@ -105,8 +105,9 @@
               <th>tx_id</th>
               <th>instruction_type</th>
               <th>args</th>
-              <th>accounts</th>
+              <th>accounts (named)</th>
               <th>data (base58)</th>
+              <th></th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -122,7 +123,9 @@
             <tr>
               <th>tx_id</th>
               <th>reason</th>
-              <th>accounts</th>
+              <th>first16hex</th>
+              <th>accounts_len</th>
+              <th>accounts_sample</th>
               <th>data (base58)</th>
             </tr>
           </thead>
@@ -133,33 +136,115 @@
   </div>
 </div>
 
-<!-- Optional: bs58 to show decoded length -->
+<!-- bs58 UMD -->
 <script src="https://unpkg.com/bs58@5.0.0/dist/index.umd.js"></script>
 
 <script type="module">
-  // ====== WASM loader ======
+  // ====== WASM loader: must be built with `--target web` ======
   let wasm, wasmReady = false;
-  (async function init() {
+
+  async function loadWasm() {
     try {
-      const mod = await import('./pkg/gmx_solana.js'); // ensure ./pkg exists
-      await mod.default();
-      wasm = mod; wasmReady = true;
+      const mod = await import('./pkg/gmx_solana.js');   // web build
+      const init = mod.default;                           // default init
+      const wasmUrl = new URL('./pkg/gmx_solana_bg.wasm', import.meta.url);
+      await init(wasmUrl);                                // explicit URL helps simple servers
+      wasm = { parse: mod.parse };
+      wasmReady = true;
       console.log('✅ WASM ready');
     } catch (e) {
       console.error('WASM load failed:', e);
-      setStatus('parseStatus','err','WASM load failed: ' + e.message);
+      const msg = (e && e.message) ? e.message : String(e);
+      const hint = msg.includes('module is not defined')
+        ? ' (You built the wrong target. Run: rm -rf pkg && wasm-pack build --target web --dev)'
+        : '';
+      setStatus('parseStatus', 'err', 'WASM load failed: ' + msg + hint);
     }
-  })();
+  }
+  loadWasm();
 
   // ====== DOM helpers ======
   const $ = s => document.querySelector(s);
-  function setStatus(id, kind, text){ const el = document.getElementById(id); el.className='status '+(kind==='ok'?'s-ok':kind==='err'?'s-err':'s-load'); el.textContent=text; el.classList.remove('hide'); }
+  function setStatus(id, kind, text){ const el=document.getElementById(id); if(!el) return; el.className='status '+(kind==='ok'?'s-ok':kind==='err'?'s-err':'s-load'); el.textContent=text; el.classList.remove('hide'); }
+  function clearStatus(id){ const el=document.getElementById(id); if(!el) return; el.textContent=''; el.classList.add('hide'); }
   function hide(el){ el.classList.add('hide'); } function show(el){ el.classList.remove('hide'); }
   function safeJSON(s){ try{ return JSON.parse(s) } catch{ return null } }
-  function escapeHTML(s){ return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;', "'":'&#39;'}[m])) }
+  function escapeHTML(s){ return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;', "'":'&#39;'}[m])); }
   function addRow(tbody, cells){ const tr=document.createElement('tr'); tr.innerHTML=cells.map(c=>`<td class="mono">${escapeHTML(c)}</td>`).join(''); tbody.appendChild(tr); }
 
-  // tabs
+  // ====== Map/Set/BigInt → JSON ======
+  function toPlain(x){
+    if (x == null) return x;
+    if (typeof x === 'bigint') return x.toString();
+    if (Array.isArray(x)) return x.map(toPlain);
+    if (x instanceof Map) {
+      const obj = Object.create(null);
+      for (const [k,v] of x.entries()) obj[k] = toPlain(v);
+      return obj;
+    }
+    if (x instanceof Set) return Array.from(x).map(toPlain);
+    if (typeof x === 'object') {
+      const out = {};
+      for (const k of Object.keys(x)) out[k] = toPlain(x[k]);
+      return out;
+    }
+    return x;
+  }
+
+  // ====== Base58 sanitizers ======
+  function cleanBase58(s){
+    return String(s).normalize('NFKC').replace(/[\u200B-\u200D\uFEFF]/g, '').replace(/[\u00A0\r\n\t ]+/g, '').trim();
+  }
+  function firstInvalidBase58Char(s){
+    const alphabet = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+    for (let i=0;i<s.length;i++){ const ch=s[i]; if(!alphabet.includes(ch)) return { index:i, ch, code:'U+'+ch.codePointAt(0).toString(16).toUpperCase() }; }
+    return null;
+  }
+
+  // ====== Accounts coercion & padding ======
+  function coerceAccounts(input) {
+    if (!input) return [];
+    if (Array.isArray(input) && input.every(x => typeof x === 'string')) return input;
+
+    if (Array.isArray(input) && input.every(x => x && typeof x === 'object')) {
+      const withIdx = input.map((x,i)=>({ idx: x.index ?? x.idx ?? x.i ?? x.position ?? i, key: x.pubkey || x.publicKey || x.key || '' })).filter(x=>x.key);
+      withIdx.sort((a,b)=>a.idx-b.idx);
+      return withIdx.map(x=>x.key);
+    }
+
+    if (typeof input === 'object') {
+      const entries = Object.entries(input).map(([_,v])=>({ idx: v?.index ?? v?.idx ?? v?.i ?? v?.position ?? Number.MAX_SAFE_INTEGER, key: v?.pubkey || v?.publicKey || v?.key || (typeof v === 'string' ? v : '') })).filter(x=>x.key);
+      if (entries.some(e=>e.idx!==Number.MAX_SAFE_INTEGER)) entries.sort((a,b)=>a.idx-b.idx);
+      return entries.map(e=>e.key);
+    }
+
+    return [];
+  }
+
+  const zeroPk = '11111111111111111111111111111111';
+  async function tryParseWithPadding(wasm, base58, accounts, maxProbe = 32) {
+    // First try as-is
+    try {
+      const r = wasm.parse(base58, accounts);
+      return r;
+    } catch (e) {
+      const msg = String(e?.message || e || '');
+      const empty = !accounts || accounts.length === 0;
+      const oob = msg.includes('memory access out of bounds');
+      if (!(empty && oob)) throw e;
+    }
+    // Probe with padded accounts if parser requires it
+    for (let n = 1; n <= maxProbe; n++){
+      const padded = Array.from({length:n}, () => zeroPk);
+      try { return wasm.parse(base58, padded); } catch (e) {
+        const msg = String(e?.message || e || '');
+        if (!msg.includes('memory access out of bounds')) throw e;
+      }
+    }
+    throw new Error('Parser requires accounts; could not infer expected count');
+  }
+
+  // ====== tabs ======
   for (const t of document.querySelectorAll('.tab')){
     t.addEventListener('click', () => {
       document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
@@ -170,36 +255,112 @@
     });
   }
 
-  // live Base58 decoded-length info
+  // ====== live Base58 decoded-length info + auto-clear ======
+  function resetSingleCard(){ $('#s_type').textContent=''; $('#s_args').textContent=''; $('#s_inaccs').textContent=''; $('#s_b58').textContent=''; $('#decodedLen').textContent=''; $('#b58Info').textContent=''; hide($('#singleCard')); clearStatus('parseStatus'); }
+
   $('#b58').addEventListener('input', () => {
-    const v = $('#b58').value.trim();
-    try{ if(!v){ $('#b58Info').textContent=''; return; } const bytes=bs58.default.decode(v); $('#b58Info').textContent=`decoded bytes: ${bytes.length}`; }
-    catch{ $('#b58Info').textContent='⚠️ invalid base58'; }
+    clearStatus('parseStatus');
+    const ta = $('#b58'); const raw = ta.value; const v = cleanBase58(raw);
+    if (!v){ resetSingleCard(); return; }
+    const bad = firstInvalidBase58Char(v);
+    if (bad){ $('#b58Info').textContent = `⚠️ invalid char ${bad.ch} (${bad.code}) at ${bad.index}`; return; }
+    try{
+      const bytes = bs58?.default?.decode ? bs58.default.decode(v) : null;
+      if (bytes) $('#b58Info').textContent = `decoded bytes: ${bytes.length}`;
+    } catch { $('#b58Info').textContent='⚠️ invalid base58'; }
+  });
+
+  $('#b58').addEventListener('paste', (e) => {
+    e.preventDefault();
+    const text = (e.clipboardData || window.clipboardData).getData('text');
+    const clean = cleanBase58(text);
+    const ta = e.target; const start = ta.selectionStart, end = ta.selectionEnd;
+    ta.value = ta.value.slice(0,start) + clean + ta.value.slice(end);
+    ta.selectionStart = ta.selectionEnd = start + clean.length;
+    ta.dispatchEvent(new Event('input', {bubbles:true}));
   });
 
   // ====== Single Parse ======
-  $('#btnParse').addEventListener('click', () => {
+  $('#btnParse').addEventListener('click', async () => {
     if (!wasmReady){ setStatus('parseStatus','err','WASM not ready'); return; }
-    const base58 = $('#b58').value.trim();
-    if (!base58){ setStatus('parseStatus','err','Enter Base58'); return; }
+    const base58 = cleanBase58($('#b58').value);
+    if (!base58){ resetSingleCard(); return; }
 
-    let accounts=[]; try{ const raw=$('#accs').value.trim(); accounts = raw? JSON.parse(raw): []; } catch{ setStatus('parseStatus','err','Accounts must be JSON array'); return; }
+    // Hints only
+    const bad = firstInvalidBase58Char(base58);
+    if (bad){ $('#b58Info').textContent = `⚠️ suspicious char ${bad.ch} (${bad.code}) at ${bad.index}`; }
+    try{
+      const bytes = bs58?.default?.decode ? bs58.default.decode(base58) : null;
+      if (bytes) { $('#b58Info').textContent = `decoded bytes: ${bytes.length}`; $('#decodedLen').textContent = `decoded bytes: ${bytes.length}`; }
+    }catch{}
+
+    // Accounts (optional)
+    let accounts=[];
+    try{
+      const raw=$('#accs').value.trim();
+      const parsed = raw? JSON.parse(raw): [];
+      accounts = coerceAccounts(parsed);
+    } catch {
+      setStatus('parseStatus','err','Accounts must be JSON array / array of objects / map'); return;
+    }
 
     setStatus('parseStatus','load','Parsing...');
     try{
-      const res = wasm.parse(base58, accounts);
-      const parsed = typeof res==='string' ? (safeJSON(res) ?? { raw_response:res }) : (res ?? {});
-      $('#s_type').textContent   = parsed.instruction_type ?? 'Unknown';
-      $('#s_args').textContent   = JSON.stringify(parsed.args ?? {}, null, 2);
-      $('#s_inaccs').textContent = JSON.stringify(parsed.accounts ?? [], null, 2);
+      const res = await tryParseWithPadding(wasm, base58, accounts, 32);
+      const js = (typeof res==='string') ? (safeJSON(res) ?? { raw_response:res }) : toPlain(res);
+      if (js && js.error){ hide($('#singleCard')); setStatus('parseStatus','err', js.error); return; }
+
+      $('#s_type').textContent   = js.instruction_type ?? js.event_type ?? 'Unknown';
+      $('#s_args').textContent   = JSON.stringify(js.args ?? {}, null, 2);
+      $('#s_inaccs').textContent = JSON.stringify(js.accounts ?? accounts ?? [], null, 2);
       $('#s_b58').textContent    = base58;
-      try{ $('#decodedLen').textContent = `decoded bytes: ${bs58.default.decode(base58).length}`; }catch{ $('#decodedLen').textContent=''; }
-      show($('#singleCard')); setStatus('parseStatus','ok','Success');
-    }catch(e){ hide($('#singleCard')); setStatus('parseStatus','err','Parse error: '+e.message); }
+
+      show($('#singleCard'));
+      setStatus('parseStatus','ok', accounts.length ? 'Success' : 'Success (padded placeholder accounts)');
+    } catch(e){
+      hide($('#singleCard'));
+      setStatus('parseStatus','err','Parse error: ' + (e?.message || e));
+    }
   });
 
-  // ====== Dune Report (two tabs) ======
+  // Clear
+  $('#btnClear').addEventListener('click', () => {
+    $('#b58').value = '';
+    $('#accs').value = '[]';
+    resetSingleCard();
+  });
+
+  // ====== Dune Report ======
   let exportRows = [];
+  const succBody = () => document.querySelector('#tblSuccess tbody');
+  const failBody = () => document.querySelector('#tblFailed tbody');
+
+  function successRow(tbody, tx_id, insType, args, named, base58, accsForWasm){
+    const tr=document.createElement('tr');
+    tr.innerHTML = `
+      <td class="mono">${escapeHTML(tx_id)}</td>
+      <td class="mono">${escapeHTML(insType)}</td>
+      <td class="mono">${escapeHTML(JSON.stringify(args))}</td>
+      <td class="mono">${escapeHTML(JSON.stringify(named))}</td>
+      <td class="mono">${escapeHTML(base58)}</td>
+      <td><button class="btn" data-use>Use</button></td>`;
+    tbody.appendChild(tr);
+    tr.querySelector('[data-use]').addEventListener('click', () => {
+      $('#b58').value = base58;
+      $('#accs').value = JSON.stringify(accsForWasm, null, 2);
+      $('#b58').dispatchEvent(new Event('input', {bubbles:true}));
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+  }
+
+  function hex16Of(b58){
+    try{
+      const b = bs58?.default?.decode ? bs58.default.decode(b58) : null;
+      if (!b) return '';
+      return Array.from(b.slice(0,8)).map(x=>x.toString(16).padStart(2,'0')).join('');
+    }catch{return ''}
+  }
+
   $('#btnDune').addEventListener('click', async () => {
     const queryId = $('#duneQueryId').value.trim() || '5402199';
     const apiKey  = $('#duneKey').value.trim();
@@ -207,7 +368,7 @@
     if (!wasmReady){ setStatus('duneStatus','err','WASM not ready'); return; }
 
     setStatus('duneStatus','load','Fetching...');
-    hide($('#duneCard'));
+    hide($('#duneCard')); succBody().innerHTML=''; failBody().innerHTML=''; exportRows=[];
 
     try{
       const url = `https://api.dune.com/api/v1/query/${encodeURIComponent(queryId)}/results?limit=1000`;
@@ -216,64 +377,80 @@
       const data = await resp.json();
       const rows = (data?.result?.rows) ?? [];
 
-      const succBody = $('#tblSuccess tbody'); succBody.innerHTML='';
-      const failBody = $('#tblFailed tbody'); failBody.innerHTML='';
-      let ok=0, fail=0; exportRows = [];
-
+      let ok=0, fail=0;
       for (const r of rows){
-        // Expect array rows: [tx_id, block_time, instruction_data_base58, accounts_json]
-        const tx_id = Array.isArray(r) ? (r[0] ?? 'N/A') : (r.tx_id ?? r.signature ?? 'N/A');
-        const base58 = Array.isArray(r) ? (r[2] ?? null) : (r.data_base58 ?? r.data ?? null);
-        const accountsRaw = Array.isArray(r) ? (r[3] ?? '[]') : (r.account_arguments ?? '[]');
-
-        let accounts=[]; try{ accounts = typeof accountsRaw === 'string' ? JSON.parse(accountsRaw) : (accountsRaw ?? []); } catch{ accounts=[]; }
-
-        if (!base58 || base58 === 'N/A' || base58 === 'null') {
-          // No instruction data
-          addRow(failBody, [tx_id, 'No instruction data', JSON.stringify(accounts), String(base58 ?? 'N/A')]);
-          exportRows.push({ tx_id, data: base58 ?? 'N/A', accounts, reason: 'No instruction data' });
-          fail++; continue;
+        const tx_id = r.tx_id ?? r.signature ?? r.hash ?? r.tx ?? r.id ?? (Array.isArray(r) ? (r[0] ?? 'N/A') : 'N/A');
+        const base58Raw = r.instruction_data_base58 ?? r.instruction_data_b58 ?? r.data_base58 ?? r.data ?? (Array.isArray(r) ? r[2] : null);
+        if (!base58Raw) {
+          addRow(failBody(), [String(tx_id), 'No instruction data', '', '0', JSON.stringify(r.accounts ?? r.accounts_json ?? r.account_arguments ?? ''), String(base58Raw ?? 'N/A')]);
+          exportRows.push({ tx_id, reason:'No instruction data', row:r }); fail++; continue;
         }
+        const base58 = cleanBase58(String(base58Raw));
+
+        // Accounts field variants
+        let accountsField = r.accounts_json ?? r.account_arguments ?? r.accounts ?? (Array.isArray(r) ? r[3] : '[]');
+        try { if (typeof accountsField === 'string') accountsField = JSON.parse(accountsField); } catch {}
+        const accountsForWasm = coerceAccounts(accountsField);
 
         try{
-          const res = wasm.parse(base58, accounts);
-          const parsed = typeof res==='string' ? (safeJSON(res) ?? { raw_response:res }) : (res ?? {});
-          const insType = parsed.instruction_type ?? 'Unknown';
+          const res = await tryParseWithPadding(wasm, base58, accountsForWasm, 32);
+          const parsed0 = (typeof res==='string') ? (safeJSON(res) ?? { raw_response:res }) : res;
+          const parsed = toPlain(parsed0);
+          const insType = parsed.instruction_type ?? parsed.event_type ?? 'Unknown';
           const args    = parsed.args ?? {};
 
           if (insType === 'Unknown') {
-            addRow(failBody, [tx_id, 'Unknown instruction type', JSON.stringify(accounts), base58]);
-            exportRows.push({ tx_id, data: base58, accounts, reason: 'Unknown instruction type' });
+            addRow(failBody(), [String(tx_id), 'Unknown instruction type', hex16Of(base58), String(accountsForWasm.length), JSON.stringify(accountsForWasm.slice(0,5)), base58]);
+            exportRows.push({ tx_id, reason:'Unknown instruction type', base58, accounts: accountsForWasm });
             fail++;
-        } else {
+          } else {
             const named = parsed.accounts ?? [];
-            addRow(succBody, [tx_id, insType, JSON.stringify(args), JSON.stringify(named), base58]);
+            successRow(succBody(), String(tx_id), insType, args, named, base58, accountsForWasm);
             exportRows.push({ tx_id, data: base58, accounts: named, args, instruction_type: insType });
             ok++;
-          }        
+          }
         } catch(e){
-          addRow(failBody, [tx_id, 'Parse error: ' + e.message, JSON.stringify(accounts), base58]);
-          exportRows.push({ tx_id, data: base58, accounts, reason: 'Parse error: ' + e.message });
+          addRow(failBody(), [String(tx_id), 'Parse error: '+(e?.message||e), hex16Of(base58), String(accountsForWasm.length), JSON.stringify(accountsForWasm.slice(0,5)), base58]);
+          exportRows.push({ tx_id, data: base58, accounts: accountsForWasm, reason: 'Parse error: '+(e?.message||e) });
           fail++;
         }
       }
 
-      $('#cntSuccess').textContent = String(ok);
-      $('#cntFailed').textContent  = String(fail);
-      $('#duneSummary').textContent = `Total: ${rows.length} • Success: ${ok} • Failed: ${fail}`;
+      document.getElementById('cntSuccess').textContent = String(ok);
+      document.getElementById('cntFailed').textContent  = String(fail);
+      document.getElementById('duneSummary').textContent = `Total: ${rows.length} • Success: ${ok} • Failed: ${fail}`;
       show($('#duneCard')); setStatus('duneStatus','ok','Done');
     }catch(e){
-      setStatus('duneStatus','err','Dune error: ' + e.message);
+      setStatus('duneStatus','err','Dune error: ' + (e?.message || e));
     }
   });
 
-  // ====== Export JSON ======
+  // ====== Export JSON/CSV ======
   $('#exportJSON').addEventListener('click', () => {
     const blob = new Blob([JSON.stringify(exportRows, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = Object.assign(document.createElement('a'), { href: url, download: 'dune_parsed.json' });
     document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
   });
+
+  $('#exportCSV').addEventListener('click', () => {
+    const failed = exportRows.filter(r => r.reason);
+    const cols = ['tx_id','reason','accounts_len','first16hex'];
+    const lines = [cols.join(',')];
+    for (const r of failed){
+      const first16hex = typeof r.base58 === 'string' ? hex16Of(r.base58) : '';
+      const accs_len = Array.isArray(r.accounts) ? r.accounts.length : Array.isArray(r.accountsForWasm) ? r.accountsForWasm.length : '';
+      lines.push([r.tx_id, (r.reason||'').replace(/[,\n]/g,' '), accs_len, first16hex].join(','));
+    }
+    const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = Object.assign(document.createElement('a'), { href: url, download: 'dune_failed.csv' });
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  });
+
+  // Optional: catch unhandled in console
+  window.addEventListener('error', e => console.error('WindowError:', e?.error || e));
+  window.addEventListener('unhandledrejection', e => console.error('UnhandledRejection:', e?.reason || e));
 </script>
 </body>
 </html>
