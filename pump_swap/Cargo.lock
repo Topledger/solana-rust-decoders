@@ -863,7 +863,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "pump_amm"
+name = "pump_swap"
 version = "1.0.0"
 dependencies = [
  "anchor-lang",
