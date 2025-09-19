@@ -3,7 +3,7 @@
 version = 4
 
 [[package]]
-name = "Deflow"
+name = "Dflow"
 version = "1.0.0"
 dependencies = [
  "anchor-lang",
