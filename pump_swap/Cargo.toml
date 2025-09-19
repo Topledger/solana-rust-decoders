@@ -1,0 +1,31 @@
+[package]
+name = "pump_amm"
+version = "1.0.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+name = "swap_v4"
+
+[dependencies]
+bs58                     = "0.5"
+borsh                    = "0.10.4"             # no "derive" feature in 0.10.x
+anyhow                   = "1.0"
+serde                    = { version = "1.0", features = ["derive"] }
+serde-wasm-bindgen       = "0.5"
+wasm-bindgen             = { version = "0.2", features = ["serde-serialize"] }
+console_error_panic_hook = "0.1"
+anchor-lang              = { version = "0.31.1", features = ["idl-build", "derive"] }
+
+[build-dependencies]
+serde_json  = "1.0"
+proc-macro2 = "1"
+quote       = "1"
+anyhow      = "1.0"
+sha2        = "0.10"
+heck        = "0.4"
+
+[profile.release]
+lto = true
+opt-level = 's'
+strip = "debuginfo"
