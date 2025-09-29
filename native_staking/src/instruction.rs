@@ -1,8 +1,27 @@
 
 use anyhow::{anyhow, Result};
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize, Serializer};
 use std::convert::TryInto;
 use borsh::BorshDeserialize;
+
+// Helper function to serialize u64 as string to avoid JavaScript number overflow
+fn serialize_u64_as_string<S>(value: &u64, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    serializer.serialize_str(&value.to_string())
+}
+
+// Helper function to serialize Option<u64> as Option<String>
+fn serialize_option_u64_as_string<S>(value: &Option<u64>, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    match value {
+        Some(v) => serializer.serialize_some(&v.to_string()),
+        None => serializer.serialize_none(),
+    }
+}
 
 // Native staking program discriminators
 const INITIALIZE_DISCRIMINATOR: u32 = 0;
@@ -35,6 +54,7 @@ pub struct Authorized {
 #[derive(BorshDeserialize, Serialize, Deserialize, Debug, Clone)]
 pub struct Lockup {
     pub unix_timestamp: i64,
+    #[serde(serialize_with = "serialize_u64_as_string")]
     pub epoch: u64,
     pub custodian: String,
 }
@@ -42,6 +62,7 @@ pub struct Lockup {
 #[derive(BorshDeserialize, Serialize, Deserialize, Debug, Clone)]
 pub struct LockupArgs {
     pub unix_timestamp: Option<i64>,
+    #[serde(serialize_with = "serialize_option_u64_as_string")]
     pub epoch: Option<u64>,
     pub custodian: Option<String>,
 }
@@ -49,6 +70,7 @@ pub struct LockupArgs {
 #[derive(BorshDeserialize, Serialize, Deserialize, Debug, Clone)]
 pub struct LockupCheckedArgs {
     pub unix_timestamp: Option<i64>,
+    #[serde(serialize_with = "serialize_option_u64_as_string")]
     pub epoch: Option<u64>,
 }
 
@@ -210,11 +232,13 @@ pub struct AuthorizeArgs {
 
 #[derive(BorshDeserialize, Serialize, Deserialize, Debug)]
 pub struct SplitArgs {
+    #[serde(serialize_with = "serialize_u64_as_string")]
     pub lamports: u64,
 }
 
 #[derive(BorshDeserialize, Serialize, Deserialize, Debug)]
 pub struct WithdrawArgs {
+    #[serde(serialize_with = "serialize_u64_as_string")]
     pub lamports: u64,
 }
 
@@ -250,11 +274,13 @@ pub struct SetLockupCheckedArgs {
 
 #[derive(BorshDeserialize, Serialize, Deserialize, Debug)]
 pub struct MoveStakeArgs {
+    #[serde(serialize_with = "serialize_u64_as_string")]
     pub stake_lamports: u64,
 }
 
 #[derive(BorshDeserialize, Serialize, Deserialize, Debug)]
 pub struct MoveLamportsArgs {
+    #[serde(serialize_with = "serialize_u64_as_string")]
     pub lamports: u64,
 }
 
