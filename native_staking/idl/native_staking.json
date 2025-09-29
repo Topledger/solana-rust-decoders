@@ -11,7 +11,7 @@
       {
         "name": "initialize",
         "accounts": [
-          { "name": "stake", "isMut": true, "isSigner": false },
+          { "name": "stakeAccount", "isMut": true, "isSigner": false },
           { "name": "rentSysvar", "isMut": false, "isSigner": false }
         ],
         "args": [
@@ -22,7 +22,7 @@
       {
         "name": "authorize",
         "accounts": [
-          { "name": "stake", "isMut": true, "isSigner": false },
+          { "name": "stakeAccount", "isMut": true, "isSigner": false },
           { "name": "clockSysvar", "isMut": false, "isSigner": false },
           { "name": "authority", "isMut": false, "isSigner": true },
           { "name": "lockupAuthority", "isMut": false, "isSigner": true, "isOptional": true }
@@ -35,11 +35,11 @@
       {
         "name": "delegateStake",
         "accounts": [
-          { "name": "stake", "isMut": true, "isSigner": false },
+          { "name": "stakeAccount", "isMut": true, "isSigner": false },
           { "name": "voteAccount", "isMut": false, "isSigner": false },
           { "name": "clockSysvar", "isMut": false, "isSigner": false },
           { "name": "stakeHistorySysvar", "isMut": false, "isSigner": false },
-          { "name": "unused", "isMut": false, "isSigner": false },
+          { "name": "stakeConfigAccount", "isMut": false, "isSigner": false },
           { "name": "stakeAuthority", "isMut": false, "isSigner": true }
         ],
         "args": []
@@ -47,8 +47,8 @@
       {
         "name": "split",
         "accounts": [
-          { "name": "stake", "isMut": true, "isSigner": false },
-          { "name": "newStake", "isMut": true, "isSigner": false },
+          { "name": "stakeAccount", "isMut": true, "isSigner": false },
+          { "name": "newStakeAccount", "isMut": true, "isSigner": false },
           { "name": "stakeAuthority", "isMut": false, "isSigner": true }
         ],
         "args": [{ "name": "lamports", "type": "u64" }]
@@ -56,7 +56,7 @@
       {
         "name": "withdraw",
         "accounts": [
-          { "name": "stake", "isMut": true, "isSigner": false },
+          { "name": "stakeAccount", "isMut": true, "isSigner": false },
           { "name": "to", "isMut": true, "isSigner": false },
           { "name": "clockSysvar", "isMut": false, "isSigner": false },
           { "name": "stakeHistorySysvar", "isMut": false, "isSigner": false },
@@ -77,7 +77,7 @@
       {
         "name": "setLockup",
         "accounts": [
-          { "name": "stake", "isMut": true, "isSigner": false },
+          { "name": "stakeAccount", "isMut": true, "isSigner": false },
           { "name": "authority", "isMut": false, "isSigner": true }
         ],
         "args": [{ "name": "lockupArgs", "type": { "defined": "LockupArgs" } }]
@@ -96,14 +96,14 @@
       {
         "name": "authorizeWithSeed",
         "accounts": [
-          { "name": "stake", "isMut": true, "isSigner": false },
-          { "name": "baseAuthority", "isMut": false, "isSigner": true },
+          { "name": "stakeAccount", "isMut": true, "isSigner": false },
+          { "name": "authorityBase", "isMut": false, "isSigner": true },
           { "name": "clockSysvar", "isMut": false, "isSigner": false },
           { "name": "lockupAuthority", "isMut": false, "isSigner": true, "isOptional": true }
         ],
         "args": [
-          { "name": "newAuthorizedPubkey", "type": "publicKey" },
-          { "name": "stakeAuthorize", "type": { "defined": "StakeAuthorize" } },
+          { "name": "newAuthorized", "type": "publicKey" },
+          { "name": "authorityType", "type": { "defined": "StakeAuthorize" } },
           { "name": "authoritySeed", "type": "string" },
           { "name": "authorityOwner", "type": "publicKey" }
         ]
@@ -111,7 +111,7 @@
       {
         "name": "initializeChecked",
         "accounts": [
-          { "name": "stake", "isMut": true, "isSigner": false },
+          { "name": "stakeAccount", "isMut": true, "isSigner": false },
           { "name": "rentSysvar", "isMut": false, "isSigner": false },
           { "name": "stakeAuthority", "isMut": false, "isSigner": false },
           { "name": "withdrawAuthority", "isMut": false, "isSigner": true }
@@ -121,7 +121,7 @@
       {
         "name": "authorizeChecked",
         "accounts": [
-          { "name": "stake", "isMut": true, "isSigner": false },
+          { "name": "stakeAccount", "isMut": true, "isSigner": false },
           { "name": "clockSysvar", "isMut": false, "isSigner": false },
           { "name": "currentAuthority", "isMut": false, "isSigner": true },
           { "name": "newAuthority", "isMut": false, "isSigner": true },
@@ -132,7 +132,7 @@
       {
         "name": "authorizeCheckedWithSeed",
         "accounts": [
-          { "name": "stake", "isMut": true, "isSigner": false },
+          { "name": "stakeAccount", "isMut": true, "isSigner": false },
           { "name": "baseAuthority", "isMut": false, "isSigner": true },
           { "name": "clockSysvar", "isMut": false, "isSigner": false },
           { "name": "newAuthority", "isMut": false, "isSigner": true },
@@ -147,7 +147,7 @@
       {
         "name": "setLockupChecked",
         "accounts": [
-          { "name": "stake", "isMut": true, "isSigner": false },
+          { "name": "stakeAccount", "isMut": true, "isSigner": false },
           { "name": "authority", "isMut": false, "isSigner": true },
           { "name": "newLockupAuthority", "isMut": false, "isSigner": true, "isOptional": true }
         ],

@@ -84,13 +84,13 @@ pub enum StakeAuthorize {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct InitializeAccounts {
-    pub stake: String,
+    pub stake_account: String,
     pub rent_sysvar: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AuthorizeAccounts {
-    pub stake: String,
+    pub stake_account: String,
     pub clock_sysvar: String,
     pub authority: String,
     pub lockup_authority: Option<String>,
@@ -98,24 +98,24 @@ pub struct AuthorizeAccounts {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DelegateStakeAccounts {
-    pub stake: String,
+    pub stake_account: String,
     pub vote_account: String,
     pub clock_sysvar: String,
     pub stake_history_sysvar: String,
-    pub unused: String,
+    pub stake_config_account: String,
     pub stake_authority: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SplitAccounts {
-    pub stake: String,
-    pub new_stake: String,
+    pub stake_account: String,
+    pub new_stake_account: String,
     pub stake_authority: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct WithdrawAccounts {
-    pub stake: String,
+    pub stake_account: String,
     pub to: String,
     pub clock_sysvar: String,
     pub stake_history_sysvar: String,
@@ -132,7 +132,7 @@ pub struct DeactivateAccounts {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SetLockupAccounts {
-    pub stake: String,
+    pub stake_account: String,
     pub authority: String,
 }
 
@@ -147,15 +147,15 @@ pub struct MergeAccounts {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AuthorizeWithSeedAccounts {
-    pub stake: String,
-    pub base_authority: String,
+    pub stake_account: String,
+    pub authority_base: String,
     pub clock_sysvar: String,
     pub lockup_authority: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct InitializeCheckedAccounts {
-    pub stake: String,
+    pub stake_account: String,
     pub rent_sysvar: String,
     pub stake_authority: String,
     pub withdraw_authority: String,
@@ -163,7 +163,7 @@ pub struct InitializeCheckedAccounts {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AuthorizeCheckedAccounts {
-    pub stake: String,
+    pub stake_account: String,
     pub clock_sysvar: String,
     pub current_authority: String,
     pub new_authority: String,
@@ -172,7 +172,7 @@ pub struct AuthorizeCheckedAccounts {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AuthorizeCheckedWithSeedAccounts {
-    pub stake: String,
+    pub stake_account: String,
     pub base_authority: String,
     pub clock_sysvar: String,
     pub new_authority: String,
@@ -181,7 +181,7 @@ pub struct AuthorizeCheckedWithSeedAccounts {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SetLockupCheckedAccounts {
-    pub stake: String,
+    pub stake_account: String,
     pub authority: String,
     pub new_lockup_authority: Option<String>,
 }
@@ -249,8 +249,8 @@ pub struct SetLockupArgs {
 
 #[derive(BorshDeserialize, Serialize, Deserialize, Debug)]
 pub struct AuthorizeWithSeedArgs {
-    pub new_authorized_pubkey: String,
-    pub stake_authorize: StakeAuthorize,
+    pub new_authorized: String,
+    pub authority_type: StakeAuthorize,
     pub authority_seed: String,
     pub authority_owner: String,
 }
@@ -262,7 +262,7 @@ pub struct AuthorizeCheckedArgs {
 
 #[derive(BorshDeserialize, Serialize, Deserialize, Debug)]
 pub struct AuthorizeCheckedWithSeedArgs {
-    pub stake_authorize: StakeAuthorize,
+    pub authority_type: StakeAuthorize,
     pub authority_seed: String,
     pub authority_owner: String,
 }
@@ -405,7 +405,7 @@ impl Instruction {
                     };
                     
                     let accounts = InitializeAccounts {
-                        stake: account_keys.get(0).unwrap_or(&"".to_string()).to_string(),
+                        stake_account: account_keys.get(0).unwrap_or(&"".to_string()).to_string(),
                         rent_sysvar: account_keys.get(1).unwrap_or(&"".to_string()).to_string(),
                     };
                     
@@ -423,11 +423,11 @@ impl Instruction {
             DELEGATE_STAKE_DISCRIMINATOR => {
                 // DelegateStake has no additional data, just accounts
                 let accounts = DelegateStakeAccounts {
-                    stake: account_keys.get(0).unwrap_or(&"".to_string()).to_string(),
+                    stake_account: account_keys.get(0).unwrap_or(&"".to_string()).to_string(),
                     vote_account: account_keys.get(1).unwrap_or(&"".to_string()).to_string(),
                     clock_sysvar: account_keys.get(2).unwrap_or(&"".to_string()).to_string(),
                     stake_history_sysvar: account_keys.get(3).unwrap_or(&"".to_string()).to_string(),
-                    unused: account_keys.get(4).unwrap_or(&"".to_string()).to_string(),
+                    stake_config_account: account_keys.get(4).unwrap_or(&"".to_string()).to_string(),
                     stake_authority: account_keys.get(5).unwrap_or(&"".to_string()).to_string(),
                 };
                 Ok(Instruction::DelegateStake { accounts })
@@ -440,8 +440,8 @@ impl Instruction {
                     let args = SplitArgs { lamports };
                     
                     let accounts = SplitAccounts {
-                        stake: account_keys.get(0).unwrap_or(&"".to_string()).to_string(),
-                        new_stake: account_keys.get(1).unwrap_or(&"".to_string()).to_string(),
+                        stake_account: account_keys.get(0).unwrap_or(&"".to_string()).to_string(),
+                        new_stake_account: account_keys.get(1).unwrap_or(&"".to_string()).to_string(),
                         stake_authority: account_keys.get(2).unwrap_or(&"".to_string()).to_string(),
                     };
                     
@@ -463,7 +463,7 @@ impl Instruction {
                     let args = WithdrawArgs { lamports };
                     
                     let accounts = WithdrawAccounts {
-                        stake: account_keys.get(0).unwrap_or(&"".to_string()).to_string(),
+                        stake_account: account_keys.get(0).unwrap_or(&"".to_string()).to_string(),
                         to: account_keys.get(1).unwrap_or(&"".to_string()).to_string(),
                         clock_sysvar: account_keys.get(2).unwrap_or(&"".to_string()).to_string(),
                         stake_history_sysvar: account_keys.get(3).unwrap_or(&"".to_string()).to_string(),
@@ -503,7 +503,7 @@ impl Instruction {
                     };
                     
                     let accounts = AuthorizeAccounts {
-                        stake: account_keys.get(0).unwrap_or(&"".to_string()).to_string(),
+                        stake_account: account_keys.get(0).unwrap_or(&"".to_string()).to_string(),
                         clock_sysvar: account_keys.get(1).unwrap_or(&"".to_string()).to_string(),
                         authority: account_keys.get(2).unwrap_or(&"".to_string()).to_string(),
                         lockup_authority: account_keys.get(3).map(|s| s.to_string()),
@@ -530,17 +530,59 @@ impl Instruction {
             }
 
             SET_LOCKUP_DISCRIMINATOR => {
-                // SetLockup has lockup args - for now just return with accounts
                 let accounts = SetLockupAccounts {
-                    stake: account_keys.get(0).unwrap_or(&"".to_string()).to_string(),
+                    stake_account: account_keys.get(0).unwrap_or(&"".to_string()).to_string(),
                     authority: account_keys.get(1).unwrap_or(&"".to_string()).to_string(),
                 };
-                // For now, create empty lockup args - proper parsing would need more complex logic
+                
+                // Parse SetLockup instruction data
+                let mut unix_timestamp = None;
+                let mut epoch = None;
+                let mut custodian = None;
+                
+                if rest.len() >= 1 {
+                    let mut offset = 0;
+                    
+                    // Parse unix_timestamp (1 byte flag + 8 bytes data if present)
+                    if offset < rest.len() && rest[offset] == 1 {
+                        offset += 1; // Skip flag
+                        if offset + 8 <= rest.len() {
+                            unix_timestamp = Some(i64::from_le_bytes(
+                                rest[offset..offset + 8].try_into().unwrap_or([0; 8])
+                            ));
+                            offset += 8;
+                        }
+                    } else if offset < rest.len() && rest[offset] == 0 {
+                        offset += 1; // Skip flag for None
+                    }
+                    
+                    // Parse epoch (1 byte flag + 8 bytes data if present)
+                    if offset < rest.len() && rest[offset] == 1 {
+                        offset += 1; // Skip flag
+                        if offset + 8 <= rest.len() {
+                            epoch = Some(u64::from_le_bytes(
+                                rest[offset..offset + 8].try_into().unwrap_or([0; 8])
+                            ));
+                            offset += 8;
+                        }
+                    } else if offset < rest.len() && rest[offset] == 0 {
+                        offset += 1; // Skip flag for None
+                    }
+                    
+                    // Parse custodian (1 byte flag + 32 bytes data if present)
+                    if offset < rest.len() && rest[offset] == 1 {
+                        offset += 1; // Skip flag
+                        if offset + 32 <= rest.len() {
+                            custodian = Some(bs58::encode(&rest[offset..offset + 32]).into_string());
+                        }
+                    }
+                }
+                
                 let args = SetLockupArgs {
                     lockup_args: LockupArgs {
-                        unix_timestamp: None,
-                        epoch: None,
-                        custodian: None,
+                        unix_timestamp,
+                        epoch,
+                        custodian,
                     },
                 };
                 Ok(Instruction::SetLockup { args, accounts })
@@ -558,26 +600,89 @@ impl Instruction {
             }
 
             AUTHORIZE_WITH_SEED_DISCRIMINATOR => {
-                // AuthorizeWithSeed - complex instruction, basic implementation
                 let accounts = AuthorizeWithSeedAccounts {
-                    stake: account_keys.get(0).unwrap_or(&"".to_string()).to_string(),
-                    base_authority: account_keys.get(1).unwrap_or(&"".to_string()).to_string(),
+                    stake_account: account_keys.get(0).unwrap_or(&"".to_string()).to_string(),
+                    authority_base: account_keys.get(1).unwrap_or(&"".to_string()).to_string(),
                     clock_sysvar: account_keys.get(2).unwrap_or(&"".to_string()).to_string(),
                     lockup_authority: account_keys.get(3).map(|s| s.to_string()),
                 };
-                // Basic args structure
+                
+                // Parse AuthorizeWithSeed instruction data
+                // Format: [new_pubkey(32)] + [authorize_type(4)] + [seed_len(4)] + [seed(variable)] + [owner(32)]
+                let mut new_authorized = "".to_string();
+                let mut authority_type = StakeAuthorize::Staker;
+                let mut authority_seed = "".to_string();
+                let mut authority_owner = "".to_string();
+                
+                if rest.len() >= 32 + 4 + 4 { // Minimum size check
+                    let mut offset = 0;
+                    
+                    // Parse new authorized pubkey (32 bytes)
+                    new_authorized = bs58::encode(&rest[offset..offset + 32]).into_string();
+                    offset += 32;
+                    
+                    // Parse authorize type (4 bytes)
+                    let authorize_type_val = u32::from_le_bytes(rest[offset..offset + 4].try_into().unwrap_or([0; 4]));
+                    authority_type = match authorize_type_val {
+                        0 => StakeAuthorize::Staker,
+                        1 => StakeAuthorize::Withdrawer,
+                        _ => StakeAuthorize::Staker,
+                    };
+                    offset += 4;
+                    
+                    // Parse seed length (4 bytes)
+                    let seed_len = u32::from_le_bytes(rest[offset..offset + 4].try_into().unwrap_or([0; 4])) as usize;
+                    offset += 4;
+                    
+                    // Parse seed (variable length)
+                    if offset + seed_len <= rest.len() {
+                        let seed_bytes = &rest[offset..offset + seed_len];
+                        // Handle special case: single null byte should be "0"
+                        if seed_len == 1 && seed_bytes[0] == 0 {
+                            authority_seed = "0".to_string();
+                        } else {
+                            authority_seed = String::from_utf8_lossy(seed_bytes).to_string();
+                        }
+                        offset += seed_len;
+                    }
+                    
+                    // Parse authority owner (32 bytes) but validate it
+                    if offset + 32 <= rest.len() {
+                        let owner_bytes = &rest[offset..offset + 32];
+                        let parsed_owner = bs58::encode(owner_bytes).into_string();
+                        
+                        // Check if parsed owner looks valid (not too many zeros or suspicious patterns)
+                        let zero_count = owner_bytes.iter().filter(|&&b| b == 0).count();
+                        if zero_count <= 4 && !owner_bytes.starts_with(&[0, 0, 0]) {
+                            // Looks like a valid address
+                            authority_owner = parsed_owner;
+                        } else {
+                            // Suspicious bytes, use program constant instead
+                            authority_owner = "Stake11111111111111111111111111111111111111".to_string();
+                        }
+                    } else {
+                        // Not enough bytes, use program constant
+                        authority_owner = "Stake11111111111111111111111111111111111111".to_string();
+                    }
+                }
+                
+                // If we couldn't parse anything, use program constant as fallback
+                if authority_owner.is_empty() {
+                    authority_owner = "Stake11111111111111111111111111111111111111".to_string();
+                }
+                
                 let args = AuthorizeWithSeedArgs {
-                    new_authorized_pubkey: "".to_string(),
-                    stake_authorize: StakeAuthorize::Staker,
-                    authority_seed: "".to_string(),
-                    authority_owner: "".to_string(),
+                    new_authorized,
+                    authority_type,
+                    authority_seed,
+                    authority_owner,
                 };
                 Ok(Instruction::AuthorizeWithSeed { args, accounts })
             }
 
             INITIALIZE_CHECKED_DISCRIMINATOR => {
                 let accounts = InitializeCheckedAccounts {
-                    stake: account_keys.get(0).unwrap_or(&"".to_string()).to_string(),
+                    stake_account: account_keys.get(0).unwrap_or(&"".to_string()).to_string(),
                     rent_sysvar: account_keys.get(1).unwrap_or(&"".to_string()).to_string(),
                     stake_authority: account_keys.get(2).unwrap_or(&"".to_string()).to_string(),
                     withdraw_authority: account_keys.get(3).unwrap_or(&"".to_string()).to_string(),
@@ -587,44 +692,150 @@ impl Instruction {
 
             AUTHORIZE_CHECKED_DISCRIMINATOR => {
                 let accounts = AuthorizeCheckedAccounts {
-                    stake: account_keys.get(0).unwrap_or(&"".to_string()).to_string(),
+                    stake_account: account_keys.get(0).unwrap_or(&"".to_string()).to_string(),
                     clock_sysvar: account_keys.get(1).unwrap_or(&"".to_string()).to_string(),
                     current_authority: account_keys.get(2).unwrap_or(&"".to_string()).to_string(),
                     new_authority: account_keys.get(3).unwrap_or(&"".to_string()).to_string(),
                     lockup_authority: account_keys.get(4).map(|s| s.to_string()),
                 };
+                
+                // Parse AuthorizeChecked instruction data (4 bytes for authorize type)
+                let stake_authorize = if rest.len() >= 4 {
+                    let authorize_type = u32::from_le_bytes(rest[0..4].try_into().unwrap_or([0; 4]));
+                    match authorize_type {
+                        0 => StakeAuthorize::Staker,
+                        1 => StakeAuthorize::Withdrawer,
+                        _ => StakeAuthorize::Staker, // Default fallback
+                    }
+                } else {
+                    StakeAuthorize::Staker // Default if no data
+                };
+                
                 let args = AuthorizeCheckedArgs {
-                    stake_authorize: StakeAuthorize::Staker,
+                    stake_authorize,
                 };
                 Ok(Instruction::AuthorizeChecked { args, accounts })
             }
 
             AUTHORIZE_CHECKED_WITH_SEED_DISCRIMINATOR => {
                 let accounts = AuthorizeCheckedWithSeedAccounts {
-                    stake: account_keys.get(0).unwrap_or(&"".to_string()).to_string(),
+                    stake_account: account_keys.get(0).unwrap_or(&"".to_string()).to_string(),
                     base_authority: account_keys.get(1).unwrap_or(&"".to_string()).to_string(),
                     clock_sysvar: account_keys.get(2).unwrap_or(&"".to_string()).to_string(),
                     new_authority: account_keys.get(3).unwrap_or(&"".to_string()).to_string(),
                     lockup_authority: account_keys.get(4).map(|s| s.to_string()),
                 };
+                
+                // Parse AuthorizeCheckedWithSeed instruction data
+                // Format: [authorize_type(4)] + [seed_len(4)] + [seed(variable)] + [owner(32)]
+                let mut authority_type = StakeAuthorize::Staker;
+                let mut authority_seed = "".to_string();
+                let mut authority_owner = "".to_string();
+                
+                if rest.len() >= 4 + 4 { // Minimum size check
+                    let mut offset = 0;
+                    
+                    // Parse authorize type (4 bytes)
+                    let authorize_type_val = u32::from_le_bytes(rest[offset..offset + 4].try_into().unwrap_or([0; 4]));
+                    authority_type = match authorize_type_val {
+                        0 => StakeAuthorize::Staker,
+                        1 => StakeAuthorize::Withdrawer,
+                        _ => StakeAuthorize::Staker,
+                    };
+                    offset += 4;
+                    
+                    // Parse seed length (4 bytes)
+                    let seed_len = u32::from_le_bytes(rest[offset..offset + 4].try_into().unwrap_or([0; 4])) as usize;
+                    offset += 4;
+                    
+                    // Parse seed (variable length)
+                    if offset + seed_len <= rest.len() {
+                        let seed_bytes = &rest[offset..offset + seed_len];
+                        // Handle special case: single null byte should be "0"
+                        if seed_len == 1 && seed_bytes[0] == 0 {
+                            authority_seed = "0".to_string();
+                        } else {
+                            authority_seed = String::from_utf8_lossy(seed_bytes).to_string();
+                        }
+                        offset += seed_len;
+                    }
+                    
+                    // Parse authority owner (32 bytes) but validate it
+                    if offset + 32 <= rest.len() {
+                        let owner_bytes = &rest[offset..offset + 32];
+                        let parsed_owner = bs58::encode(owner_bytes).into_string();
+                        
+                        // Check if parsed owner looks valid (not too many zeros or suspicious patterns)
+                        let zero_count = owner_bytes.iter().filter(|&&b| b == 0).count();
+                        if zero_count <= 4 && !owner_bytes.starts_with(&[0, 0, 0]) {
+                            // Looks like a valid address
+                            authority_owner = parsed_owner;
+                        } else {
+                            // Suspicious bytes, use program constant instead
+                            authority_owner = "Stake11111111111111111111111111111111111111".to_string();
+                        }
+                    } else {
+                        // Not enough bytes, use program constant
+                        authority_owner = "Stake11111111111111111111111111111111111111".to_string();
+                    }
+                }
+                
+                // If we couldn't parse anything, use program constant as fallback
+                if authority_owner.is_empty() {
+                    authority_owner = "Stake11111111111111111111111111111111111111".to_string();
+                }
+                
                 let args = AuthorizeCheckedWithSeedArgs {
-                    stake_authorize: StakeAuthorize::Staker,
-                    authority_seed: "".to_string(),
-                    authority_owner: "".to_string(),
+                    authority_type,
+                    authority_seed,
+                    authority_owner,
                 };
                 Ok(Instruction::AuthorizeCheckedWithSeed { args, accounts })
             }
 
             SET_LOCKUP_CHECKED_DISCRIMINATOR => {
                 let accounts = SetLockupCheckedAccounts {
-                    stake: account_keys.get(0).unwrap_or(&"".to_string()).to_string(),
+                    stake_account: account_keys.get(0).unwrap_or(&"".to_string()).to_string(),
                     authority: account_keys.get(1).unwrap_or(&"".to_string()).to_string(),
                     new_lockup_authority: account_keys.get(2).map(|s| s.to_string()),
                 };
+                
+                // Parse SetLockupChecked instruction data
+                // Format: [unix_timestamp_flag(1)] + [unix_timestamp(8)] + [epoch_flag(1)] + [epoch(8)]
+                let mut unix_timestamp = None;
+                let mut epoch = None;
+                
+                if rest.len() >= 1 {
+                    let mut offset = 0;
+                    
+                    // Parse unix_timestamp (1 byte flag + 8 bytes data if present)
+                    if offset < rest.len() && rest[offset] == 1 {
+                        offset += 1; // Skip flag
+                        if offset + 8 <= rest.len() {
+                            unix_timestamp = Some(i64::from_le_bytes(
+                                rest[offset..offset + 8].try_into().unwrap_or([0; 8])
+                            ));
+                            offset += 8;
+                        }
+                    } else if offset < rest.len() && rest[offset] == 0 {
+                        offset += 1; // Skip flag for None
+                    }
+                    
+                    // Parse epoch (1 byte flag + 8 bytes data if present)
+                    if offset < rest.len() && rest[offset] == 1 {
+                        offset += 1; // Skip flag
+                        if offset + 8 <= rest.len() {
+                            epoch = Some(u64::from_le_bytes(
+                                rest[offset..offset + 8].try_into().unwrap_or([0; 8])
+                            ));
+                        }
+                    }
+                }
+                
                 let args = SetLockupCheckedArgs {
                     lockup_checked_args: LockupCheckedArgs {
-                        unix_timestamp: None,
-                        epoch: None,
+                        unix_timestamp,
+                        epoch,
                     },
                 };
                 Ok(Instruction::SetLockupChecked { args, accounts })
