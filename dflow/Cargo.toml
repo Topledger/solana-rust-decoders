@@ -13,10 +13,16 @@ borsh                    = "0.10"  # Borsh (de)serialization
 anyhow                   = "1.0"   # ergonomic error handling
 serde                    = { version = "1.0", features = ["derive"] }
 serde-big-array = "0.3"
-serde-wasm-bindgen       = "0.5"   # serde ↔ Wasm bindings
-wasm-bindgen             = { version = "0.2", features = ["serde-serialize"] }
-console_error_panic_hook = "0.1"   # nicer panic messages in Wasm
 anchor-lang = { version = "0.31.1", features = ["idl-build", "derive"] }
+
+# Optional WASM dependencies (for JavaScript/web use)
+serde-wasm-bindgen       = { version = "0.5", optional = true }   # serde ↔ Wasm bindings
+wasm-bindgen             = { version = "0.2", features = ["serde-serialize"], optional = true }
+console_error_panic_hook = { version = "0.1", optional = true }   # nicer panic messages in Wasm
+
+[features]
+default = []
+wasm = ["serde-wasm-bindgen", "wasm-bindgen", "console_error_panic_hook"]
 
 [build-dependencies]
 anchor-idl = "0.4.1"       # for GeneratorOptions
