@@ -88,6 +88,8 @@ pub mod typedefs {
         HumidiFi(HumidiFiDynamicRouteV1Options),
         SolFiV2(SolFiV2DynamicRouteV1Options),
         Mozart(MozartDynamicRouteV1Options),
+        ObricV2(ObricV2DynamicRouteV1Options),
+        Nexus(NexusDynamicRouteV1Options),
     }
     #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
     pub struct FeeEvent {
@@ -177,11 +179,15 @@ pub mod typedefs {
         pub orchestrator_flags: OrchestratorFlags,
     }
     #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    pub struct NexusDynamicRouteV1Options {}
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
     pub struct NexusSwapOptions {
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount: u64,
         pub orchestrator_flags: OrchestratorFlags,
     }
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    pub struct ObricV2DynamicRouteV1Options {}
     #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
     pub struct ObricV2SwapOptions {
         #[serde(serialize_with = "crate::serialize_to_string")]

@@ -1350,6 +1350,10 @@
       "code": 15025,
       "name": "LegUnderproducedOutput",
       "msg": "Leg produced less output than expected"
+    },
+    {
+      "code": 15999,
+      "name": "InvalidInstructionData"
     }
   ],
   "types": [
@@ -1898,6 +1902,26 @@
                 }
               }
             ]
+          },
+          {
+            "name": "ObricV2",
+            "fields": [
+              {
+                "defined": {
+                  "name": "ObricV2DynamicRouteV1Options"
+                }
+              }
+            ]
+          },
+          {
+            "name": "Nexus",
+            "fields": [
+              {
+                "defined": {
+                  "name": "NexusDynamicRouteV1Options"
+                }
+              }
+            ]
           }
         ]
       }
@@ -2214,6 +2238,13 @@
       }
     },
     {
+      "name": "NexusDynamicRouteV1Options",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
       "name": "NexusSwapOptions",
       "type": {
         "kind": "struct",
@@ -2234,6 +2265,13 @@
             }
           }
         ]
+      }
+    },
+    {
+      "name": "ObricV2DynamicRouteV1Options",
+      "type": {
+        "kind": "struct",
+        "fields": []
       }
     },
     {
