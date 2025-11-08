@@ -5,7 +5,7 @@ edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
-name = "okx"
+name = "okx_v2"
 
 [dependencies]
 bs58                     = "0.5"   # base58 decode
