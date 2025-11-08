@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en-US">
+
+<head>
+  <meta charset="utf-8" />
+  <title>hello-wasm example</title>
+</head>
+
+<body>
+  <script type="module">
+    import init, { parse } from "./pkg/okx.js";
+    init().then(() => {
+      let join_key = "5kkPihtAaNhVHmAShzyRw3vg3dQFAiEA888BmvTHU3v8nRCKQSp4j52EVapC6QRyLivuWmPWvVx9NBBShLdcMqMp_0_1";
+      let data = "2ZRJ199BC4VzLGjH84XYoZWbHC45C8DYhNRAAURVSNsfjKLGNDs35J7eLGviuQWVk4G46t7FfL2EnEN3PFdwqmMJJoAq6VK4aEsLnUcghBoZcXf7fX1B1Yj";
+      let accounts = [
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        "94GevKgX3yofzQgRrNfdyVwJUBWLBbxgAxpT5SRfw7nB",
+        
+    ];
+      console.log(parse(data, accounts));
+    });
+  </script>
+</body>
+
+</html>
