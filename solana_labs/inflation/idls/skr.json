@@ -1,0 +1,1307 @@
+{
+  "address": "6kVHkubNvseqLJz13VqxLFjcrXjTeg1mCD7CbY7cHde3",
+  "metadata": {
+    "name": "skr",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "initialize_inflation_config",
+      "discriminator": [
+        150,
+        128,
+        12,
+        95,
+        160,
+        154,
+        90,
+        24
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "mint_authority",
+          "signer": true
+        },
+        {
+          "name": "inflation_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  105,
+                  110,
+                  102,
+                  108,
+                  97,
+                  116,
+                  105,
+                  111,
+                  110,
+                  95,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint",
+          "writable": true
+        },
+        {
+          "name": "destination"
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "event_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "InitializeInflationConfigArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "pause_inflation",
+      "discriminator": [
+        26,
+        209,
+        144,
+        252,
+        107,
+        160,
+        134,
+        107
+      ],
+      "accounts": [
+        {
+          "name": "inflation_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  105,
+                  110,
+                  102,
+                  108,
+                  97,
+                  116,
+                  105,
+                  111,
+                  110,
+                  95,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "docs": [
+            "The current authority that can pause inflation"
+          ],
+          "signer": true,
+          "relations": [
+            "inflation_config"
+          ]
+        },
+        {
+          "name": "event_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "resume_inflation",
+      "discriminator": [
+        58,
+        153,
+        30,
+        219,
+        223,
+        122,
+        205,
+        184
+      ],
+      "accounts": [
+        {
+          "name": "inflation_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  105,
+                  110,
+                  102,
+                  108,
+                  97,
+                  116,
+                  105,
+                  111,
+                  110,
+                  95,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "docs": [
+            "The current authority that can resume inflation"
+          ],
+          "signer": true,
+          "relations": [
+            "inflation_config"
+          ]
+        },
+        {
+          "name": "event_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "transfer_mint_authority",
+      "discriminator": [
+        87,
+        237,
+        187,
+        84,
+        168,
+        175,
+        241,
+        75
+      ],
+      "accounts": [
+        {
+          "name": "inflation_config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  105,
+                  110,
+                  102,
+                  108,
+                  97,
+                  116,
+                  105,
+                  111,
+                  110,
+                  95,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "docs": [
+            "The current authority (admin) that can transfer mint authority"
+          ],
+          "signer": true,
+          "relations": [
+            "inflation_config"
+          ]
+        },
+        {
+          "name": "mint",
+          "docs": [
+            "The mint whose authority will be transferred"
+          ],
+          "writable": true
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "event_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "TransferMintAuthorityArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "trigger_inflation",
+      "discriminator": [
+        98,
+        169,
+        27,
+        83,
+        188,
+        9,
+        120,
+        199
+      ],
+      "accounts": [
+        {
+          "name": "inflation_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  105,
+                  110,
+                  102,
+                  108,
+                  97,
+                  116,
+                  105,
+                  111,
+                  110,
+                  95,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint",
+          "writable": true
+        },
+        {
+          "name": "destination",
+          "writable": true
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "event_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "update_config",
+      "discriminator": [
+        29,
+        158,
+        252,
+        191,
+        10,
+        83,
+        219,
+        99
+      ],
+      "accounts": [
+        {
+          "name": "inflation_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  105,
+                  110,
+                  102,
+                  108,
+                  97,
+                  116,
+                  105,
+                  111,
+                  110,
+                  95,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "docs": [
+            "The current authority that can update the config"
+          ],
+          "signer": true,
+          "relations": [
+            "inflation_config"
+          ]
+        },
+        {
+          "name": "new_destination",
+          "docs": [
+            "Optional new destination account (validated if provided)"
+          ],
+          "optional": true
+        },
+        {
+          "name": "event_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "UpdateConfigArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "update_inflation_parameters",
+      "discriminator": [
+        142,
+        21,
+        95,
+        55,
+        169,
+        161,
+        28,
+        213
+      ],
+      "accounts": [
+        {
+          "name": "inflation_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  105,
+                  110,
+                  102,
+                  108,
+                  97,
+                  116,
+                  105,
+                  111,
+                  110,
+                  95,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "docs": [
+            "The current authority that can update inflation parameters"
+          ],
+          "signer": true,
+          "relations": [
+            "inflation_config"
+          ]
+        },
+        {
+          "name": "event_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "UpdateInflationParametersArgs"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "InflationConfig",
+      "discriminator": [
+        93,
+        208,
+        157,
+        38,
+        198,
+        62,
+        168,
+        45
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "InflationConfigInitialized",
+      "discriminator": [
+        63,
+        27,
+        168,
+        47,
+        67,
+        145,
+        234,
+        45
+      ]
+    },
+    {
+      "name": "InflationConfigUpdated",
+      "discriminator": [
+        209,
+        186,
+        199,
+        8,
+        27,
+        64,
+        190,
+        133
+      ]
+    },
+    {
+      "name": "InflationParametersUpdated",
+      "discriminator": [
+        24,
+        162,
+        14,
+        158,
+        173,
+        149,
+        32,
+        244
+      ]
+    },
+    {
+      "name": "InflationPaused",
+      "discriminator": [
+        99,
+        2,
+        99,
+        182,
+        168,
+        117,
+        22,
+        165
+      ]
+    },
+    {
+      "name": "InflationResumed",
+      "discriminator": [
+        203,
+        219,
+        167,
+        95,
+        154,
+        239,
+        153,
+        209
+      ]
+    },
+    {
+      "name": "InflationTriggered",
+      "discriminator": [
+        226,
+        7,
+        68,
+        231,
+        129,
+        19,
+        29,
+        20
+      ]
+    },
+    {
+      "name": "MintAuthorityTransferred",
+      "discriminator": [
+        23,
+        136,
+        155,
+        223,
+        27,
+        166,
+        51,
+        85
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InflationPaused",
+      "msg": "Inflation is currently paused"
+    },
+    {
+      "code": 6001,
+      "name": "AlreadyMintedForPeriod",
+      "msg": "Inflation already minted for this period"
+    },
+    {
+      "code": 6002,
+      "name": "MathOverflow",
+      "msg": "Math overflow occurred"
+    },
+    {
+      "code": 6003,
+      "name": "InvalidInflationRate",
+      "msg": "Invalid inflation rate - must be <= 10000000 bps and terminal <= initial"
+    },
+    {
+      "code": 6004,
+      "name": "InvalidDecayRate",
+      "msg": "Invalid decay rate - must be <= 10000000 bps"
+    },
+    {
+      "code": 6005,
+      "name": "InvalidPeriodLength",
+      "msg": "Invalid period length - must be > 0"
+    },
+    {
+      "code": 6006,
+      "name": "InvalidMint",
+      "msg": "Invalid mint address"
+    },
+    {
+      "code": 6007,
+      "name": "InvalidDestinationAccount",
+      "msg": "Invalid destination account"
+    },
+    {
+      "code": 6008,
+      "name": "UnauthorizedAuthority",
+      "msg": "Unauthorized: signer is not the current authority"
+    },
+    {
+      "code": 6009,
+      "name": "InflationNotPaused",
+      "msg": "Inflation is not paused"
+    }
+  ],
+  "types": [
+    {
+      "name": "InflationConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "docs": [
+              "PDA bump"
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "initial_supply",
+            "docs": [
+              "SKR token initial supply at genesis"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "initial_rate_bps",
+            "docs": [
+              "Starting inflation rate (basis points with 10M precision, e.g., 1_500_000 = 15%)"
+            ],
+            "type": "u32"
+          },
+          {
+            "name": "terminal_rate_bps",
+            "docs": [
+              "Minimum inflation rate (basis points with 10M precision, e.g., 200_000 = 2%)"
+            ],
+            "type": "u32"
+          },
+          {
+            "name": "decay_rate_bps",
+            "docs": [
+              "Annual decay factor in basis points with 10M precision (e.g., 2_500_000 = 25%)"
+            ],
+            "type": "u32"
+          },
+          {
+            "name": "seconds_per_period",
+            "docs": [
+              "Number of slots per inflation period"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "inflation_start_timestamp",
+            "docs": [
+              "Reference slot to calculate elapsed periods"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "mint",
+            "docs": [
+              "SKR mint address"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "destination",
+            "docs": [
+              "Inflation destination account receiving minted tokens"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "authority",
+            "docs": [
+              "Governance or upgrade authority"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "paused",
+            "docs": [
+              "Controlling inflation flow"
+            ],
+            "type": "bool"
+          },
+          {
+            "name": "pause_start_timestamp",
+            "docs": [
+              "Slot when inflation was paused (0 if not paused)"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "skipped_seconds",
+            "docs": [
+              "Number of seconds skipped due to pauses"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "last_minted_period",
+            "docs": [
+              "Last period for which inflation was minted"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "total_minted",
+            "docs": [
+              "Cumulative SKR minted via inflation"
+            ],
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InflationConfigInitialized",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "inflation_config",
+            "type": "pubkey"
+          },
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "destination",
+            "type": "pubkey"
+          },
+          {
+            "name": "initial_supply",
+            "type": "u64"
+          },
+          {
+            "name": "initial_rate_bps",
+            "type": "u32"
+          },
+          {
+            "name": "terminal_rate_bps",
+            "type": "u32"
+          },
+          {
+            "name": "decay_rate_bps",
+            "type": "u32"
+          },
+          {
+            "name": "seconds_per_period",
+            "type": "u64"
+          },
+          {
+            "name": "inflation_start_timestamp",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InflationConfigUpdated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "inflation_config",
+            "type": "pubkey"
+          },
+          {
+            "name": "old_authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "new_authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "old_destination",
+            "type": "pubkey"
+          },
+          {
+            "name": "new_destination",
+            "type": "pubkey"
+          },
+          {
+            "name": "updated_by",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InflationParametersUpdated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "inflation_config",
+            "type": "pubkey"
+          },
+          {
+            "name": "updated_by",
+            "type": "pubkey"
+          },
+          {
+            "name": "old_initial_rate_bps",
+            "type": "u32"
+          },
+          {
+            "name": "new_initial_rate_bps",
+            "type": "u32"
+          },
+          {
+            "name": "old_terminal_rate_bps",
+            "type": "u32"
+          },
+          {
+            "name": "new_terminal_rate_bps",
+            "type": "u32"
+          },
+          {
+            "name": "old_decay_rate_bps",
+            "type": "u32"
+          },
+          {
+            "name": "new_decay_rate_bps",
+            "type": "u32"
+          },
+          {
+            "name": "old_seconds_per_period",
+            "type": "u64"
+          },
+          {
+            "name": "new_seconds_per_period",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InflationPaused",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "inflation_config",
+            "type": "pubkey"
+          },
+          {
+            "name": "paused_by",
+            "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InflationResumed",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "inflation_config",
+            "type": "pubkey"
+          },
+          {
+            "name": "resumed_by",
+            "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "u64"
+          },
+          {
+            "name": "elapsed_seconds",
+            "type": "u64"
+          },
+          {
+            "name": "total_skipped_seconds",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InflationTriggered",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "inflation_config",
+            "type": "pubkey"
+          },
+          {
+            "name": "period",
+            "type": "u64"
+          },
+          {
+            "name": "tokens_minted",
+            "type": "u64"
+          },
+          {
+            "name": "current_rate_bps",
+            "type": "u64"
+          },
+          {
+            "name": "rate_per_period_bps",
+            "type": "u64"
+          },
+          {
+            "name": "total_minted",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitializeInflationConfigArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "initial_rate_bps",
+            "type": "u32"
+          },
+          {
+            "name": "terminal_rate_bps",
+            "type": "u32"
+          },
+          {
+            "name": "decay_rate_bps",
+            "type": "u32"
+          },
+          {
+            "name": "seconds_per_period",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MintAuthorityTransferred",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "inflation_config",
+            "type": "pubkey"
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "old_authority",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "new_authority",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "transferred_by",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TransferMintAuthorityArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "new_authority",
+            "docs": [
+              "The new mint authority (None to remove authority entirely)"
+            ],
+            "type": {
+              "option": "pubkey"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateConfigArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "new_authority",
+            "docs": [
+              "New authority (optional - if None, authority remains unchanged)"
+            ],
+            "type": {
+              "option": "pubkey"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateInflationParametersArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "new_initial_rate_bps",
+            "docs": [
+              "New initial inflation rate (basis points with 10M precision, e.g., 1_500_000 = 15%)"
+            ],
+            "type": {
+              "option": "u32"
+            }
+          },
+          {
+            "name": "new_terminal_rate_bps",
+            "docs": [
+              "New terminal inflation rate (basis points with 10M precision, e.g., 200_000 = 2%)"
+            ],
+            "type": {
+              "option": "u32"
+            }
+          },
+          {
+            "name": "new_decay_rate_bps",
+            "docs": [
+              "New decay rate (basis points with 10M precision, e.g., 2_500_000 = 25%)"
+            ],
+            "type": {
+              "option": "u32"
+            }
+          },
+          {
+            "name": "new_seconds_per_period",
+            "docs": [
+              "New number of seconds per inflation period"
+            ],
+            "type": {
+              "option": "u64"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
