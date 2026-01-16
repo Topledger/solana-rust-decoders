@@ -1,5 +1,5 @@
 {
-  "address": "6kVHkubNvseqLJz13VqxLFjcrXjTeg1mCD7CbY7cHde3",
+  "address": "SKRiK1zfF4MZbUa4a64rhuVooVS4zgfLCAe85PNzRgN",
   "metadata": {
     "name": "skr",
     "version": "0.1.0",
@@ -929,7 +929,7 @@
           {
             "name": "pause_start_timestamp",
             "docs": [
-              "Slot when inflation was paused (0 if not paused)"
+              "Timestamp when inflation was paused (0 if not paused)"
             ],
             "type": "u64"
           },

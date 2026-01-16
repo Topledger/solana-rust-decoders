@@ -1,5 +1,5 @@
 {
-  "address": "7i46xbM2PQAXSXNTTnWujvDxA6cs36o143Fh6hAHR4XZ",
+  "address": "SKRsLAiDMeJGa633pypwGNSxBcGNkP98ai9Q7JvvEu3",
   "metadata": {
     "name": "staking",
     "version": "0.1.0",
@@ -1422,6 +1422,11 @@
       "code": 6019,
       "name": "NothingToWithdraw",
       "msg": "Nothing to withdraw: no unstaking amount available"
+    },
+    {
+      "code": 6020,
+      "name": "InvalidTokenAccount",
+      "msg": "Invalid token account: must be an Associated Token Account"
     }
   ],
   "types": [
@@ -1555,7 +1560,7 @@
             "docs": [
               "Commission tokens accrued by this guardian."
             ],
-            "type": "u64"
+            "type": "u128"
           },
           {
             "name": "commission_bps",
@@ -1775,26 +1780,8 @@
           {
             "name": "cumulative_commission_per_share",
             "docs": [
-              "cumulative tracking of the amount of rewars per share Guardians",
+              "cumulative tracking of the amount of rewards per share Guardians",
               "should receive."
-            ],
-            "type": "u128"
-          },
-          {
-            "name": "user_eligible_shares",
-            "docs": [
-              "Sum of shares belonging to guardians with commission < 100%.",
-              "These shares are eligible to receive user rewards.",
-              "Shares from guardians with 100% commission are NOT included."
-            ],
-            "type": "u128"
-          },
-          {
-            "name": "cumulative_user_reward_share_price_increase",
-            "docs": [
-              "Cumulative share price increase from user rewards only.",
-              "This is used to calculate the \"base share price\" for guardians with 100% commission,",
-              "who should not benefit from user rewards."
             ],
             "type": "u128"
           },
@@ -2094,11 +2081,11 @@
             "type": "u128"
           },
           {
-            "name": "last_cumulative_commission_per_share",
+            "name": "cumulative_commission_before_staking",
             "docs": [
-              "Last value of the guardian's cumulative_commission_per_share when this user staked",
-              "Used to calculate commission based on rate at time rewards were earned",
-              "This is per-guardian, not global, to handle commission rate changes correctly"
+              "Amount of commission earned by the Guardian given the amount of shares staked.",
+              "Used as a reference point to calculate the amount of commission earned by the Guardian",
+              "while the user's stake is active."
             ],
             "type": "u128"
           },
