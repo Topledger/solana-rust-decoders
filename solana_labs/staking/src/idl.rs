@@ -67,7 +67,7 @@ pub mod typedefs {
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub last_share_price: u128,
         #[serde(serialize_with = "crate::serialize_to_string")]
-        pub accrued_commission: u64,
+        pub accrued_commission: u128,
         pub commission_bps: u16,
         pub bump: u8,
         pub active: bool,
@@ -142,10 +142,6 @@ pub mod typedefs {
         pub commission_weight_sum: u128,
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub cumulative_commission_per_share: u128,
-        #[serde(serialize_with = "crate::serialize_to_string")]
-        pub user_eligible_shares: u128,
-        #[serde(serialize_with = "crate::serialize_to_string")]
-        pub cumulative_user_reward_share_price_increase: u128,
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub last_vault_amount: u64,
     }
@@ -264,7 +260,7 @@ pub mod typedefs {
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub cost_basis: u128,
         #[serde(serialize_with = "crate::serialize_to_string")]
-        pub last_cumulative_commission_per_share: u128,
+        pub cumulative_commission_before_staking: u128,
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub unstaking_amount: u64,
         pub unstake_timestamp: i64,
