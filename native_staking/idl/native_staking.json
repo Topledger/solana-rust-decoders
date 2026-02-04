@@ -1,0 +1,252 @@
+{
+    "version": "0.2.0",
+    "name": "stake",
+    "address": "Stake11111111111111111111111111111111111111",
+    "metadata": {
+      "description": "Unofficial Anchor-style IDL mirroring solana-stake-interface v2.0.0",
+      "source": "https://docs.rs/solana-stake-interface/latest",
+      "note": "Native program; no Anchor discriminators"
+    },
+    "instructions": [
+      {
+        "name": "initialize",
+        "accounts": [
+          { "name": "stakeAccount", "isMut": true, "isSigner": false },
+          { "name": "rentSysvar", "isMut": false, "isSigner": false }
+        ],
+        "args": [
+          { "name": "authorized", "type": { "defined": "Authorized" } },
+          { "name": "lockup", "type": { "defined": "Lockup" } }
+        ]
+      },
+      {
+        "name": "authorize",
+        "accounts": [
+          { "name": "stakeAccount", "isMut": true, "isSigner": false },
+          { "name": "clockSysvar", "isMut": false, "isSigner": false },
+          { "name": "authority", "isMut": false, "isSigner": true },
+          { "name": "lockupAuthority", "isMut": false, "isSigner": true, "isOptional": true }
+        ],
+        "args": [
+          { "name": "newAuthorizedPubkey", "type": "publicKey" },
+          { "name": "stakeAuthorize", "type": { "defined": "StakeAuthorize" } }
+        ]
+      },
+      {
+        "name": "delegateStake",
+        "accounts": [
+          { "name": "stakeAccount", "isMut": true, "isSigner": false },
+          { "name": "voteAccount", "isMut": false, "isSigner": false },
+          { "name": "clockSysvar", "isMut": false, "isSigner": false },
+          { "name": "stakeHistorySysvar", "isMut": false, "isSigner": false },
+          { "name": "stakeConfigAccount", "isMut": false, "isSigner": false },
+          { "name": "stakeAuthority", "isMut": false, "isSigner": true }
+        ],
+        "args": []
+      },
+      {
+        "name": "split",
+        "accounts": [
+          { "name": "stakeAccount", "isMut": true, "isSigner": false },
+          { "name": "newStakeAccount", "isMut": true, "isSigner": false },
+          { "name": "stakeAuthority", "isMut": false, "isSigner": true }
+        ],
+        "args": [{ "name": "lamports", "type": "u64" }]
+      },
+      {
+        "name": "withdraw",
+        "accounts": [
+          { "name": "stakeAccount", "isMut": true, "isSigner": false },
+          { "name": "to", "isMut": true, "isSigner": false },
+          { "name": "clockSysvar", "isMut": false, "isSigner": false },
+          { "name": "stakeHistorySysvar", "isMut": false, "isSigner": false },
+          { "name": "withdrawAuthority", "isMut": false, "isSigner": true },
+          { "name": "lockupAuthority", "isMut": false, "isSigner": true, "isOptional": true }
+        ],
+        "args": [{ "name": "lamports", "type": "u64" }]
+      },
+      {
+        "name": "deactivate",
+        "accounts": [
+          { "name": "delegatedStake", "isMut": true, "isSigner": false },
+          { "name": "clockSysvar", "isMut": false, "isSigner": false },
+          { "name": "stakeAuthority", "isMut": false, "isSigner": true }
+        ],
+        "args": []
+      },
+      {
+        "name": "setLockup",
+        "accounts": [
+          { "name": "stakeAccount", "isMut": true, "isSigner": false },
+          { "name": "authority", "isMut": false, "isSigner": true }
+        ],
+        "args": [{ "name": "lockupArgs", "type": { "defined": "LockupArgs" } }]
+      },
+      {
+        "name": "merge",
+        "accounts": [
+          { "name": "destinationStake", "isMut": true, "isSigner": false },
+          { "name": "sourceStake", "isMut": true, "isSigner": false },
+          { "name": "clockSysvar", "isMut": false, "isSigner": false },
+          { "name": "stakeHistorySysvar", "isMut": false, "isSigner": false },
+          { "name": "stakeAuthority", "isMut": false, "isSigner": true }
+        ],
+        "args": []
+      },
+      {
+        "name": "authorizeWithSeed",
+        "accounts": [
+          { "name": "stakeAccount", "isMut": true, "isSigner": false },
+          { "name": "authorityBase", "isMut": false, "isSigner": true },
+          { "name": "clockSysvar", "isMut": false, "isSigner": false },
+          { "name": "lockupAuthority", "isMut": false, "isSigner": true, "isOptional": true }
+        ],
+        "args": [
+          { "name": "newAuthorized", "type": "publicKey" },
+          { "name": "authorityType", "type": { "defined": "StakeAuthorize" } },
+          { "name": "authoritySeed", "type": "string" },
+          { "name": "authorityOwner", "type": "publicKey" }
+        ]
+      },
+      {
+        "name": "initializeChecked",
+        "accounts": [
+          { "name": "stakeAccount", "isMut": true, "isSigner": false },
+          { "name": "rentSysvar", "isMut": false, "isSigner": false },
+          { "name": "stakeAuthority", "isMut": false, "isSigner": false },
+          { "name": "withdrawAuthority", "isMut": false, "isSigner": true }
+        ],
+        "args": []
+      },
+      {
+        "name": "authorizeChecked",
+        "accounts": [
+          { "name": "stakeAccount", "isMut": true, "isSigner": false },
+          { "name": "clockSysvar", "isMut": false, "isSigner": false },
+          { "name": "currentAuthority", "isMut": false, "isSigner": true },
+          { "name": "newAuthority", "isMut": false, "isSigner": true },
+          { "name": "lockupAuthority", "isMut": false, "isSigner": true, "isOptional": true }
+        ],
+        "args": [{ "name": "stakeAuthorize", "type": { "defined": "StakeAuthorize" } }]
+      },
+      {
+        "name": "authorizeCheckedWithSeed",
+        "accounts": [
+          { "name": "stakeAccount", "isMut": true, "isSigner": false },
+          { "name": "baseAuthority", "isMut": false, "isSigner": true },
+          { "name": "clockSysvar", "isMut": false, "isSigner": false },
+          { "name": "newAuthority", "isMut": false, "isSigner": true },
+          { "name": "lockupAuthority", "isMut": false, "isSigner": true, "isOptional": true }
+        ],
+        "args": [
+          { "name": "stakeAuthorize", "type": { "defined": "StakeAuthorize" } },
+          { "name": "authoritySeed", "type": "string" },
+          { "name": "authorityOwner", "type": "publicKey" }
+        ]
+      },
+      {
+        "name": "setLockupChecked",
+        "accounts": [
+          { "name": "stakeAccount", "isMut": true, "isSigner": false },
+          { "name": "authority", "isMut": false, "isSigner": true },
+          { "name": "newLockupAuthority", "isMut": false, "isSigner": true, "isOptional": true }
+        ],
+        "args": [{ "name": "lockupCheckedArgs", "type": { "defined": "LockupCheckedArgs" } }]
+      },
+      { "name": "getMinimumDelegation", "accounts": [], "args": [] },
+      {
+        "name": "deactivateDelinquent",
+        "accounts": [
+          { "name": "delegatedStake", "isMut": true, "isSigner": false },
+          { "name": "delinquentVoteAccount", "isMut": false, "isSigner": false },
+          { "name": "referenceVoteAccount", "isMut": false, "isSigner": false }
+        ],
+        "args": []
+      },
+      {
+        "name": "redelegate",
+        "metadata": { "deprecated": true, "note": "Will not be enabled" },
+        "accounts": [
+          { "name": "delegatedStake", "isMut": true, "isSigner": false },
+          { "name": "newUninitializedStake", "isMut": true, "isSigner": false },
+          { "name": "newVoteAccount", "isMut": false, "isSigner": false },
+          { "name": "unused", "isMut": false, "isSigner": false },
+          { "name": "stakeAuthority", "isMut": false, "isSigner": true }
+        ],
+        "args": []
+      },
+      {
+        "name": "moveStake",
+        "accounts": [
+          { "name": "sourceStake", "isMut": true, "isSigner": false },
+          { "name": "destinationStake", "isMut": true, "isSigner": false },
+          { "name": "stakeAuthority", "isMut": false, "isSigner": true }
+        ],
+        "args": [{ "name": "stakeLamports", "type": "u64" }]
+      },
+      {
+        "name": "moveLamports",
+        "accounts": [
+          { "name": "sourceStake", "isMut": true, "isSigner": false },
+          { "name": "destinationStake", "isMut": true, "isSigner": false },
+          { "name": "stakeAuthority", "isMut": false, "isSigner": true }
+        ],
+        "args": [{ "name": "lamports", "type": "u64" }]
+      }
+    ],
+    "types": [
+      {
+        "name": "Authorized",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            { "name": "staker", "type": "publicKey" },
+            { "name": "withdrawer", "type": "publicKey" }
+          ]
+        }
+      },
+      {
+        "name": "Lockup",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            { "name": "unixTimestamp", "type": "i64" },
+            { "name": "epoch", "type": "u64" },
+            { "name": "custodian", "type": "publicKey" }
+          ]
+        }
+      },
+      {
+        "name": "LockupArgs",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            { "name": "unixTimestamp", "type": { "option": "i64" } },
+            { "name": "epoch", "type": { "option": "u64" } },
+            { "name": "custodian", "type": { "option": "publicKey" } }
+          ]
+        }
+      },
+      {
+        "name": "LockupCheckedArgs",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            { "name": "unixTimestamp", "type": { "option": "i64" } },
+            { "name": "epoch", "type": { "option": "u64" } }
+          ]
+        }
+      },
+      {
+        "name": "StakeAuthorize",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            { "name": "Staker" },
+            { "name": "Withdrawer" }
+          ]
+        }
+      }
+    ]
+  }
+  
