@@ -877,10 +877,22 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = CloseEmptyTokenAccountArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
-                let token_account = keys.next().unwrap().clone();
-                let authority = keys.next().unwrap().clone();
-                let destination = keys.next().unwrap().clone();
-                let token_program = keys.next().unwrap().clone();
+                let token_account = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "token_account"))?
+                    .clone();
+                let authority = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "authority"))?
+                    .clone();
+                let destination = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "destination"))?
+                    .clone();
+                let token_program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "token_program"))?
+                    .clone();
                 let remaining = keys.cloned().collect();
                 let accounts = CloseEmptyTokenAccountAccounts {
                     token_account,
@@ -895,13 +907,36 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = CloseOrderArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
-                let order = keys.next().unwrap().clone();
-                let order_vault = keys.next().unwrap().clone();
-                let return_input_token_account = keys.next().unwrap().clone();
-                let return_rent_to = keys.next().unwrap().clone();
-                let closer = keys.next().unwrap().clone();
-                let token_program = keys.next().unwrap().clone();
-                let system_program = keys.next().unwrap().clone();
+                let order = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "order"))?
+                    .clone();
+                let order_vault = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "order_vault"))?
+                    .clone();
+                let return_input_token_account = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "return_input_token_account")
+                    })?
+                    .clone();
+                let return_rent_to = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "return_rent_to"))?
+                    .clone();
+                let closer = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "closer"))?
+                    .clone();
+                let token_program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "token_program"))?
+                    .clone();
+                let system_program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "system_program"))?
+                    .clone();
                 let remaining = keys.cloned().collect();
                 let accounts = CloseOrderAccounts {
                     order,
@@ -919,14 +954,40 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = CreateReferralTokenAccountIdempotentArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
-                let payer = keys.next().unwrap().clone();
-                let project = keys.next().unwrap().clone();
-                let referral_account = keys.next().unwrap().clone();
-                let referral_token_account = keys.next().unwrap().clone();
-                let mint = keys.next().unwrap().clone();
-                let system_program = keys.next().unwrap().clone();
-                let token_program = keys.next().unwrap().clone();
-                let referral_program = keys.next().unwrap().clone();
+                let payer = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "payer"))?
+                    .clone();
+                let project = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "project"))?
+                    .clone();
+                let referral_account = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "referral_account"))?
+                    .clone();
+                let referral_token_account = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "referral_token_account")
+                    })?
+                    .clone();
+                let mint = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "mint"))?
+                    .clone();
+                let system_program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "system_program"))?
+                    .clone();
+                let token_program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "token_program"))?
+                    .clone();
+                let referral_program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "referral_program"))?
+                    .clone();
                 let remaining = keys.cloned().collect();
                 let accounts = CreateReferralTokenAccountIdempotentAccounts {
                     payer,
@@ -945,21 +1006,76 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = FillOrderArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
-                let order = keys.next().unwrap().clone();
-                let order_vault = keys.next().unwrap().clone();
-                let output_token_account = keys.next().unwrap().clone();
-                let return_input_token_account = keys.next().unwrap().clone();
-                let return_rent_to = keys.next().unwrap().clone();
-                let filler_input_token_account = keys.next().unwrap().clone();
-                let input_mint = keys.next().unwrap().clone();
-                let filler_output_token_account = keys.next().unwrap().clone();
-                let output_mint = keys.next().unwrap().clone();
-                let filler = keys.next().unwrap().clone();
-                let token_program = keys.next().unwrap().clone();
-                let associated_token_program = keys.next().unwrap().clone();
-                let system_program = keys.next().unwrap().clone();
-                let event_authority = keys.next().unwrap().clone();
-                let program = keys.next().unwrap().clone();
+                let order = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "order"))?
+                    .clone();
+                let order_vault = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "order_vault"))?
+                    .clone();
+                let output_token_account = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "output_token_account")
+                    })?
+                    .clone();
+                let return_input_token_account = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "return_input_token_account")
+                    })?
+                    .clone();
+                let return_rent_to = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "return_rent_to"))?
+                    .clone();
+                let filler_input_token_account = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "filler_input_token_account")
+                    })?
+                    .clone();
+                let input_mint = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "input_mint"))?
+                    .clone();
+                let filler_output_token_account = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "filler_output_token_account")
+                    })?
+                    .clone();
+                let output_mint = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "output_mint"))?
+                    .clone();
+                let filler = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "filler"))?
+                    .clone();
+                let token_program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "token_program"))?
+                    .clone();
+                let associated_token_program = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "associated_token_program")
+                    })?
+                    .clone();
+                let system_program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "system_program"))?
+                    .clone();
+                let event_authority = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "event_authority"))?
+                    .clone();
+                let program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "program"))?
+                    .clone();
                 let remaining = keys.cloned().collect();
                 let accounts = FillOrderAccounts {
                     order,
@@ -985,20 +1101,80 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = InitMarketLedgerIdempotentArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
-                let predictions_program = keys.next().unwrap().clone();
-                let market_ledger = keys.next().unwrap().clone();
-                let market_ledger_redemption_vault = keys.next().unwrap().clone();
-                let market_ledger_order_vault = keys.next().unwrap().clone();
-                let market_ledger_reduce_yes_vault = keys.next().unwrap().clone();
-                let market_ledger_reduce_no_vault = keys.next().unwrap().clone();
-                let settlement_escrow = keys.next().unwrap().clone();
-                let escrow_mint = keys.next().unwrap().clone();
-                let market_yes_outcome_mint = keys.next().unwrap().clone();
-                let market_no_outcome_mint = keys.next().unwrap().clone();
-                let payer = keys.next().unwrap().clone();
-                let outcome_token_program = keys.next().unwrap().clone();
-                let escrow_token_program = keys.next().unwrap().clone();
-                let system_program = keys.next().unwrap().clone();
+                let predictions_program = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "predictions_program")
+                    })?
+                    .clone();
+                let market_ledger = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "market_ledger"))?
+                    .clone();
+                let market_ledger_redemption_vault = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "market_ledger_redemption_vault")
+                    })?
+                    .clone();
+                let market_ledger_order_vault = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "market_ledger_order_vault")
+                    })?
+                    .clone();
+                let market_ledger_reduce_yes_vault = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "market_ledger_reduce_yes_vault")
+                    })?
+                    .clone();
+                let market_ledger_reduce_no_vault = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "market_ledger_reduce_no_vault")
+                    })?
+                    .clone();
+                let settlement_escrow = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "settlement_escrow"))?
+                    .clone();
+                let escrow_mint = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "escrow_mint"))?
+                    .clone();
+                let market_yes_outcome_mint = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "market_yes_outcome_mint")
+                    })?
+                    .clone();
+                let market_no_outcome_mint = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "market_no_outcome_mint")
+                    })?
+                    .clone();
+                let payer = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "payer"))?
+                    .clone();
+                let outcome_token_program = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "outcome_token_program")
+                    })?
+                    .clone();
+                let escrow_token_program = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "escrow_token_program")
+                    })?
+                    .clone();
+                let system_program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "system_program"))?
+                    .clone();
                 let remaining = keys.cloned().collect();
                 let accounts = InitMarketLedgerIdempotentAccounts {
                     predictions_program,
@@ -1023,19 +1199,66 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = OpenOrderArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
-                let order = keys.next().unwrap().clone();
-                let order_vault = keys.next().unwrap().clone();
-                let input_token_account = keys.next().unwrap().clone();
-                let output_token_account = keys.next().unwrap().clone();
-                let return_input_token_account = keys.next().unwrap().clone();
-                let input_mint = keys.next().unwrap().clone();
-                let user_token_authority = keys.next().unwrap().clone();
-                let fee_payer = keys.next().unwrap().clone();
-                let fee_receiver = keys.next().unwrap().clone();
-                let rent_depositor = keys.next().unwrap().clone();
-                let token_program = keys.next().unwrap().clone();
-                let system_program = keys.next().unwrap().clone();
-                let rent = keys.next().unwrap().clone();
+                let order = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "order"))?
+                    .clone();
+                let order_vault = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "order_vault"))?
+                    .clone();
+                let input_token_account = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "input_token_account")
+                    })?
+                    .clone();
+                let output_token_account = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "output_token_account")
+                    })?
+                    .clone();
+                let return_input_token_account = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "return_input_token_account")
+                    })?
+                    .clone();
+                let input_mint = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "input_mint"))?
+                    .clone();
+                let user_token_authority = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "user_token_authority")
+                    })?
+                    .clone();
+                let fee_payer = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "fee_payer"))?
+                    .clone();
+                let fee_receiver = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "fee_receiver"))?
+                    .clone();
+                let rent_depositor = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "rent_depositor"))?
+                    .clone();
+                let token_program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "token_program"))?
+                    .clone();
+                let system_program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "system_program"))?
+                    .clone();
+                let rent = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "rent"))?
+                    .clone();
                 let remaining = keys.cloned().collect();
                 let accounts = OpenOrderAccounts {
                     order,
@@ -1059,12 +1282,34 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = SwapArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
-                let token_program = keys.next().unwrap().clone();
-                let associated_token_program = keys.next().unwrap().clone();
-                let system_program = keys.next().unwrap().clone();
-                let user_token_authority = keys.next().unwrap().clone();
-                let event_authority = keys.next().unwrap().clone();
-                let program = keys.next().unwrap().clone();
+                let token_program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "token_program"))?
+                    .clone();
+                let associated_token_program = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "associated_token_program")
+                    })?
+                    .clone();
+                let system_program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "system_program"))?
+                    .clone();
+                let user_token_authority = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "user_token_authority")
+                    })?
+                    .clone();
+                let event_authority = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "event_authority"))?
+                    .clone();
+                let program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "program"))?
+                    .clone();
                 let remaining = keys.cloned().collect();
                 let accounts = SwapAccounts {
                     token_program,
@@ -1081,12 +1326,34 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = Swap2Args::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
-                let token_program = keys.next().unwrap().clone();
-                let associated_token_program = keys.next().unwrap().clone();
-                let system_program = keys.next().unwrap().clone();
-                let user_token_authority = keys.next().unwrap().clone();
-                let event_authority = keys.next().unwrap().clone();
-                let program = keys.next().unwrap().clone();
+                let token_program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "token_program"))?
+                    .clone();
+                let associated_token_program = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "associated_token_program")
+                    })?
+                    .clone();
+                let system_program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "system_program"))?
+                    .clone();
+                let user_token_authority = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "user_token_authority")
+                    })?
+                    .clone();
+                let event_authority = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "event_authority"))?
+                    .clone();
+                let program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "program"))?
+                    .clone();
                 let remaining = keys.cloned().collect();
                 let accounts = Swap2Accounts {
                     token_program,
@@ -1103,15 +1370,50 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = Swap2WithDestinationArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
-                let token_program = keys.next().unwrap().clone();
-                let associated_token_program = keys.next().unwrap().clone();
-                let system_program = keys.next().unwrap().clone();
-                let user_token_authority = keys.next().unwrap().clone();
-                let destination_token_account = keys.next().unwrap().clone();
-                let destination_token_authority = keys.next().unwrap().clone();
-                let destination_mint = keys.next().unwrap().clone();
-                let event_authority = keys.next().unwrap().clone();
-                let program = keys.next().unwrap().clone();
+                let token_program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "token_program"))?
+                    .clone();
+                let associated_token_program = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "associated_token_program")
+                    })?
+                    .clone();
+                let system_program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "system_program"))?
+                    .clone();
+                let user_token_authority = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "user_token_authority")
+                    })?
+                    .clone();
+                let destination_token_account = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "destination_token_account")
+                    })?
+                    .clone();
+                let destination_token_authority = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "destination_token_authority")
+                    })?
+                    .clone();
+                let destination_mint = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "destination_mint"))?
+                    .clone();
+                let event_authority = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "event_authority"))?
+                    .clone();
+                let program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "program"))?
+                    .clone();
                 let remaining = keys.cloned().collect();
                 let accounts = Swap2WithDestinationAccounts {
                     token_program,
@@ -1131,13 +1433,40 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = Swap2WithDestinationNativeArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
-                let token_program = keys.next().unwrap().clone();
-                let associated_token_program = keys.next().unwrap().clone();
-                let system_program = keys.next().unwrap().clone();
-                let user_token_authority = keys.next().unwrap().clone();
-                let destination_account = keys.next().unwrap().clone();
-                let event_authority = keys.next().unwrap().clone();
-                let program = keys.next().unwrap().clone();
+                let token_program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "token_program"))?
+                    .clone();
+                let associated_token_program = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "associated_token_program")
+                    })?
+                    .clone();
+                let system_program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "system_program"))?
+                    .clone();
+                let user_token_authority = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "user_token_authority")
+                    })?
+                    .clone();
+                let destination_account = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "destination_account")
+                    })?
+                    .clone();
+                let event_authority = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "event_authority"))?
+                    .clone();
+                let program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "program"))?
+                    .clone();
                 let remaining = keys.cloned().collect();
                 let accounts = Swap2WithDestinationNativeAccounts {
                     token_program,
@@ -1155,15 +1484,50 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = SwapWithDestinationArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
-                let token_program = keys.next().unwrap().clone();
-                let associated_token_program = keys.next().unwrap().clone();
-                let system_program = keys.next().unwrap().clone();
-                let user_token_authority = keys.next().unwrap().clone();
-                let destination_token_account = keys.next().unwrap().clone();
-                let destination_token_authority = keys.next().unwrap().clone();
-                let destination_mint = keys.next().unwrap().clone();
-                let event_authority = keys.next().unwrap().clone();
-                let program = keys.next().unwrap().clone();
+                let token_program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "token_program"))?
+                    .clone();
+                let associated_token_program = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "associated_token_program")
+                    })?
+                    .clone();
+                let system_program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "system_program"))?
+                    .clone();
+                let user_token_authority = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "user_token_authority")
+                    })?
+                    .clone();
+                let destination_token_account = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "destination_token_account")
+                    })?
+                    .clone();
+                let destination_token_authority = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "destination_token_authority")
+                    })?
+                    .clone();
+                let destination_mint = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "destination_mint"))?
+                    .clone();
+                let event_authority = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "event_authority"))?
+                    .clone();
+                let program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "program"))?
+                    .clone();
                 let remaining = keys.cloned().collect();
                 let accounts = SwapWithDestinationAccounts {
                     token_program,
@@ -1183,13 +1547,40 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = SwapWithDestinationNativeArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
-                let token_program = keys.next().unwrap().clone();
-                let associated_token_program = keys.next().unwrap().clone();
-                let system_program = keys.next().unwrap().clone();
-                let user_token_authority = keys.next().unwrap().clone();
-                let destination_account = keys.next().unwrap().clone();
-                let event_authority = keys.next().unwrap().clone();
-                let program = keys.next().unwrap().clone();
+                let token_program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "token_program"))?
+                    .clone();
+                let associated_token_program = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "associated_token_program")
+                    })?
+                    .clone();
+                let system_program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "system_program"))?
+                    .clone();
+                let user_token_authority = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "user_token_authority")
+                    })?
+                    .clone();
+                let destination_account = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "destination_account")
+                    })?
+                    .clone();
+                let event_authority = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "event_authority"))?
+                    .clone();
+                let program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "program"))?
+                    .clone();
                 let remaining = keys.cloned().collect();
                 let accounts = SwapWithDestinationNativeAccounts {
                     token_program,
@@ -1207,12 +1598,30 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = TransferFeeArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
-                let from = keys.next().unwrap().clone();
-                let to = keys.next().unwrap().clone();
-                let authority = keys.next().unwrap().clone();
-                let token_program = keys.next().unwrap().clone();
-                let event_authority = keys.next().unwrap().clone();
-                let program = keys.next().unwrap().clone();
+                let from = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "from"))?
+                    .clone();
+                let to = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "to"))?
+                    .clone();
+                let authority = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "authority"))?
+                    .clone();
+                let token_program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "token_program"))?
+                    .clone();
+                let event_authority = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "event_authority"))?
+                    .clone();
+                let program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "program"))?
+                    .clone();
                 let remaining = keys.cloned().collect();
                 let accounts = TransferFeeAccounts {
                     from,
@@ -1229,9 +1638,18 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = TransferSolArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
-                let from = keys.next().unwrap().clone();
-                let to = keys.next().unwrap().clone();
-                let system_program = keys.next().unwrap().clone();
+                let from = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "from"))?
+                    .clone();
+                let to = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "to"))?
+                    .clone();
+                let system_program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "system_program"))?
+                    .clone();
                 let remaining = keys.cloned().collect();
                 let accounts = TransferSolAccounts {
                     from,
@@ -1245,14 +1663,46 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = TransferToSponsorArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
-                let user_token_authority = keys.next().unwrap().clone();
-                let user_token_account = keys.next().unwrap().clone();
-                let sponsor = keys.next().unwrap().clone();
-                let sponsor_token_account = keys.next().unwrap().clone();
-                let mint = keys.next().unwrap().clone();
-                let token_program = keys.next().unwrap().clone();
-                let associated_token_program = keys.next().unwrap().clone();
-                let system_program = keys.next().unwrap().clone();
+                let user_token_authority = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "user_token_authority")
+                    })?
+                    .clone();
+                let user_token_account = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "user_token_account")
+                    })?
+                    .clone();
+                let sponsor = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "sponsor"))?
+                    .clone();
+                let sponsor_token_account = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "sponsor_token_account")
+                    })?
+                    .clone();
+                let mint = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "mint"))?
+                    .clone();
+                let token_program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "token_program"))?
+                    .clone();
+                let associated_token_program = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "associated_token_program")
+                    })?
+                    .clone();
+                let system_program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "system_program"))?
+                    .clone();
                 let remaining = keys.cloned().collect();
                 let accounts = TransferToSponsorAccounts {
                     user_token_authority,
@@ -1271,9 +1721,23 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = UnwrapSolArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
-                let owner = keys.next().unwrap().clone();
-                let wrapped_sol_associated_token_account = keys.next().unwrap().clone();
-                let token_program = keys.next().unwrap().clone();
+                let owner = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "owner"))?
+                    .clone();
+                let wrapped_sol_associated_token_account = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!(
+                            "Missing account key: {}",
+                            "wrapped_sol_associated_token_account"
+                        )
+                    })?
+                    .clone();
+                let token_program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "token_program"))?
+                    .clone();
                 let remaining = keys.cloned().collect();
                 let accounts = UnwrapSolAccounts {
                     owner,
@@ -1287,12 +1751,37 @@ impl Instruction {
                 let mut rdr: &[u8] = rest;
                 let args = WrapSolArgs::deserialize(&mut rdr)?;
                 let mut keys = account_keys.iter();
-                let from = keys.next().unwrap().clone();
-                let wrapped_sol_associated_token_account = keys.next().unwrap().clone();
-                let native_mint = keys.next().unwrap().clone();
-                let token_program = keys.next().unwrap().clone();
-                let associated_token_program = keys.next().unwrap().clone();
-                let system_program = keys.next().unwrap().clone();
+                let from = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "from"))?
+                    .clone();
+                let wrapped_sol_associated_token_account = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!(
+                            "Missing account key: {}",
+                            "wrapped_sol_associated_token_account"
+                        )
+                    })?
+                    .clone();
+                let native_mint = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "native_mint"))?
+                    .clone();
+                let token_program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "token_program"))?
+                    .clone();
+                let associated_token_program = keys
+                    .next()
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing account key: {}", "associated_token_program")
+                    })?
+                    .clone();
+                let system_program = keys
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing account key: {}", "system_program"))?
+                    .clone();
                 let remaining = keys.cloned().collect();
                 let accounts = WrapSolAccounts {
                     from,

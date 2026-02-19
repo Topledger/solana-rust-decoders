@@ -105,8 +105,9 @@ fn main() -> Result<()> {
             .map(|acc| format_ident!("{}", acc.name.as_str()))
             .collect();
         let extract = idents.iter().map(|ident| {
+            let ident_str = ident.to_string();
             quote! {
-                let #ident = keys.next().unwrap().clone();
+                let #ident = keys.next().ok_or_else(|| anyhow::anyhow!("Missing account key: {}", #ident_str))?.clone();
             }
         });
         arms.push(quote! {
