@@ -8,6 +8,52 @@
   },
   "instructions": [
     {
+      "name": "close_empty_token_account",
+      "docs": [
+        "Closes a token account if it has a zero balance"
+      ],
+      "discriminator": [
+        232,
+        75,
+        140,
+        136,
+        250,
+        78,
+        224,
+        188
+      ],
+      "accounts": [
+        {
+          "name": "token_account",
+          "docs": [
+            "The token account to close (supports both spl_token and spl_token_2022)"
+          ],
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "docs": [
+            "The authority of the token account. Must sign."
+          ],
+          "signer": true
+        },
+        {
+          "name": "destination",
+          "docs": [
+            "The account to receive the rent from closing the token account."
+          ],
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "docs": [
+            "The token program (either spl_token or spl_token_2022)"
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "close_order",
       "docs": [
         "Closes an order, returning tokens from the order vault"
@@ -302,6 +348,77 @@
             "defined": {
               "name": "FillOrderParams"
             }
+          }
+        }
+      ]
+    },
+    {
+      "name": "init_market_ledger_idempotent",
+      "docs": [
+        "Initialize a market ledger if it doesn't already exist"
+      ],
+      "discriminator": [
+        183,
+        43,
+        139,
+        79,
+        125,
+        225,
+        35,
+        159
+      ],
+      "accounts": [
+        {
+          "name": "predictions_program"
+        },
+        {
+          "name": "market_ledger"
+        },
+        {
+          "name": "market_ledger_redemption_vault"
+        },
+        {
+          "name": "market_ledger_order_vault"
+        },
+        {
+          "name": "market_ledger_reduce_yes_vault"
+        },
+        {
+          "name": "market_ledger_reduce_no_vault"
+        },
+        {
+          "name": "settlement_escrow"
+        },
+        {
+          "name": "escrow_mint"
+        },
+        {
+          "name": "market_yes_outcome_mint"
+        },
+        {
+          "name": "market_no_outcome_mint"
+        },
+        {
+          "name": "payer"
+        },
+        {
+          "name": "outcome_token_program"
+        },
+        {
+          "name": "escrow_token_program"
+        },
+        {
+          "name": "system_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "market_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
           }
         }
       ]
@@ -1352,6 +1469,21 @@
       "msg": "Leg produced less output than expected"
     },
     {
+      "code": 15026,
+      "name": "NoSettlementTokensReceived",
+      "msg": "No settlement tokens were received during the swap"
+    },
+    {
+      "code": 15027,
+      "name": "InsufficientAccountsForOpenPredictionsOrder",
+      "msg": "Insufficient accounts provided for OpenPredictionsOrder action"
+    },
+    {
+      "code": 15028,
+      "name": "InvalidTokenAccount",
+      "msg": "Invalid token account. Must be either spl_token or spl_token_2022 account"
+    },
+    {
       "code": 15999,
       "name": "InvalidInstructionData"
     }
@@ -1751,12 +1883,154 @@
                 }
               }
             ]
+          },
+          {
+            "name": "ManifestSwap",
+            "fields": [
+              {
+                "defined": {
+                  "name": "ManifestSwapOptions"
+                }
+              }
+            ]
+          },
+          {
+            "name": "BisonFiSwap",
+            "fields": [
+              {
+                "defined": {
+                  "name": "BisonFiSwapOptions"
+                }
+              }
+            ]
+          },
+          {
+            "name": "SanctumInfinitySwap",
+            "fields": [
+              {
+                "defined": {
+                  "name": "SanctumInfinitySwapOptions"
+                }
+              }
+            ]
+          },
+          {
+            "name": "SanctumInfinityLiquidity",
+            "fields": [
+              {
+                "defined": {
+                  "name": "SanctumInfinityLiquidityOptions"
+                }
+              }
+            ]
+          },
+          {
+            "name": "OpenPredictionsOrder",
+            "fields": [
+              {
+                "defined": {
+                  "name": "OpenPredictionsOrderOptions"
+                }
+              }
+            ]
+          },
+          {
+            "name": "ScorchSwap",
+            "fields": [
+              {
+                "defined": {
+                  "name": "ScorchSwapOptions"
+                }
+              }
+            ]
+          },
+          {
+            "name": "IncludeAccount"
+          },
+          {
+            "name": "StabbleWeightedSwap",
+            "fields": [
+              {
+                "defined": {
+                  "name": "StabbleWeightedSwapOptions"
+                }
+              }
+            ]
+          },
+          {
+            "name": "VertigoSwap",
+            "fields": [
+              {
+                "defined": {
+                  "name": "VertigoSwapOptions"
+                }
+              }
+            ]
+          },
+          {
+            "name": "SetMinimumLegOutputs",
+            "fields": [
+              {
+                "defined": {
+                  "name": "SetMinimumLegOutputsOptions"
+                }
+              }
+            ]
+          },
+          {
+            "name": "SetMinimumLegPrices",
+            "fields": [
+              {
+                "defined": {
+                  "name": "SetMinimumLegPricesOptions"
+                }
+              }
+            ]
+          },
+          {
+            "name": "SetSponsor"
+          },
+          {
+            "name": "WrapSol",
+            "fields": [
+              {
+                "defined": {
+                  "name": "WrapSolOptions"
+                }
+              }
+            ]
+          },
+          {
+            "name": "UnwrapSol"
           }
         ]
       }
     },
     {
       "name": "AlphaQSwapOptions",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "orchestrator_flags",
+            "docs": [
+              "Optional flags for the swap"
+            ],
+            "type": {
+              "defined": {
+                "name": "OrchestratorFlags"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "BisonFiSwapOptions",
       "type": {
         "kind": "struct",
         "fields": [
@@ -2058,7 +2332,46 @@
       }
     },
     {
+      "name": "LegPrice",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "output_atoms_per_input_token",
+            "type": "u64"
+          },
+          {
+            "name": "input_mint_decimals",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
       "name": "LifinityV2SwapOptions",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "orchestrator_flags",
+            "docs": [
+              "Optional flags for the swap"
+            ],
+            "type": {
+              "defined": {
+                "name": "OrchestratorFlags"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ManifestSwapOptions",
       "type": {
         "kind": "struct",
         "fields": [
@@ -2353,6 +2666,44 @@
               "Flags for the order"
             ],
             "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "OpenPredictionsOrderOptions",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "nonce",
+            "type": "u64"
+          },
+          {
+            "name": "order_outcome",
+            "type": "u8"
+          },
+          {
+            "name": "quoted_out_amount",
+            "docs": [
+              "Quoted output amount for the predictions order"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "slippage_bps",
+            "docs": [
+              "Slippage for the predictions order (separate from swap slippage)"
+            ],
+            "type": "u16"
+          },
+          {
+            "name": "platform_fee_recipient_vault",
+            "type": "pubkey"
+          },
+          {
+            "name": "platform_fee_scale",
+            "type": "u16"
           }
         ]
       }
@@ -2782,6 +3133,76 @@
       }
     },
     {
+      "name": "SanctumInfinityLiquidityOptions",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "lst_value_calc_accs",
+            "type": "u8"
+          },
+          {
+            "name": "lst_index",
+            "type": "u32"
+          },
+          {
+            "name": "orchestrator_flags",
+            "docs": [
+              "Optional flags for the swap"
+            ],
+            "type": {
+              "defined": {
+                "name": "OrchestratorFlags"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "SanctumInfinitySwapOptions",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "src_lst_value_calc_accs",
+            "type": "u8"
+          },
+          {
+            "name": "dst_lst_value_calc_accs",
+            "type": "u8"
+          },
+          {
+            "name": "src_lst_index",
+            "type": "u32"
+          },
+          {
+            "name": "dst_lst_index",
+            "type": "u32"
+          },
+          {
+            "name": "orchestrator_flags",
+            "docs": [
+              "Optional flags for the swap"
+            ],
+            "type": {
+              "defined": {
+                "name": "OrchestratorFlags"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "SarosDlmmSwapOptions",
       "type": {
         "kind": "struct",
@@ -2798,6 +3219,71 @@
             "type": {
               "defined": {
                 "name": "OrchestratorFlags"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ScorchSwapOptions",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "id",
+            "type": "u128"
+          },
+          {
+            "name": "orchestrator_flags",
+            "docs": [
+              "Optional flags for the swap"
+            ],
+            "type": {
+              "defined": {
+                "name": "OrchestratorFlags"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "SetMinimumLegOutputsOptions",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "minimum_outputs",
+            "docs": [
+              "Minimum allowed output amount for each swap leg"
+            ],
+            "type": {
+              "vec": "u64"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "SetMinimumLegPricesOptions",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "minimum_prices",
+            "docs": [
+              "Minimum allowed price for each swap leg"
+            ],
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "LegPrice"
+                }
               }
             }
           }
@@ -2880,6 +3366,29 @@
     },
     {
       "name": "StabbleStableSwapOptions",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "orchestrator_flags",
+            "docs": [
+              "Optional flags for the swap"
+            ],
+            "type": {
+              "defined": {
+                "name": "OrchestratorFlags"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "StabbleWeightedSwapOptions",
       "type": {
         "kind": "struct",
         "fields": [
@@ -3092,6 +3601,29 @@
       }
     },
     {
+      "name": "VertigoSwapOptions",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "orchestrator_flags",
+            "docs": [
+              "Optional flags for the swap"
+            ],
+            "type": {
+              "defined": {
+                "name": "OrchestratorFlags"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "WhirlpoolsSwapOptions",
       "type": {
         "kind": "struct",
@@ -3141,6 +3673,18 @@
                 "name": "OrchestratorFlags"
               }
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "WrapSolOptions",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "lamports",
+            "type": "u64"
           }
         ]
       }

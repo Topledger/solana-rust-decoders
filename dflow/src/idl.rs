@@ -59,9 +59,29 @@ pub mod typedefs {
         TransferFeeWithMint(TransferFeeOptions),
         RecordId(RecordIdOptions),
         RecordId2(RecordId2Options),
+        ManifestSwap(ManifestSwapOptions),
+        BisonFiSwap(BisonFiSwapOptions),
+        SanctumInfinitySwap(SanctumInfinitySwapOptions),
+        SanctumInfinityLiquidity(SanctumInfinityLiquidityOptions),
+        OpenPredictionsOrder(OpenPredictionsOrderOptions),
+        ScorchSwap(ScorchSwapOptions),
+        IncludeAccount,
+        StabbleWeightedSwap(StabbleWeightedSwapOptions),
+        VertigoSwap(VertigoSwapOptions),
+        SetMinimumLegOutputs(SetMinimumLegOutputsOptions),
+        SetMinimumLegPrices(SetMinimumLegPricesOptions),
+        SetSponsor,
+        WrapSol(WrapSolOptions),
+        UnwrapSol,
     }
     #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
     pub struct AlphaQSwapOptions {
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub amount: u64,
+        pub orchestrator_flags: OrchestratorFlags,
+    }
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    pub struct BisonFiSwapOptions {
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount: u64,
         pub orchestrator_flags: OrchestratorFlags,
@@ -132,7 +152,19 @@ pub mod typedefs {
         pub orchestrator_flags: OrchestratorFlags,
     }
     #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    pub struct LegPrice {
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub output_atoms_per_input_token: u64,
+        pub input_mint_decimals: u8,
+    }
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
     pub struct LifinityV2SwapOptions {
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub amount: u64,
+        pub orchestrator_flags: OrchestratorFlags,
+    }
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    pub struct ManifestSwapOptions {
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount: u64,
         pub orchestrator_flags: OrchestratorFlags,
@@ -209,6 +241,18 @@ pub mod typedefs {
         #[serde(with = "pubkey_serde")]
         pub closer: Pubkey,
         pub flags: u8,
+    }
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    pub struct OpenPredictionsOrderOptions {
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub nonce: u64,
+        pub order_outcome: u8,
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub quoted_out_amount: u64,
+        pub slippage_bps: u16,
+        #[serde(with = "pubkey_serde")]
+        pub platform_fee_recipient_vault: Pubkey,
+        pub platform_fee_scale: u16,
     }
     #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
     pub struct OrchestratorFlags {
@@ -319,10 +363,44 @@ pub mod typedefs {
         pub orchestrator_flags: OrchestratorFlags,
     }
     #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    pub struct SanctumInfinityLiquidityOptions {
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub amount: u64,
+        pub lst_value_calc_accs: u8,
+        pub lst_index: u32,
+        pub orchestrator_flags: OrchestratorFlags,
+    }
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    pub struct SanctumInfinitySwapOptions {
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub amount: u64,
+        pub src_lst_value_calc_accs: u8,
+        pub dst_lst_value_calc_accs: u8,
+        pub src_lst_index: u32,
+        pub dst_lst_index: u32,
+        pub orchestrator_flags: OrchestratorFlags,
+    }
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
     pub struct SarosDlmmSwapOptions {
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount: u64,
         pub orchestrator_flags: OrchestratorFlags,
+    }
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    pub struct ScorchSwapOptions {
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub amount: u64,
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub id: u128,
+        pub orchestrator_flags: OrchestratorFlags,
+    }
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Debug, Default)]
+    pub struct SetMinimumLegOutputsOptions {
+        pub minimum_outputs: Vec<u64>,
+    }
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Debug, Default)]
+    pub struct SetMinimumLegPricesOptions {
+        pub minimum_prices: Vec<LegPrice>,
     }
     #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Debug, Copy)]
     pub enum Side {
@@ -352,6 +430,12 @@ pub mod typedefs {
     }
     #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
     pub struct StabbleStableSwapOptions {
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub amount: u64,
+        pub orchestrator_flags: OrchestratorFlags,
+    }
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    pub struct StabbleWeightedSwapOptions {
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount: u64,
         pub orchestrator_flags: OrchestratorFlags,
@@ -406,6 +490,12 @@ pub mod typedefs {
         pub amount: u64,
     }
     #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    pub struct VertigoSwapOptions {
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub amount: u64,
+        pub orchestrator_flags: OrchestratorFlags,
+    }
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
     pub struct WhirlpoolsSwapOptions {
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount: u64,
@@ -420,6 +510,11 @@ pub mod typedefs {
         pub orchestrator_flags: OrchestratorFlags,
     }
     #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+    pub struct WrapSolOptions {
+        #[serde(serialize_with = "crate::serialize_to_string")]
+        pub lamports: u64,
+    }
+    #[derive(Serialize, AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
     pub struct ZeroFiSwapOptions {
         #[serde(serialize_with = "crate::serialize_to_string")]
         pub amount: u64,
@@ -428,6 +523,14 @@ pub mod typedefs {
 }
 pub mod accounts_data {
     use serde::Serialize;
+    #[derive(Debug, Serialize)]
+    pub struct CloseEmptyTokenAccountAccounts {
+        pub token_account: String,
+        pub authority: String,
+        pub destination: String,
+        pub token_program: String,
+        pub remaining: Vec<String>,
+    }
     #[derive(Debug, Serialize)]
     pub struct CloseOrderAccounts {
         pub order: String,
@@ -468,6 +571,24 @@ pub mod accounts_data {
         pub system_program: String,
         pub event_authority: String,
         pub program: String,
+        pub remaining: Vec<String>,
+    }
+    #[derive(Debug, Serialize)]
+    pub struct InitMarketLedgerIdempotentAccounts {
+        pub predictions_program: String,
+        pub market_ledger: String,
+        pub market_ledger_redemption_vault: String,
+        pub market_ledger_order_vault: String,
+        pub market_ledger_reduce_yes_vault: String,
+        pub market_ledger_reduce_no_vault: String,
+        pub settlement_escrow: String,
+        pub escrow_mint: String,
+        pub market_yes_outcome_mint: String,
+        pub market_no_outcome_mint: String,
+        pub payer: String,
+        pub outcome_token_program: String,
+        pub escrow_token_program: String,
+        pub system_program: String,
         pub remaining: Vec<String>,
     }
     #[derive(Debug, Serialize)]
@@ -608,12 +729,18 @@ pub mod ix_data {
     use crate::pubkey_serializer::pubkey_serde_u32;
     use serde::Serialize;
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct CloseEmptyTokenAccountArgs {}
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct CloseOrderArgs {}
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct CreateReferralTokenAccountIdempotentArgs {}
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct FillOrderArgs {
         pub params: FillOrderParams,
+    }
+    #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
+    pub struct InitMarketLedgerIdempotentArgs {
+        pub market_id: [u8; 32usize],
     }
     #[derive(:: borsh :: BorshDeserialize, Debug, Serialize)]
     pub struct OpenOrderArgs {
@@ -669,6 +796,10 @@ pub mod ix_data {
 #[derive(Debug, Serialize)]
 #[serde(tag = "instruction_type")]
 pub enum Instruction {
+    CloseEmptyTokenAccount {
+        accounts: CloseEmptyTokenAccountAccounts,
+        args: CloseEmptyTokenAccountArgs,
+    },
     CloseOrder {
         accounts: CloseOrderAccounts,
         args: CloseOrderArgs,
@@ -680,6 +811,10 @@ pub enum Instruction {
     FillOrder {
         accounts: FillOrderAccounts,
         args: FillOrderArgs,
+    },
+    InitMarketLedgerIdempotent {
+        accounts: InitMarketLedgerIdempotentAccounts,
+        args: InitMarketLedgerIdempotentArgs,
     },
     OpenOrder {
         accounts: OpenOrderAccounts,
@@ -738,6 +873,24 @@ impl Instruction {
         let (disc_slice, rest) = data.split_at(8);
         let disc: [u8; 8] = disc_slice.try_into().unwrap();
         match disc {
+            [232u8, 75u8, 140u8, 136u8, 250u8, 78u8, 224u8, 188u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = CloseEmptyTokenAccountArgs::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let token_account = keys.next().unwrap().clone();
+                let authority = keys.next().unwrap().clone();
+                let destination = keys.next().unwrap().clone();
+                let token_program = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = CloseEmptyTokenAccountAccounts {
+                    token_account,
+                    authority,
+                    destination,
+                    token_program,
+                    remaining,
+                };
+                return Ok(Instruction::CloseEmptyTokenAccount { accounts, args });
+            }
             [90u8, 103u8, 209u8, 28u8, 7u8, 63u8, 168u8, 4u8] => {
                 let mut rdr: &[u8] = rest;
                 let args = CloseOrderArgs::deserialize(&mut rdr)?;
@@ -827,6 +980,44 @@ impl Instruction {
                     remaining,
                 };
                 return Ok(Instruction::FillOrder { accounts, args });
+            }
+            [183u8, 43u8, 139u8, 79u8, 125u8, 225u8, 35u8, 159u8] => {
+                let mut rdr: &[u8] = rest;
+                let args = InitMarketLedgerIdempotentArgs::deserialize(&mut rdr)?;
+                let mut keys = account_keys.iter();
+                let predictions_program = keys.next().unwrap().clone();
+                let market_ledger = keys.next().unwrap().clone();
+                let market_ledger_redemption_vault = keys.next().unwrap().clone();
+                let market_ledger_order_vault = keys.next().unwrap().clone();
+                let market_ledger_reduce_yes_vault = keys.next().unwrap().clone();
+                let market_ledger_reduce_no_vault = keys.next().unwrap().clone();
+                let settlement_escrow = keys.next().unwrap().clone();
+                let escrow_mint = keys.next().unwrap().clone();
+                let market_yes_outcome_mint = keys.next().unwrap().clone();
+                let market_no_outcome_mint = keys.next().unwrap().clone();
+                let payer = keys.next().unwrap().clone();
+                let outcome_token_program = keys.next().unwrap().clone();
+                let escrow_token_program = keys.next().unwrap().clone();
+                let system_program = keys.next().unwrap().clone();
+                let remaining = keys.cloned().collect();
+                let accounts = InitMarketLedgerIdempotentAccounts {
+                    predictions_program,
+                    market_ledger,
+                    market_ledger_redemption_vault,
+                    market_ledger_order_vault,
+                    market_ledger_reduce_yes_vault,
+                    market_ledger_reduce_no_vault,
+                    settlement_escrow,
+                    escrow_mint,
+                    market_yes_outcome_mint,
+                    market_no_outcome_mint,
+                    payer,
+                    outcome_token_program,
+                    escrow_token_program,
+                    system_program,
+                    remaining,
+                };
+                return Ok(Instruction::InitMarketLedgerIdempotent { accounts, args });
             }
             [206u8, 88u8, 88u8, 143u8, 38u8, 136u8, 50u8, 224u8] => {
                 let mut rdr: &[u8] = rest;
