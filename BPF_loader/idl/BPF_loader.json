@@ -1,0 +1,102 @@
+{
+  "version": "0.1.0",
+  "name": "bpf_loader_upgradeable",
+  "docs": [
+    "Unofficial IDL for Solana's native BPF Upgradeable Loader.",
+    "Instruction shapes and account lists derived from the Solana SDK."
+  ],
+  "instructions": [
+    {
+      "name": "initializeBuffer",
+      "accounts": [
+        { "name": "buffer", "isMut": true, "isSigner": false },
+        { "name": "authority", "isMut": false, "isSigner": false, "isOptional": true }
+      ],
+      "args": []
+    },
+    {
+      "name": "write",
+      "accounts": [
+        { "name": "buffer", "isMut": true, "isSigner": false },
+        { "name": "authority", "isMut": false, "isSigner": true }
+      ],
+      "args": [
+        { "name": "offset", "type": "u32" },
+        { "name": "bytes",  "type": "bytes" }
+      ]
+    },
+    {
+      "name": "deployWithMaxDataLen",
+      "accounts": [
+        { "name": "payer",         "isMut": false, "isSigner": true  },
+        { "name": "programData",   "isMut": true,  "isSigner": false },
+        { "name": "program",       "isMut": true,  "isSigner": false },
+        { "name": "buffer",        "isMut": true,  "isSigner": false },
+        { "name": "rent",          "isMut": false, "isSigner": false },
+        { "name": "clock",         "isMut": false, "isSigner": false },
+        { "name": "systemProgram", "isMut": false, "isSigner": false },
+        { "name": "authority",     "isMut": false, "isSigner": true  }
+      ],
+      "args": [
+        { "name": "maxDataLen", "type": "u64" }
+      ]
+    },
+    {
+      "name": "upgrade",
+      "accounts": [
+        { "name": "programData", "isMut": true,  "isSigner": false },
+        { "name": "program",     "isMut": true,  "isSigner": false },
+        { "name": "buffer",      "isMut": true,  "isSigner": false },
+        { "name": "spill",       "isMut": true,  "isSigner": false },
+        { "name": "rent",        "isMut": false, "isSigner": false },
+        { "name": "clock",       "isMut": false, "isSigner": false },
+        { "name": "authority",   "isMut": false, "isSigner": true  }
+      ],
+      "args": []
+    },
+    {
+      "name": "setAuthority",
+      "accounts": [
+        { "name": "target",           "isMut": true,  "isSigner": false },
+        { "name": "currentAuthority", "isMut": false, "isSigner": true  },
+        { "name": "newAuthority",     "isMut": false, "isSigner": false, "isOptional": true }
+      ],
+      "args": []
+    },
+    {
+      "name": "close",
+      "accounts": [
+        { "name": "account",     "isMut": true,  "isSigner": false },
+        { "name": "recipient",   "isMut": true,  "isSigner": false },
+        { "name": "authority",   "isMut": false, "isSigner": true,  "isOptional": true },
+        { "name": "program",     "isMut": true,  "isSigner": false, "isOptional": true }
+      ],
+      "args": []
+    },
+    {
+      "name": "extendProgram",
+      "accounts": [
+        { "name": "programData",   "isMut": true,  "isSigner": false },
+        { "name": "program",       "isMut": true,  "isSigner": false },
+        { "name": "systemProgram", "isMut": false, "isSigner": false, "isOptional": true },
+        { "name": "payer",         "isMut": false, "isSigner": true,  "isOptional": true }
+      ],
+      "args": [
+        { "name": "additionalBytes", "type": "u32" }
+      ]
+    },
+    {
+      "name": "setAuthorityChecked",
+      "accounts": [
+        { "name": "target",           "isMut": true,  "isSigner": false },
+        { "name": "currentAuthority", "isMut": false, "isSigner": true  },
+        { "name": "newAuthority",     "isMut": false, "isSigner": true  }
+      ],
+      "args": []
+    }
+  ],
+  "metadata": {
+    "address": "BPFLoaderUpgradeab1e11111111111111111111111",
+    "category": "native"
+  }
+}
