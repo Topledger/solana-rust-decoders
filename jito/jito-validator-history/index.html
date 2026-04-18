@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en-US">
+
+<head>
+  <meta charset="utf-8" />
+  <title>hello-wasm example</title>
+</head>
+
+<body>
+  <script type="module">
+    import init, { parse } from "./pkg/validator_history.js";
+    init().then(() => {
+      let join_key = "5kkPihtAaNhVHmAShzyRw3vg3dQFAiEA888BmvTHU3v8nRCKQSp4j52EVapC6QRyLivuWmPWvVx9NBBShLdcMqMp_0_1";
+      let data = "Zo6VbzxQkbd";
+      let accounts = ["3agAXJk2bvTJ8VmEGMDXbt22irKjYxZ2XybCRnUontvN", 
+      "J1to1yufRnoWn81KYg1XkTWzmKjnYSnmE2VY8DGUJ9Qv", 
+      "BZP2F1L4FwCaeTPmCmfGiVJAiMFwGawo5mbLj4JFzwEd", 
+      "CRnkKQTxctQ7LHVN3yssdgJyEksBJeBrDdwZAxBtsJoZ", 
+      "STGR71TeAeycQUDKzku1GqPQdErQcTcdqxJuQmCjBu6", 
+      "nAbAXJsDjU4MML6ctFm5kB4HoXQvad2m9nhtXaxixsV", 
+      "EojrqXVLBoBbqWXaY6qLVSkMQ4a34FvgEh8uuqx5TGmS", 
+      "nAbAXJsDjU4MML6ctFm5kB4HoXQvad2m9nhtXaxixsV", 
+      "EojrqXVLBoBbqWXaY6qLVSkMQ4a34FvgEh8uuqx5TGmS", 
+      "nAbAXJsDjU4MML6ctFm5kB4HoXQvad2m9nhtXaxixsV", 
+      "EojrqXVLBoBbqWXaY6qLVSkMQ4a34FvgEh8uuqx5TGmS", 
+     ];
+      console.log(parse(data, accounts));
+    });
+  </script>
+</body>
+
+</html>
